@@ -1,17 +1,17 @@
-# CODING-STANDARDS.md — {{PROJECT_NAME}}
+# CODING-STANDARDS.md — Livwell
 # ================================================================
 # These standards are enforced by the pre-MR checklist.
 # Any change to this file must go through the normal MR process
-# with minimum {{MR_APPROVERS}} approvals.
+# with minimum 1 approvals.
 # Changes take effect immediately after merge.
 # ================================================================
 #
 # ---------------------------------------------------------------
 # LICENSE NOTICE
 # Copyright © Bizcircle Technologies Ltd. All rights reserved.
-# Licensed to: {{CUSTOMER_NAME}}
-# License Key: {{LICENSE_KEY}}
-# Installed: {{INSTALL_DATE}}
+# Licensed to: Livwell Real estate LLC
+# License Key: DUMMY-LIVWELL-001
+# Installed: 2026-05-11
 # ---------------------------------------------------------------
 
 ---
@@ -117,9 +117,9 @@
 
 | Date | Changed by | What changed | MR link |
 |---|---|---|---|
-| {{CREATED_DATE}} | {{OWNER_NAMES}} | Initial standards | — |
+| 2026-05-11 | Ankush | Initial standards | — |
 
 ---
 
-*Any change to this file requires {{MR_APPROVERS}} approvals via MR.*
-*Last updated: {{LAST_UPDATED_DATE}}*
+*Any change to this file requires 1 approvals via MR.*
+*Last updated: 2026-05-11*

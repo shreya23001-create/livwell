@@ -1,9 +1,9 @@
-# sarthy_coding_standards.md — {{PROJECT_NAME}}
+# sarthy_coding_standards.md — Livwell
 # ================================================================
 # Enforced by pre-MR checklist.
-# Changes require MR with {{MR_APPROVERS}} approvals.
+# Changes require MR with 1 approvals.
 # ================================================================
-# Licensed to: {{CUSTOMER_NAME}} | Key: {{LICENSE_KEY}}
+# Licensed to: Livwell Real estate LLC | Key: DUMMY-LIVWELL-001
 # Copyright © Bizcircle Technologies Ltd. All rights reserved.
 # ---------------------------------------------------------------
 
@@ -83,7 +83,7 @@
 ## 9. AMENDMENTS LOG
 | Date | Changed by | What changed | MR link |
 |---|---|---|---|
-| {{CREATED_DATE}} | {{OWNER_NAMES}} | Initial standards | — |
+| 2026-05-11 | Ankush | Initial standards | — |
 
 ---
-*Changes require {{MR_APPROVERS}} approvals via MR. Last updated: {{LAST_UPDATED_DATE}}*
+*Changes require 1 approvals via MR. Last updated: 2026-05-11*

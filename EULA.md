@@ -5,12 +5,12 @@
 # Company Registration: 15928217 (England & Wales)
 # ================================================================
 #
-# Licensed to: {{CUSTOMER_NAME}}
-# License Key: {{LICENSE_KEY}}
-# Installed: {{INSTALL_DATE}}
-# License Type: {{LICENSE_TYPE}}
-# Seats: {{LICENSE_SEATS}}
-# Valid Until: {{LICENSE_EXPIRY}}
+# Licensed to: Livwell Real estate LLC
+# License Key: DUMMY-LIVWELL-001
+# Installed: 2026-05-11
+# License Type: PILOT
+# Seats: 2
+# Valid Until: 2026-09-11
 # ================================================================
 
 ---
@@ -167,4 +167,4 @@ Website: sarthy.io
 *By proceeding with installation, you confirm that you have read,
 understood, and agreed to all terms of this Agreement.*
 
-*EULA Version: 1.0 | Effective: {{INSTALL_DATE}}*
+*EULA Version: 1.0 | Effective: 2026-05-11*

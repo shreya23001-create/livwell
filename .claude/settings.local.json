@@ -1,0 +1,6 @@
+{
+  "env": {
+    "GITLAB_TOKEN": "YOUR_PRIVATE_TOKEN_HERE",
+    "GITLAB_HOST": "https://goodtekies.com"
+  }
+}

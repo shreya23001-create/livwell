@@ -1,0 +1,205 @@
+/* =====================================================
+   FOOTER COMPONENT
+   ===================================================== */
+
+// ── App Download Banner ───────────────────────────────
+.ft-app-banner {
+  background: #f5f5f5;
+  text-align: center;
+  padding: 2rem 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ft-app-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 1rem;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.ft-app-badges {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ft-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #111;
+  color: #fff;
+  padding: 0.55rem 1.25rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: background 0.2s;
+  min-width: 148px;
+
+  &:hover {
+    background: #333;
+  }
+}
+
+.ft-badge-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.ft-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.ft-badge-sub {
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+
+.ft-badge-main {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+// ── Link Columns Section ──────────────────────────────
+.ft-links-section {
+  background: #fff;
+  padding: 3rem 0 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ft-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.ft-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem 3rem;
+  align-items: start;
+
+  &.ft-row--2col {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 640px;
+  }
+}
+
+.ft-divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2.5rem 0;
+}
+
+.ft-col-heading {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 1rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.ft-col-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ft-link {
+  font-size: 0.82rem;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.15s;
+  display: block;
+
+  &:hover {
+    color: #c8a84b;
+  }
+}
+
+// ── Offices Section ──────────────────────────────────
+.ft-offices-section {
+  background: #f5f3f0;
+  padding: 3rem 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ft-offices-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 2.5rem;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.ft-offices-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem 2.5rem;
+}
+
+.ft-office-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.ft-office-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+.ft-office-address {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+// ── Responsive ────────────────────────────────────────
+@media (max-width: 1024px) {
+  .ft-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ft-offices-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+
+  .ft-row,
+  .ft-row.ft-row--2col {
+    grid-template-columns: 1fr;
+  }
+
+  .ft-offices-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ft-bottom-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ft-bottom-links {
+    justify-content: center;
+  }
+
+  .ft-socials {
+    justify-content: center;
+  }
+}

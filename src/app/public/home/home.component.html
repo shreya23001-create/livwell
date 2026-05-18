@@ -1,0 +1,1011 @@
+<!-- ============================================================
+     HERO SECTION — Livwell Premium Layout
+     ============================================================ -->
+<section class="hero-section">
+
+  <!-- Background slides -->
+  <div class="hero-bg">
+    <div *ngFor="let slide of heroSlides; let i = index"
+         class="hero-slide"
+         [class.active]="activeSlide() === i"
+         [style.background-image]="'url(' + slide.image + ')'">
+    </div>
+    <div class="hero-overlay"></div>
+  </div>
+
+  <!-- Slide counter — right edge -->
+  <div class="hero-counter">
+    <span class="hero-counter-current">{{ (activeSlide() + 1).toString().padStart(2, '0') }}</span>
+    <div class="hero-counter-track">
+      <div class="hero-counter-fill"
+           [style.height.%]="((activeSlide() + 1) / heroSlides.length) * 100"></div>
+    </div>
+    <span class="hero-counter-total">{{ heroSlides.length.toString().padStart(2, '0') }}</span>
+  </div>
+
+  <!-- Slide nav arrows — right edge -->
+  <div class="hero-nav">
+    <button class="hero-nav-btn" (click)="activeSlide.set((activeSlide() - 1 + heroSlides.length) % heroSlides.length)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"/></svg>
+    </button>
+    <button class="hero-nav-btn" (click)="activeSlide.set((activeSlide() + 1) % heroSlides.length)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg>
+    </button>
+  </div>
+
+  <!-- CENTER: headline + search -->
+  <div class="hero-center">
+
+    <!-- Award badge -->
+    <div class="hero-badge">
+      <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+        <polygon points="24,4 29,18 44,18 32,28 37,42 24,33 11,42 16,28 4,18 19,18" fill="#c8a84b"/>
+      </svg>
+      <span>UAE's Most Trusted Real Estate Agency</span>
+    </div>
+
+    <!-- Main headline -->
+    <h1 class="hero-headline">
+      Find Your <span class="hero-headline-gold">Dream</span> Property in Dubai
+    </h1>
+    <p class="hero-subline">Over 2,500 premium listings. Expert agents. End-to-end support.</p>
+
+    <!-- Tab + Search card -->
+    <div class="hero-search-card">
+      <!-- Tabs -->
+      <div class="hero-tabs">
+        <button *ngFor="let tab of searchTabs"
+                class="hero-tab"
+                [class.active]="searchType() === tab.value"
+                (click)="searchType.set(tab.value)">
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <!-- Search row -->
+      <div class="hero-search-row">
+        <div class="hero-search-field">
+          <svg class="hero-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text"
+                 class="hero-search-input"
+                 placeholder="Search area, community or project…"
+                 [(ngModel)]="searchQuery" />
+        </div>
+        <button class="hero-search-btn" routerLink="/properties">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/>
+          </svg>
+          Search
+        </button>
+      </div>
+
+      <!-- Quick chips -->
+      <div class="hero-chips">
+        <span class="hero-chip-label">Popular:</span>
+        <a routerLink="/properties" class="hero-chip">Apartments</a>
+        <a routerLink="/properties" class="hero-chip">Villas</a>
+        <a routerLink="/properties" class="hero-chip">Townhouses</a>
+        <a routerLink="/properties" class="hero-chip">Off-Plan</a>
+        <a routerLink="/properties" class="hero-chip">Palm Jumeirah</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM: slide info left + stats strip right -->
+  <div class="hero-bottom" *ngIf="heroSlides[activeSlide()] as slide">
+
+    <!-- Slide info -->
+    <div class="hero-project">
+      <div class="hero-location-tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+        </svg>
+        {{ slide.location }}
+      </div>
+      <h2 class="hero-project-name">{{ slide.project }}</h2>
+      <div class="hero-project-pills">
+        <span class="hero-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+          From {{ slide.startingPrice }}
+        </span>
+        <span class="hero-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          {{ slide.paymentPlan }} Plan
+        </span>
+        <a routerLink="/properties" class="hero-pill hero-pill-gold">
+          Explore →
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="hero-stats-strip">
+      <div class="hero-stat-item">
+        <span class="hero-stat-num">2,500<sup>+</sup></span>
+        <span class="hero-stat-lbl">Listings</span>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat-item">
+        <span class="hero-stat-num">950<sup>+</sup></span>
+        <span class="hero-stat-lbl">Agents</span>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat-item">
+        <span class="hero-stat-num">17<sup>yrs</sup></span>
+        <span class="hero-stat-lbl">Experience</span>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat-item">
+        <span class="hero-stat-num">98<sup>%</sup></span>
+        <span class="hero-stat-lbl">Satisfaction</span>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ============================================================
+     TRUST BAND — exact FAM Properties layout
+     ============================================================ -->
+<section class="trust-band">
+
+  <!-- Black top block: stats + tagline + award badge -->
+  <div class="trust-black">
+    <div class="container-custom">
+      <div class="trust-black-inner">
+
+        <!-- Stats + tagline (left/center) -->
+        <div class="trust-left">
+          <div class="trust-stats-row">
+            <div class="trust-stat">
+              <span class="trust-num">950+</span>
+              <span class="trust-lbl">Agents</span>
+            </div>
+            <div class="trust-stat">
+              <span class="trust-num">17 Years</span>
+              <span class="trust-lbl">of Experience</span>
+            </div>
+            <div class="trust-stat">
+              <span class="trust-num">25 Offices</span>
+              <span class="trust-lbl">across Dubai</span>
+            </div>
+          </div>
+          <p class="trust-tagline">Every real estate decision. One trusted partner.</p>
+        </div>
+
+        <!-- Arabian Property Awards badge (right) -->
+        <div class="trust-award">
+          <img src="images/arabian-property.png" alt="Arabian Property Awards Winner 2025-2026" class="award-img">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Google reviews card — overlaps black/white boundary -->
+    <div class="trust-google-wrap">
+      <div class="trust-google-card">
+        <!-- Left: score + stars + laurel -->
+        <div class="google-left">
+          <div class="google-laurel-wrap">
+            <svg class="laurel-left" width="28" height="40" viewBox="0 0 28 40" fill="none">
+              <path d="M24 38 C20 30, 8 26, 6 14 C10 18, 14 20, 18 16 C16 24, 20 30, 24 38Z" fill="#9e9e9e"/>
+              <path d="M20 32 C16 26, 6 22, 6 10 C10 14, 12 18, 16 14 C14 22, 16 28, 20 32Z" fill="#bdbdbd"/>
+            </svg>
+            <div class="google-score-block">
+              <span class="google-score">4.9</span>
+              <div class="google-stars">
+                <svg *ngFor="let s of [0,1,2,3,4]" width="16" height="16" viewBox="0 0 24 24" fill="#f5a623"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+              </div>
+            </div>
+            <svg class="laurel-right" width="28" height="40" viewBox="0 0 28 40" fill="none">
+              <path d="M4 38 C8 30, 20 26, 22 14 C18 18, 14 20, 10 16 C12 24, 8 30, 4 38Z" fill="#9e9e9e"/>
+              <path d="M8 32 C12 26, 22 22, 22 10 C18 14, 16 18, 12 14 C14 22, 12 28, 8 32Z" fill="#bdbdbd"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Center: tagline -->
+        <div class="google-center">
+          <p class="google-tagline">It <span class="g-orange">Matters</span> which <span class="g-orange">Agency</span> you <span class="g-orange">Trust</span></p>
+        </div>
+        <!-- Right: Google logo + count -->
+        <div class="google-right">
+          <svg width="72" height="24" viewBox="0 0 272 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#EA4335"/>
+            <path d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#FBBC05"/>
+            <path d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.67-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.26zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z" fill="#4285F4"/>
+            <path d="M225 3v65h-9.5V3h9.5z" fill="#34A853"/>
+            <path d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z" fill="#EA4335"/>
+            <path d="M35.29 41.41V32h31.31c.31 1.6.47 3.49.47 5.53 0 6.87-1.88 15.36-7.96 21.44-5.92 6.16-13.49 9.45-23.52 9.45C16.26 68.42 0 52.62 0 33.29 0 13.96 16.26 0 35.29 0c10.26 0 17.58 4.03 23.08 9.28l-6.48 6.48c-3.94-3.69-9.28-6.56-16.6-6.56-13.55 0-24.14 10.91-24.14 24.09s10.59 24.09 24.14 24.09c8.79 0 13.8-3.53 17.02-6.75 2.61-2.61 4.33-6.34 5.01-11.44H35.29z" fill="#4285F4"/>
+          </svg>
+          <div class="google-count-block">
+            <span class="google-count">14,000+</span>
+            <span class="google-reviews-lbl">Reviews</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- White bottom block: developer logos -->
+  <div class="trust-white">
+    <div class="container-custom">
+      <h3 class="trust-dev-heading">Trusted Partner of the Most Prominent Developers</h3>
+      <div class="trust-dev-logos">
+        <div class="dev-logo-box">
+          <img src="images/emaar.png" alt="Emaar" class="dev-logo-img">
+        </div>
+        <div class="dev-logo-box">
+          <img src="images/binghatti.png" alt="Binghatti" class="dev-logo-img">
+        </div>
+        <div class="dev-logo-box">
+          <img src="images/dubai_property.png" alt="Dubai Properties" class="dev-logo-img">
+        </div>
+        <div class="dev-logo-box">
+          <img src="images/damac.png" alt="DAMAC" class="dev-logo-img">
+        </div>
+        <div class="dev-logo-box">
+          <img src="images/meraas.png" alt="Meraas" class="dev-logo-img">
+        </div>
+        <div class="dev-logo-box">
+          <img src="images/azizi.png" alt="Azizi" class="dev-logo-img">
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============================================================
+     LATEST LAUNCHED PROJECTS — FAM style horizontal scroll
+     ============================================================ -->
+<section class="latest-projects-section">
+  <div class="container-custom">
+
+    <!-- Header row -->
+    <div class="lp-header">
+      <h2 class="lp-title">Latest Launched Projects in Dubai</h2>
+      <a routerLink="/off-plan" class="lp-view-all">
+        VIEW ALL PROJECTS
+        <span class="lp-view-all-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </span>
+      </a>
+    </div>
+
+    <!-- Scrollable cards track -->
+    <div class="lp-track-wrap">
+      <div class="lp-track" #lpTrack>
+        <div *ngFor="let p of latestProjects" class="lp-card">
+          <!-- Image -->
+          <div class="lp-img-wrap">
+            <img [src]="p.image" [alt]="p.name" class="lp-img">
+            <div class="lp-payment-badge">{{ p.paymentPlan }} Payment Plan</div>
+            <div *ngIf="p.badge" class="lp-hot-dot"></div>
+          </div>
+          <!-- Info -->
+          <div class="lp-info">
+            <h3 class="lp-name">{{ p.name }}</h3>
+            <div class="lp-meta-row">
+              <span class="lp-meta">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ p.location }}
+              </span>
+            </div>
+            <div class="lp-divider"></div>
+            <div class="lp-meta-row">
+              <span class="lp-meta">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                {{ p.developer }}
+              </span>
+            </div>
+            <div class="lp-divider"></div>
+            <p class="lp-handover">Handover in {{ p.handover }}</p>
+            <a [routerLink]="['/properties']" class="lp-price-btn">from {{ p.startingPrice }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav arrows -->
+    <div class="lp-nav">
+      <button class="lp-nav-btn" (click)="scrollLatestProjects(-1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button class="lp-nav-btn" (click)="scrollLatestProjects(1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     GUIDES SECTION
+     ============================================================ -->
+<section class="guides-section">
+  <div class="container-custom">
+    <div class="guides-header">
+      <h2 class="guides-title">Guides</h2>
+      <a routerLink="/blog" class="lp-view-all">
+        VIEW ALL GUIDES
+        <span class="lp-view-all-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </span>
+      </a>
+    </div>
+    <div class="guides-grid">
+      <a *ngFor="let guide of guides" routerLink="/blog" class="guide-card">
+        <img [src]="guide.avatar" [alt]="guide.title" class="guide-avatar">
+        <h4 class="guide-name">{{ guide.title }}</h4>
+        <p class="guide-sub">{{ guide.subtitle }}</p>
+        <span class="guide-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     OUR TEAMS SECTION
+     ============================================================ -->
+<section class="teams-section">
+  <div class="container-custom">
+    <div class="teams-header">
+      <h2 class="guides-title">Our teams</h2>
+      <a routerLink="/agents" class="lp-view-all">
+        VIEW ALL TEAMS
+        <span class="lp-view-all-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </span>
+      </a>
+    </div>
+
+    <div class="teams-body">
+      <!-- Left: scrollable team name list -->
+      <div class="teams-list">
+        <button *ngFor="let team of teamAreas; let i = index"
+                class="team-name-btn"
+                [class.active]="activeTeam() === i"
+                (click)="activeTeam.set(i)">
+          {{ team.area }}
+        </button>
+      </div>
+
+      <!-- Right: infinite carousel -->
+      <div class="teams-cards-wrap">
+        <div class="teams-carousel-viewport">
+          <div class="teams-carousel-track">
+            <!-- Original set -->
+            <ng-container *ngFor="let agent of teamAreas[activeTeam()].agents">
+              <div class="team-agent-card">
+                <div class="team-agent-img-wrap">
+                  <img [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
+                  <div class="team-agent-info">
+                    <p class="team-agent-name">{{ agent.name }}</p>
+                    <p class="team-agent-role">{{ agent.role }}</p>
+                  </div>
+                  <a href="https://wa.me/971000000000" class="team-wa-btn" target="_blank" rel="noopener">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                  </a>
+                </div>
+              </div>
+            </ng-container>
+            <!-- Duplicate set for seamless loop -->
+            <ng-container *ngFor="let agent of teamAreas[activeTeam()].agents">
+              <div class="team-agent-card" aria-hidden="true">
+                <div class="team-agent-img-wrap">
+                  <img [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
+                  <div class="team-agent-info">
+                    <p class="team-agent-name">{{ agent.name }}</p>
+                    <p class="team-agent-role">{{ agent.role }}</p>
+                  </div>
+                  <a href="https://wa.me/971000000000" class="team-wa-btn" target="_blank" rel="noopener">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                  </a>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MOST TRENDING PROJECTS
+     ============================================================ -->
+<section class="trending-section">
+  <div class="container-custom">
+
+    <!-- Header row: title + tabs + arrows -->
+    <div class="trending-header">
+      <h2 class="trending-title">Most Trending Projects in Dubai</h2>
+    </div>
+    <div class="trending-controls">
+      <div class="trending-tabs">
+        <button *ngFor="let tab of trendingTabs"
+                class="trending-tab"
+                [class.active]="activeTrendingTab() === tab.value"
+                (click)="activeTrendingTab.set(tab.value)">
+          {{ tab.label }}
+        </button>
+      </div>
+      <div class="trending-arrows">
+        <button class="lp-nav-btn trending-btn" (click)="scrollTrending(-1)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button class="lp-nav-btn trending-btn" (click)="scrollTrending(1)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Cards track -->
+    <div class="trending-track" #trendingTrack>
+      <div *ngFor="let p of filteredTrendingProjects()" class="trending-card">
+        <!-- Image -->
+        <div class="trending-img-wrap">
+          <img [src]="p.image" [alt]="p.name" class="trending-img">
+          <span class="trending-badge" [class.badge-red]="p.badge === 'Ready'" [class.badge-dark]="p.badge !== 'Ready'">
+            {{ p.badge }}
+          </span>
+        </div>
+        <!-- Info below image -->
+        <div class="trending-info">
+          <div class="trending-price">
+            <span class="trending-from">From AED</span>
+            <span class="trending-amount">{{ p.price }}</span>
+          </div>
+          <div class="trending-meta">
+            <span class="trending-meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              {{ p.name }}
+            </span>
+            <span class="trending-meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              {{ p.developer }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: ALL LUXURY button -->
+    <div class="trending-footer">
+      <a routerLink="/properties" class="trending-all-btn">
+        ALL {{ activeTrendingTab() | uppercase }}
+        <span class="lp-view-all-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </span>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURED PROPERTIES
+     ============================================================ -->
+<section class="section-padding">
+  <div class="container-custom">
+    <div class="section-header animate-on-scroll">
+      <div class="section-label">Our Selection</div>
+      <h2 class="section-title">Featured Properties</h2>
+      <p class="section-desc">Handpicked luxury properties across the UAE's most prestigious communities</p>
+    </div>
+
+    <div class="properties-grid">
+      <a *ngFor="let property of featuredProperties; let i = index"
+         [routerLink]="['/properties', property.id]"
+         class="property-card animate-on-scroll"
+         [class]="'delay-' + ((i % 3) * 100 + 100)">
+
+        <!-- Full image fills the card -->
+        <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy">
+
+        <!-- Gradient overlay darkens bottom -->
+        <div class="property-overlay"></div>
+
+        <!-- Top row: badge + type + favourite -->
+        <div class="property-top">
+          <div class="property-badges">
+            <span *ngIf="property.badge" class="property-badge" [ngClass]="'badge-' + property.badge.toLowerCase()">
+              {{ property.badge }}
+            </span>
+            <span class="property-type">{{ property.type }}</span>
+          </div>
+          <button class="property-favorite" (click)="$event.preventDefault()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Bottom: all text info overlaid on image — FAM style -->
+        <div class="property-info">
+          <div class="property-price">{{ property.price }}</div>
+          <h3 class="property-title">{{ property.title }}</h3>
+          <div class="property-location">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+            </svg>
+            {{ property.location }}
+          </div>
+          <div class="property-specs">
+            <span class="spec">{{ property.beds }} Beds</span>
+            <span class="spec-dot">·</span>
+            <span class="spec">{{ property.baths }} Baths</span>
+            <span class="spec-dot">·</span>
+            <span class="spec">{{ property.sqft }}</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="text-center mt-12 animate-on-scroll">
+      <a routerLink="/properties" class="btn-primary">
+        View All Properties
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURED OFF-PLAN PROJECTS
+     ============================================================ -->
+<section class="offplan-section section-padding">
+  <div class="container-custom">
+    <div class="section-header animate-on-scroll">
+      <div class="section-label">New Developments</div>
+      <h2 class="section-title">Featured Off-Plan Projects</h2>
+      <p class="section-desc">Invest early in Dubai's most anticipated developments and secure the best prices</p>
+    </div>
+
+    <div class="offplan-grid">
+      <div *ngFor="let project of offPlanProjects; let i = index"
+           class="offplan-card animate-on-scroll"
+           [class]="'delay-' + (i * 150 + 100)">
+        <div class="offplan-img-wrap">
+          <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy">
+          <div class="offplan-overlay"></div>
+          <div class="offplan-top-badges">
+            <span class="offplan-badge">{{ project.badge }}</span>
+            <span class="offplan-type-badge">{{ project.type }}</span>
+          </div>
+          <div class="offplan-roi-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+            </svg>
+            {{ project.roi }}
+          </div>
+        </div>
+
+        <div class="offplan-body">
+          <div class="offplan-developer">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+            </svg>
+            {{ project.developer }}
+          </div>
+          <h3 class="offplan-name">{{ project.name }}</h3>
+          <div class="offplan-location">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+            </svg>
+            {{ project.location }}
+          </div>
+          <div class="offplan-details">
+            <div class="offplan-detail-item">
+              <span class="offplan-detail-label">Starting From</span>
+              <span class="offplan-detail-value">{{ project.startingPrice }}</span>
+            </div>
+            <div class="offplan-detail-divider"></div>
+            <div class="offplan-detail-item">
+              <span class="offplan-detail-label">Completion</span>
+              <span class="offplan-detail-value">{{ project.completion }}</span>
+            </div>
+          </div>
+          <div class="offplan-actions">
+            <a [routerLink]="['/off-plan', project.id]" class="offplan-cta">
+              View Project
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
+            <a routerLink="/contact" class="offplan-enquire">Enquire Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="offplan-cta-banner animate-on-scroll">
+      <div class="offplan-banner-content">
+        <div class="offplan-banner-icon">🏗️</div>
+        <div>
+          <div class="offplan-banner-title">Explore All Off-Plan Projects</div>
+          <div class="offplan-banner-sub">Get exclusive pre-launch prices and flexible payment plans</div>
+        </div>
+      </div>
+      <a routerLink="/off-plan" class="btn-gold">
+        View All Projects
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROPERTY TYPES
+     ============================================================ -->
+<section class="property-types-section">
+  <div class="container-custom">
+    <div class="section-header animate-on-scroll">
+      <div class="section-label">Browse by Category</div>
+      <h2 class="section-title">Property Types</h2>
+    </div>
+
+    <div class="types-grid">
+      <a *ngFor="let type of propertyTypes; let i = index"
+         routerLink="/properties"
+         class="type-card animate-on-scroll"
+         [class]="'delay-' + ((i % 3) * 100 + 100)">
+        <div class="type-icon">{{ type.icon }}</div>
+        <div class="type-label">{{ type.label }}</div>
+        <div class="type-count">{{ type.count }}</div>
+        <div class="type-arrow">→</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     WHY CHOOSE US
+     ============================================================ -->
+<section class="section-padding">
+  <div class="container-custom">
+    <div class="why-grid">
+      <div class="why-text animate-on-scroll">
+        <div class="section-label">Why Livwell</div>
+        <h2 class="section-title">Your Trusted Real Estate Partner</h2>
+        <p class="why-desc">
+          With over 15 years of expertise in the UAE property market, we combine deep local knowledge
+          with cutting-edge technology to deliver an unmatched real estate experience.
+        </p>
+
+        <div class="features-list">
+          <div *ngFor="let feature of [
+            { title: 'Market Expertise', desc: 'Deep insights into UAE property trends and valuations', icon: '📊' },
+            { title: 'Verified Listings', desc: 'Every property is verified and legally compliant', icon: '✅' },
+            { title: 'Dedicated Support', desc: 'Personal agent assigned to every client', icon: '🤝' },
+            { title: 'Seamless Process', desc: 'End-to-end assistance from search to handover', icon: '🔑' }
+          ]" class="feature-item">
+            <div class="feature-icon">{{ feature.icon }}</div>
+            <div>
+              <div class="feature-title">{{ feature.title }}</div>
+              <div class="feature-desc">{{ feature.desc }}</div>
+            </div>
+          </div>
+        </div>
+
+        <a routerLink="/contact" class="btn-primary mt-8">Get Free Consultation</a>
+      </div>
+
+      <div class="why-visual animate-on-scroll delay-200">
+        <div class="why-image-grid">
+          <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80" alt="Luxury property" class="why-img why-img-main">
+          <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=400&q=80" alt="Modern interior" class="why-img why-img-sm1">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80" alt="Property exterior" class="why-img why-img-sm2">
+        </div>
+        <div class="why-badge">
+          <span class="why-badge-value">4.9★</span>
+          <span class="why-badge-label">Client Rating</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TOP AGENTS
+     ============================================================ -->
+<section class="agents-section section-padding">
+  <div class="container-custom">
+    <div class="section-header animate-on-scroll">
+      <div class="section-label">Our Experts</div>
+      <h2 class="section-title">Meet Our Top Agents</h2>
+      <p class="section-desc">Experienced professionals dedicated to finding your ideal property</p>
+    </div>
+
+    <div class="agents-grid">
+      <div *ngFor="let agent of topAgents; let i = index"
+           class="agent-card animate-on-scroll"
+           [class]="'delay-' + (i * 100 + 100)">
+        <div class="agent-avatar-wrap">
+          <img [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
+          <div class="agent-rating">
+            ★ {{ agent.rating }}
+          </div>
+        </div>
+        <h3 class="agent-name">{{ agent.name }}</h3>
+        <p class="agent-role">{{ agent.role }}</p>
+        <div class="agent-deals">{{ agent.deals }} Deals Closed</div>
+        <div class="agent-actions">
+          <a routerLink="/agents" class="agent-cta">View Profile →</a>
+          <a routerLink="/contact" class="agent-contact-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+            </svg>
+            Contact
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-12 animate-on-scroll">
+      <a routerLink="/agents" class="btn-outline">Meet All Agents</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TESTIMONIALS
+     ============================================================ -->
+<section class="testimonials-section section-padding">
+  <div class="container-custom">
+    <div class="section-header animate-on-scroll">
+      <div class="section-label">Client Stories</div>
+      <h2 class="section-title" style="color:#fff">What Our Clients Say</h2>
+    </div>
+
+    <div class="testimonial-slider animate-on-scroll">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">
+          <span *ngFor="let s of getStars(testimonials[activeTestimonial()].rating)">★</span>
+        </div>
+        <blockquote class="testimonial-text">
+          "{{ testimonials[activeTestimonial()].text }}"
+        </blockquote>
+        <div class="testimonial-author">
+          <img [src]="testimonials[activeTestimonial()].avatar"
+               [alt]="testimonials[activeTestimonial()].name"
+               class="testimonial-avatar">
+          <div>
+            <div class="testimonial-name">{{ testimonials[activeTestimonial()].name }}</div>
+            <div class="testimonial-role">{{ testimonials[activeTestimonial()].role }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-dots">
+        <button *ngFor="let t of testimonials; let i = index"
+                class="dot"
+                [class.active]="activeTestimonial() === i"
+                (click)="setTestimonial(i)">
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     REAL ESTATE NEWS
+     ============================================================ -->
+<section class="news-section section-padding">
+  <div class="container-custom">
+    <div class="news-header animate-on-scroll">
+      <div>
+        <div class="section-label">Stay Informed</div>
+        <h2 class="section-title">Real Estate News &amp; Insights</h2>
+        <p class="section-desc" style="text-align:left;margin:0">
+          Expert analysis, market updates, and lifestyle guides from our property specialists.
+        </p>
+      </div>
+      <a routerLink="/blog" class="btn-outline news-all-btn">View All Articles →</a>
+    </div>
+
+    <div class="news-grid animate-on-scroll">
+      <!-- Featured article -->
+      <a [routerLink]="['/blog', featuredArticle.id]" class="news-featured">
+        <div class="news-featured-img-wrap">
+          <img [src]="featuredArticle.image" [alt]="featuredArticle.title" class="news-featured-img" loading="lazy">
+          <div class="news-img-overlay"></div>
+          <span class="news-category-badge">{{ featuredArticle.category }}</span>
+        </div>
+        <div class="news-featured-body">
+          <h3 class="news-featured-title">{{ featuredArticle.title }}</h3>
+          <p class="news-featured-excerpt">{{ featuredArticle.excerpt }}</p>
+          <div class="news-meta">
+            <span class="news-author">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+              {{ featuredArticle.author }}
+            </span>
+            <span class="news-dot">·</span>
+            <span>{{ featuredArticle.date }}</span>
+            <span class="news-dot">·</span>
+            <span>{{ featuredArticle.readTime }}</span>
+          </div>
+          <span class="news-read-more">Read Article →</span>
+        </div>
+      </a>
+
+      <!-- Side articles -->
+      <div class="news-side">
+        <a *ngFor="let article of sideArticles; let i = index"
+           [routerLink]="['/blog', article.id]"
+           class="news-card animate-on-scroll"
+           [class]="'delay-' + (i * 100 + 100)">
+          <div class="news-card-img-wrap">
+            <img [src]="article.image" [alt]="article.title" class="news-card-img" loading="lazy">
+          </div>
+          <div class="news-card-body">
+            <span class="news-card-category">{{ article.category }}</span>
+            <h4 class="news-card-title">{{ article.title }}</h4>
+            <div class="news-meta news-card-meta">
+              <span>{{ article.date }}</span>
+              <span class="news-dot">·</span>
+              <span>{{ article.readTime }}</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     NEWSLETTER SUBSCRIBE
+     ============================================================ -->
+<section class="newsletter-section">
+  <div class="container-custom">
+    <div class="newsletter-card animate-on-scroll">
+      <!-- Decorative blobs -->
+      <div class="nl-blob nl-blob-1"></div>
+      <div class="nl-blob nl-blob-2"></div>
+
+      <div class="newsletter-content">
+        <div class="nl-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="nl-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+          </svg>
+        </div>
+
+        <div class="nl-text">
+          <div class="section-label" style="justify-content:center">Weekly Newsletter</div>
+          <h2 class="nl-title">Get the Latest Property<br>Insights in Your Inbox</h2>
+          <p class="nl-desc">
+            Join 18,000+ subscribers who receive exclusive market reports, new listings,
+            investment tips, and UAE real estate news every week — no spam, ever.
+          </p>
+        </div>
+
+        <div class="nl-perks">
+          <div *ngFor="let perk of [
+            { icon: '📊', label: 'Weekly market reports' },
+            { icon: '🏠', label: 'New listings first' },
+            { icon: '💡', label: 'Investment tips' },
+            { icon: '🔔', label: 'Price drop alerts' }
+          ]" class="nl-perk">
+            <span class="nl-perk-icon">{{ perk.icon }}</span>
+            <span>{{ perk.label }}</span>
+          </div>
+        </div>
+
+        @if (!newsletterSubmitted()) {
+          <form class="nl-form" (ngSubmit)="subscribeNewsletter()" (submit)="$event.preventDefault()">
+            <div class="nl-input-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="nl-input-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                class="nl-input"
+                [ngModel]="newsletterEmail()"
+                (ngModelChange)="newsletterEmail.set($event)"
+                name="nlEmail"
+                required>
+              <button type="submit" class="nl-submit">
+                Subscribe Free
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </button>
+            </div>
+            <p class="nl-privacy">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+              </svg>
+              No spam. Unsubscribe anytime. We respect your privacy.
+            </p>
+          </form>
+        } @else {
+          <div class="nl-success">
+            <div class="nl-success-icon">✓</div>
+            <h3 class="nl-success-title">You're subscribed!</h3>
+            <p class="nl-success-desc">
+              Welcome aboard! Your first weekly digest will arrive this Friday.
+              Check your inbox to confirm your subscription.
+            </p>
+          </div>
+        }
+
+        <div class="nl-social-proof">
+          <div class="nl-avatars">
+            <img *ngFor="let av of [
+              'https://randomuser.me/api/portraits/women/12.jpg',
+              'https://randomuser.me/api/portraits/men/18.jpg',
+              'https://randomuser.me/api/portraits/women/35.jpg',
+              'https://randomuser.me/api/portraits/men/42.jpg'
+            ]" [src]="av" alt="subscriber" class="nl-avatar">
+          </div>
+          <p class="nl-proof-text">
+            <strong>18,000+</strong> property investors already subscribed
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA SECTION
+     ============================================================ -->
+<section class="cta-section">
+  <div class="container-custom">
+    <div class="cta-card animate-on-scroll">
+      <div class="cta-content">
+        <div class="section-label" style="color: var(--color-gold-400)">Get Started Today</div>
+        <h2 class="cta-title">Ready to Find Your Dream Property?</h2>
+        <p class="cta-desc">
+          Schedule a free consultation with one of our expert agents and start your property journey today.
+        </p>
+        <div class="cta-actions">
+          <a routerLink="/properties" class="btn-gold">Browse Properties</a>
+          <a routerLink="/contact" class="btn-outline-white">Contact an Agent</a>
+        </div>
+      </div>
+      <div class="cta-visual">
+        <div class="cta-float-card">
+          <div class="cta-float-icon">🏠</div>
+          <div>
+            <div class="cta-float-title">Free Property Valuation</div>
+            <div class="cta-float-sub">Get your property valued by experts</div>
+          </div>
+        </div>
+        <div class="cta-float-card delay-200">
+          <div class="cta-float-icon">📋</div>
+          <div>
+            <div class="cta-float-title">Legal Assistance</div>
+            <div class="cta-float-sub">We handle all the paperwork</div>
+          </div>
+        </div>
+        <div class="cta-float-card delay-400">
+          <div class="cta-float-icon">💰</div>
+          <div>
+            <div class="cta-float-title">Mortgage Advisory</div>
+            <div class="cta-float-sub">Best financing options for you</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

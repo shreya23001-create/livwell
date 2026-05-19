@@ -191,12 +191,46 @@ export class PropertyDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
-  // v4 — with footer
+  // v5 — added charts + newsletter
 
   property = signal<PropertyListing | null>(null);
   activeImageIndex = signal(0);
   descExpanded = signal(false);
   isFaved = signal(false);
+  newsletterEmail = signal('');
+  newsletterSubmitted = signal(false);
+
+  // Price trend data (monthly avg price/sqft for last 12 months)
+  readonly priceTrendPoints = [1180, 1195, 1210, 1198, 1220, 1245, 1238, 1260, 1255, 1278, 1290, 1305];
+  readonly priceTrendMonths = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'];
+
+  // Demand trend (quarterly transactions)
+  readonly demandQuarters = ['Q2\'23', 'Q3\'23', 'Q4\'23', 'Q1\'24', 'Q2\'24', 'Q3\'24', 'Q4\'24', 'Q1\'25', 'Q2\'25', 'Q3\'25', 'Q4\'25', 'Q1\'26'];
+  readonly demandValues = [42, 55, 38, 61, 74, 68, 82, 79, 91, 85, 98, 107];
+
+  get priceTrendMax(): number { return Math.max(...this.priceTrendPoints); }
+  get priceTrendMin(): number { return Math.min(...this.priceTrendPoints); }
+
+  getPriceTrendPath(): string {
+    const w = 600; const h = 120; const pad = 10;
+    const min = this.priceTrendMin - 30;
+    const max = this.priceTrendMax + 30;
+    return this.priceTrendPoints.map((v, i) => {
+      const x = pad + (i / (this.priceTrendPoints.length - 1)) * (w - pad * 2);
+      const y = h - pad - ((v - min) / (max - min)) * (h - pad * 2);
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+  }
+
+  getDemandBarHeight(val: number): number {
+    return Math.round((val / Math.max(...this.demandValues)) * 100);
+  }
+
+  subscribeNewsletter(): void {
+    if (this.newsletterEmail()) {
+      this.newsletterSubmitted.set(true);
+    }
+  }
 
   // Mortgage calculator
   mortgagePrice = signal(0);

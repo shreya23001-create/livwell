@@ -1,17 +1,58 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { FooterComponent } from '../../shared/components/footer/footer.component';
+
+interface Stat {
+  value: string;
+  label: string;
+}
+
+interface CoreValue {
+  title: string;
+  body: string;
+}
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  template: `
-    <div style="min-height:80vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;padding:8rem 2rem 4rem;">
-      <h1 style="font-family:Sandena-Medium,Helvetica,Arial,'Lucida Grande',sans-serif;font-size:2.5rem;font-weight:700;color:#0a0e1a">About Us</h1>
-      <p style="color:#6b7280;font-size:1rem">Coming soon — learn more about Livwell Real Estate.</p>
-      <a routerLink="/" style="color:#444ce7;font-weight:600;text-decoration:none">← Back to Home</a>
-    </div>
-  `,
+  imports: [CommonModule, FormsModule, RouterLink, FooterComponent],
+  templateUrl: './about.component.html',
+  styleUrl: './about.component.scss',
 })
-export class AboutComponent {}
+export class AboutComponent {
+  newsletterEmail = signal('');
+  newsletterSubmitted = signal(false);
+
+  stats: Stat[] = [
+    { value: '950+', label: 'Expert Agents' },
+    { value: '17 Years', label: 'of Excellence' },
+    { value: '25', label: 'Offices Across Dubai' },
+    { value: '18,000+', label: 'Clients & Investors' },
+  ];
+
+  coreValues: CoreValue[] = [
+    { title: 'Integrity', body: 'We uphold the highest ethical standards, ensuring transparency and honesty in all our dealings.' },
+    { title: 'Innovation', body: 'We continuously seek creative solutions and leverage cutting-edge technology to deliver better outcomes for our clients.' },
+    { title: 'Excellence', body: 'We are committed to delivering the highest quality service at every stage of your real estate journey.' },
+    { title: 'Respect', body: 'We value and respect our clients, teammates, and partners, fostering a culture of trust and mutual respect.' },
+    { title: 'Authenticity', body: 'We foster authentic relationships built on trust and collaboration, putting your interests at the heart of every recommendation.' },
+    { title: 'Collaboration', body: 'Collaboration is at the core of what we do — internally across departments, and externally with all valued partners, to unlock value.' },
+    { title: 'Social Responsibility', body: 'We are committed to sustainable practices for the communities we serve, operating with purpose beyond profit.' },
+    { title: 'Kindness', body: 'We inspire a positive and caring working environment, and simply enjoy doing business with a smile — every interaction matters.' },
+  ];
+
+  promises: string[] = [
+    'We will always provide you with the most sound and user-friendly technology, ensuring seamless client interactions at all times.',
+    'We will always ensure you have the support of an experienced and dedicated team to assist and guide your efforts at every step.',
+    'We will always be transparent and ensure that you are never faced with information asymmetry between you and your competitors.',
+    'We will always look for new and better ways to work, grow, and deliver — and share in our collective success together.',
+    'We will never instruct you to compromise your ethics or mislead a client in any way, shape, or form.',
+    'We will never make you share your company contacts, your clients, just take the lead.',
+  ];
+
+  subscribeNewsletter(): void {
+    if (this.newsletterEmail()) this.newsletterSubmitted.set(true);
+  }
+}

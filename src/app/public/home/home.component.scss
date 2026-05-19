@@ -939,7 +939,7 @@ $gold-light: #e8c870;
   right: 1rem;
   width: 10px;
   height: 10px;
-  background: #e53e3e;
+  background: #1a5c3a;
   border-radius: 50%;
   border: 2px solid #fff;
 }
@@ -984,7 +984,7 @@ $gold-light: #e8c870;
 
 .lp-handover {
   font-size: 0.82rem;
-  color: #2563eb;
+  color: #1a5c3a;
   font-weight: 500;
   margin: 0.5rem 0 1rem;
 }
@@ -1158,7 +1158,7 @@ $gold-light: #e8c870;
   border-radius: 0.25rem;
   letter-spacing: 0.02em;
 
-  &.badge-red { background: #e53e3e; color: #fff; }
+  &.badge-red { background: #1a5c3a; color: #fff; }
   &.badge-dark { background: rgba(0,0,0,0.7); color: #fff; }
 }
 
@@ -1837,7 +1837,7 @@ $gold-light: #e8c870;
   top: 0.75rem;
   right: 0.75rem;
   font-size: 0.875rem;
-  color: #444ce7;
+  color: #1a5c3a;
   opacity: 0;
   transition: all 0.3s;
 }
@@ -1931,7 +1931,7 @@ $gold-light: #e8c870;
   position: absolute;
   bottom: -1rem;
   left: -1rem;
-  background: linear-gradient(135deg, #444ce7, #6172f3);
+  background: linear-gradient(135deg, #1a5c3a, #22754a);
   color: #fff;
   border-radius: 1rem;
   padding: 1rem 1.5rem;
@@ -2030,7 +2030,7 @@ $gold-light: #e8c870;
 .agent-deals {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #444ce7;
+  color: #1a5c3a;
   margin-bottom: 1rem;
 }
 
@@ -2050,7 +2050,7 @@ $gold-light: #e8c870;
   transition: color 0.2s;
 
   &:hover {
-    color: #444ce7;
+    color: #1a5c3a;
   }
 }
 
@@ -2064,14 +2064,14 @@ $gold-light: #e8c870;
   border-radius: 0.5rem;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #444ce7;
+  color: #1a5c3a;
   text-decoration: none;
   transition: all 0.25s ease;
 
   &:hover {
-    background: #444ce7;
+    background: #1a5c3a;
     color: #fff;
-    border-color: #444ce7;
+    border-color: #1a5c3a;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(68, 76, 231, 0.3);
   }
@@ -2196,7 +2196,7 @@ $gold-light: #e8c870;
   gap: 0.35rem;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #6172f3;
+  color: #22754a;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin-bottom: 0.5rem;
@@ -2270,7 +2270,7 @@ $gold-light: #e8c870;
   flex: 1;
   justify-content: center;
   padding: 0.65rem 1rem;
-  background: linear-gradient(135deg, #444ce7, #6172f3);
+  background: linear-gradient(135deg, #1a5c3a, #22754a);
   color: #fff;
   border-radius: 0.625rem;
   font-size: 0.82rem;
@@ -2279,7 +2279,7 @@ $gold-light: #e8c870;
   transition: all 0.25s ease;
 
   &:hover {
-    background: linear-gradient(135deg, #3538cd, #444ce7);
+    background: linear-gradient(135deg, #134430, #1a5c3a);
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(68, 76, 231, 0.35);
   }
@@ -2301,8 +2301,8 @@ $gold-light: #e8c870;
   white-space: nowrap;
 
   &:hover {
-    border-color: #444ce7;
-    color: #444ce7;
+    border-color: #1a5c3a;
+    color: #1a5c3a;
     background: #eef2ff;
   }
 }
@@ -2625,7 +2625,7 @@ $gold-light: #e8c870;
   top: 1rem;
   left: 1rem;
   padding: 0.3rem 0.9rem;
-  background: #444ce7;
+  background: #1a5c3a;
   color: #fff;
   border-radius: 9999px;
   font-size: 0.7rem;
@@ -2682,7 +2682,7 @@ $gold-light: #e8c870;
   gap: 0.4rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #444ce7;
+  color: #1a5c3a;
   transition: all 0.2s;
 }
 
@@ -2742,7 +2742,7 @@ $gold-light: #e8c870;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #444ce7;
+  color: #1a5c3a;
   margin-bottom: 0.35rem;
 }
 
@@ -2928,7 +2928,7 @@ $gold-light: #e8c870;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #444ce7, #6172f3);
+  background: linear-gradient(135deg, #1a5c3a, #22754a);
   color: #fff;
   border: none;
   border-radius: 0.625rem;
@@ -2940,7 +2940,7 @@ $gold-light: #e8c870;
   flex-shrink: 0;
 
   &:hover {
-    background: linear-gradient(135deg, #3538cd, #444ce7);
+    background: linear-gradient(135deg, #134430, #1a5c3a);
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(68, 76, 231, 0.4);
   }

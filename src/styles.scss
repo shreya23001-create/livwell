@@ -4,21 +4,21 @@
 
 @theme {
   /* Colors */
-  --color-primary-50: #f0f4ff;
-  --color-primary-100: #e0eaff;
-  --color-primary-200: #c7d7fe;
-  --color-primary-300: #a5bbfc;
-  --color-primary-400: #8098f9;
-  --color-primary-500: #6172f3;
-  --color-primary-600: #444ce7;
-  --color-primary-700: #3538cd;
-  --color-primary-800: #2d31a6;
-  --color-primary-900: #2d3282;
-  --color-primary-950: #1f2064;
+  --color-primary-50: #f0f7f4;
+  --color-primary-100: #d6ede3;
+  --color-primary-200: #aedbc7;
+  --color-primary-300: #7dc3a6;
+  --color-primary-400: #4da882;
+  --color-primary-500: #22754a;
+  --color-primary-600: #1a5c3a;
+  --color-primary-700: #134430;
+  --color-primary-800: #0d2e20;
+  --color-primary-900: #071a13;
+  --color-primary-950: #030d09;
 
-  --color-gold-400: #f5c842;
-  --color-gold-500: #e6b800;
-  --color-gold-600: #cc9f00;
+  --color-gold-400: #dfc06a;
+  --color-gold-500: #c8a84b;
+  --color-gold-600: #a8882e;
 
   --color-dark-600: #243047;
   --color-dark-700: #1a2235;
@@ -146,11 +146,11 @@
    CSS CUSTOM PROPERTIES
    ============================================= */
 :root {
-  --primary: #444ce7;
-  --primary-light: #6172f3;
-  --primary-dark: #3538cd;
-  --gold: #e6b800;
-  --gold-light: #f5c842;
+  --primary: #1a5c3a;
+  --primary-light: #22754a;
+  --primary-dark: #134430;
+  --gold: #c8a84b;
+  --gold-light: #dfc06a;
   --dark-900: #0a0e1a;
   --dark-800: #111827;
   --dark-700: #1a2235;
@@ -278,11 +278,11 @@ h6 {
   border: none;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 4px 20px rgba(68, 76, 231, 0.35);
+  box-shadow: 0 4px 20px rgba(26, 92, 58, 0.35);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(68, 76, 231, 0.45);
+    box-shadow: 0 8px 30px rgba(26, 92, 58, 0.45);
   }
 
   &:active {
@@ -438,7 +438,7 @@ router-outlet+* {
   &:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(68, 76, 231, 0.1);
+    box-shadow: 0 0 0 3px rgba(26, 92, 58, 0.1);
   }
 
   &::placeholder {

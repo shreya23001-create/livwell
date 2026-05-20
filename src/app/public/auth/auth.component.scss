@@ -292,6 +292,10 @@ $light:  #f4f6fa;
   font-size: 0.75rem;
   color: $accent;
   text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
   &:hover { text-decoration: underline; }
 }
 .auth-input-wrap { position: relative; }
@@ -504,4 +508,55 @@ $light:  #f4f6fa;
   span { font-size: 0.75rem; color: #9ca3af; white-space: nowrap; }
 }
 .auth-social { display: flex; justify-content: center; margin-bottom: 0.5rem; }
+
+// ── Forgot Password Flow ─────────────────────────────
+.fp-steps {
+  display: flex; align-items: center; margin-bottom: 1.75rem;
+}
+.fp-step {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  .fp-step-dot {
+    width: 2rem; height: 2rem; border-radius: 50%; border: 2px solid $border;
+    background: #fff; color: $muted; font-size: 0.78rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    svg { width: 0.875rem; height: 0.875rem; }
+  }
+  .fp-step-label { font-size: 0.68rem; font-weight: 600; color: $muted; }
+  &.active .fp-step-dot { border-color: $accent; background: $accent; color: #fff; }
+  &.active .fp-step-label { color: $accent; }
+  &.done .fp-step-dot { border-color: #10b981; background: #10b981; color: #fff; }
+  &.done .fp-step-label { color: #10b981; }
+}
+.fp-step-line {
+  flex: 1; height: 2px; background: $border; margin: 0 0.25rem; margin-bottom: 1.25rem;
+  &.done { background: #10b981; }
+}
+
+.fp-otp-input { letter-spacing: 0.4em; font-size: 1.25rem; font-weight: 700; text-align: center; }
+
+.fp-resend-row { text-align: center; margin-top: 0.75rem; }
+.fp-resend-countdown { font-size: 0.78rem; color: $muted; }
+.fp-resend-btn {
+  background: none; border: none; color: $accent; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  padding: 0; &:hover { text-decoration: underline; }
+}
+
+.fp-back-row { text-align: center; margin-top: 1rem; }
+.fp-back-btn {
+  display: inline-flex; align-items: center; gap: 0.35rem; background: none; border: none;
+  color: $muted; font-size: 0.78rem; cursor: pointer; padding: 0;
+  svg { width: 0.875rem; height: 0.875rem; }
+  &:hover { color: $text; }
+}
+
+.fp-success-box {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1rem 0 0.5rem; text-align: center;
+}
+.fp-success-icon {
+  width: 3.5rem; height: 3.5rem; border-radius: 50%; background: #f0fdf4; border: 2px solid #bbf7d0;
+  display: flex; align-items: center; justify-content: center; color: #10b981;
+  svg { width: 1.75rem; height: 1.75rem; }
+}
+.fp-success-title { font-size: 1.2rem; font-weight: 800; color: $text; margin: 0; }
+.fp-success-msg   { font-size: 0.85rem; color: $sub; line-height: 1.6; margin: 0; }
 

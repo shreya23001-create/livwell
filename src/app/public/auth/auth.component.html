@@ -32,70 +32,220 @@
   <div class="auth-right">
     <div class="auth-form-box">
 
-      <div class="auth-form-header">
-        <h2 class="auth-form-title">Admin Sign In</h2>
-        <p class="auth-form-sub">Sign in to your Livwell admin account</p>
-      </div>
+      <!-- ══ LOGIN FORM ══ -->
+      <ng-container *ngIf="!forgotMode()">
 
-      <div *ngIf="serverError()" class="auth-alert auth-alert--error">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
-        <div>
-          {{ serverError() }}
-          <span *ngIf="attemptsLeft() !== null" class="auth-alert-sub">{{ attemptsLeft() }} attempt{{ attemptsLeft() === 1 ? '' : 's' }} remaining.</span>
-        </div>
-      </div>
-
-      <form (ngSubmit)="submit()" novalidate>
-        <div class="auth-field" [class.has-error]="errors()['email']">
-          <label class="auth-label">Email address</label>
-          <input type="email" class="auth-input" placeholder="admin@livwell.ae"
-                 [(ngModel)]="form.email" name="email"
-                 (input)="clearError('email')" autocomplete="email">
-          <span *ngIf="errors()['email']" class="auth-field-error">{{ errors()['email'] }}</span>
+        <div class="auth-form-header">
+          <h2 class="auth-form-title">Admin Sign In</h2>
+          <p class="auth-form-sub">Sign in to your Livwell admin account</p>
         </div>
 
-        <div class="auth-field" [class.has-error]="errors()['password']">
-          <div class="auth-label-row">
-            <label class="auth-label">Password</label>
-            <a href="#" class="auth-forgot-link" (click)="$event.preventDefault()">Forgot password?</a>
+        <div *ngIf="serverError()" class="auth-alert auth-alert--error">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
+          <div>
+            {{ serverError() }}
+            <span *ngIf="attemptsLeft() !== null" class="auth-alert-sub">{{ attemptsLeft() }} attempt{{ attemptsLeft() === 1 ? '' : 's' }} remaining.</span>
           </div>
-          <div class="auth-input-wrap">
-            <input [type]="showPw() ? 'text' : 'password'" class="auth-input" placeholder="••••••••"
-                   [(ngModel)]="form.password" name="password"
-                   (input)="clearError('password')" autocomplete="current-password">
-            <button type="button" class="auth-toggle-pw" (click)="showPw.update(v => !v)" tabindex="-1">
-              <svg *ngIf="!showPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
-              <svg *ngIf="showPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+        </div>
+
+        <form (ngSubmit)="submit()" novalidate>
+          <div class="auth-field" [class.has-error]="errors()['email']">
+            <label class="auth-label">Email address</label>
+            <input type="email" class="auth-input" placeholder="admin@livwell.ae"
+                   [(ngModel)]="form.email" name="email"
+                   (input)="clearError('email')" autocomplete="email">
+            <span *ngIf="errors()['email']" class="auth-field-error">{{ errors()['email'] }}</span>
+          </div>
+
+          <div class="auth-field" [class.has-error]="errors()['password']">
+            <div class="auth-label-row">
+              <label class="auth-label">Password</label>
+              <button type="button" class="auth-forgot-link" (click)="openForgot()">Forgot password?</button>
+            </div>
+            <div class="auth-input-wrap">
+              <input [type]="showPw() ? 'text' : 'password'" class="auth-input" placeholder="••••••••"
+                     [(ngModel)]="form.password" name="password"
+                     (input)="clearError('password')" autocomplete="current-password">
+              <button type="button" class="auth-toggle-pw" (click)="showPw.update(v => !v)" tabindex="-1">
+                <svg *ngIf="!showPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                <svg *ngIf="showPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+              </button>
+            </div>
+            <span *ngIf="errors()['password']" class="auth-field-error">{{ errors()['password'] }}</span>
+          </div>
+
+          <div class="auth-checkbox-row">
+            <label class="auth-checkbox-label">
+              <input type="checkbox" [(ngModel)]="form.remember" name="remember">
+              <span class="auth-checkbox-box"></span>
+              Remember me for 30 days
+            </label>
+          </div>
+
+          <button type="submit" class="auth-submit-btn" [disabled]="loading()">
+            <span *ngIf="!loading()">Sign In</span>
+            <span *ngIf="loading()" class="auth-spinner"></span>
+          </button>
+        </form>
+
+        <div class="auth-divider"><span>or continue with</span></div>
+        <div class="auth-social">
+          <asl-google-signin-button type="standard" size="large" shape="rectangular" theme="outline" text="signin_with" [width]="340"></asl-google-signin-button>
+        </div>
+
+        <div class="auth-back-row">
+          <a routerLink="/" class="auth-back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+            Back to website
+          </a>
+        </div>
+
+      </ng-container>
+
+      <!-- ══ FORGOT PASSWORD FLOW ══ -->
+      <ng-container *ngIf="forgotMode()">
+
+        <!-- Step indicator -->
+        <div class="fp-steps">
+          <div class="fp-step" [class.active]="forgotStep() === 'email'" [class.done]="forgotStep() === 'otp' || forgotStep() === 'reset'">
+            <div class="fp-step-dot">
+              <svg *ngIf="forgotStep() === 'otp' || forgotStep() === 'reset'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+              <span *ngIf="forgotStep() === 'email'">1</span>
+            </div>
+            <span class="fp-step-label">Email</span>
+          </div>
+          <div class="fp-step-line" [class.done]="forgotStep() === 'otp' || forgotStep() === 'reset'"></div>
+          <div class="fp-step" [class.active]="forgotStep() === 'otp'" [class.done]="forgotStep() === 'reset'">
+            <div class="fp-step-dot">
+              <svg *ngIf="forgotStep() === 'reset'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+              <span *ngIf="forgotStep() !== 'reset'">2</span>
+            </div>
+            <span class="fp-step-label">Verify</span>
+          </div>
+          <div class="fp-step-line" [class.done]="forgotStep() === 'reset'"></div>
+          <div class="fp-step" [class.active]="forgotStep() === 'reset'">
+            <div class="fp-step-dot"><span>3</span></div>
+            <span class="fp-step-label">Reset</span>
+          </div>
+        </div>
+
+        <!-- Success state -->
+        <ng-container *ngIf="forgotSuccess()">
+          <div class="fp-success-box">
+            <div class="fp-success-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+            </div>
+            <h3 class="fp-success-title">Password Reset!</h3>
+            <p class="fp-success-msg">{{ forgotSuccess() }}</p>
+            <button class="auth-submit-btn" (click)="closeForgot()">Back to Sign In</button>
+          </div>
+        </ng-container>
+
+        <!-- Step 1: Email -->
+        <ng-container *ngIf="!forgotSuccess() && forgotStep() === 'email'">
+          <div class="auth-form-header">
+            <h2 class="auth-form-title">Forgot Password?</h2>
+            <p class="auth-form-sub">Enter your admin email and we'll send you a reset code.</p>
+          </div>
+          <div *ngIf="forgotError()" class="auth-alert auth-alert--error">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
+            {{ forgotError() }}
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">Email address</label>
+            <input type="email" class="auth-input" placeholder="admin@livwell.ae"
+                   [ngModel]="forgotEmail()" (ngModelChange)="forgotEmail.set($event); forgotError.set('')"
+                   name="fpEmail" autocomplete="email">
+          </div>
+          <button class="auth-submit-btn" (click)="submitForgotEmail()" [disabled]="loading()">
+            <span *ngIf="!loading()">Send Reset Code</span>
+            <span *ngIf="loading()" class="auth-spinner"></span>
+          </button>
+          <div class="fp-back-row">
+            <button class="fp-back-btn" (click)="closeForgot()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+              Back to Sign In
             </button>
           </div>
-          <span *ngIf="errors()['password']" class="auth-field-error">{{ errors()['password'] }}</span>
-        </div>
+        </ng-container>
 
-        <div class="auth-checkbox-row">
-          <label class="auth-checkbox-label">
-            <input type="checkbox" [(ngModel)]="form.remember" name="remember">
-            <span class="auth-checkbox-box"></span>
-            Remember me for 30 days
-          </label>
-        </div>
+        <!-- Step 2: OTP -->
+        <ng-container *ngIf="!forgotSuccess() && forgotStep() === 'otp'">
+          <div class="auth-form-header">
+            <h2 class="auth-form-title">Enter OTP Code</h2>
+            <p class="auth-form-sub">A 6-digit code has been sent to <strong>{{ forgotEmail() }}</strong>. Check the browser console for the demo code.</p>
+          </div>
+          <div *ngIf="forgotError()" class="auth-alert auth-alert--error">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
+            {{ forgotError() }}
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">6-digit OTP</label>
+            <input type="text" class="auth-input fp-otp-input" placeholder="000000" maxlength="6"
+                   [ngModel]="forgotOtp()" (ngModelChange)="forgotOtp.set($event); forgotError.set('')"
+                   name="fpOtp" autocomplete="one-time-code">
+          </div>
+          <button class="auth-submit-btn" (click)="submitOtp()">Verify Code</button>
+          <div class="fp-resend-row">
+            <span *ngIf="otpResendCountdown() > 0" class="fp-resend-countdown">Resend in {{ otpResendCountdown() }}s</span>
+            <button *ngIf="otpResendCountdown() === 0" class="fp-resend-btn" (click)="resendOtp()">Resend OTP</button>
+          </div>
+          <div class="fp-back-row">
+            <button class="fp-back-btn" (click)="forgotStep.set('email')">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+              Change email
+            </button>
+          </div>
+        </ng-container>
 
-        <button type="submit" class="auth-submit-btn" [disabled]="loading()">
-          <span *ngIf="!loading()">Sign In</span>
-          <span *ngIf="loading()" class="auth-spinner"></span>
-        </button>
-      </form>
+        <!-- Step 3: New password -->
+        <ng-container *ngIf="!forgotSuccess() && forgotStep() === 'reset'">
+          <div class="auth-form-header">
+            <h2 class="auth-form-title">Set New Password</h2>
+            <p class="auth-form-sub">Choose a strong new password for your account.</p>
+          </div>
+          <div *ngIf="forgotError()" class="auth-alert auth-alert--error">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
+            {{ forgotError() }}
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">New Password</label>
+            <div class="auth-input-wrap">
+              <input [type]="showNewPw() ? 'text' : 'password'" class="auth-input" placeholder="Min 8 chars, 1 uppercase, 1 number"
+                     [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event); forgotError.set('')"
+                     name="fpNewPw" autocomplete="new-password">
+              <button type="button" class="auth-toggle-pw" (click)="showNewPw.update(v => !v)" tabindex="-1">
+                <svg *ngIf="!showNewPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                <svg *ngIf="showNewPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+              </button>
+            </div>
+            <div class="auth-pw-strength" *ngIf="newPassword()">
+              <div class="auth-pw-bars">
+                <div *ngFor="let i of [1,2,3,4]" class="auth-pw-bar"
+                     [style.background]="passwordStrength() >= i ? strengthColors[passwordStrength()] : '#e5e7eb'"></div>
+              </div>
+              <span class="auth-pw-label" [style.color]="strengthColors[passwordStrength()]">{{ strengthLabels[passwordStrength()] }}</span>
+            </div>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">Confirm New Password</label>
+            <div class="auth-input-wrap">
+              <input [type]="showConfirmPw() ? 'text' : 'password'" class="auth-input" placeholder="Re-enter your new password"
+                     [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event); forgotError.set('')"
+                     name="fpConfirm" autocomplete="new-password">
+              <button type="button" class="auth-toggle-pw" (click)="showConfirmPw.update(v => !v)" tabindex="-1">
+                <svg *ngIf="!showConfirmPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                <svg *ngIf="showConfirmPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+              </button>
+            </div>
+          </div>
+          <button class="auth-submit-btn" (click)="submitResetPassword()" [disabled]="loading()">
+            <span *ngIf="!loading()">Reset Password</span>
+            <span *ngIf="loading()" class="auth-spinner"></span>
+          </button>
+        </ng-container>
 
-      <div class="auth-divider"><span>or continue with</span></div>
-      <div class="auth-social">
-        <asl-google-signin-button type="standard" size="large" shape="rectangular" theme="outline" text="signin_with" [width]="340"></asl-google-signin-button>
-      </div>
-
-      <div class="auth-back-row">
-        <a routerLink="/" class="auth-back-link">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
-          Back to website
-        </a>
-      </div>
+      </ng-container>
 
     </div>
   </div>

@@ -199,4 +199,32 @@ export class AuthService {
     const state = this._failedAttempts[email.toLowerCase()];
     return !!(state?.lockedUntil && new Date() < state.lockedUntil);
   }
+
+  // ── FORGOT PASSWORD ──────────────────────────────────
+  // Simulates sending an OTP. Returns true if email exists in any account store.
+  requestPasswordReset(email: string): boolean {
+    const key = email.toLowerCase().trim();
+    const allAccounts = [...DEMO_ACCOUNTS, ...this._customers];
+    return allAccounts.some(a => a.email.toLowerCase() === key);
+  }
+
+  // Resets the password for a verified account (demo: always succeeds for existing emails).
+  resetPassword(email: string, newPassword: string): boolean {
+    const key = email.toLowerCase().trim();
+
+    const demoIdx = DEMO_ACCOUNTS.findIndex(a => a.email.toLowerCase() === key);
+    if (demoIdx !== -1) {
+      DEMO_ACCOUNTS[demoIdx].password = newPassword;
+      return true;
+    }
+
+    const custIdx = this._customers.findIndex(a => a.email.toLowerCase() === key);
+    if (custIdx !== -1) {
+      this._customers[custIdx].password = newPassword;
+      this.saveCustomers();
+      return true;
+    }
+
+    return false;
+  }
 }

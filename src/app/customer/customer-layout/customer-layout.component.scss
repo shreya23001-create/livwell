@@ -1,0 +1,203 @@
+$accent:  #6366f1;
+$accent2: #4f46e5;
+$border:  #e5e7eb;
+$muted:   #9ca3af;
+$text:    #111827;
+$sub:     #6b7280;
+$bg:      #f4f6fa;
+
+// ── Shell ──────────────────────────────────────────────────
+.cust-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: $bg;
+}
+
+// ── Top Navbar ─────────────────────────────────────────────
+.cust-nav {
+  background: #fff;
+  border-bottom: 1px solid $border;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.cust-nav-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+// Brand
+.cust-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.cust-brand-logo {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, $accent, #8b5cf6);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cust-brand-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: $text;
+}
+
+// Nav links
+.cust-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+}
+.cust-nav-link {
+  padding: 0.4rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $sub;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  &:hover { background: $bg; color: $text; }
+  &.active { background: rgba(99,102,241,0.1); color: $accent; font-weight: 600; }
+}
+
+// Right side
+.cust-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.cust-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cust-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $accent, #8b5cf6);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cust-user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cust-logout-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid $border;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $muted;
+  transition: color 0.15s, background 0.15s;
+  svg { width: 1rem; height: 1rem; }
+  &:hover { color: #ef4444; background: #fef2f2; border-color: #fca5a5; }
+}
+.cust-hamburger {
+  display: none;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: $text;
+  svg { width: 1.25rem; height: 1.25rem; }
+}
+
+// Mobile menu
+.cust-mobile-menu {
+  border-top: 1px solid $border;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.cust-mobile-link {
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $sub;
+  text-decoration: none;
+  &.active { background: rgba(99,102,241,0.1); color: $accent; }
+  &:hover { background: $bg; }
+}
+.cust-mobile-logout {
+  margin-top: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: #fef2f2;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+// ── Main ───────────────────────────────────────────────────
+.cust-main {
+  flex: 1;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+// ── Footer ─────────────────────────────────────────────────
+.cust-footer {
+  border-top: 1px solid $border;
+  background: #fff;
+  padding: 1rem 2rem;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: $muted;
+  a { color: $accent; text-decoration: none; font-weight: 500; &:hover { text-decoration: underline; } }
+}
+
+// ── Responsive ─────────────────────────────────────────────
+@media (max-width: 768px) {
+  .cust-nav-links { display: none; }
+  .cust-user-name { display: none; }
+  .cust-hamburger { display: flex; }
+  .cust-main { padding: 1rem; }
+}

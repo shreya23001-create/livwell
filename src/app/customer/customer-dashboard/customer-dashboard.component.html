@@ -1,0 +1,145 @@
+<div class="cdash">
+
+  <!-- Header -->
+  <div class="cdash-header">
+    <div>
+      <h1 class="cdash-title">{{ greeting() }}, {{ firstName() }} 👋</h1>
+      <p class="cdash-sub">{{ today }}</p>
+    </div>
+    <a routerLink="/properties" class="cdash-browse-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Browse Properties
+    </a>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="cdash-kpis">
+    <div class="cdash-kpi">
+      <div class="cdash-kpi-icon cdash-kpi-icon--saved">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div>
+        <div class="cdash-kpi-value">{{ savedProperties().length }}</div>
+        <div class="cdash-kpi-label">Saved Properties</div>
+      </div>
+    </div>
+    <div class="cdash-kpi">
+      <div class="cdash-kpi-icon cdash-kpi-icon--enq">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <div>
+        <div class="cdash-kpi-value">{{ recentEnquiries().length }}</div>
+        <div class="cdash-kpi-label">Total Enquiries</div>
+      </div>
+    </div>
+    <div class="cdash-kpi">
+      <div class="cdash-kpi-icon cdash-kpi-icon--replied">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <div class="cdash-kpi-value">{{ recentEnquiries().filter(e => e.status === 'replied').length }}</div>
+        <div class="cdash-kpi-label">Replies Received</div>
+      </div>
+    </div>
+    <div class="cdash-kpi">
+      <div class="cdash-kpi-icon cdash-kpi-icon--pending">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div>
+        <div class="cdash-kpi-value">{{ recentEnquiries().filter(e => e.status === 'pending').length }}</div>
+        <div class="cdash-kpi-label">Pending Replies</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-column row -->
+  <div class="cdash-row">
+
+    <!-- Saved Properties -->
+    <div class="cdash-card">
+      <div class="cdash-card-header">
+        <div>
+          <h3 class="cdash-card-title">Saved Properties</h3>
+          <p class="cdash-card-sub">Properties you have shortlisted</p>
+        </div>
+        <a routerLink="/my/properties" class="cdash-link">View all</a>
+      </div>
+
+      @if (savedProperties().length === 0) {
+        <div class="cdash-empty">
+          <p>No saved properties yet. <a routerLink="/properties">Browse listings</a></p>
+        </div>
+      } @else {
+        <div class="cdash-prop-list">
+          @for (prop of savedProperties(); track prop.id) {
+            <div class="cdash-prop-row">
+              <div class="cdash-prop-thumb">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+              <div class="cdash-prop-info">
+                <div class="cdash-prop-name">{{ prop.title }}</div>
+                <div class="cdash-prop-loc">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ prop.location }}
+                </div>
+                <div class="cdash-prop-specs">{{ prop.beds > 0 ? prop.beds + ' Beds · ' : 'Studio · ' }}{{ prop.baths }} Baths · {{ prop.area }} sq.ft</div>
+              </div>
+              <div class="cdash-prop-right">
+                <div class="cdash-prop-price">{{ prop.price }}</div>
+                <span class="cdash-status-badge cdash-status-badge--{{ prop.status }}">{{ statusLabel(prop.status) }}</span>
+                <div class="cdash-prop-saved">Saved {{ prop.savedOn }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Recent Enquiries -->
+    <div class="cdash-card">
+      <div class="cdash-card-header">
+        <div>
+          <h3 class="cdash-card-title">Recent Enquiries</h3>
+          <p class="cdash-card-sub">Your messages to agents</p>
+        </div>
+        <a routerLink="/my/enquiries" class="cdash-link">View all</a>
+      </div>
+
+      @if (recentEnquiries().length === 0) {
+        <div class="cdash-empty">
+          <p>No enquiries yet.</p>
+        </div>
+      } @else {
+        <div class="cdash-enq-list">
+          @for (enq of recentEnquiries(); track enq.id) {
+            <div class="cdash-enq-row">
+              <div class="cdash-enq-top">
+                <span class="cdash-enq-prop">{{ enq.property }}</span>
+                <span class="cdash-enq-badge cdash-enq-badge--{{ enq.status }}">{{ statusLabel(enq.status) }}</span>
+              </div>
+              <p class="cdash-enq-msg">"{{ enq.message }}"</p>
+              <div class="cdash-enq-meta">
+                <span>Agent: {{ enq.agent }}</span>
+                <span>{{ enq.date }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- CTA banner -->
+  <div class="cdash-cta">
+    <div class="cdash-cta-text">
+      <h3>Looking for your dream home?</h3>
+      <p>Browse over 1,200+ verified listings across Dubai with expert agent support.</p>
+    </div>
+    <div class="cdash-cta-actions">
+      <a routerLink="/properties" class="cdash-cta-btn cdash-cta-btn--primary">Browse All Properties</a>
+      <a routerLink="/contact" class="cdash-cta-btn cdash-cta-btn--ghost">Talk to an Agent</a>
+    </div>
+  </div>
+
+</div>

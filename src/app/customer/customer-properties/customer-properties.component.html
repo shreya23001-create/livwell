@@ -1,0 +1,86 @@
+<div class="cprops-page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Saved Properties</h1>
+      <p class="page-sub">{{ filtered().length }} of {{ properties().length }} saved listings</p>
+    </div>
+    <a routerLink="/properties" class="btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Browse More
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-box">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search saved properties…" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+    </div>
+    <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)">
+      <option value="all">All Statuses</option>
+      <option value="available">Available</option>
+      <option value="reserved">Reserved</option>
+      <option value="sold">Sold</option>
+    </select>
+    <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)">
+      <option value="all">Sale & Rent</option>
+      <option value="sale">For Sale</option>
+      <option value="rent">For Rent</option>
+    </select>
+  </div>
+
+  <!-- Grid -->
+  @if (filtered().length === 0) {
+    <div class="empty-state">
+      <p>No saved properties match your filters.</p>
+      <a routerLink="/properties">Browse all listings →</a>
+    </div>
+  } @else {
+    <div class="prop-grid">
+      @for (prop of filtered(); track prop.id) {
+        <div class="prop-card">
+          <div class="prop-card-top">
+            <div class="prop-img-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="prop-badges">
+              <span class="type-badge">{{ prop.type }}</span>
+              <span class="cat-badge cat-badge--{{ prop.category }}">{{ prop.category === 'sale' ? 'For Sale' : 'For Rent' }}</span>
+            </div>
+            <span class="status-badge status-badge--{{ prop.status }}">{{ statusLabel(prop.status) }}</span>
+            <button class="remove-btn" (click)="removeProperty(prop.id)" title="Remove from saved">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+          </div>
+          <div class="prop-body">
+            <div class="prop-title">{{ prop.title }}</div>
+            <div class="prop-location">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ prop.location }}
+            </div>
+            <div class="prop-price">{{ prop.price }}</div>
+            <div class="prop-specs">
+              @if (prop.beds > 0) {
+                <span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 16h20M6 8v8"/></svg>
+                  {{ prop.beds }} Beds
+                </span>
+              }
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                {{ prop.baths }} Baths
+              </span>
+              <span>{{ prop.area }} sq.ft</span>
+            </div>
+          </div>
+          <div class="prop-footer">
+            <div class="prop-agent">Agent: <strong>{{ prop.agent }}</strong></div>
+            <div class="prop-saved-tag">Saved {{ prop.savedOn }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -1,0 +1,182 @@
+$accent:  #6366f1;
+$accent2: #4f46e5;
+$red:     #ef4444;
+$border:  #e5e7eb;
+$muted:   #9ca3af;
+$text:    #111827;
+$sub:     #6b7280;
+$bg:      #f4f6fa;
+
+.cal-page { padding: 1.75rem 2rem; max-width: 1400px; }
+
+.cal-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.cal-title { font-size: 1.5rem; font-weight: 800; color: $text; margin: 0 0 0.25rem; }
+.cal-sub   { font-size: 0.85rem; color: $sub; margin: 0; }
+
+.btn-primary {
+  display: flex; align-items: center; gap: 0.4rem; background: $accent; color: #fff;
+  border: none; border-radius: 0.5rem; padding: 0.6rem 1.25rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  svg { width: 1rem; height: 1rem; }
+  &:hover { background: $accent2; }
+}
+.btn-sm-primary {
+  background: $accent; color: #fff; border: none; border-radius: 0.375rem;
+  padding: 0.35rem 0.75rem; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+  &:hover { background: $accent2; }
+}
+.btn-ghost  { background: none; border: 1px solid $border; border-radius: 0.5rem; padding: 0.55rem 1.1rem; font-size: 0.875rem; color: $sub; cursor: pointer; &:hover { background: $bg; } }
+.btn-danger { background: $red; color: #fff; border: none; border-radius: 0.5rem; padding: 0.55rem 1.1rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; &:hover { background: #dc2626; } }
+
+// Layout
+.cal-layout { display: grid; grid-template-columns: 1fr 280px; gap: 1.25rem; }
+
+// Calendar main card
+.cal-main { background: #fff; border: 1px solid $border; border-radius: 0.875rem; padding: 1.25rem; }
+
+// Month nav
+.cal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.cal-nav-btn {
+  width: 2rem; height: 2rem; border-radius: 0.5rem; border: 1px solid $border;
+  background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: $sub; svg { width: 1rem; height: 1rem; }
+  &:hover { background: $bg; color: $text; }
+}
+.cal-month-label { font-size: 1rem; font-weight: 700; color: $text; }
+
+// Grid
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+  &--header { margin-bottom: 4px; }
+}
+.cal-weekday { text-align: center; font-size: 0.72rem; font-weight: 700; color: $muted; padding: 0.35rem 0; text-transform: uppercase; }
+
+.cal-cell {
+  min-height: 72px; padding: 0.4rem; border-radius: 0.5rem; cursor: pointer;
+  border: 1px solid transparent; transition: background 0.12s, border-color 0.12s;
+  &:hover { background: $bg; }
+  &--other { opacity: 0.35; cursor: default; &:hover { background: none; } }
+  &--today .cal-day-num {
+    background: $accent; color: #fff; border-radius: 50%;
+    width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center;
+  }
+  &--selected { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.3); }
+}
+.cal-day-num { font-size: 0.8rem; font-weight: 600; color: $text; width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0.25rem; }
+.cal-dots { display: flex; flex-wrap: wrap; gap: 2px; }
+.cal-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  &--viewing  { background: $accent; }
+  &--meeting  { background: #7c3aed; }
+  &--followup { background: #f59e0b; }
+  &--call     { background: #10b981; }
+}
+.cal-dot-more { font-size: 0.6rem; color: $muted; font-weight: 600; }
+
+// Day detail
+.cal-day-detail {
+  margin-top: 1rem; border-top: 1px solid $border; padding-top: 1rem;
+}
+.cal-day-detail-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem;
+}
+.cal-day-detail-title { font-size: 0.9rem; font-weight: 700; color: $text; }
+.cal-empty { font-size: 0.85rem; color: $muted; padding: 1rem 0; }
+.cal-add-link { background: none; border: none; color: $accent; font-weight: 600; cursor: pointer; font-size: 0.85rem; padding: 0; &:hover { text-decoration: underline; } }
+
+.cal-event-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.cal-event-row {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.75rem; border-radius: 0.5rem; background: $bg;
+  border: 1px solid $border;
+}
+.cal-event-time { font-size: 0.75rem; font-weight: 600; color: $sub; white-space: nowrap; min-width: 55px; padding-top: 0.1rem; }
+.cal-event-bar {
+  width: 3px; border-radius: 999px; align-self: stretch; flex-shrink: 0; min-height: 20px;
+  &--viewing  { background: $accent; }
+  &--meeting  { background: #7c3aed; }
+  &--followup { background: #f59e0b; }
+  &--call     { background: #10b981; }
+}
+.cal-event-info { flex: 1; min-width: 0; }
+.cal-event-title { font-size: 0.85rem; font-weight: 700; color: $text; }
+.cal-event-meta  { font-size: 0.75rem; color: $muted; margin-top: 0.1rem; }
+.cal-event-notes { font-size: 0.73rem; color: $sub; font-style: italic; margin-top: 0.2rem; }
+
+.cal-type-badge {
+  font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+  &--viewing  { background: rgba(99,102,241,0.12); color: $accent2; }
+  &--meeting  { background: #f5f3ff; color: #7c3aed; }
+  &--followup { background: #fffbeb; color: #b45309; }
+  &--call     { background: #f0fdf4; color: #059669; }
+}
+
+.cal-event-actions { display: flex; gap: 0.375rem; flex-shrink: 0; }
+.action-btn {
+  width: 1.75rem; height: 1.75rem; border-radius: 0.375rem; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  svg { width: 0.85rem; height: 0.85rem; }
+  &--edit   { background: #eff6ff; color: #1d4ed8; &:hover { background: #dbeafe; } }
+  &--delete { background: #fef2f2; color: $red;     &:hover { background: #fee2e2; } }
+}
+
+// Sidebar
+.cal-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+.cal-sidebar-card {
+  background: #fff; border: 1px solid $border; border-radius: 0.875rem; padding: 1.25rem;
+}
+.cal-sidebar-title { font-size: 0.9rem; font-weight: 700; color: $text; margin-bottom: 1rem; }
+
+.upcoming-list { display: flex; flex-direction: column; gap: 0; }
+.upcoming-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 0; border-bottom: 1px solid $border; cursor: pointer;
+  &:last-child { border-bottom: none; }
+  &:hover .upcoming-title { color: $accent; }
+}
+.upcoming-date-block {
+  width: 2.5rem; flex-shrink: 0; text-align: center;
+  background: rgba(99,102,241,0.08); border-radius: 0.5rem; padding: 0.35rem 0;
+}
+.upcoming-day { font-size: 1rem; font-weight: 800; color: $accent; line-height: 1; }
+.upcoming-mon { font-size: 0.65rem; font-weight: 600; color: $sub; text-transform: uppercase; }
+.upcoming-info { flex: 1; min-width: 0; }
+.upcoming-title { font-size: 0.8rem; font-weight: 600; color: $text; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.upcoming-meta  { font-size: 0.72rem; color: $muted; }
+
+.legend-list { display: flex; flex-direction: column; gap: 0.625rem; }
+.legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.83rem; color: $sub; }
+.legend-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  &--viewing  { background: $accent; }
+  &--meeting  { background: #7c3aed; }
+  &--followup { background: #f59e0b; }
+  &--call     { background: #10b981; }
+}
+
+// Modal
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.modal { background: #fff; border-radius: 0.875rem; width: 100%; max-width: 560px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.2); &--sm { max-width: 420px; } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid $border; h2 { font-size: 1.05rem; font-weight: 700; color: $text; margin: 0; } &--danger h2 { color: $red; } }
+.modal-close { background: none; border: none; cursor: pointer; color: $muted; display: flex; padding: 0.25rem; svg { width: 1.1rem; height: 1.1rem; } &:hover { color: $text; } }
+.modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; border-top: 1px solid $border; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.form-field {
+  display: flex; flex-direction: column; gap: 0.35rem; &--full { grid-column: 1/-1; }
+  label { font-size: 0.8rem; font-weight: 600; color: $sub; }
+  input, select, textarea { border: 1px solid $border; border-radius: 0.5rem; padding: 0.55rem 0.75rem; font-size: 0.875rem; color: $text; outline: none; background: #fff; width: 100%; box-sizing: border-box; transition: border-color 0.15s; &:focus { border-color: $accent; } }
+  textarea { resize: vertical; font-family: inherit; }
+  &.has-error input, &.has-error select { border-color: $red; }
+}
+.field-error { font-size: 0.75rem; color: $red; }
+.delete-msg { font-size: 0.9rem; color: $sub; line-height: 1.6; margin: 0; }
+
+@media (max-width: 1024px) { .cal-layout { grid-template-columns: 1fr; } }
+@media (max-width: 640px)  { .form-row { grid-template-columns: 1fr; } }

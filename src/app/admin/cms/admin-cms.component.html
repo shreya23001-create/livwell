@@ -1,0 +1,353 @@
+<div class="cms-page">
+
+  <!-- Header -->
+  <div class="cms-header">
+    <div>
+      <h1 class="cms-title">Content Management</h1>
+      <p class="cms-sub">Manage banners, featured properties, announcements and page content</p>
+    </div>
+    @if (saveSuccess()) {
+      <div class="cms-toast">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 11 4 16"/></svg>
+        {{ saveSuccess() }}
+      </div>
+    }
+  </div>
+
+  <!-- Tabs -->
+  <div class="cms-tabs">
+    <button class="cms-tab" [class.active]="activeTab() === 'banners'"       (click)="activeTab.set('banners')">Hero Banners</button>
+    <button class="cms-tab" [class.active]="activeTab() === 'featured'"      (click)="activeTab.set('featured')">Featured Properties</button>
+    <button class="cms-tab" [class.active]="activeTab() === 'announcements'" (click)="activeTab.set('announcements')">Announcements</button>
+    <button class="cms-tab" [class.active]="activeTab() === 'pages'"         (click)="activeTab.set('pages')">Page Content</button>
+  </div>
+
+  <!-- ── BANNERS ─────────────────────────────────────────── -->
+  @if (activeTab() === 'banners') {
+    <div class="cms-section">
+      <div class="cms-section-header">
+        <div>
+          <div class="cms-section-title">Hero Banners</div>
+          <div class="cms-section-sub">Manage the rotating banners shown on your homepage hero section.</div>
+        </div>
+        <button class="btn-primary" (click)="openAddBanner()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Banner
+        </button>
+      </div>
+
+      <div class="cms-list">
+        @for (b of banners(); track b.id) {
+          <div class="cms-banner-card">
+            <div class="cms-banner-order">{{ b.order }}</div>
+            <div class="cms-banner-body">
+              <div class="cms-banner-title">{{ b.title }}</div>
+              <div class="cms-banner-sub">{{ b.subtitle }}</div>
+              <div class="cms-banner-meta">
+                <span class="cms-cta-pill">{{ b.ctaText }} → {{ b.ctaLink }}</span>
+              </div>
+            </div>
+            <div class="cms-banner-actions">
+              <button class="status-toggle" [class.active]="b.status === 'active'" (click)="toggleBannerStatus(b.id)">
+                {{ b.status === 'active' ? 'Active' : 'Inactive' }}
+              </button>
+              <button class="action-btn action-btn--edit" (click)="openEditBanner(b)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="action-btn action-btn--delete" (click)="deleteBannerId.set(b.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ── FEATURED PROPERTIES ────────────────────────────── -->
+  @if (activeTab() === 'featured') {
+    <div class="cms-section">
+      <div class="cms-section-header">
+        <div>
+          <div class="cms-section-title">Featured Properties</div>
+          <div class="cms-section-sub">{{ featuredCount() }} of {{ featuredProperties().length }} properties currently featured on the homepage.</div>
+        </div>
+      </div>
+
+      <div class="featured-grid">
+        @for (p of featuredProperties(); track p.id) {
+          <div class="featured-card" [class.is-featured]="p.featured">
+            <div class="featured-card-head">
+              <div class="featured-order-badge">{{ p.order }}</div>
+              <label class="feat-toggle-wrap">
+                <input type="checkbox" [checked]="p.featured" (change)="toggleFeatured(p.id)" />
+                <span class="feat-toggle"></span>
+                <span class="feat-toggle-label">{{ p.featured ? 'Featured' : 'Not Featured' }}</span>
+              </label>
+            </div>
+            <div class="featured-card-name">{{ p.name }}</div>
+            <div class="featured-card-meta">
+              <span class="feat-type-badge">{{ p.type }}</span>
+              <span class="feat-location">{{ p.location }}</span>
+            </div>
+            <div class="featured-price">{{ p.price }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ── ANNOUNCEMENTS ──────────────────────────────────── -->
+  @if (activeTab() === 'announcements') {
+    <div class="cms-section">
+      <div class="cms-section-header">
+        <div>
+          <div class="cms-section-title">Site Announcements</div>
+          <div class="cms-section-sub">Banners and notices shown to users across the platform.</div>
+        </div>
+        <button class="btn-primary" (click)="openAddAnn()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Announcement
+        </button>
+      </div>
+
+      <div class="cms-list">
+        @for (a of announcements(); track a.id) {
+          <div class="cms-ann-card ann-type--{{ a.type }}">
+            <div class="ann-type-strip"></div>
+            <div class="ann-body">
+              <div class="ann-head">
+                <span class="ann-type-badge ann-badge--{{ a.type }}">{{ annTypeLabel(a.type) }}</span>
+                <span class="ann-expires">Expires: {{ a.expiresOn || '—' }}</span>
+              </div>
+              <div class="ann-title">{{ a.title }}</div>
+              <div class="ann-text">{{ a.body }}</div>
+            </div>
+            <div class="cms-banner-actions">
+              <button class="status-toggle" [class.active]="a.active" (click)="toggleAnn(a.id)">
+                {{ a.active ? 'Active' : 'Inactive' }}
+              </button>
+              <button class="action-btn action-btn--edit" (click)="openEditAnn(a)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="action-btn action-btn--delete" (click)="deleteAnnId.set(a.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ── PAGE CONTENT ───────────────────────────────────── -->
+  @if (activeTab() === 'pages') {
+    <div class="cms-section">
+      <div class="cms-section-header">
+        <div>
+          <div class="cms-section-title">Page Content</div>
+          <div class="cms-section-sub">Edit headings, subheadings and body text for key pages.</div>
+        </div>
+      </div>
+
+      <div class="pages-list">
+        @for (page of pages(); track page.id) {
+          <div class="page-card">
+            @if (editingPageId() !== page.id) {
+              <!-- View mode -->
+              <div class="page-card-view">
+                <div class="page-card-label">{{ page.label }}</div>
+                <div class="page-heading-preview">{{ page.heading }}</div>
+                <div class="page-sub-preview">{{ page.subheading }}</div>
+                @if (page.body) { <div class="page-body-preview">{{ page.body }}</div> }
+                <button class="btn-edit-page" (click)="editPage(page)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Edit
+                </button>
+              </div>
+            } @else {
+              <!-- Edit mode -->
+              <div class="page-card-edit">
+                <div class="page-card-label">{{ page.label }}</div>
+                <div class="pform-field">
+                  <label>Heading</label>
+                  <input type="text" [ngModel]="pageForm().heading" (ngModelChange)="pageForm.update(f => ({...f, heading: $event}))" />
+                </div>
+                <div class="pform-field">
+                  <label>Subheading</label>
+                  <input type="text" [ngModel]="pageForm().subheading" (ngModelChange)="pageForm.update(f => ({...f, subheading: $event}))" />
+                </div>
+                <div class="pform-field">
+                  <label>Body (optional)</label>
+                  <textarea rows="4" [ngModel]="pageForm().body" (ngModelChange)="pageForm.update(f => ({...f, body: $event}))"></textarea>
+                </div>
+                <div class="pform-actions">
+                  <button class="btn-ghost" (click)="editingPageId.set(null)">Cancel</button>
+                  <button class="btn-primary" (click)="savePage()">Save Changes</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+</div>
+
+<!-- ── Banner Add/Edit Modal ──────────────────────────── -->
+@if (showBannerModal()) {
+  <div class="modal-overlay" (click)="showBannerModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingBannerId() !== null ? 'Edit Banner' : 'Add Banner' }}</h2>
+        <button class="modal-close" (click)="showBannerModal.set(false)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field form-field--full" [class.has-error]="bannerErrors()['title']">
+            <label>Banner Title</label>
+            <input type="text" [ngModel]="bannerForm().title" (ngModelChange)="bannerForm.update(f => ({...f, title: $event}))" placeholder="e.g. Find Your Dream Home in Dubai" />
+            @if (bannerErrors()['title']) { <span class="field-error">{{ bannerErrors()['title'] }}</span> }
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field form-field--full">
+            <label>Subtitle</label>
+            <input type="text" [ngModel]="bannerForm().subtitle" (ngModelChange)="bannerForm.update(f => ({...f, subtitle: $event}))" placeholder="Short description shown under the title" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field" [class.has-error]="bannerErrors()['ctaText']">
+            <label>Button Text</label>
+            <input type="text" [ngModel]="bannerForm().ctaText" (ngModelChange)="bannerForm.update(f => ({...f, ctaText: $event}))" placeholder="e.g. Browse Properties" />
+            @if (bannerErrors()['ctaText']) { <span class="field-error">{{ bannerErrors()['ctaText'] }}</span> }
+          </div>
+          <div class="form-field" [class.has-error]="bannerErrors()['ctaLink']">
+            <label>Button Link</label>
+            <input type="text" [ngModel]="bannerForm().ctaLink" (ngModelChange)="bannerForm.update(f => ({...f, ctaLink: $event}))" placeholder="/properties" />
+            @if (bannerErrors()['ctaLink']) { <span class="field-error">{{ bannerErrors()['ctaLink'] }}</span> }
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Status</label>
+            <select [ngModel]="bannerForm().status" (ngModelChange)="bannerForm.update(f => ({...f, status: $event}))">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Display Order</label>
+            <input type="number" min="1" [ngModel]="bannerForm().order" (ngModelChange)="bannerForm.update(f => ({...f, order: +$event}))" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" (click)="showBannerModal.set(false)">Cancel</button>
+        <button class="btn-primary" (click)="saveBanner()">{{ editingBannerId() !== null ? 'Save Changes' : 'Add Banner' }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Banner Delete Confirm ──────────────────────────── -->
+@if (deleteBannerId() !== null) {
+  <div class="modal-overlay" (click)="deleteBannerId.set(null)">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header modal-header--danger">
+        <h2>Delete Banner</h2>
+        <button class="modal-close" (click)="deleteBannerId.set(null)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="delete-msg">Are you sure you want to delete this banner? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" (click)="deleteBannerId.set(null)">Cancel</button>
+        <button class="btn-danger" (click)="deleteBanner()">Delete</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Announcement Add/Edit Modal ───────────────────── -->
+@if (showAnnModal()) {
+  <div class="modal-overlay" (click)="showAnnModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingAnnId() !== null ? 'Edit Announcement' : 'Add Announcement' }}</h2>
+        <button class="modal-close" (click)="showAnnModal.set(false)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field form-field--full" [class.has-error]="annErrors()['title']">
+            <label>Title</label>
+            <input type="text" [ngModel]="annForm().title" (ngModelChange)="annForm.update(f => ({...f, title: $event}))" placeholder="Announcement title" />
+            @if (annErrors()['title']) { <span class="field-error">{{ annErrors()['title'] }}</span> }
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field form-field--full" [class.has-error]="annErrors()['body']">
+            <label>Body</label>
+            <textarea rows="3" [ngModel]="annForm().body" (ngModelChange)="annForm.update(f => ({...f, body: $event}))" placeholder="Announcement message…"></textarea>
+            @if (annErrors()['body']) { <span class="field-error">{{ annErrors()['body'] }}</span> }
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Type</label>
+            <select [ngModel]="annForm().type" (ngModelChange)="annForm.update(f => ({...f, type: $event}))">
+              <option value="info">Info</option>
+              <option value="success">Success</option>
+              <option value="warning">Warning</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Expires On</label>
+            <input type="date" [ngModel]="annForm().expiresOn" (ngModelChange)="annForm.update(f => ({...f, expiresOn: $event}))" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Status</label>
+            <select [ngModel]="annForm().active" (ngModelChange)="annForm.update(f => ({...f, active: $event === 'true' || $event === true}))">
+              <option [value]="true">Active</option>
+              <option [value]="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" (click)="showAnnModal.set(false)">Cancel</button>
+        <button class="btn-primary" (click)="saveAnn()">{{ editingAnnId() !== null ? 'Save Changes' : 'Add Announcement' }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Announcement Delete Confirm ───────────────────── -->
+@if (deleteAnnId() !== null) {
+  <div class="modal-overlay" (click)="deleteAnnId.set(null)">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header modal-header--danger">
+        <h2>Delete Announcement</h2>
+        <button class="modal-close" (click)="deleteAnnId.set(null)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="delete-msg">Are you sure you want to delete this announcement? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" (click)="deleteAnnId.set(null)">Cancel</button>
+        <button class="btn-danger" (click)="deleteAnn()">Delete</button>
+      </div>
+    </div>
+  </div>
+}

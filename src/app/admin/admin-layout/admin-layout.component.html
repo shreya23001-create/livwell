@@ -1,0 +1,87 @@
+<div class="adm-shell" [class.collapsed]="sidebarCollapsed()">
+
+  <!-- ── SIDEBAR ───────────────────────────────────── -->
+  <aside class="adm-sidebar">
+
+    <!-- Logo / brand -->
+    <div class="adm-sidebar-brand">
+      <div class="adm-brand-logo">LW</div>
+      <div class="adm-brand-text">
+        <div class="adm-brand-name">Livwell</div>
+        <div class="adm-brand-sub">Admin Portal</div>
+      </div>
+      <!-- Collapse btn: visible when expanded -->
+      <button class="adm-collapse-btn" (click)="toggle()" title="Collapse sidebar">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" /></svg>
+      </button>
+      <!-- Expand btn: visible when collapsed -->
+      <button class="adm-expand-btn" (click)="toggle()" title="Expand sidebar">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" /></svg>
+      </button>
+    </div>
+
+    <!-- Nav items -->
+    <nav class="adm-nav">
+      <a *ngFor="let item of navItems"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         class="adm-nav-item"
+         [title]="item.label">
+        <span class="adm-nav-icon" [innerHTML]="item.icon"></span>
+        <span class="adm-nav-label">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <!-- Divider + quick links -->
+    <div class="adm-sidebar-section-label">Quick Links</div>
+    <nav class="adm-nav adm-nav--small">
+      <a routerLink="/" class="adm-nav-item" target="_blank" title="View Website">
+        <span class="adm-nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+        </span>
+        <span class="adm-nav-label">View Website</span>
+      </a>
+    </nav>
+
+    <!-- User / logout -->
+    <div class="adm-sidebar-footer">
+      <div class="adm-user-card">
+        <div class="adm-user-avatar">A</div>
+        <div class="adm-user-info">
+          <div class="adm-user-name">Admin</div>
+          <div class="adm-user-role">Super Admin</div>
+        </div>
+        <button class="adm-logout-btn" (click)="auth.logout()" title="Logout">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── MAIN AREA ──────────────────────────────────── -->
+  <div class="adm-main">
+
+    <!-- Top bar — no hamburger here -->
+    <header class="adm-topbar">
+      <div class="adm-topbar-search">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+        <input type="text" placeholder="Search properties, leads, users…">
+      </div>
+      <div class="adm-topbar-right">
+        <button class="adm-topbar-icon-btn" title="Notifications">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
+          <span class="adm-notif-dot"></span>
+        </button>
+        <div class="adm-topbar-avatar">A</div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="adm-content">
+      <router-outlet />
+    </div>
+
+  </div>
+
+</div>

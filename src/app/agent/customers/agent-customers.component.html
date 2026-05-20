@@ -1,0 +1,53 @@
+<div class="cust-page">
+  <div class="page-header">
+    <div><h1 class="page-title">Customers</h1><p class="page-sub">Your assigned customer accounts</p></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val">{{ stats().total }}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card stat-card--green"><div class="stat-val">{{ stats().active }}</div><div class="stat-lbl">Active</div></div>
+    <div class="stat-card stat-card--gold"><div class="stat-val">{{ stats().closed }}</div><div class="stat-lbl">Closed Deals</div></div>
+    <div class="stat-card stat-card--blue"><div class="stat-val">{{ stats().enquiries }}</div><div class="stat-lbl">Total Enquiries</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-box">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+      <input type="text" placeholder="Search name, email, interest…" [value]="search()" (input)="search.set($any($event.target).value)">
+    </div>
+    <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="closed">Closed</option>
+    </select>
+  </div>
+
+  <!-- Cards -->
+  <div class="cust-grid">
+    <div class="cust-card" *ngFor="let c of filtered()">
+      <div class="cust-card-top">
+        <div class="cust-avatar">{{ c.name[0] }}</div>
+        <div class="cust-info">
+          <div class="cust-name">{{ c.name }}</div>
+          <div class="cust-email">{{ c.email }}</div>
+          <div class="cust-phone">{{ c.phone }}</div>
+        </div>
+        <span class="status-badge status-badge--{{ c.status }}">{{ c.status | titlecase }}</span>
+      </div>
+      <div class="cust-interest">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+        {{ c.interest }}
+      </div>
+      <div class="cust-budget">Budget: <strong>{{ c.budget }}</strong></div>
+      <div class="cust-notes" *ngIf="c.notes">{{ c.notes }}</div>
+      <div class="cust-footer">
+        <span class="cust-meta">{{ c.enquiries }} enquir{{ c.enquiries===1?'y':'ies' }}</span>
+        <span class="cust-meta">Last active {{ c.lastActive }}</span>
+      </div>
+    </div>
+    <div *ngIf="filtered().length===0" class="empty-state">No customers found.</div>
+  </div>
+</div>

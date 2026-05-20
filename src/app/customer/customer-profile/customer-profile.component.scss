@@ -1,0 +1,221 @@
+$accent:  #6366f1;
+$accent2: #4f46e5;
+$border:  #e5e7eb;
+$muted:   #9ca3af;
+$text:    #111827;
+$sub:     #6b7280;
+$bg:      #f4f6fa;
+
+.cprofile-page { }
+
+.page-header { margin-bottom: 1.5rem; }
+.page-title  { font-size: 1.5rem; font-weight: 800; color: $text; margin: 0 0 0.25rem; }
+.page-sub    { font-size: 0.85rem; color: $sub; margin: 0; }
+
+// Hero
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.profile-avatar-wrap { position: relative; flex-shrink: 0; }
+.profile-avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $accent, #8b5cf6);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: $accent;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  svg { width: 0.7rem; height: 0.7rem; }
+}
+.profile-hero-name  { font-size: 1.1rem; font-weight: 700; color: $text; margin-bottom: 0.15rem; }
+.profile-hero-email { font-size: 0.83rem; color: $muted; margin-bottom: 0.4rem; }
+.profile-hero-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(99,102,241,0.12);
+  color: $accent;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+}
+
+// Tabs
+.profile-tabs {
+  display: flex;
+  gap: 0;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  width: fit-content;
+}
+.tab-btn {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $sub;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  &:not(:last-child) { border-right: 1px solid $border; }
+  &:hover { background: $bg; color: $text; }
+  &.active { background: $accent; color: #fff; font-weight: 600; }
+}
+
+// Alerts
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  svg { width: 1rem; height: 1rem; flex-shrink: 0; }
+  &--success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+  &--error   { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+}
+
+// Card
+.profile-card {
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+}
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0 0 1rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 1px solid $border;
+}
+
+// Form
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  &--sm { grid-template-columns: 1fr 1fr; }
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  &--full { grid-column: 1 / -1; }
+  label { font-size: 0.8rem; font-weight: 600; color: $sub; }
+  input, select {
+    border: 1px solid $border;
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.875rem;
+    color: $text;
+    outline: none;
+    background: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+    &:focus { border-color: $accent; }
+  }
+}
+.input-wrap {
+  position: relative;
+  input { padding-right: 2.5rem; }
+}
+.pw-toggle {
+  position: absolute;
+  right: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $muted;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  svg { width: 1rem; height: 1rem; }
+  &:hover { color: $text; }
+}
+.form-actions { margin-top: 1.5rem; }
+.btn-primary {
+  background: $accent;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover { background: $accent2; }
+}
+
+// Preferences toggles
+.pref-list { display: flex; flex-direction: column; gap: 0; }
+.pref-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid $border;
+  cursor: pointer;
+  &:last-child { border-bottom: none; }
+}
+.pref-info { display: flex; flex-direction: column; gap: 0.15rem; }
+.pref-label { font-size: 0.875rem; font-weight: 600; color: $text; }
+.pref-desc  { font-size: 0.78rem; color: $muted; }
+.toggle {
+  width: 2.5rem;
+  height: 1.375rem;
+  border-radius: 999px;
+  background: $border;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  &.on { background: $accent; }
+}
+.toggle-thumb {
+  position: absolute;
+  top: 0.15rem;
+  left: 0.15rem;
+  width: 1.075rem;
+  height: 1.075rem;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle.on .toggle-thumb { transform: translateX(1.125rem); }
+
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .profile-tabs { width: 100%; }
+  .tab-btn { flex: 1; text-align: center; }
+}

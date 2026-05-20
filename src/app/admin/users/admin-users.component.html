@@ -1,0 +1,323 @@
+<div class="usr-page">
+
+  <!-- ── HEADER ───────────────────────────────────────── -->
+  <div class="usr-header">
+    <div>
+      <h1 class="usr-title">Users</h1>
+      <p class="usr-sub">Manage all platform users — admins, agents and customers</p>
+    </div>
+    <button class="usr-btn usr-btn--primary" (click)="openAdd()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Add User
+    </button>
+  </div>
+
+  <!-- ── STAT CARDS ────────────────────────────────────── -->
+  <div class="usr-stats">
+    <div class="usr-stat-card">
+      <div class="usr-stat-val">{{ stats().total }}</div>
+      <div class="usr-stat-lbl">Total Users</div>
+    </div>
+    <div class="usr-stat-card usr-stat-card--purple">
+      <div class="usr-stat-val">{{ stats().admins }}</div>
+      <div class="usr-stat-lbl">Admins</div>
+    </div>
+    <div class="usr-stat-card usr-stat-card--green">
+      <div class="usr-stat-val">{{ stats().agents }}</div>
+      <div class="usr-stat-lbl">Agents</div>
+    </div>
+    <div class="usr-stat-card usr-stat-card--blue">
+      <div class="usr-stat-val">{{ stats().customers }}</div>
+      <div class="usr-stat-lbl">Customers</div>
+    </div>
+    <div class="usr-stat-card usr-stat-card--red">
+      <div class="usr-stat-val">{{ stats().suspended }}</div>
+      <div class="usr-stat-lbl">Suspended / Locked</div>
+    </div>
+  </div>
+
+  <!-- ── FILTERS ───────────────────────────────────────── -->
+  <div class="usr-filters">
+    <div class="usr-search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+      </svg>
+      <input class="usr-search" type="text" placeholder="Search by name, email or phone…" [value]="search()"
+        (input)="search.set($any($event.target).value); onSearch()">
+    </div>
+    <select class="usr-select" [value]="filterRole()" (change)="filterRole.set($any($event.target).value); onFilter()">
+      <option value="">All Roles</option>
+      <option value="super_admin">Super Admin</option>
+      <option value="admin">Admin</option>
+      <option value="agent">Agent</option>
+      <option value="customer">Customer</option>
+    </select>
+    <select class="usr-select" [value]="filterStatus()"
+      (change)="filterStatus.set($any($event.target).value); onFilter()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="pending_verification">Pending</option>
+      <option value="suspended">Suspended</option>
+      <option value="locked">Locked</option>
+    </select>
+    <button *ngIf="hasFilters()" class="usr-btn usr-btn--ghost" (click)="clearFilters()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+      Clear
+    </button>
+  </div>
+
+  <div class="usr-result-bar">
+    <span class="usr-result-count">{{ filtered().length }} users</span>
+  </div>
+
+  <!-- ── TABLE ─────────────────────────────────────────── -->
+  <div class="usr-table-wrap">
+    <table class="usr-table">
+      <thead>
+        <tr>
+          <th class="usr-th usr-th--sortable" (click)="sort('name')">User<svg *ngIf="sortField() === 'name'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
+          <th class="usr-th">Role</th>
+          <th class="usr-th">Status</th>
+          <th class="usr-th usr-th--sortable" (click)="sort('joinedDate')">Joined<svg *ngIf="sortField() === 'joinedDate'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
+          <th class="usr-th usr-th--sortable" (click)="sort('lastActive')">Last Active<svg *ngIf="sortField() === 'lastActive'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
+          <th class="usr-th">Activity</th>
+          <th class="usr-th usr-th--actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of paginated()" class="usr-row">
+
+          <!-- User info -->
+          <td class="usr-td">
+            <div class="usr-cell-user">
+              <div class="usr-avatar" [style.background]="avatarColor(u.role) + '22'"
+                [style.color]="avatarColor(u.role)">
+                {{ initials(u.name) }}
+              </div>
+              <div>
+                <div class="usr-cell-name">{{ u.name }}</div>
+                <div class="usr-cell-email">{{ u.email }}</div>
+                <div class="usr-cell-phone">{{ u.phone }}</div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Role -->
+          <td class="usr-td">
+            <span class="usr-role-badge usr-role-badge--{{ u.role }}">{{ roleLabel(u.role) }}</span>
+          </td>
+
+          <!-- Status -->
+          <td class="usr-td">
+            <span class="usr-status-badge usr-status-badge--{{ u.status }}">{{ statusLabel(u.status) }}</span>
+          </td>
+
+          <!-- Joined -->
+          <td class="usr-td usr-date">{{ u.joinedDate | date:'d MMM y' }}</td>
+
+          <!-- Last active -->
+          <td class="usr-td usr-date">{{ u.lastActive | date:'d MMM y' }}</td>
+
+          <!-- Activity (agents only) -->
+          <td class="usr-td">
+            <ng-container *ngIf="u.role === 'agent'; else noActivity">
+              <div class="usr-activity">
+                <span class="usr-activity-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  </svg>
+                  {{ u.propertiesCount }} listings
+                </span>
+                <span class="usr-activity-item usr-activity-item--lead">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
+                  {{ u.leadsCount }} leads
+                </span>
+              </div>
+            </ng-container>
+            <ng-template #noActivity>
+              <span *ngIf="u.role === 'customer' && u.leadsCount" class="usr-activity-item usr-activity-item--lead">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+                {{ u.leadsCount }} enquiries
+              </span>
+              <span *ngIf="u.role !== 'customer' || !u.leadsCount" class="usr-no-activity">—</span>
+            </ng-template>
+          </td>
+
+          <!-- Actions -->
+          <td class="usr-td usr-td--actions">
+            <button class="usr-action-btn usr-action-btn--edit" (click)="openEdit(u)" title="Edit user">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+              </svg>
+            </button>
+            <button class="usr-action-btn" [class.usr-action-btn--suspend]="u.status === 'active'"
+              [class.usr-action-btn--activate]="u.status !== 'active'" (click)="toggleStatus(u)"
+              [title]="u.status === 'active' ? 'Suspend user' : 'Activate user'">
+              <svg *ngIf="u.status === 'active'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+              <svg *ngIf="u.status !== 'active'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+            </button>
+            <button class="usr-action-btn usr-action-btn--delete" (click)="confirmDelete(u)" title="Delete user">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+              </svg>
+            </button>
+          </td>
+
+        </tr>
+        <tr *ngIf="paginated().length === 0">
+          <td colspan="7" class="usr-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+            </svg>
+            <p>No users found</p>
+            <button *ngIf="hasFilters()" class="usr-btn usr-btn--ghost" (click)="clearFilters()">Clear filters</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── PAGINATION ─────────────────────────────────────── -->
+  <div class="usr-pagination" *ngIf="totalPages() > 1">
+    <button class="usr-page-btn" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+    </button>
+    <ng-container *ngFor="let pg of pages()">
+      <span *ngIf="pg === -1" class="usr-page-ellipsis">…</span>
+      <button *ngIf="pg !== -1" class="usr-page-btn" [class.active]="pg === page()" (click)="page.set(pg)">{{ pg
+        }}</button>
+    </ng-container>
+    <button class="usr-page-btn" [disabled]="page() === totalPages()" (click)="page.update(p => p + 1)">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
+    </button>
+    <span class="usr-page-info">Page {{ page() }} of {{ totalPages() }}</span>
+  </div>
+
+</div>
+
+<!-- ══ ADD / EDIT MODAL ════════════════════════════════ -->
+<div class="usr-modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
+<div class="usr-modal" *ngIf="modalOpen()">
+  <div class="usr-modal-header">
+    <h2 class="usr-modal-title">{{ editingId() !== null ? 'Edit User' : 'Add User' }}</h2>
+    <button class="usr-modal-close" (click)="closeModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <div class="usr-modal-body">
+
+    <div class="usr-form-row">
+      <div class="usr-form-field" [class.has-error]="formErrors()['name']">
+        <label class="usr-form-label">Full Name *</label>
+        <input class="usr-form-input" type="text" placeholder="e.g. Sarah Al-Mansouri" [value]="form()['name'] || ''"
+          (input)="patchForm('name', $any($event.target).value)">
+        <span *ngIf="formErrors()['name']" class="usr-form-error">{{ formErrors()['name'] }}</span>
+      </div>
+      <div class="usr-form-field" [class.has-error]="formErrors()['email']">
+        <label class="usr-form-label">Email *</label>
+        <input class="usr-form-input" type="email" placeholder="user@livwell.ae" [value]="form()['email'] || ''"
+          (input)="patchForm('email', $any($event.target).value)">
+        <span *ngIf="formErrors()['email']" class="usr-form-error">{{ formErrors()['email'] }}</span>
+      </div>
+    </div>
+
+    <div class="usr-form-row">
+      <div class="usr-form-field" [class.has-error]="formErrors()['phone']">
+        <label class="usr-form-label">Phone *</label>
+        <input class="usr-form-input" type="tel" placeholder="+971 50 123 4567" [value]="form()['phone'] || ''"
+          (input)="patchForm('phone', $any($event.target).value)">
+        <span *ngIf="formErrors()['phone']" class="usr-form-error">{{ formErrors()['phone'] }}</span>
+      </div>
+      <div class="usr-form-field">
+        <label class="usr-form-label">Role *</label>
+        <select class="usr-form-input" [value]="form()['role']" (change)="patchForm('role', $any($event.target).value)">
+          <option *ngFor="let r of roleList" [value]="r">{{ roleLabel(r) }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="usr-form-row">
+      <div class="usr-form-field">
+        <label class="usr-form-label">Status</label>
+        <select class="usr-form-input" [value]="form()['status']"
+          (change)="patchForm('status', $any($event.target).value)">
+          <option *ngFor="let s of statusList" [value]="s">{{ statusLabel(s) }}</option>
+        </select>
+      </div>
+      <div class="usr-form-field">
+        <label class="usr-form-label">Joined Date</label>
+        <input class="usr-form-input" type="date" [value]="form()['joinedDate'] || ''"
+          (input)="patchForm('joinedDate', $any($event.target).value)">
+      </div>
+    </div>
+
+  </div>
+  <div class="usr-modal-footer">
+    <button class="usr-btn usr-btn--ghost" (click)="closeModal()">Cancel</button>
+    <button class="usr-btn usr-btn--primary" (click)="saveUser()">
+      {{ editingId() !== null ? 'Save Changes' : 'Add User' }}
+    </button>
+  </div>
+</div>
+
+<!-- ══ DELETE MODAL ════════════════════════════════════ -->
+<div class="usr-modal-backdrop" *ngIf="deleteTarget()" (click)="cancelDelete()"></div>
+<div class="usr-modal usr-modal--sm" *ngIf="deleteTarget()">
+  <div class="usr-modal-header">
+    <h2 class="usr-modal-title">Delete User</h2>
+    <button class="usr-modal-close" (click)="cancelDelete()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <div class="usr-modal-body">
+    <div class="usr-delete-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+      </svg>
+    </div>
+    <p class="usr-delete-msg">Are you sure you want to delete <strong>{{ deleteTarget()?.name }}</strong>? This cannot
+      be undone.</p>
+  </div>
+  <div class="usr-modal-footer">
+    <button class="usr-btn usr-btn--ghost" (click)="cancelDelete()">Cancel</button>
+    <button class="usr-btn usr-btn--danger" (click)="doDelete()">Delete User</button>
+  </div>
+</div>

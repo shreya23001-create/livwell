@@ -1,0 +1,183 @@
+<div class="reports-page">
+
+  <!-- ── Header ── -->
+  <div class="reports-header">
+    <div>
+      <h1 class="reports-title">Reports & Analytics</h1>
+      <p class="reports-subtitle">Platform performance overview</p>
+    </div>
+    <div class="period-tabs">
+      <button [class.active]="period()==='week'"    (click)="period.set('week')">Week</button>
+      <button [class.active]="period()==='month'"   (click)="period.set('month')">Month</button>
+      <button [class.active]="period()==='quarter'" (click)="period.set('quarter')">Quarter</button>
+      <button [class.active]="period()==='year'"    (click)="period.set('year')">Year</button>
+    </div>
+  </div>
+
+  <!-- ── KPI Cards ── -->
+  <div class="kpi-grid">
+    <div class="kpi-card" *ngFor="let k of kpis">
+      <div class="kpi-top">
+        <span class="kpi-label">{{ k.label }}</span>
+        <span class="kpi-trend kpi-trend--{{ k.trend }}">
+          <span *ngIf="k.trend==='up'">▲</span>
+          <span *ngIf="k.trend==='down'">▼</span>
+          <span *ngIf="k.trend==='flat'">—</span>
+          {{ k.trendVal }}
+        </span>
+      </div>
+      <div class="kpi-value kpi-value--{{ k.color }}">{{ k.value }}</div>
+      <div class="kpi-sub">{{ k.sub }}</div>
+    </div>
+  </div>
+
+  <!-- ── Row: Revenue Chart + Lead Pipeline ── -->
+  <div class="charts-row">
+
+    <!-- Revenue Bar Chart -->
+    <div class="chart-card chart-card--wide">
+      <div class="chart-header">
+        <h3>Monthly Revenue (AED M)</h3>
+        <span class="chart-badge">2026</span>
+      </div>
+      <div class="bar-chart bar-chart--vertical">
+        <div class="bar-chart-grid">
+          <div class="bar-chart-bars">
+            <div class="vbar-item" *ngFor="let item of monthlyRevenue">
+              <div class="vbar-wrap">
+                <div class="vbar-fill" [style.height.%]="item.pct" [style.background]="item.color"></div>
+              </div>
+              <div class="vbar-val">{{ item.value }}M</div>
+              <div class="vbar-label">{{ item.label }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lead Pipeline -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Lead Pipeline</h3>
+        <span class="chart-badge">{{ leadsByStatus[0].value + leadsByStatus[1].value + leadsByStatus[2].value + leadsByStatus[3].value + leadsByStatus[4].value + leadsByStatus[5].value }} total</span>
+      </div>
+      <div class="hbar-list">
+        <div class="hbar-item" *ngFor="let item of leadsByStatus">
+          <div class="hbar-meta">
+            <span class="hbar-label">{{ item.label }}</span>
+            <span class="hbar-val">{{ item.value }}</span>
+          </div>
+          <div class="hbar-track">
+            <div class="hbar-fill" [style.width.%]="item.pct" [style.background]="item.color"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Row: Lead Sources + Property Types ── -->
+  <div class="charts-row charts-row--half">
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Leads by Source</h3>
+      </div>
+      <div class="hbar-list">
+        <div class="hbar-item" *ngFor="let item of leadsBySource">
+          <div class="hbar-meta">
+            <span class="hbar-label">{{ item.label }}</span>
+            <span class="hbar-val">{{ item.value }}</span>
+          </div>
+          <div class="hbar-track">
+            <div class="hbar-fill" [style.width.%]="item.pct" [style.background]="item.color"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Properties by Type</h3>
+      </div>
+      <div class="hbar-list">
+        <div class="hbar-item" *ngFor="let item of propertiesByType">
+          <div class="hbar-meta">
+            <span class="hbar-label">{{ item.label }}</span>
+            <span class="hbar-val">{{ item.value }}</span>
+          </div>
+          <div class="hbar-track">
+            <div class="hbar-fill" [style.width.%]="item.pct" [style.background]="item.color"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Row: Top Agents + Recent Activity ── -->
+  <div class="charts-row">
+
+    <!-- Top Agents Table -->
+    <div class="chart-card chart-card--wide">
+      <div class="chart-header">
+        <h3>Top Agents</h3>
+        <span class="chart-badge">This month</span>
+      </div>
+      <table class="agents-table">
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Leads</th>
+            <th>Won</th>
+            <th>Revenue</th>
+            <th>Conversion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let agent of topAgents; let i = index">
+            <td>
+              <div class="agent-cell">
+                <div class="agent-rank rank--{{ i+1 }}">{{ i+1 }}</div>
+                <div class="agent-avatar">{{ agent.name[0] }}</div>
+                <span class="agent-name">{{ agent.name }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="agent-bar-wrap">
+                <div class="agent-bar" [style.width.%]="(agent.leads / maxAgentLeads()) * 100"></div>
+                <span>{{ agent.leads }}</span>
+              </div>
+            </td>
+            <td><strong>{{ agent.won }}</strong></td>
+            <td class="td-revenue">{{ agent.revenue }}</td>
+            <td>
+              <div class="conv-wrap">
+                <div class="conv-bar" [style.width.%]="agent.conversion"></div>
+                <span>{{ agent.conversion }}%</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Recent Activity</h3>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item" *ngFor="let a of recentActivity">
+          <div class="activity-icon activity-icon--{{ a.type }}">{{ a.icon }}</div>
+          <div class="activity-body">
+            <p class="activity-text">{{ a.text }}</p>
+            <span class="activity-time">{{ a.time }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,192 @@
+<div class="cprofile-page">
+
+  <div class="page-header">
+    <h1 class="page-title">Profile & Settings</h1>
+    <p class="page-sub">Manage your account details and preferences</p>
+  </div>
+
+  <!-- Profile hero -->
+  <div class="profile-hero">
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar">{{ initials() }}</div>
+      <div class="profile-avatar-edit" title="Upload photo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+    </div>
+    <div>
+      <div class="profile-hero-name">{{ profileForm.name || 'Your Name' }}</div>
+      <div class="profile-hero-email">{{ profileForm.email }}</div>
+      <span class="profile-hero-badge">Customer</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="profile-tabs">
+    <button class="tab-btn" [class.active]="activeTab() === 'profile'"     (click)="activeTab.set('profile')">Personal Info</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'security'"    (click)="activeTab.set('security')">Security</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'preferences'" (click)="activeTab.set('preferences')">Notifications</button>
+  </div>
+
+  <!-- Alerts -->
+  @if (saveSuccess()) {
+    <div class="alert alert--success">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      {{ saveSuccess() }}
+    </div>
+  }
+  @if (saveError()) {
+    <div class="alert alert--error">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ saveError() }}
+    </div>
+  }
+
+  <!-- Personal Info -->
+  @if (activeTab() === 'profile') {
+    <div class="profile-card">
+      <h3 class="section-title">Personal Information</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Full Name</label>
+          <input type="text" [(ngModel)]="profileForm.name" placeholder="Your full name" />
+        </div>
+        <div class="form-field">
+          <label>Email Address</label>
+          <input type="email" [(ngModel)]="profileForm.email" placeholder="your@email.com" />
+        </div>
+        <div class="form-field">
+          <label>Phone Number</label>
+          <input type="tel" [(ngModel)]="profileForm.phone" placeholder="+971 50 000 0000" />
+        </div>
+        <div class="form-field">
+          <label>Nationality</label>
+          <input type="text" [(ngModel)]="profileForm.nationality" placeholder="e.g. UAE, India, UK" />
+        </div>
+      </div>
+
+      <h3 class="section-title" style="margin-top:1.5rem">Property Preferences</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>I am looking to</label>
+          <select [(ngModel)]="profileForm.lookingFor">
+            <option value="buy">Buy</option>
+            <option value="rent">Rent</option>
+            <option value="invest">Invest</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Budget</label>
+          <input type="text" [(ngModel)]="profileForm.budget" placeholder="e.g. AED 2,000,000" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" (click)="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+  }
+
+  <!-- Security -->
+  @if (activeTab() === 'security') {
+    <div class="profile-card">
+      <h3 class="section-title">Change Password</h3>
+      <div class="form-grid form-grid--sm">
+        <div class="form-field form-field--full">
+          <label>Current Password</label>
+          <div class="input-wrap">
+            <input [type]="showCurrentPw() ? 'text' : 'password'" [(ngModel)]="passwordForm.current" placeholder="Enter current password" />
+            <button type="button" class="pw-toggle" (click)="showCurrentPw.update(v => !v)">
+              @if (showCurrentPw()) {
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>New Password</label>
+          <div class="input-wrap">
+            <input [type]="showNewPw() ? 'text' : 'password'" [(ngModel)]="passwordForm.newPw" placeholder="Min 8 characters" />
+            <button type="button" class="pw-toggle" (click)="showNewPw.update(v => !v)">
+              @if (showNewPw()) {
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Confirm New Password</label>
+          <div class="input-wrap">
+            <input [type]="showConfirmPw() ? 'text' : 'password'" [(ngModel)]="passwordForm.confirmPw" placeholder="Repeat new password" />
+            <button type="button" class="pw-toggle" (click)="showConfirmPw.update(v => !v)">
+              @if (showConfirmPw()) {
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" (click)="savePassword()">Update Password</button>
+      </div>
+    </div>
+  }
+
+  <!-- Preferences -->
+  @if (activeTab() === 'preferences') {
+    <div class="profile-card">
+      <h3 class="section-title">Email Notifications</h3>
+      <div class="pref-list">
+        <label class="pref-item">
+          <div class="pref-info">
+            <span class="pref-label">Enquiry replies</span>
+            <span class="pref-desc">Get notified when an agent replies to your enquiry</span>
+          </div>
+          <div class="toggle" [class.on]="preferences.emailEnquiryReplies" (click)="preferences.emailEnquiryReplies = !preferences.emailEnquiryReplies"><div class="toggle-thumb"></div></div>
+        </label>
+        <label class="pref-item">
+          <div class="pref-info">
+            <span class="pref-label">New matching listings</span>
+            <span class="pref-desc">Receive alerts for new properties that match your preferences</span>
+          </div>
+          <div class="toggle" [class.on]="preferences.emailNewListings" (click)="preferences.emailNewListings = !preferences.emailNewListings"><div class="toggle-thumb"></div></div>
+        </label>
+        <label class="pref-item">
+          <div class="pref-info">
+            <span class="pref-label">Weekly market digest</span>
+            <span class="pref-desc">A weekly summary of Dubai real estate market trends</span>
+          </div>
+          <div class="toggle" [class.on]="preferences.emailWeeklyDigest" (click)="preferences.emailWeeklyDigest = !preferences.emailWeeklyDigest"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+
+      <h3 class="section-title" style="margin-top:1.5rem">SMS Notifications</h3>
+      <div class="pref-list">
+        <label class="pref-item">
+          <div class="pref-info">
+            <span class="pref-label">Viewing reminders</span>
+            <span class="pref-desc">Reminders 1 hour before scheduled property viewings</span>
+          </div>
+          <div class="toggle" [class.on]="preferences.smsViewingReminders" (click)="preferences.smsViewingReminders = !preferences.smsViewingReminders"><div class="toggle-thumb"></div></div>
+        </label>
+        <label class="pref-item">
+          <div class="pref-info">
+            <span class="pref-label">Agent messages</span>
+            <span class="pref-desc">Direct messages from your assigned agent</span>
+          </div>
+          <div class="toggle" [class.on]="preferences.smsAgentMessages" (click)="preferences.smsAgentMessages = !preferences.smsAgentMessages"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" (click)="savePreferences()">Save Preferences</button>
+      </div>
+    </div>
+  }
+
+</div>

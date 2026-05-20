@@ -1,0 +1,362 @@
+<div class="prop-page">
+
+  <!-- ── PAGE HEADER ──────────────────────────────────── -->
+  <div class="prop-header">
+    <div>
+      <h1 class="prop-title">Properties</h1>
+      <p class="prop-sub">Manage all property listings across the platform</p>
+    </div>
+    <button class="prop-btn prop-btn--primary" (click)="openAdd()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+      Add Property
+    </button>
+  </div>
+
+  <!-- ── STAT CARDS ────────────────────────────────────── -->
+  <div class="prop-stats">
+    <div class="prop-stat-card">
+      <div class="prop-stat-val">{{ stats().total }}</div>
+      <div class="prop-stat-lbl">Total Listings</div>
+    </div>
+    <div class="prop-stat-card prop-stat-card--green">
+      <div class="prop-stat-val">{{ stats().active }}</div>
+      <div class="prop-stat-lbl">Active</div>
+    </div>
+    <div class="prop-stat-card prop-stat-card--amber">
+      <div class="prop-stat-val">{{ stats().pending }}</div>
+      <div class="prop-stat-lbl">Pending</div>
+    </div>
+    <div class="prop-stat-card prop-stat-card--blue">
+      <div class="prop-stat-val">{{ stats().sold }}</div>
+      <div class="prop-stat-lbl">Sold</div>
+    </div>
+    <div class="prop-stat-card prop-stat-card--gold">
+      <div class="prop-stat-val">{{ stats().featured }}</div>
+      <div class="prop-stat-lbl">Featured</div>
+    </div>
+  </div>
+
+  <!-- ── FILTERS ───────────────────────────────────────── -->
+  <div class="prop-filters">
+    <div class="prop-search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+      <input class="prop-search" type="text" placeholder="Search by title, location, agent…"
+             [value]="search()" (input)="search.set($any($event.target).value); onSearch()">
+    </div>
+    <select class="prop-select" [value]="filterCategory()" (change)="filterCategory.set($any($event.target).value); onFilter()">
+      <option value="">All Categories</option>
+      <option value="sale">For Sale</option>
+      <option value="rent">For Rent</option>
+      <option value="off_plan">Off-Plan</option>
+    </select>
+    <select class="prop-select" [value]="filterType()" (change)="filterType.set($any($event.target).value); onFilter()">
+      <option value="">All Types</option>
+      <option *ngFor="let t of typeList" [value]="t">{{ typeLabel(t) }}</option>
+    </select>
+    <select class="prop-select" [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value); onFilter()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="pending">Pending</option>
+      <option value="sold">Sold</option>
+      <option value="rented">Rented</option>
+      <option value="off_market">Off Market</option>
+    </select>
+    <button *ngIf="hasFilters()" class="prop-btn prop-btn--ghost" (click)="clearFilters()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+      Clear
+    </button>
+  </div>
+
+  <!-- ── RESULTS COUNT ─────────────────────────────────── -->
+  <div class="prop-result-bar">
+    <span class="prop-result-count">{{ filtered().length }} properties</span>
+    <span *ngIf="hasFilters()" class="prop-filter-tag">Filtered</span>
+  </div>
+
+  <!-- ── TABLE ─────────────────────────────────────────── -->
+  <div class="prop-table-wrap">
+    <table class="prop-table">
+      <thead>
+        <tr>
+          <th class="prop-th prop-th--sortable" (click)="sort('title')">
+            Property
+            <svg *ngIf="sortField() === 'title'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>
+          </th>
+          <th class="prop-th">Category / Type</th>
+          <th class="prop-th prop-th--sortable" (click)="sort('price')">
+            Price
+            <svg *ngIf="sortField() === 'price'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>
+          </th>
+          <th class="prop-th">Status</th>
+          <th class="prop-th prop-th--sortable" (click)="sort('views')">
+            Views / Leads
+            <svg *ngIf="sortField() === 'views'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>
+          </th>
+          <th class="prop-th">Agent</th>
+          <th class="prop-th prop-th--sortable" (click)="sort('listedDate')">
+            Listed
+            <svg *ngIf="sortField() === 'listedDate'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>
+          </th>
+          <th class="prop-th prop-th--actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of paginated()" class="prop-row">
+
+          <!-- Property info -->
+          <td class="prop-td">
+            <div class="prop-cell-title">
+              <span class="prop-featured-dot" *ngIf="p.featured" title="Featured"></span>
+              {{ p.title }}
+            </div>
+            <div class="prop-cell-meta">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+              {{ p.community }}, {{ p.location }}
+            </div>
+            <div class="prop-cell-specs">
+              <span *ngIf="p.bedrooms > 0">{{ p.bedrooms }}BR</span>
+              <span *ngIf="p.bedrooms === 0">Studio</span>
+              · {{ p.bathrooms }}BA · {{ p.area | number }}sqft
+            </div>
+          </td>
+
+          <!-- Category / Type -->
+          <td class="prop-td">
+            <span class="prop-category-badge prop-category-badge--{{ p.category }}">{{ categoryLabel(p.category) }}</span>
+            <div class="prop-type-lbl">{{ typeLabel(p.type) }}</div>
+          </td>
+
+          <!-- Price -->
+          <td class="prop-td">
+            <div class="prop-price">{{ formatPrice(p.price, p.currency) }}</div>
+            <div class="prop-price-sub" *ngIf="p.category === 'rent'">/year</div>
+          </td>
+
+          <!-- Status -->
+          <td class="prop-td">
+            <span class="prop-status-badge prop-status-badge--{{ p.status }}">{{ statusLabel(p.status) }}</span>
+          </td>
+
+          <!-- Views / Leads -->
+          <td class="prop-td">
+            <div class="prop-metrics">
+              <span class="prop-metric">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                {{ p.views }}
+              </span>
+              <span class="prop-metric prop-metric--lead">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                {{ p.leads }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Agent -->
+          <td class="prop-td">
+            <div class="prop-agent">
+              <div class="prop-agent-avatar">{{ p.agent.charAt(0) }}</div>
+              <span class="prop-agent-name">{{ p.agent }}</span>
+            </div>
+          </td>
+
+          <!-- Listed date -->
+          <td class="prop-td prop-date">{{ p.listedDate | date:'d MMM y' }}</td>
+
+          <!-- Actions -->
+          <td class="prop-td prop-td--actions">
+            <button class="prop-action-btn prop-action-btn--edit" (click)="openEdit(p)" title="Edit">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>
+            </button>
+            <button class="prop-action-btn prop-action-btn--delete" (click)="confirmDelete(p)" title="Delete">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+            </button>
+          </td>
+
+        </tr>
+        <tr *ngIf="paginated().length === 0">
+          <td colspan="8" class="prop-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" /></svg>
+            <p>No properties found</p>
+            <button *ngIf="hasFilters()" class="prop-btn prop-btn--ghost" (click)="clearFilters()">Clear filters</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── PAGINATION ─────────────────────────────────────── -->
+  <div class="prop-pagination" *ngIf="totalPages() > 1">
+    <button class="prop-page-btn" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+    </button>
+    <ng-container *ngFor="let pg of pages()">
+      <span *ngIf="pg === -1" class="prop-page-ellipsis">…</span>
+      <button *ngIf="pg !== -1" class="prop-page-btn" [class.active]="pg === page()" (click)="page.set(pg)">{{ pg }}</button>
+    </ng-container>
+    <button class="prop-page-btn" [disabled]="page() === totalPages()" (click)="page.update(p => p + 1)">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+    </button>
+    <span class="prop-page-info">Page {{ page() }} of {{ totalPages() }}</span>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- ADD / EDIT MODAL                                       -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="prop-modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
+<div class="prop-modal" *ngIf="modalOpen()">
+  <div class="prop-modal-header">
+    <h2 class="prop-modal-title">{{ editingId() !== null ? 'Edit Property' : 'Add Property' }}</h2>
+    <button class="prop-modal-close" (click)="closeModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+    </button>
+  </div>
+
+  <div class="prop-modal-body">
+
+    <!-- Title -->
+    <div class="prop-form-field" [class.has-error]="formErrors()['title']">
+      <label class="prop-form-label">Property Title *</label>
+      <input class="prop-form-input" type="text" placeholder="e.g. Luxury 3BR Apartment in Downtown"
+             [value]="form()['title'] || ''" (input)="patchForm('title', $any($event.target).value)">
+      <span *ngIf="formErrors()['title']" class="prop-form-error">{{ formErrors()['title'] }}</span>
+    </div>
+
+    <!-- Category + Type row -->
+    <div class="prop-form-row">
+      <div class="prop-form-field">
+        <label class="prop-form-label">Category *</label>
+        <select class="prop-form-input" [value]="form()['category']" (change)="patchForm('category', $any($event.target).value)">
+          <option value="sale">For Sale</option>
+          <option value="rent">For Rent</option>
+          <option value="off_plan">Off-Plan</option>
+        </select>
+      </div>
+      <div class="prop-form-field">
+        <label class="prop-form-label">Type *</label>
+        <select class="prop-form-input" [value]="form()['type']" (change)="patchForm('type', $any($event.target).value)">
+          <option *ngFor="let t of typeList" [value]="t">{{ typeLabel(t) }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Price + Currency row -->
+    <div class="prop-form-row">
+      <div class="prop-form-field" [class.has-error]="formErrors()['price']">
+        <label class="prop-form-label">Price *</label>
+        <input class="prop-form-input" type="number" min="0" placeholder="0"
+               [value]="form()['price'] || ''" (input)="patchForm('price', +$any($event.target).value)">
+        <span *ngIf="formErrors()['price']" class="prop-form-error">{{ formErrors()['price'] }}</span>
+      </div>
+      <div class="prop-form-field">
+        <label class="prop-form-label">Currency</label>
+        <select class="prop-form-input" [value]="form()['currency']" (change)="patchForm('currency', $any($event.target).value)">
+          <option value="AED">AED</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Area + Beds + Baths -->
+    <div class="prop-form-row prop-form-row--3">
+      <div class="prop-form-field" [class.has-error]="formErrors()['area']">
+        <label class="prop-form-label">Area (sqft) *</label>
+        <input class="prop-form-input" type="number" min="0" placeholder="0"
+               [value]="form()['area'] || ''" (input)="patchForm('area', +$any($event.target).value)">
+        <span *ngIf="formErrors()['area']" class="prop-form-error">{{ formErrors()['area'] }}</span>
+      </div>
+      <div class="prop-form-field">
+        <label class="prop-form-label">Bedrooms</label>
+        <input class="prop-form-input" type="number" min="0" max="20"
+               [value]="form()['bedrooms'] ?? 1" (input)="patchForm('bedrooms', +$any($event.target).value)">
+      </div>
+      <div class="prop-form-field">
+        <label class="prop-form-label">Bathrooms</label>
+        <input class="prop-form-input" type="number" min="1" max="20"
+               [value]="form()['bathrooms'] ?? 1" (input)="patchForm('bathrooms', +$any($event.target).value)">
+      </div>
+    </div>
+
+    <!-- Location + Community -->
+    <div class="prop-form-row">
+      <div class="prop-form-field" [class.has-error]="formErrors()['location']">
+        <label class="prop-form-label">Location *</label>
+        <input class="prop-form-input" type="text" placeholder="e.g. Downtown Dubai"
+               [value]="form()['location'] || ''" (input)="patchForm('location', $any($event.target).value)">
+        <span *ngIf="formErrors()['location']" class="prop-form-error">{{ formErrors()['location'] }}</span>
+      </div>
+      <div class="prop-form-field" [class.has-error]="formErrors()['community']">
+        <label class="prop-form-label">Community *</label>
+        <input class="prop-form-input" type="text" placeholder="e.g. Burj Views"
+               [value]="form()['community'] || ''" (input)="patchForm('community', $any($event.target).value)">
+        <span *ngIf="formErrors()['community']" class="prop-form-error">{{ formErrors()['community'] }}</span>
+      </div>
+    </div>
+
+    <!-- Agent + Status -->
+    <div class="prop-form-row">
+      <div class="prop-form-field" [class.has-error]="formErrors()['agent']">
+        <label class="prop-form-label">Agent *</label>
+        <input class="prop-form-input" type="text" placeholder="Agent full name"
+               [value]="form()['agent'] || ''" (input)="patchForm('agent', $any($event.target).value)">
+        <span *ngIf="formErrors()['agent']" class="prop-form-error">{{ formErrors()['agent'] }}</span>
+      </div>
+      <div class="prop-form-field">
+        <label class="prop-form-label">Status</label>
+        <select class="prop-form-input" [value]="form()['status']" (change)="patchForm('status', $any($event.target).value)">
+          <option *ngFor="let s of statusList" [value]="s">{{ statusLabel(s) }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Listed date + Featured -->
+    <div class="prop-form-row">
+      <div class="prop-form-field">
+        <label class="prop-form-label">Listed Date</label>
+        <input class="prop-form-input" type="date"
+               [value]="form()['listedDate'] || ''" (input)="patchForm('listedDate', $any($event.target).value)">
+      </div>
+      <div class="prop-form-field prop-form-field--check">
+        <label class="prop-form-label">&nbsp;</label>
+        <label class="prop-check-label">
+          <input type="checkbox" [checked]="form()['featured']" (change)="patchForm('featured', $any($event.target).checked)">
+          <span class="prop-check-box"></span>
+          Mark as Featured
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="prop-modal-footer">
+    <button class="prop-btn prop-btn--ghost" (click)="closeModal()">Cancel</button>
+    <button class="prop-btn prop-btn--primary" (click)="saveProperty()">
+      {{ editingId() !== null ? 'Save Changes' : 'Add Property' }}
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- DELETE CONFIRM MODAL                                   -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="prop-modal-backdrop" *ngIf="deleteModal()" (click)="cancelDelete()"></div>
+<div class="prop-modal prop-modal--sm" *ngIf="deleteModal()">
+  <div class="prop-modal-header">
+    <h2 class="prop-modal-title">Delete Property</h2>
+    <button class="prop-modal-close" (click)="cancelDelete()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+    </button>
+  </div>
+  <div class="prop-modal-body">
+    <div class="prop-delete-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+    </div>
+    <p class="prop-delete-msg">Are you sure you want to delete <strong>{{ deleteModal()?.title }}</strong>? This action cannot be undone.</p>
+  </div>
+  <div class="prop-modal-footer">
+    <button class="prop-btn prop-btn--ghost" (click)="cancelDelete()">Cancel</button>
+    <button class="prop-btn prop-btn--danger" (click)="doDelete()">Delete Property</button>
+  </div>
+</div>

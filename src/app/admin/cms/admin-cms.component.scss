@@ -1,0 +1,223 @@
+$accent:  #6366f1;
+$accent2: #4f46e5;
+$red:     #ef4444;
+$border:  #e5e7eb;
+$muted:   #9ca3af;
+$text:    #111827;
+$sub:     #6b7280;
+$bg:      #f4f6fa;
+
+.cms-page { padding: 1.75rem 2rem; max-width: 1200px; }
+
+// ── Header
+.cms-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.cms-title { font-size: 1.5rem; font-weight: 800; color: $text; margin: 0 0 0.25rem; }
+.cms-sub   { font-size: 0.85rem; color: $sub; margin: 0; }
+
+.cms-toast {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem;
+  padding: 0.625rem 1rem; font-size: 0.8rem; font-weight: 600; color: #15803d;
+  svg { width: 1rem; height: 1rem; }
+}
+
+// ── Tabs
+.cms-tabs {
+  display: flex; gap: 0.25rem; background: $bg; border: 1px solid $border;
+  border-radius: 0.625rem; padding: 0.3rem; margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+.cms-tab {
+  flex: 1; padding: 0.55rem 1rem; border-radius: 0.375rem; border: none; background: transparent;
+  font-size: 0.85rem; font-weight: 600; color: $muted; cursor: pointer; white-space: nowrap;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  &.active { background: #fff; color: $text; box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+  &:hover:not(.active) { color: $text; background: rgba(255,255,255,0.6); }
+}
+
+// ── Section shell
+.cms-section { }
+.cms-section-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;
+}
+.cms-section-title { font-size: 1rem; font-weight: 700; color: $text; margin-bottom: 0.2rem; }
+.cms-section-sub   { font-size: 0.83rem; color: $sub; }
+
+// ── Shared buttons
+.btn-primary {
+  display: flex; align-items: center; gap: 0.4rem; background: $accent; color: #fff;
+  border: none; border-radius: 0.5rem; padding: 0.6rem 1.25rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  svg { width: 1rem; height: 1rem; }
+  &:hover { background: $accent2; }
+}
+.btn-ghost {
+  background: none; border: 1px solid $border; border-radius: 0.5rem; padding: 0.55rem 1.1rem;
+  font-size: 0.875rem; color: $sub; cursor: pointer;
+  &:hover { background: $bg; }
+}
+.btn-danger {
+  background: $red; color: #fff; border: none; border-radius: 0.5rem; padding: 0.55rem 1.1rem;
+  font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  &:hover { background: #dc2626; }
+}
+
+// ── List container
+.cms-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+// ── Banner card
+.cms-banner-card {
+  display: flex; align-items: center; gap: 1rem;
+  background: #fff; border: 1px solid $border; border-radius: 0.75rem; padding: 1rem 1.25rem;
+}
+.cms-banner-order {
+  width: 2rem; height: 2rem; border-radius: 50%; background: rgba(99,102,241,0.1);
+  color: $accent; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cms-banner-body { flex: 1; min-width: 0; }
+.cms-banner-title { font-size: 0.9rem; font-weight: 700; color: $text; margin-bottom: 0.2rem; }
+.cms-banner-sub   { font-size: 0.8rem; color: $sub; margin-bottom: 0.4rem; }
+.cms-banner-meta  { }
+.cms-cta-pill {
+  display: inline-block; font-size: 0.72rem; background: $bg; border: 1px solid $border;
+  border-radius: 999px; padding: 0.15rem 0.6rem; color: $muted;
+}
+.cms-banner-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+
+.status-toggle {
+  border: none; border-radius: 999px; padding: 0.3rem 0.875rem;
+  font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s;
+  background: #f3f4f6; color: $muted;
+  &.active { background: rgba(99,102,241,0.12); color: $accent2; }
+}
+
+.action-btn {
+  width: 1.875rem; height: 1.875rem; border-radius: 0.375rem; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  svg { width: 0.85rem; height: 0.85rem; }
+  &--edit   { background: #eff6ff; color: #1d4ed8; &:hover { background: #dbeafe; } }
+  &--delete { background: #fef2f2; color: $red;     &:hover { background: #fee2e2; } }
+}
+
+// ── Featured grid
+.featured-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;
+}
+.featured-card {
+  background: #fff; border: 1px solid $border; border-radius: 0.875rem; padding: 1.125rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &.is-featured { border-color: rgba(99,102,241,0.35); box-shadow: 0 0 0 3px rgba(99,102,241,0.06); }
+}
+.featured-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.featured-order-badge {
+  width: 1.5rem; height: 1.5rem; border-radius: 50%; background: $bg;
+  font-size: 0.72rem; font-weight: 800; color: $sub;
+  display: flex; align-items: center; justify-content: center;
+}
+.feat-toggle-wrap {
+  display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;
+  input { display: none; }
+}
+.feat-toggle {
+  width: 2.25rem; height: 1.25rem; border-radius: 999px; background: #e5e7eb;
+  position: relative; flex-shrink: 0; transition: background 0.2s;
+  &::after { content: ''; position: absolute; top: 2px; left: 2px; width: 1rem; height: 1rem; border-radius: 50%; background: #fff; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  input:checked ~ & { background: $accent; &::after { transform: translateX(1rem); } }
+}
+.feat-toggle-label { font-size: 0.75rem; font-weight: 600; color: $sub; }
+.featured-card-name { font-size: 0.875rem; font-weight: 700; color: $text; margin-bottom: 0.5rem; }
+.featured-card-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.feat-type-badge {
+  font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px;
+  background: $bg; color: $sub; border: 1px solid $border;
+}
+.feat-location { font-size: 0.78rem; color: $muted; }
+.featured-price { font-size: 0.875rem; font-weight: 700; color: $accent; }
+
+// ── Announcement card
+.cms-ann-card {
+  display: flex; align-items: stretch; background: #fff; border: 1px solid $border; border-radius: 0.75rem; overflow: hidden;
+}
+.ann-type-strip {
+  width: 4px; flex-shrink: 0;
+  .ann-type--info &    { background: #3b82f6; }
+  .ann-type--success & { background: #10b981; }
+  .ann-type--warning & { background: #f59e0b; }
+}
+.ann-body { flex: 1; padding: 1rem 1.25rem; min-width: 0; }
+.ann-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.ann-type-badge {
+  font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px;
+  &.ann-badge--info    { background: #eff6ff; color: #1d4ed8; }
+  &.ann-badge--success { background: #f0fdf4; color: #15803d; }
+  &.ann-badge--warning { background: #fffbeb; color: #b45309; }
+}
+.ann-expires { font-size: 0.72rem; color: $muted; margin-left: auto; }
+.ann-title   { font-size: 0.875rem; font-weight: 700; color: $text; margin-bottom: 0.3rem; }
+.ann-text    { font-size: 0.8rem; color: $sub; line-height: 1.5; }
+.cms-ann-card .cms-banner-actions { padding: 1rem; align-self: center; }
+
+// ── Pages list
+.pages-list { display: flex; flex-direction: column; gap: 1rem; }
+.page-card {
+  background: #fff; border: 1px solid $border; border-radius: 0.875rem; overflow: hidden;
+}
+.page-card-view { padding: 1.25rem; }
+.page-card-label { font-size: 0.72rem; font-weight: 700; color: $accent; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+.page-heading-preview { font-size: 1rem; font-weight: 700; color: $text; margin-bottom: 0.25rem; }
+.page-sub-preview { font-size: 0.85rem; color: $sub; margin-bottom: 0.375rem; }
+.page-body-preview {
+  font-size: 0.78rem; color: $muted; line-height: 1.55;
+  white-space: pre-wrap; margin-bottom: 0.75rem;
+  max-height: 4rem; overflow: hidden;
+}
+.btn-edit-page {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  background: $bg; border: 1px solid $border; border-radius: 0.375rem;
+  padding: 0.35rem 0.875rem; font-size: 0.8rem; font-weight: 600; color: $sub; cursor: pointer; margin-top: 0.25rem;
+  svg { width: 0.8rem; height: 0.8rem; }
+  &:hover { background: #e9eaf0; color: $text; }
+}
+
+.page-card-edit { padding: 1.25rem; border-top: 3px solid $accent; }
+.pform-field {
+  display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.875rem;
+  label { font-size: 0.78rem; font-weight: 600; color: $sub; }
+  input, textarea {
+    border: 1px solid $border; border-radius: 0.5rem; padding: 0.55rem 0.75rem;
+    font-size: 0.875rem; color: $text; outline: none; width: 100%; box-sizing: border-box;
+    background: #fff; transition: border-color 0.15s;
+    &:focus { border-color: $accent; }
+  }
+  textarea { resize: vertical; font-family: inherit; }
+}
+.pform-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem; }
+
+// ── Modal
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.modal { background: #fff; border-radius: 0.875rem; width: 100%; max-width: 560px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.2); &--sm { max-width: 420px; } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid $border; h2 { font-size: 1.05rem; font-weight: 700; color: $text; margin: 0; } &--danger h2 { color: $red; } }
+.modal-close { background: none; border: none; cursor: pointer; color: $muted; display: flex; padding: 0.25rem; svg { width: 1.1rem; height: 1.1rem; } &:hover { color: $text; } }
+.modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; border-top: 1px solid $border; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.form-field {
+  display: flex; flex-direction: column; gap: 0.35rem; &--full { grid-column: 1/-1; }
+  label { font-size: 0.8rem; font-weight: 600; color: $sub; }
+  input, select, textarea { border: 1px solid $border; border-radius: 0.5rem; padding: 0.55rem 0.75rem; font-size: 0.875rem; color: $text; outline: none; background: #fff; width: 100%; box-sizing: border-box; transition: border-color 0.15s; &:focus { border-color: $accent; } }
+  textarea { resize: vertical; font-family: inherit; }
+  &.has-error input, &.has-error select, &.has-error textarea { border-color: $red; }
+}
+.field-error { font-size: 0.75rem; color: $red; }
+.delete-msg { font-size: 0.9rem; color: $sub; line-height: 1.6; margin: 0; }
+
+@media (max-width: 640px) {
+  .form-row { grid-template-columns: 1fr; }
+  .cms-banner-card { flex-direction: column; align-items: flex-start; }
+  .cms-banner-actions { width: 100%; justify-content: flex-end; }
+}

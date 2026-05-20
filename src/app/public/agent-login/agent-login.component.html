@@ -1,0 +1,98 @@
+<div class="auth-shell">
+
+  <div class="auth-left auth-left--agent">
+    <div class="auth-left-inner">
+      <a routerLink="/" class="auth-brand">
+        <div class="auth-brand-logo">LW</div>
+        <span class="auth-brand-name">Livwell</span>
+      </a>
+      <div class="auth-left-body">
+        <h1 class="auth-hero-title">Agent<br><span>Portal</span></h1>
+        <p class="auth-hero-sub">Access your leads, manage listings and track your performance — all in one place.</p>
+        <div class="auth-role-cards">
+          <div class="auth-role-card">
+            <div class="auth-role-icon auth-role-icon--agent">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+            </div>
+            <div>
+              <div class="auth-role-title">Agent Portal</div>
+              <div class="auth-role-desc">Manage assigned leads, listings &amp; customer interactions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form-box">
+
+      <div class="auth-form-header">
+        <h2 class="auth-form-title">Agent Sign In</h2>
+        <p class="auth-form-sub">Sign in to your Livwell agent account</p>
+      </div>
+
+      <div *ngIf="serverError()" class="auth-alert auth-alert--error">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
+        <div>
+          {{ serverError() }}
+          <span *ngIf="attemptsLeft() !== null" class="auth-alert-sub">{{ attemptsLeft() }} attempt{{ attemptsLeft() === 1 ? '' : 's' }} remaining.</span>
+        </div>
+      </div>
+
+      <form (ngSubmit)="submit()" novalidate>
+        <div class="auth-field" [class.has-error]="errors()['email']">
+          <label class="auth-label">Email address</label>
+          <input type="email" class="auth-input" placeholder="agent@livwell.ae"
+                 [(ngModel)]="form.email" name="email"
+                 (input)="clearError('email')" autocomplete="email">
+          <span *ngIf="errors()['email']" class="auth-field-error">{{ errors()['email'] }}</span>
+        </div>
+
+        <div class="auth-field" [class.has-error]="errors()['password']">
+          <div class="auth-label-row">
+            <label class="auth-label">Password</label>
+            <a href="#" class="auth-forgot-link" (click)="$event.preventDefault()">Forgot password?</a>
+          </div>
+          <div class="auth-input-wrap">
+            <input [type]="showPw() ? 'text' : 'password'" class="auth-input" placeholder="••••••••"
+                   [(ngModel)]="form.password" name="password"
+                   (input)="clearError('password')" autocomplete="current-password">
+            <button type="button" class="auth-toggle-pw" (click)="showPw.update(v => !v)" tabindex="-1">
+              <svg *ngIf="!showPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+              <svg *ngIf="showPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+            </button>
+          </div>
+          <span *ngIf="errors()['password']" class="auth-field-error">{{ errors()['password'] }}</span>
+        </div>
+
+        <div class="auth-checkbox-row">
+          <label class="auth-checkbox-label">
+            <input type="checkbox" [(ngModel)]="form.remember" name="remember">
+            <span class="auth-checkbox-box"></span>
+            Remember me for 30 days
+          </label>
+        </div>
+
+        <button type="submit" class="auth-submit-btn" [disabled]="loading()">
+          <span *ngIf="!loading()">Sign In</span>
+          <span *ngIf="loading()" class="auth-spinner"></span>
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>or continue with</span></div>
+      <div class="auth-social">
+        <asl-google-signin-button type="standard" size="large" shape="rectangular" theme="outline" text="signin_with" [width]="340"></asl-google-signin-button>
+      </div>
+
+      <div class="auth-back-row">
+        <a routerLink="/" class="auth-back-link">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+          Back to website
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>

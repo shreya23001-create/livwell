@@ -1,0 +1,91 @@
+<div class="cenq-page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">My Enquiries</h1>
+      <p class="page-sub">All your messages to agents in one place</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card stat-card--all" (click)="filterStatus.set('all')" [class.active]="filterStatus() === 'all'">
+      <div class="stat-val">{{ stats().total }}</div>
+      <div class="stat-lbl">Total</div>
+    </div>
+    <div class="stat-card stat-card--pending" (click)="filterStatus.set('pending')" [class.active]="filterStatus() === 'pending'">
+      <div class="stat-val">{{ stats().pending }}</div>
+      <div class="stat-lbl">Pending</div>
+    </div>
+    <div class="stat-card stat-card--replied" (click)="filterStatus.set('replied')" [class.active]="filterStatus() === 'replied'">
+      <div class="stat-val">{{ stats().replied }}</div>
+      <div class="stat-lbl">Replied</div>
+    </div>
+    <div class="stat-card stat-card--closed" (click)="filterStatus.set('closed')" [class.active]="filterStatus() === 'closed'">
+      <div class="stat-val">{{ stats().closed }}</div>
+      <div class="stat-lbl">Closed</div>
+    </div>
+  </div>
+
+  <!-- List -->
+  @if (filtered().length === 0) {
+    <div class="empty-state">No enquiries found.</div>
+  } @else {
+    <div class="enq-list">
+      @for (enq of filtered(); track enq.id) {
+        <div class="enq-card" [class.enq-card--expanded]="expandedId() === enq.id">
+
+          <div class="enq-card-header" (click)="toggleExpand(enq.id)">
+            <!-- Agent avatar -->
+            <div class="agent-avatar">{{ enq.agentInitials }}</div>
+
+            <!-- Main info -->
+            <div class="enq-info">
+              <div class="enq-prop">{{ enq.property }}</div>
+              <div class="enq-meta">
+                <span>{{ enq.location }}</span>
+                <span>·</span>
+                <span>{{ enq.price }}</span>
+                <span>·</span>
+                <span>Agent: {{ enq.agent }}</span>
+              </div>
+            </div>
+
+            <!-- Right side -->
+            <div class="enq-right">
+              <span class="enq-badge enq-badge--{{ enq.status }}">{{ statusLabel(enq.status) }}</span>
+              <span class="enq-date">{{ enq.date }}</span>
+              <svg class="enq-chevron" [class.open]="expandedId() === enq.id" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          @if (expandedId() === enq.id) {
+            <div class="enq-body">
+              <!-- Customer message -->
+              <div class="enq-thread">
+                <div class="thread-item thread-item--customer">
+                  <div class="thread-label">Your message</div>
+                  <div class="thread-bubble thread-bubble--customer">{{ enq.message }}</div>
+                </div>
+
+                @if (enq.reply) {
+                  <div class="thread-item thread-item--agent">
+                    <div class="thread-label">{{ enq.agent }} replied · {{ enq.replyDate }}</div>
+                    <div class="thread-bubble thread-bubble--agent">{{ enq.reply }}</div>
+                  </div>
+                } @else {
+                  <div class="enq-awaiting">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Awaiting reply from agent…
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

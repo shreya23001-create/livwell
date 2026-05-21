@@ -94,6 +94,7 @@ export const routes: Routes = [
           { path: 'customers', loadComponent: () => import('./agent/customers/agent-customers.component').then(m => m.AgentCustomersComponent) },
           { path: 'properties', loadComponent: () => import('./agent/properties/agent-properties.component').then(m => m.AgentPropertiesComponent) },
           { path: 'calendar', loadComponent: () => import('./agent/calendar/agent-calendar.component').then(m => m.AgentCalendarComponent) },
+          { path: 'profile', loadComponent: () => import('./agent/profile/agent-profile.component').then(m => m.AgentProfileComponent) },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         ],
       },

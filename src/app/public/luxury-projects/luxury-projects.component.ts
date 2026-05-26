@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 
@@ -30,6 +30,19 @@ interface LuxuryProject {
   styleUrl: './luxury-projects.component.scss',
 })
 export class LuxuryProjectsComponent {
+  filter = signal('');
+
+  pageTitle = computed(() =>
+    this.filter() === 'ultra'
+      ? 'Ultra Luxury Projects in Dubai'
+      : 'Luxury Real Estate Projects in Dubai'
+  );
+
+  constructor(private route: ActivatedRoute) {
+    this.route.queryParamMap.subscribe(params => {
+      this.filter.set(params.get('filter') ?? '');
+    });
+  }
   projects: LuxuryProject[] = [
     {
       id: 1,

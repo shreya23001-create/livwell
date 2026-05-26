@@ -67,8 +67,8 @@
 }
 
 .logo-img-footer {
-  height: 42px;
-  width: 102px;
+  height: 63px;
+  width: 163px;
   // filter: brightness(0) invert(1);
   opacity: 0.9;
 }
@@ -813,6 +813,10 @@
     right: 1.25rem;
     width: 3rem;
     height: 3rem;
-    svg { width: 1.6rem; height: 1.6rem; }
+
+    svg {
+      width: 1.6rem;
+      height: 1.6rem;
+    }
   }
 }

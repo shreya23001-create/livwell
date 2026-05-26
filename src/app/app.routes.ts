@@ -17,6 +17,9 @@ export const routes: Routes = [
       { path: 'about', loadComponent: () => import('./public/about/about.component').then(m => m.AboutComponent) },
       { path: 'blog', loadComponent: () => import('./public/blog/blog.component').then(m => m.BlogComponent) },
       { path: 'contact', loadComponent: () => import('./public/contact/contact.component').then(m => m.ContactComponent) },
+      { path: 'luxury-projects', loadComponent: () => import('./public/luxury-projects/luxury-projects.component').then(m => m.LuxuryProjectsComponent) },
+      { path: 'terms-of-use', loadComponent: () => import('./public/terms-of-use/terms-of-use').then(m => m.TermsOfUse) },
+      { path: 'privacy-policy', loadComponent: () => import('./public/privacy-policy/privacy-policy').then(m => m.PrivacyPolicy) },
     ],
   },
 
@@ -34,10 +37,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./customer/customer-layout/customer-layout.component').then(m => m.CustomerLayoutComponent),
     children: [
-      { path: 'dashboard',   loadComponent: () => import('./customer/customer-dashboard/customer-dashboard.component').then(m => m.CustomerDashboardComponent) },
-      { path: 'properties',  loadComponent: () => import('./customer/customer-properties/customer-properties.component').then(m => m.CustomerPropertiesComponent) },
-      { path: 'enquiries',   loadComponent: () => import('./customer/customer-enquiries/customer-enquiries.component').then(m => m.CustomerEnquiriesComponent) },
-      { path: 'profile',     loadComponent: () => import('./customer/customer-profile/customer-profile.component').then(m => m.CustomerProfileComponent) },
+      { path: 'dashboard', loadComponent: () => import('./customer/customer-dashboard/customer-dashboard.component').then(m => m.CustomerDashboardComponent) },
+      { path: 'properties', loadComponent: () => import('./customer/customer-properties/customer-properties.component').then(m => m.CustomerPropertiesComponent) },
+      { path: 'enquiries', loadComponent: () => import('./customer/customer-enquiries/customer-enquiries.component').then(m => m.CustomerEnquiriesComponent) },
+      { path: 'profile', loadComponent: () => import('./customer/customer-profile/customer-profile.component').then(m => m.CustomerProfileComponent) },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

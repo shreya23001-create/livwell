@@ -54,17 +54,17 @@ export class ContactComponent {
   }
 
   offices: Office[] = [
-    { name: 'Bay Square', address: 'Office 801, Building 01, Bay Square, Business Bay', phone: '+971 4 123 4567' },
-    { name: 'Dubai Marina', address: '1401 Marina Plaza, Dubai Marina', phone: '+971 4 123 4568' },
-    { name: 'Downtown Dubai', address: 'City Walk Boulevard, Shop 8-02, Downtown Dubai', phone: '+971 4 123 4569' },
-    { name: 'Palm Jumeirah', address: 'Golden Mile 9, Shop 10 Galleria, Palm Jumeirah', phone: '+971 4 123 4570' },
-    { name: 'Dubai Hills', address: 'Park Heights Square, Building 2, Level 6', phone: '+971 4 123 4571' },
-    { name: 'Jumeirah Park', address: 'Shop G10, East Pavilion, Jumeirah Park', phone: '+971 4 123 4572' },
-    { name: 'Meydan', address: 'Meydan Heights Retail Centre, Unit G10', phone: '+971 4 123 4573' },
-    { name: 'Creek Harbour', address: 'GRF-02, Tower 3, North Podium, Creek Harbour', phone: '+971 4 123 4574' },
-    { name: 'Motor City', address: 'Control Tower, Unit 2803, Motor City', phone: '+971 4 123 4575' },
-    { name: 'Al Furjan', address: 'FRJP R-27B Pavilion, Al Furjan South', phone: '+971 4 123 4576' },
-    { name: 'Mudon', address: 'Shop No. 2 & 1, Al Salam, Mudon Community Centre', phone: '+971 4 123 4577' },
-    { name: 'Villanova', address: 'Villanova, Wadi Al Safa, Emirates Road', phone: '+971 4 123 4578' },
+    { name: 'Al Barsha (HQ)', address: 'Al-Barsha Business Centre, 3rd Floor, Office 311-B, Al Barsha, Dubai', phone: '+971 52 520 9703' },
+    { name: 'Dubai Marina', address: '1401 Marina Plaza, Dubai Marina', phone: '+971 52 520 9703' },
+    { name: 'Downtown Dubai', address: 'City Walk Boulevard, Shop 8-02, Downtown Dubai', phone: '+971 52 520 9703' },
+    { name: 'Palm Jumeirah', address: 'Golden Mile 9, Shop 10 Galleria, Palm Jumeirah', phone: '+971 52 520 9703' },
+    { name: 'Dubai Hills', address: 'Park Heights Square, Building 2, Level 6', phone: '+971 52 520 9703' },
+    { name: 'Jumeirah Park', address: 'Shop G10, East Pavilion, Jumeirah Park', phone: '+971 52 520 9703' },
+    { name: 'Meydan', address: 'Meydan Heights Retail Centre, Unit G10', phone: '+971 52 520 9703' },
+    { name: 'Creek Harbour', address: 'GRF-02, Tower 3, North Podium, Creek Harbour', phone: '+971 52 520 9703' },
+    { name: 'Motor City', address: 'Control Tower, Unit 2803, Motor City', phone: '+971 52 520 9703' },
+    { name: 'Al Furjan', address: 'FRJP R-27B Pavilion, Al Furjan South', phone: '+971 52 520 9703' },
+    { name: 'Mudon', address: 'Shop No. 2 & 1, Al Salam, Mudon Community Centre', phone: '+971 52 520 9703' },
+    { name: 'Villanova', address: 'Villanova, Wadi Al Safa, Emirates Road', phone: '+971 52 520 9703' },
   ];
 }

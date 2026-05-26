@@ -1,0 +1,251 @@
+// ============================================================
+// LUXURY PROJECTS PAGE
+// ============================================================
+
+$gold:       #c8a84b;
+$gold-light: #e8c870;
+$dark:       #0d0d0d;
+$dark-card:  #141414;
+$dark-card2: #1a1a1a;
+$border:     rgba(255,255,255,0.08);
+$text:       #e8e8e8;
+$muted:      #888;
+
+.lxp-page {
+  background: $dark;
+  min-height: 100vh;
+  color: $text;
+}
+
+// ── Card list ─────────────────────────────────────────────
+.lxp-list {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.lxp-card {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  background: $dark-card;
+  border: 1px solid $border;
+  border-radius: 0.875rem;
+  overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s;
+
+  &:hover {
+    border-color: rgba($gold, 0.3);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Card image ────────────────────────────────────────────
+.lxp-card-img-wrap {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+}
+
+.lxp-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s ease;
+
+  .lxp-card:hover & { transform: scale(1.04); }
+}
+
+.lxp-card-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 55%, rgba(0,0,0,0.45) 100%);
+
+  @media (max-width: 860px) {
+    background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 60%);
+  }
+}
+
+.lxp-badge {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  background: $gold;
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.7rem;
+  border-radius: 2rem;
+}
+
+.lxp-status {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.28rem 0.7rem;
+  border-radius: 2rem;
+  letter-spacing: 0.04em;
+
+  &.status--ready        { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+  &.status--offplan      { background: rgba($gold,0.12);      color: $gold;   border: 1px solid rgba($gold,0.3); }
+  &.status--construction { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+}
+
+// ── Card body ─────────────────────────────────────────────
+.lxp-card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 1.75rem;
+  gap: 1rem;
+}
+
+.lxp-card-top { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.lxp-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.73rem;
+  color: $muted;
+}
+
+.lxp-card-sep { color: $border; }
+
+.lxp-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.lxp-card-developer,
+.lxp-card-location {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: $muted;
+  svg { color: $gold; flex-shrink: 0; }
+}
+
+// ── Pricing block ─────────────────────────────────────────
+.lxp-card-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem 1.1rem;
+  background: $dark-card2;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+}
+
+.lxp-price-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.lxp-price-label {
+  font-size: 0.68rem;
+  color: $muted;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.lxp-price-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: $gold;
+  letter-spacing: -0.01em;
+}
+
+.lxp-price-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.lxp-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: $muted;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid $border;
+  padding: 0.28rem 0.65rem;
+  border-radius: 2rem;
+  svg { color: $gold; }
+
+  &--sqft { color: rgba($gold, 0.8); border-color: rgba($gold, 0.2); }
+}
+
+// ── Actions ───────────────────────────────────────────────
+.lxp-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.lxp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: $gold;
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.45rem;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  border: none;
+  cursor: pointer;
+
+  &:hover { background: $gold-light; transform: translateY(-1px); }
+}
+
+.lxp-btn-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #25d366;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.45rem;
+  text-decoration: none;
+  transition: background 0.2s;
+
+  &:hover { background: #1ebe5c; }
+}
+
+.lxp-btn-email {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  background: transparent;
+  border: 1px solid $border;
+  border-radius: 0.45rem;
+  color: $muted;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover { border-color: $gold; color: $gold; }
+}

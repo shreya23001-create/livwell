@@ -1,46 +1,36 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
+import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 
-interface Stat {
-  value: string;
-  label: string;
-}
-
-interface CoreValue {
-  title: string;
-  body: string;
-}
+interface Stat { value: string; label: string; }
+interface CoreValue { title: string; body: string; }
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, FooterComponent],
+  imports: [CommonModule, RouterLink, FooterComponent, NewsletterSectionComponent],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
 })
 export class AboutComponent {
-  newsletterEmail = signal('');
-  newsletterSubmitted = signal(false);
-
   stats: Stat[] = [
-    { value: '950+', label: 'Expert Agents' },
+    { value: '950+',    label: 'Expert Agents' },
     { value: '17 Years', label: 'of Excellence' },
-    { value: '25', label: 'Offices Across Dubai' },
+    { value: '25',      label: 'Offices Across Dubai' },
     { value: '18,000+', label: 'Clients & Investors' },
   ];
 
   coreValues: CoreValue[] = [
-    { title: 'Integrity', body: 'We uphold the highest ethical standards, ensuring transparency and honesty in all our dealings.' },
-    { title: 'Innovation', body: 'We continuously seek creative solutions and leverage cutting-edge technology to deliver better outcomes for our clients.' },
-    { title: 'Excellence', body: 'We are committed to delivering the highest quality service at every stage of your real estate journey.' },
-    { title: 'Respect', body: 'We value and respect our clients, teammates, and partners, fostering a culture of trust and mutual respect.' },
-    { title: 'Authenticity', body: 'We foster authentic relationships built on trust and collaboration, putting your interests at the heart of every recommendation.' },
-    { title: 'Collaboration', body: 'Collaboration is at the core of what we do — internally across departments, and externally with all valued partners, to unlock value.' },
+    { title: 'Integrity',            body: 'We uphold the highest ethical standards, ensuring transparency and honesty in all our dealings.' },
+    { title: 'Innovation',           body: 'We continuously seek creative solutions and leverage cutting-edge technology to deliver better outcomes for our clients.' },
+    { title: 'Excellence',           body: 'We are committed to delivering the highest quality service at every stage of your real estate journey.' },
+    { title: 'Respect',              body: 'We value and respect our clients, teammates, and partners, fostering a culture of trust and mutual respect.' },
+    { title: 'Authenticity',         body: 'We foster authentic relationships built on trust and collaboration, putting your interests at the heart of every recommendation.' },
+    { title: 'Collaboration',        body: 'Collaboration is at the core of what we do — internally across departments, and externally with all valued partners.' },
     { title: 'Social Responsibility', body: 'We are committed to sustainable practices for the communities we serve, operating with purpose beyond profit.' },
-    { title: 'Kindness', body: 'We inspire a positive and caring working environment, and simply enjoy doing business with a smile — every interaction matters.' },
+    { title: 'Kindness',             body: 'We inspire a positive and caring working environment, and simply enjoy doing business with a smile — every interaction matters.' },
   ];
 
   promises: string[] = [
@@ -51,8 +41,4 @@ export class AboutComponent {
     'We will never instruct you to compromise your ethics or mislead a client in any way, shape, or form.',
     'We will never make you share your company contacts, your clients, just take the lead.',
   ];
-
-  subscribeNewsletter(): void {
-    if (this.newsletterEmail()) this.newsletterSubmitted.set(true);
-  }
 }

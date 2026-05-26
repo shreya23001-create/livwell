@@ -187,7 +187,7 @@ export class AdminCmsComponent {
   pages = signal<PageContent[]>([
     { id: 'home-hero', label: 'Home — Hero Section', heading: 'Find Your Dream Home in Dubai', subheading: 'Browse 500+ exclusive properties across prime locations in the UAE', body: '' },
     { id: 'about-hero', label: 'About Us — Hero', heading: 'Dubai\'s Premier Real Estate Platform', subheading: 'Connecting buyers, sellers and investors with verified properties since 2018', body: 'Livwell Real Estate is a leading property platform in the UAE...' },
-    { id: 'contact-info', label: 'Contact — Office Info', heading: 'Get In Touch', subheading: 'Our team is available 7 days a week', body: 'Office: Level 14, Boulevard Plaza, Downtown Dubai\nPhone: +971 4 000 0000\nEmail: hello@livwell.ae' },
+    { id: 'contact-info', label: 'Contact — Office Info', heading: 'Get In Touch', subheading: 'Our team is available 7 days a week', body: 'Office: Al-Barsha Business Centre, 3rd Floor, Office 311-B, Dubai\nPhone: +971 52 520 9703\nEmail: contact@livwelldubai.com' },
   ]);
 
   editingPageId = signal<string | null>(null);

@@ -1,0 +1,95 @@
+<!-- ============================================================
+     NEWSLETTER SUBSCRIBE
+     ============================================================ -->
+<section class="newsletter-section">
+  <div class="container-custom">
+    <div class="newsletter-card">
+      <!-- Decorative blobs -->
+      <div class="nl-blob nl-blob-1"></div>
+      <div class="nl-blob nl-blob-2"></div>
+
+      <div class="newsletter-content">
+        <div class="nl-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="nl-icon">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+          </svg>
+        </div>
+
+        <div class="nl-text">
+          <div class="section-label" style="justify-content:center">Weekly Newsletter</div>
+          <h2 class="nl-title">Get the Latest Property<br>Insights in Your Inbox</h2>
+          <p class="nl-desc">
+            Join 18,000+ subscribers who receive exclusive market reports, new listings,
+            investment tips, and UAE real estate news every week — no spam, ever.
+          </p>
+        </div>
+
+        <div class="nl-perks">
+          <div *ngFor="let perk of [
+            { icon: '📊', label: 'Weekly market reports' },
+            { icon: '🏠', label: 'New listings first' },
+            { icon: '💡', label: 'Investment tips' },
+            { icon: '🔔', label: 'Price drop alerts' }
+          ]" class="nl-perk">
+            <span class="nl-perk-icon">{{ perk.icon }}</span>
+            <span>{{ perk.label }}</span>
+          </div>
+        </div>
+
+        @if (!newsletterSubmitted()) {
+        <form class="nl-form" (ngSubmit)="subscribeNewsletter()" (submit)="$event.preventDefault()">
+          <div class="nl-input-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="nl-input-icon">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+            </svg>
+            <input type="email" placeholder="Enter your email address" class="nl-input" [ngModel]="newsletterEmail()"
+              (ngModelChange)="newsletterEmail.set($event)" name="nlEmail" required>
+            <button type="submit" class="nl-submit">
+              Subscribe Free
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </button>
+          </div>
+          <p class="nl-privacy">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-3.5 h-3.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+            </svg>
+            No spam. Unsubscribe anytime. We respect your privacy.
+          </p>
+        </form>
+        } @else {
+        <div class="nl-success">
+          <div class="nl-success-icon">✓</div>
+          <h3 class="nl-success-title">You're subscribed!</h3>
+          <p class="nl-success-desc">
+            Welcome aboard! Your first weekly digest will arrive this Friday.
+            Check your inbox to confirm your subscription.
+          </p>
+        </div>
+        }
+
+        <div class="nl-social-proof">
+          <div class="nl-avatars">
+            <img *ngFor="let av of [
+              'https://randomuser.me/api/portraits/women/12.jpg',
+              'https://randomuser.me/api/portraits/men/18.jpg',
+              'https://randomuser.me/api/portraits/women/35.jpg',
+              'https://randomuser.me/api/portraits/men/42.jpg'
+            ]" [src]="av" alt="subscriber" class="nl-avatar">
+          </div>
+          <p class="nl-proof-text">
+            <strong>18,000+</strong> property investors already subscribed
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

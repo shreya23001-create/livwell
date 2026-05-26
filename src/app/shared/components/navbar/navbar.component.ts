@@ -5,7 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { filter } from 'rxjs/operators';
 
 // Pages where the navbar should always be white (no hero behind it)
-const ALWAYS_WHITE_ROUTES = ['/properties', '/off-plan', '/about', '/contact', '/agents'];
+const ALWAYS_WHITE_ROUTES = ['/properties', '/off-plan', '/about', '/contact', '/agents', '/privacy-policy', '/terms-of-use', '/luxury-projects', '/blog'];
 
 @Component({
   selector: 'app-navbar',

@@ -1,0 +1,59 @@
+<!-- LINK COLUMNS GRID -->
+<div class="ft-links-section">
+  <div class="ft-container">
+
+    <!-- Row 1: 4 columns -->
+    <div class="ft-row">
+      <div *ngFor="let col of row1" class="ft-col">
+        <h4 class="ft-col-heading">{{ col.heading }}</h4>
+        <ul class="ft-col-list">
+          <li *ngFor="let link of col.links">
+            <a [routerLink]="link.href" class="ft-link">{{ link.label }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ft-divider"></div>
+
+    <!-- Row 2: 4 columns -->
+    <div class="ft-row">
+      <div *ngFor="let col of row2" class="ft-col">
+        <h4 class="ft-col-heading">{{ col.heading }}</h4>
+        <ul class="ft-col-list">
+          <li *ngFor="let link of col.links">
+            <a [routerLink]="link.href" class="ft-link">{{ link.label }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ft-divider"></div>
+
+    <!-- Row 3: 2 columns -->
+    <div class="ft-row ft-row--2col">
+      <div *ngFor="let col of row3" class="ft-col">
+        <h4 class="ft-col-heading">{{ col.heading }}</h4>
+        <ul class="ft-col-list">
+          <li *ngFor="let link of col.links">
+            <a [routerLink]="link.href" class="ft-link">{{ link.label }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- OFFICES SECTION -->
+<div class="ft-offices-section">
+  <div class="ft-container">
+    <h3 class="ft-offices-heading">Our Offices</h3>
+    <div class="ft-offices-grid">
+      <div *ngFor="let office of offices" class="ft-office-card">
+        <h4 class="ft-office-name">{{ office.name }}</h4>
+        <p class="ft-office-address">{{ office.address }}</p>
+      </div>
+    </div>
+  </div>
+</div>

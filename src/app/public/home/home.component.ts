@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser, UpperCasePipe } from '@angular/common'
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
+import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 
 interface Property {
   id: number;
@@ -29,6 +30,8 @@ interface Agent {
   deals: number;
   rating: number;
   avatar: string;
+  phone: string;
+  email: string;
 }
 
 interface Testimonial {
@@ -54,7 +57,7 @@ interface NewsArticle {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, UpperCasePipe, FooterComponent],
+  imports: [CommonModule, RouterLink, FormsModule, UpperCasePipe, FooterComponent, NewsletterSectionComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -68,13 +71,12 @@ export class HomeComponent implements OnInit {
     { value: 'new-projects', label: 'New Projects' },
   ];
   activeTestimonial = signal(0);
-  newsletterEmail = signal('');
-  newsletterSubmitted = signal(false);
   activeSlide = signal(0);
 
   heroSlides = [
     {
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1920&q=85',
+      // Dark moody city skyline at dusk — towers lit up, stormy sky
+      image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=90',
       project: 'Creek Horizon Residences',
       location: 'Dubai Creek Harbour',
       desc: 'Contemporary waterfront living with panoramic creek and skyline views in the heart of the new Dubai.',
@@ -82,7 +84,8 @@ export class HomeComponent implements OnInit {
       paymentPlan: '20 / 60 / 20 %',
     },
     {
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=85',
+      // Night city skyline — glowing towers, deep blue hour
+      image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=90',
       project: 'Downtown Heights',
       location: 'Downtown Dubai',
       desc: 'Iconic residences steps from Burj Khalifa — where luxury meets the pulse of the city.',
@@ -90,7 +93,8 @@ export class HomeComponent implements OnInit {
       paymentPlan: '10 / 65 / 25 %',
     },
     {
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=85',
+      // Golden hour city skyline wide — warm towers, hazy horizon
+      image: 'https://images.unsplash.com/photo-1470219556762-1771e7f9427d?w=1920&q=90',
       project: 'Marina Cove',
       location: 'Dubai Marina',
       desc: 'Elegant apartments with full marina views. Lifestyle living at its finest.',
@@ -98,20 +102,40 @@ export class HomeComponent implements OnInit {
       paymentPlan: '20 / 55 / 25 %',
     },
     {
-      image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1920&q=85',
+      // Deep blue hour city panorama — distant glowing skyline
+      image: 'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=1920&q=90',
+      project: 'Business Bay Towers',
+      location: 'Business Bay',
+      desc: 'Premium high-rise residences at the centre of Dubai\'s dynamic business and lifestyle district.',
+      startingPrice: 'AED 1.2M',
+      paymentPlan: '10 / 60 / 30 %',
+    },
+    {
+      // Aerial city dusk — warm orange glow across dense skyline
+      image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=90',
+      project: 'Jumeirah Living',
+      location: 'Jumeirah Beach Residence',
+      desc: 'Beachfront residences with sweeping sea views and direct access to the finest dining and leisure.',
+      startingPrice: 'AED 3.1M',
+      paymentPlan: '20 / 55 / 25 %',
+    },
+    {
+      // Luxury villa with pool — warm evening light, one villa slide
+      image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1920&q=90',
+      project: 'Emerald Hills Villa',
+      location: 'Emirates Hills',
+      desc: 'Sprawling private villa with lush gardens, infinity pool and panoramic city views.',
+      startingPrice: 'AED 8.9M',
+      paymentPlan: '20 / 50 / 30 %',
+    },
+    {
+      // Contemporary villa exterior — minimalist, one villa slide
+      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=90',
       project: 'Palm Vista Villas',
       location: 'Palm Jumeirah',
       desc: 'Exclusive beachfront villas on the iconic Palm — the pinnacle of Dubai luxury.',
       startingPrice: 'AED 12.5M',
       paymentPlan: '15 / 55 / 30 %',
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=1920&q=85',
-      project: 'Arabian Ranches III',
-      location: 'Arabian Ranches',
-      desc: 'Family-first community living with green spaces, schools and world-class amenities.',
-      startingPrice: 'AED 2.1M',
-      paymentPlan: '10 / 70 / 20 %',
     },
   ];
 
@@ -185,10 +209,9 @@ export class HomeComponent implements OnInit {
   ];
 
   topAgents: Agent[] = [
-    { name: 'Sarah Al-Mansouri', role: 'Luxury Properties', deals: 142, rating: 4.9, avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
-    { name: 'Ahmed Hassan', role: 'Commercial & Villas', deals: 98, rating: 4.8, avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
-    { name: 'Priya Sharma', role: 'Off-Plan Specialist', deals: 215, rating: 5.0, avatar: 'https://randomuser.me/api/portraits/women/68.jpg' },
-    { name: 'Michael Chen', role: 'Investments & ROI', deals: 173, rating: 4.9, avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
+    { name: 'Anuj Sharma',      role: 'Business Associate', deals: 0, rating: 5.0, avatar: 'images/Anuj.jpeg',   phone: '+971542481813',  email: 'anuj@livwelldubai.ae'  },
+    { name: 'Niket Mehta',      role: 'Business Associate', deals: 0, rating: 5.0, avatar: 'images/Niket .jpeg', phone: '+971585798027',  email: 'niket@livwelldubai.ae' },
+    { name: 'Yash Uday Chari',  role: 'Business Associate', deals: 0, rating: 5.0, avatar: 'images/Yash.jpeg',   phone: '+971585833629',  email: 'yash@livwelldubai.ae'  },
   ];
 
   testimonials: Testimonial[] = [
@@ -436,12 +459,6 @@ export class HomeComponent implements OnInit {
     return Array(Math.floor(rating)).fill(0);
   }
 
-  subscribeNewsletter(): void {
-    if (this.newsletterEmail().trim()) {
-      this.newsletterSubmitted.set(true);
-    }
-  }
-
   activeTeam = signal(0);
   activeTrendingTab = signal('luxury');
 
@@ -478,59 +495,10 @@ export class HomeComponent implements OnInit {
 
   teamAreas = [
     {
-      area: 'Tilal Al Ghaf', agents: [
-        { name: 'M. Karim Kassas', role: 'Senior Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-        { name: 'Intaj Ahmed', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
-        { name: 'Ali Alahmar', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/57.jpg' },
-      ]
-    },
-    {
-      area: 'La Mer', agents: [
-        { name: 'Sarah Al-Mansouri', role: 'Senior Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
-        { name: 'Priya Sharma', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/68.jpg' },
-        { name: 'Michael Chen', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
-      ]
-    },
-    {
-      area: 'Mina Rashid', agents: [
-        { name: 'Ahmed Hassan', role: 'Senior Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/46.jpg' },
-        { name: 'Fatima Yousuf', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-        { name: 'Omar Khalid', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/34.jpg' },
-      ]
-    },
-    {
-      area: 'Expo City', agents: [
-        { name: 'Ravi Kumar', role: 'Senior Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/55.jpg' },
-        { name: 'Lena Park', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/55.jpg' },
-        { name: 'James Carter', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/35.jpg' },
-      ]
-    },
-    {
-      area: 'Wadi Al Safa 4', agents: [
-        { name: 'Nour Al Rashid', role: 'Senior Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/22.jpg' },
-        { name: 'David Kim', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/28.jpg' },
-        { name: 'Anya Patel', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/36.jpg' },
-      ]
-    },
-    {
-      area: 'Wadi Al Safa 5', agents: [
-        { name: 'Tom Walsh', role: 'Senior Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/40.jpg' },
-        { name: 'Hana Ali', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/48.jpg' },
-        { name: 'Carlos Ruiz', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/63.jpg' },
-      ]
-    },
-    {
-      area: 'Wadi Al Safa 7', agents: [
-        { name: 'Zara Mohammed', role: 'Senior Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/60.jpg' },
-        { name: 'Leon Fischer', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/70.jpg' },
-        { name: 'Nina Hassan', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/72.jpg' },
-      ]
-    },
-    {
-      area: 'Sobha Hartland', agents: [
-        { name: 'Raj Patel', role: 'Senior Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/57.jpg' },
-        { name: 'Maya Singh', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/women/34.jpg' },
-        { name: 'Omar Al Farsi', role: 'Property Advisor', avatar: 'https://randomuser.me/api/portraits/men/48.jpg' },
+      area: 'Our Associates', agents: [
+        { name: 'Anuj Sharma',     role: 'Business Associate', avatar: 'images/Anuj.jpeg',   phone: '+971542481813',  email: 'anuj@livwelldubai.ae'  },
+        { name: 'Niket Mehta',     role: 'Business Associate', avatar: 'images/Niket .jpeg', phone: '+971585798027',  email: 'niket@livwelldubai.ae' },
+        { name: 'Yash Uday Chari', role: 'Business Associate', avatar: 'images/Yash.jpeg',   phone: '+971585833629',  email: 'yash@livwelldubai.ae'  },
       ]
     },
   ];

@@ -3,7 +3,7 @@
 
     <!-- Logo -->
     <a routerLink="/" class="nav-logo" (click)="closeMobileMenu()">
-      <img src="images/logo2.png" alt="Livwell Real Estate LLC" class="logo-img">
+      <img src="images/livwell logo.png" alt="Livwell Real Estate LLC" class="logo-img">
     </a>
 
     <!-- Desktop Nav Links with dropdowns -->
@@ -115,9 +115,8 @@
           </svg>
         </button>
         <div class="nav-dropdown">
-          <a routerLink="/properties" [queryParams]="{luxe:'true'}" class="nav-dd-item"
-            (click)="closeMobileMenu()">Luxury Projects</a>
-          <a routerLink="/properties" [queryParams]="{luxe:'ultra'}" class="nav-dd-item"
+          <a routerLink="/luxury-projects" class="nav-dd-item" (click)="closeMobileMenu()">Luxury Projects</a>
+          <a routerLink="/luxury-projects" [queryParams]="{filter:'ultra'}" class="nav-dd-item"
             (click)="closeMobileMenu()">Ultra Luxury Projects</a>
           <a routerLink="/properties" [queryParams]="{type:'Branded'}" class="nav-dd-item"
             (click)="closeMobileMenu()">Dubai Branded Residences</a>
@@ -300,13 +299,13 @@
       }
       <button class="btn-logout" (click)="auth.logout()">Logout</button>
       } @else {
-      <a routerLink="/contact" class="btn-valuation">
+      <!-- <a routerLink="/contact" class="btn-valuation">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
           <polyline points="9 22 9 12 15 12 15 22" />
         </svg>
         Valuation
-      </a>
+      </a> -->
       <a routerLink="/customer" class="btn-signin">Sign In</a>
       }
     </div>
@@ -356,7 +355,7 @@
         <!-- Brand -->
         <div class="footer-brand">
           <a routerLink="/" class="nav-logo footer-logo">
-            <img src="images/logo2.png" alt="Livwell Real Estate LLC" class="logo-img logo-img-footer">
+            <img src="images/livwell logo white.png" alt="Livwell Real Estate LLC" class="logo-img logo-img-footer">
           </a>
           <p class="footer-desc">
             Your trusted partner in finding the perfect property. Luxury, comfort, and investment — all in one place.
@@ -423,21 +422,21 @@
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
-              123 Business Bay, Dubai, UAE
+              Al-Barsha Business Centre, 3rd Floor, Office 311-B, Dubai, UAE
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.27a16 16 0 0 0 8 8l1.27-.85a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 24 17.92z" />
               </svg>
-              +971 4 123 4567
+              +971 52 520 9703
             </li>
             <li>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
-              info&#64;livwell.ae
+              contact&#64;livwelldubai.com
             </li>
           </ul>
         </div>
@@ -450,8 +449,8 @@
     <div class="container-custom footer-bottom-inner">
       <p class="footer-copyright">© {{ currentYear }} Livwell Real Estate LLC. All rights reserved.</p>
       <div class="footer-legal">
-        <a routerLink="/contact">Privacy Policy</a>
-        <a routerLink="/contact">Terms of Use</a>
+        <a routerLink="/privacy-policy">Privacy Policy</a>
+        <a routerLink="/terms-of-use">Terms of Use</a>
         <a routerLink="/contact">Sitemap</a>
       </div>
       <div class="footer-socials">
@@ -492,12 +491,11 @@
 
 <!-- ── WhatsApp Floating Button ── -->
 <a class="wa-fab"
-   href="https://wa.me/971500000000?text=Hello%2C%20I%27m%20interested%20in%20a%20property%20on%20Livwell."
-   target="_blank"
-   rel="noopener noreferrer"
-   aria-label="Chat on WhatsApp">
+  href="https://wa.me/971500000000?text=Hello%2C%20I%27m%20interested%20in%20a%20property%20on%20Livwell."
+  target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
   <svg viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M16 .5C7.44.5.5 7.44.5 16c0 2.75.72 5.44 2.1 7.82L.5 31.5l7.88-2.06A15.46 15.46 0 0 0 16 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5Zm0 28.4a12.9 12.9 0 0 1-6.58-1.8l-.47-.28-4.68 1.22 1.25-4.56-.31-.48A12.9 12.9 0 0 1 3.1 16C3.1 9.06 8.56 3.1 16 3.1S28.9 9.06 28.9 16 23.44 28.9 16 28.9Zm7.06-9.68c-.38-.2-2.27-1.12-2.62-1.24-.35-.13-.6-.2-.86.2s-.99 1.24-1.21 1.49c-.22.26-.44.29-.82.1a10.37 10.37 0 0 1-3.05-1.88 11.4 11.4 0 0 1-2.11-2.63c-.22-.38 0-.58.17-.77.16-.17.38-.44.57-.66.18-.22.24-.38.37-.63.12-.25.06-.47-.03-.66-.1-.2-.86-2.07-1.18-2.83-.31-.74-.63-.64-.86-.65l-.73-.01c-.25 0-.66.09-1 .47s-1.33 1.3-1.33 3.17 1.36 3.68 1.55 3.93c.2.25 2.68 4.1 6.5 5.75.91.39 1.62.63 2.17.8.91.29 1.74.25 2.4.15.73-.11 2.27-.93 2.59-1.83.32-.9.32-1.66.22-1.82-.09-.16-.35-.25-.73-.45Z"/>
+    <path
+      d="M16 .5C7.44.5.5 7.44.5 16c0 2.75.72 5.44 2.1 7.82L.5 31.5l7.88-2.06A15.46 15.46 0 0 0 16 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5Zm0 28.4a12.9 12.9 0 0 1-6.58-1.8l-.47-.28-4.68 1.22 1.25-4.56-.31-.48A12.9 12.9 0 0 1 3.1 16C3.1 9.06 8.56 3.1 16 3.1S28.9 9.06 28.9 16 23.44 28.9 16 28.9Zm7.06-9.68c-.38-.2-2.27-1.12-2.62-1.24-.35-.13-.6-.2-.86.2s-.99 1.24-1.21 1.49c-.22.26-.44.29-.82.1a10.37 10.37 0 0 1-3.05-1.88 11.4 11.4 0 0 1-2.11-2.63c-.22-.38 0-.58.17-.77.16-.17.38-.44.57-.66.18-.22.24-.38.37-.63.12-.25.06-.47-.03-.66-.1-.2-.86-2.07-1.18-2.83-.31-.74-.63-.64-.86-.65l-.73-.01c-.25 0-.66.09-1 .47s-1.33 1.3-1.33 3.17 1.36 3.68 1.55 3.93c.2.25 2.68 4.1 6.5 5.75.91.39 1.62.63 2.17.8.91.29 1.74.25 2.4.15.73-.11 2.27-.93 2.59-1.83.32-.9.32-1.66.22-1.82-.09-.16-.35-.25-.73-.45Z" />
   </svg>
   <span class="wa-fab-tooltip">Chat on WhatsApp</span>
 </a>

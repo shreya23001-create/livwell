@@ -1967,23 +1967,19 @@ $gold-light: #e8c870;
 }
 
 .agents-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1.5rem;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
 }
 
 .agent-card {
   background: #fff;
   border-radius: 1rem;
   padding: 2rem 1.5rem;
+  width: calc(25% - 1.5rem);
+  min-width: 240px;
+  max-width: 320px;
   text-align: center;
   border: 1.5px solid #f3f4f6;
   transition: all 0.3s ease;

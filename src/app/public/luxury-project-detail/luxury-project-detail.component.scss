@@ -1,0 +1,562 @@
+$gold:    #c8a84b;
+$green:   #1a5c3a;
+$green2:  #22754a;
+$dark:    #0a1628;
+$border:  #e5e7eb;
+$muted:   #6b7280;
+$text:    #111827;
+$bg:      #f9fafb;
+$white:   #fff;
+
+.lpd-page { background: $bg; min-height: 100vh; }
+.lpd-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+// ── Breadcrumb ─────────────────────────────────────────────
+.lpd-breadcrumb-bar {
+  background: $white;
+  border-bottom: 1px solid $border;
+  padding: 0.75rem 1.5rem;
+  margin-top: 64px;
+}
+
+.lpd-bc-link {
+  font-size: 0.8rem;
+  color: $muted;
+  text-decoration: none;
+  transition: color 0.2s;
+  &:hover { color: $gold; }
+}
+
+.lpd-bc-sep { font-size: 0.9rem; color: $muted; margin: 0 0.4rem; }
+.lpd-bc-current { font-size: 0.8rem; color: $text; }
+
+// ── Gallery ────────────────────────────────────────────────
+.lpd-gallery-section {
+  background: #111;
+  padding: 1.5rem 0;
+}
+
+.lpd-gallery {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 0.75rem;
+  height: 420px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+.lpd-gallery-main {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.lpd-gallery-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lpd-gallery-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: $gold;
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: 2rem;
+}
+
+.lpd-gallery-status {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 2rem;
+
+  &.status--ready        { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+  &.status--offplan      { background: rgba($gold,0.12);      color: $gold;   border: 1px solid rgba($gold,0.3); }
+  &.status--construction { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+}
+
+.lpd-gallery-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+
+  @media (max-width: 768px) { flex-direction: row; overflow-x: auto; }
+}
+
+.lpd-gallery-thumb {
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+  height: 95px;
+
+  &.active { border-color: $gold; }
+  &:hover  { border-color: rgba($gold, 0.6); }
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  @media (max-width: 768px) { width: 120px; height: 80px; }
+}
+
+// ── Hero Info ──────────────────────────────────────────────
+.lpd-hero-info {
+  background: $white;
+  border-bottom: 1px solid $border;
+  padding: 2rem 0;
+}
+
+.lpd-hero-info-inner {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+.lpd-hero-dev { font-size: 0.82rem; color: $muted; margin: 0 0 0.4rem; }
+
+.lpd-hero-title {
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: $text;
+  font-family: Georgia, 'Times New Roman', serif;
+  margin: 0 0 0.3rem;
+}
+
+.lpd-hero-subtitle { font-size: 0.9rem; color: $muted; margin: 0 0 1.25rem; }
+
+.lpd-hero-specs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  border: 1px solid $border;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.lpd-hero-spec {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.65rem 1.1rem;
+}
+
+.lpd-spec-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; color: $muted; }
+.lpd-spec-val   { font-size: 0.88rem; font-weight: 700; color: $text; }
+.lpd-spec-divider { width: 1px; background: $border; align-self: stretch; }
+
+// ── Price card ─────────────────────────────────────────────
+.lpd-price-card {
+  background: $bg;
+  border: 1.5px solid $border;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lpd-price-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: $muted; }
+.lpd-price-value { font-size: 1.6rem; font-weight: 700; color: $green; margin-bottom: 0.5rem; }
+
+.lpd-price-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.lpd-btn-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #25d366;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: background 0.2s;
+  &:hover { background: #1ebe5c; }
+
+  &--full { justify-content: center; }
+}
+
+.lpd-btn-outline-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid $border;
+  color: $text;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: border-color 0.2s;
+  &:hover { border-color: $gold; color: $gold; }
+}
+
+// ── Sections ───────────────────────────────────────────────
+.lpd-section {
+  padding: 3rem 0;
+  &--alt { background: $white; }
+}
+
+.lpd-section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0 0 1.5rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid $gold;
+  display: inline-block;
+}
+
+// ── Experts ────────────────────────────────────────────────
+.lpd-experts-grid {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.lpd-expert-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: $bg;
+  border: 1.5px solid $border;
+  border-radius: 0.875rem;
+  padding: 1.1rem 1.25rem;
+  flex: 1;
+  min-width: 260px;
+  transition: border-color 0.2s;
+  &:hover { border-color: rgba($gold, 0.4); }
+}
+
+.lpd-expert-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid $border;
+  flex-shrink: 0;
+}
+
+.lpd-expert-info { flex: 1; }
+.lpd-expert-name { font-size: 0.9rem; font-weight: 700; color: $text; margin: 0 0 0.2rem; }
+.lpd-expert-role { font-size: 0.75rem; color: $muted; margin: 0; }
+
+.lpd-expert-actions { display: flex; gap: 0.4rem; }
+
+.lpd-expert-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #25d366;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.4rem;
+  text-decoration: none;
+}
+
+.lpd-expert-call {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid $border;
+  color: $text;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.4rem;
+  text-decoration: none;
+  &:hover { border-color: $gold; color: $gold; }
+}
+
+// ── Payment Plan ───────────────────────────────────────────
+.lpd-payment-grid {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.lpd-payment-card {
+  flex: 1;
+  min-width: 140px;
+  background: $bg;
+  border: 1.5px solid $border;
+  border-radius: 0.875rem;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  border-top: 3px solid $gold;
+}
+
+.lpd-payment-percent {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $gold;
+  margin-bottom: 0.4rem;
+}
+
+.lpd-payment-label { font-size: 0.82rem; color: $muted; font-weight: 500; }
+
+// ── Overview ───────────────────────────────────────────────
+.lpd-overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.lpd-overview-text {
+  font-size: 0.92rem;
+  color: $muted;
+  line-height: 1.8;
+  margin: 0 0 1.5rem;
+}
+
+.lpd-highlights-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.lpd-highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: $text;
+  svg { color: $green; flex-shrink: 0; margin-top: 2px; }
+}
+
+// ── Amenities ──────────────────────────────────────────────
+.lpd-amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  @media (max-width: 640px) { grid-template-columns: repeat(3, 1fr); }
+}
+
+.lpd-amenity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 0.65rem;
+  padding: 0.875rem 0.5rem;
+  text-align: center;
+  transition: border-color 0.2s;
+  &:hover { border-color: rgba($gold, 0.4); }
+}
+
+.lpd-amenity-icon { font-size: 1.4rem; }
+.lpd-amenity-label { font-size: 0.72rem; color: $muted; font-weight: 500; }
+
+// ── Table ──────────────────────────────────────────────────
+.lpd-table-wrap { overflow-x: auto; border-radius: 0.75rem; border: 1px solid $border; }
+
+.lpd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+
+  th {
+    background: $bg;
+    color: $muted;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid $border;
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    color: $text;
+    border-bottom: 1px solid $border;
+    &:last-child { border-bottom: none; }
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: $bg; }
+}
+
+.lpd-table-price { font-weight: 700; color: $green; }
+
+// ── FAQs ───────────────────────────────────────────────────
+.lpd-faqs-wrap { max-width: 780px; }
+
+.lpd-faqs { display: flex; flex-direction: column; gap: 0; }
+
+.lpd-faq {
+  border-bottom: 1px solid $border;
+  &:first-child { border-top: 1px solid $border; }
+}
+
+.lpd-faq-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: transparent;
+  border: none;
+  padding: 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $text;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.2s;
+  &:hover { color: $gold; }
+  svg { flex-shrink: 0; color: $gold; }
+}
+
+.lpd-faq-a {
+  font-size: 0.85rem;
+  color: $muted;
+  line-height: 1.8;
+  padding: 0 0 1rem;
+}
+
+// ── CTA Banner ─────────────────────────────────────────────
+.lpd-cta-banner {
+  background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 100%);
+  padding: 3rem 0;
+}
+
+.lpd-cta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.lpd-cta-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin: 0 0 0.4rem; }
+.lpd-cta-desc  { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin: 0; }
+
+.lpd-cta-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.lpd-btn-email-cta {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: border-color 0.2s;
+  &:hover { border-color: $gold; }
+}
+
+// ── No-data / Not-found hero ───────────────────────────────
+.lpd-nodata-hero {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1.5rem 3rem;
+  background: $bg;
+}
+
+.lpd-nodata-card {
+  max-width: 680px;
+  width: 100%;
+  background: linear-gradient(135deg, #0a2018 0%, #1a3a2a 100%);
+  border-radius: 1.25rem;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.lpd-nodata-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+.lpd-nodata-badge {
+  display: inline-block;
+  background: $gold;
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.9rem;
+  border-radius: 2rem;
+  margin-bottom: 1rem;
+}
+
+.lpd-nodata-title {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: #fff;
+  font-family: Georgia, 'Times New Roman', serif;
+  margin: 0 0 1rem;
+}
+
+.lpd-nodata-desc {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.8;
+  margin: 0 0 2rem;
+}
+
+.lpd-nodata-actions { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
+
+.lpd-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, $green, $green2);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.7rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  &:hover { opacity: 0.88; }
+}
+
+.lpd-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.7rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: border-color 0.2s;
+  &:hover { border-color: $gold; }
+}

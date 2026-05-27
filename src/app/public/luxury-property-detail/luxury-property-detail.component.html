@@ -1,0 +1,355 @@
+<div class="lpd-page">
+
+  <!-- ── Not Found ──────────────────────────────────────── -->
+  <ng-container *ngIf="notFound()">
+    <div class="lpd-not-found">
+      <div class="lpd-nf-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v4"/><circle cx="11" cy="15" r=".5" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2 class="lpd-nf-title">Property Not Found</h2>
+      <p class="lpd-nf-sub">This listing doesn't exist or may have been removed.</p>
+      <a routerLink="/luxury-properties-for-sale" class="lpd-nf-btn">Browse All Properties</a>
+    </div>
+  </ng-container>
+
+  <!-- ── Stub (no data) ─────────────────────────────────── -->
+  <ng-container *ngIf="!notFound() && property() && !hasData()">
+    <div class="lpd-stub">
+      <div class="lpd-stub-inner">
+        <div class="lpd-stub-icon">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <h2 class="lpd-stub-title">{{ property()?.title }}</h2>
+        <p class="lpd-stub-sub">Full listing details coming soon. Contact us to get exclusive information about this property.</p>
+        <div class="lpd-stub-actions">
+          <a [href]="'https://wa.me/971525209703?text=I want to know more about ' + property()?.title"
+             target="_blank" rel="noopener" class="lpd-stub-wa">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            WhatsApp Us
+          </a>
+          <a href="mailto:contact@livwelldubai.com" class="lpd-stub-email">Email Us</a>
+        </div>
+        <a routerLink="/luxury-properties-for-sale" class="lpd-stub-back">← Back to Listings</a>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ── Full Detail ─────────────────────────────────────── -->
+  <ng-container *ngIf="!notFound() && property() && hasData()">
+    <div class="lpd-wrap">
+
+      <!-- Breadcrumb -->
+      <div class="lpd-breadcrumb">
+        <a routerLink="/" class="lpd-bc-link">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </a>
+        <span class="lpd-bc-sep">›</span>
+        <a routerLink="/luxury-properties-for-sale" class="lpd-bc-link">Luxury Properties</a>
+        <span class="lpd-bc-sep">›</span>
+        <a [routerLink]="['/luxury-properties-for-sale']" [queryParams]="{type: property()!.type}" class="lpd-bc-link">{{ property()!.type }}s in Dubai</a>
+        <span class="lpd-bc-sep">›</span>
+        <span class="lpd-bc-current">{{ property()!.title }}</span>
+      </div>
+
+      <!-- Title row above gallery -->
+      <div class="lpd-title-row">
+        <div class="lpd-title-left">
+          <h1 class="lpd-main-title">{{ property()!.title }}</h1>
+          <div class="lpd-title-meta">
+            <span class="lpd-status-chip" [ngClass]="statusClass(property()!.status)">{{ property()!.status }}</span>
+            <span class="lpd-title-loc">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+              {{ property()!.location }}, Dubai
+            </span>
+            <span class="lpd-title-dev">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              {{ property()!.developer }}
+            </span>
+          </div>
+        </div>
+        <div class="lpd-title-right">
+          <div class="lpd-price-badge">
+            <div class="lpd-price-lbl-sm">Sale Price</div>
+            <div class="lpd-price-val-lg">{{ property()!.price }}</div>
+            <div class="lpd-price-sqft-sm">{{ property()!.pricePerSqft }} / sqft</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery grid (main + 4 thumbs) -->
+      <div class="lpd-gallery-grid">
+        <div class="lpd-gallery-main" (click)="openLightbox()">
+          <img [src]="property()!.images[activeImage()]" [alt]="property()!.title" class="lpd-main-img">
+          <span *ngIf="property()?.badge" class="lpd-badge">{{ property()?.badge }}</span>
+          <button class="lpd-nav lpd-nav-prev"
+            (click)="$event.stopPropagation(); prevImage()"
+            *ngIf="property()!.images.length > 1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="lpd-nav lpd-nav-next"
+            (click)="$event.stopPropagation(); nextImage()"
+            *ngIf="property()!.images.length > 1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="lpd-view-all-btn" (click)="$event.stopPropagation(); openLightbox()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            View all {{ property()!.images.length }} photos
+          </button>
+        </div>
+        <div class="lpd-gallery-thumbs-grid" *ngIf="property()!.images.length > 1">
+          <div *ngFor="let img of property()!.images.slice(1,5); let i = index"
+               class="lpd-thumb-cell" [class.active]="activeImage() === i+1"
+               (click)="activeImage.set(i+1)">
+            <img [src]="img" [alt]="'Photo ' + (i+2)">
+            <div *ngIf="i === 3 && property()!.images.length > 5" class="lpd-thumb-more">
+              +{{ property()!.images.length - 5 }} more
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specs bar -->
+      <div class="lpd-specs-bar">
+        <div class="lpd-spec-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7v13h18V7"/><path d="M1 7h22"/><path d="M5 7V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/></svg>
+          <span class="lpd-spec-v">{{ property()!.beds }}</span>
+          <span class="lpd-spec-l">Beds</span>
+        </div>
+        <div class="lpd-spec-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6H5a2 2 0 0 0-2 2v3"/><path d="M3 11h18v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-3z"/></svg>
+          <span class="lpd-spec-v">{{ property()!.baths }}</span>
+          <span class="lpd-spec-l">Baths</span>
+        </div>
+        <div class="lpd-spec-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          <span class="lpd-spec-v">{{ property()!.area }}</span>
+          <span class="lpd-spec-l">Area</span>
+        </div>
+        <div class="lpd-spec-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="1"/><path d="M3 11V7a4 4 0 0 1 4-4h.5"/><path d="M10 11V7c0-1.1.9-2 2-2s2 .9 2 2v4"/></svg>
+          <span class="lpd-spec-v">{{ property()!.parking }}</span>
+          <span class="lpd-spec-l">Parking</span>
+        </div>
+        <div class="lpd-spec-item" *ngIf="property()!.furnished">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 9V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v2"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z"/></svg>
+          <span class="lpd-spec-v">Yes</span>
+          <span class="lpd-spec-l">Furnished</span>
+        </div>
+        <div class="lpd-spec-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <span class="lpd-spec-v">{{ property()!.listedDate }}</span>
+          <span class="lpd-spec-l">Listed</span>
+        </div>
+      </div>
+
+      <!-- Two-column body -->
+      <div class="lpd-body-grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="lpd-body-left">
+
+          <!-- About -->
+          <section class="lpd-section">
+            <h2 class="lpd-sec-title">About this property</h2>
+            <div class="lpd-about-wrap">
+              <p class="lpd-about" [class.truncated]="!aboutExpanded()">{{ property()!.about }}</p>
+              <button *ngIf="property()!.about.length > 320" class="lpd-read-more" (click)="aboutExpanded.set(!aboutExpanded())">
+                {{ aboutExpanded() ? 'Show less ↑' : 'Read more ↓' }}
+              </button>
+            </div>
+            <div class="lpd-about-details">
+              <div class="lpd-about-row"><span class="lpd-ad-lbl">Property Name</span><span class="lpd-ad-val">{{ property()!.title }}</span></div>
+              <div class="lpd-about-row"><span class="lpd-ad-lbl">Developer</span><span class="lpd-ad-val">{{ property()!.developer }}</span></div>
+              <div class="lpd-about-row"><span class="lpd-ad-lbl">Location</span><span class="lpd-ad-val">{{ property()!.location }}, Dubai</span></div>
+              <div class="lpd-about-row"><span class="lpd-ad-lbl">Community</span><span class="lpd-ad-val">{{ property()!.community }}</span></div>
+              <div class="lpd-about-row"><span class="lpd-ad-lbl">Property Type</span><span class="lpd-ad-val">{{ property()!.type }}</span></div>
+              <div class="lpd-about-row"><span class="lpd-ad-lbl">Status</span><span class="lpd-ad-val">{{ property()!.status }}</span></div>
+            </div>
+          </section>
+
+          <!-- Ask Agent -->
+          <section class="lpd-section">
+            <h2 class="lpd-sec-title">Ask {{ property()!.agent.name }} a question</h2>
+            <div class="lpd-ask">
+              <div class="lpd-ask-agent">
+                <img [src]="property()!.agent.avatar" [alt]="property()!.agent.name" class="lpd-ask-av">
+                <div>
+                  <div class="lpd-ask-name">{{ property()!.agent.name }}</div>
+                  <div class="lpd-ask-role">{{ property()!.agent.role }}</div>
+                </div>
+                <div class="lpd-ask-badge">Top Agent</div>
+              </div>
+              <textarea class="lpd-ask-ta" rows="4"
+                [value]="message()"
+                (input)="message.set($any($event.target).value)"
+                placeholder="Type your question about this property..."></textarea>
+              <a [href]="'https://wa.me/' + property()!.agent.phone.replace('+','') + '?text=' + message()"
+                 target="_blank" rel="noopener" class="lpd-ask-submit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                Ask a Question
+              </a>
+            </div>
+          </section>
+
+          <!-- Mortgage Calculator -->
+          <section class="lpd-section">
+            <h2 class="lpd-sec-title">Mortgage calculator</h2>
+            <div class="lpd-mort">
+              <div class="lpd-mort-fields">
+                <div class="lpd-mort-field">
+                  <label>Property Price (AED)</label>
+                  <input type="number" class="lpd-mort-in" [value]="mortgageAmount()" (input)="mortgageAmount.set(+$any($event.target).value)" readonly>
+                </div>
+                <div class="lpd-mort-field">
+                  <label>Down Payment (%)</label>
+                  <input type="number" min="10" max="80" class="lpd-mort-in" [value]="mortgageDown()" (input)="mortgageDown.set(+$any($event.target).value)">
+                </div>
+                <div class="lpd-mort-field">
+                  <label>No. of payments (Yrs)</label>
+                  <input type="number" min="5" max="30" class="lpd-mort-in" [value]="mortgageYears()" (input)="mortgageYears.set(+$any($event.target).value)">
+                </div>
+              </div>
+              <div class="lpd-mort-output">
+                <div class="lpd-mort-out-row">
+                  <div class="lpd-mort-out-item">
+                    <span class="lpd-mort-out-l">Monthly installments</span>
+                    <span class="lpd-mort-out-v">{{ formatCurrency(monthlyPayment()) }}</span>
+                  </div>
+                  <div class="lpd-mort-out-item lpd-mort-out-highlight">
+                    <span class="lpd-mort-out-l">Contact the finance!</span>
+                    <span class="lpd-mort-out-v lpd-mort-big">{{ formatCurrency(monthlyPayment()) }}</span>
+                    <span class="lpd-mort-out-sub">Property Price: {{ property()!.price }}</span>
+                  </div>
+                </div>
+                <p class="lpd-mort-note">* This is an estimate only. Actual payments will differ based on your profile and lender terms.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Amenities -->
+          <section class="lpd-section">
+            <h2 class="lpd-sec-title">Amenities</h2>
+            <div class="lpd-amenities">
+              <div *ngFor="let a of property()!.amenities" class="lpd-amenity">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                {{ a }}
+              </div>
+            </div>
+          </section>
+
+          <!-- Map -->
+          <section class="lpd-section" *ngIf="property()!.mapUrl">
+            <h2 class="lpd-sec-title">{{ property()!.community }} location</h2>
+            <div class="lpd-map">
+              <iframe [src]="safeMapUrl()" width="100%" height="380" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+          </section>
+
+          <!-- Nearby Schools -->
+          <section class="lpd-section" *ngIf="property()!.nearbySchools.length > 0">
+            <h2 class="lpd-sec-title">Nearby schools</h2>
+            <div class="lpd-schools">
+              <div *ngFor="let s of property()!.nearbySchools" class="lpd-school">
+                <div class="lpd-school-ico">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="lpd-school-body">
+                  <div class="lpd-school-name">{{ s.name }}</div>
+                  <div class="lpd-school-dist">{{ s.distance }} away</div>
+                </div>
+                <div class="lpd-school-rating">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <span>{{ s.rating }}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- QR Code -->
+          <section class="lpd-section lpd-qr-section">
+            <div class="lpd-qr-inner">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://livwelldubai.ae/luxury-property/{{ property()!.id }}"
+                   alt="QR Code" class="lpd-qr-img">
+              <div class="lpd-qr-text">
+                <div class="lpd-qr-title">Scan to share this listing</div>
+                <div class="lpd-qr-sub">Use your phone camera to scan and share this property with anyone.</div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN — sticky agent card -->
+        <div class="lpd-body-right">
+          <div class="lpd-sticky-card">
+
+            <!-- Price -->
+            <div class="lpd-sc-price">
+              <div class="lpd-sc-price-lbl">Sale Price</div>
+              <div class="lpd-sc-price-val">{{ property()!.price }}</div>
+              <div class="lpd-sc-price-sqft">{{ property()!.pricePerSqft }} / sqft</div>
+            </div>
+
+            <!-- Agent -->
+            <div class="lpd-sc-agent">
+              <img [src]="property()!.agent.avatar" [alt]="property()!.agent.name" class="lpd-sc-av">
+              <div>
+                <div class="lpd-sc-agent-name">{{ property()!.agent.name }}</div>
+                <div class="lpd-sc-agent-role">{{ property()!.agent.role }}</div>
+              </div>
+            </div>
+
+            <!-- Contact buttons -->
+            <div class="lpd-sc-btns">
+              <a [href]="'tel:' + property()!.agent.phone" class="lpd-sc-btn lpd-sc-btn--call">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.18 2 2 0 0 1 3.64 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.97-.97a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Call Agent
+              </a>
+              <a [href]="'https://wa.me/' + property()!.agent.phone.replace('+','') + '?text=I am interested in ' + property()!.title"
+                 target="_blank" rel="noopener" class="lpd-sc-btn lpd-sc-btn--wa">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                WhatsApp
+              </a>
+              <a [href]="'mailto:' + property()!.agent.email" class="lpd-sc-btn lpd-sc-btn--email">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+                Email Agent
+              </a>
+            </div>
+
+            <!-- Key facts -->
+            <div class="lpd-sc-facts">
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Type</span><span class="lpd-sc-fact-v">{{ property()!.type }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Status</span><span class="lpd-sc-fact-v">{{ property()!.status }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Developer</span><span class="lpd-sc-fact-v">{{ property()!.developer }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Community</span><span class="lpd-sc-fact-v">{{ property()!.community }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Beds</span><span class="lpd-sc-fact-v">{{ property()!.beds }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Baths</span><span class="lpd-sc-fact-v">{{ property()!.baths }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Area</span><span class="lpd-sc-fact-v">{{ property()!.area }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Parking</span><span class="lpd-sc-fact-v">{{ property()!.parking }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Furnished</span><span class="lpd-sc-fact-v">{{ property()!.furnished ? 'Yes' : 'No' }}</span></div>
+              <div class="lpd-sc-fact"><span class="lpd-sc-fact-l">Listed</span><span class="lpd-sc-fact-v">{{ property()!.listedDate }}</span></div>
+            </div>
+
+            <button class="lpd-sc-follow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Follow this listing
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ── Newsletter + SEO ───────────────────────────────── -->
+  <ng-container *ngIf="!notFound()">
+    <app-newsletter-section></app-newsletter-section>
+    <app-seo-links-section></app-seo-links-section>
+  </ng-container>
+
+</div>

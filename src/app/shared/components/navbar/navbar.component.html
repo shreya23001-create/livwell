@@ -116,8 +116,8 @@
         </button>
         <div class="nav-dropdown">
           <a routerLink="/luxury-projects" class="nav-dd-item" (click)="closeMobileMenu()">Luxury Projects</a>
-          <a routerLink="/luxury-projects" [queryParams]="{filter:'ultra'}" class="nav-dd-item"
-            (click)="closeMobileMenu()">Ultra Luxury Projects</a>
+          <a routerLink="/ultra-luxury-projects" class="nav-dd-item" (click)="closeMobileMenu()">Ultra Luxury
+            Projects</a>
           <a routerLink="/properties" [queryParams]="{type:'Branded'}" class="nav-dd-item"
             (click)="closeMobileMenu()">Dubai Branded Residences</a>
           <!-- Luxury for Sale flyout -->
@@ -129,14 +129,14 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a routerLink="/properties" [queryParams]="{luxe:'true',type:'Apartment',status:'Sale'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Apartments</a>
-              <a routerLink="/properties" [queryParams]="{luxe:'true',type:'Villa',status:'Sale'}" class="nav-dd-item"
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Apartment',intent:'Buy'}" class="nav-dd-item"
+                (click)="closeMobileMenu()">Apartments</a>
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Villa',intent:'Buy'}" class="nav-dd-item"
                 (click)="closeMobileMenu()">Villas</a>
-              <a routerLink="/properties" [queryParams]="{luxe:'true',type:'Home',status:'Sale'}" class="nav-dd-item"
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Home',intent:'Buy'}" class="nav-dd-item"
                 (click)="closeMobileMenu()">Homes</a>
-              <a routerLink="/properties" [queryParams]="{luxe:'true',type:'Penthouse',status:'Sale'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Penthouses</a>
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Penthouse',intent:'Buy'}" class="nav-dd-item"
+                (click)="closeMobileMenu()">Penthouses</a>
             </div>
           </div>
           <!-- Luxury for Rent flyout -->
@@ -148,13 +148,13 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a routerLink="/properties" [queryParams]="{luxe:'true',type:'Apartment',status:'Rent'}"
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Apartment',intent:'Rent'}"
                 class="nav-dd-item" (click)="closeMobileMenu()">Apartments</a>
-              <a routerLink="/properties" [queryParams]="{luxe:'true',type:'Villa',status:'Rent'}" class="nav-dd-item"
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Villa',intent:'Rent'}" class="nav-dd-item"
                 (click)="closeMobileMenu()">Villas</a>
-              <a routerLink="/properties" [queryParams]="{luxe:'true',type:'Home',status:'Rent'}" class="nav-dd-item"
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Home',intent:'Rent'}" class="nav-dd-item"
                 (click)="closeMobileMenu()">Homes</a>
-              <a routerLink="/properties" [queryParams]="{luxe:'true',type:'Penthouse',status:'Rent'}"
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Penthouse',intent:'Rent'}"
                 class="nav-dd-item" (click)="closeMobileMenu()">Penthouses</a>
             </div>
           </div>

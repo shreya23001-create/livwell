@@ -1,0 +1,431 @@
+$green: #1a5c3a;
+$green2: #22754a;
+$green-light: #e8f4ee;
+$gold: #c8a84b;
+$text: #1a1a1a;
+$muted: #6b7280;
+$border: #e5e7eb;
+$bg: #f5f5f5;
+$white: #ffffff;
+$radius: 10px;
+
+.lpd-page {
+  min-height: 100vh;
+  background: $bg;
+  padding-top: 80px;
+}
+
+// ── Not Found ─────────────────────────────────────────────
+.lpd-not-found {
+  max-width: 480px; margin: 6rem auto; text-align: center; padding: 2rem;
+  .lpd-nf-icon { width: 80px; height: 80px; border-radius: 50%; background: $green-light; color: $green; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+  .lpd-nf-title { font-size: 1.6rem; font-weight: 700; color: $text; margin: 0 0 0.5rem; }
+  .lpd-nf-sub { color: $muted; margin-bottom: 1.5rem; }
+  .lpd-nf-btn { display: inline-block; padding: 0.75rem 2rem; background: $green; color: $white; border-radius: 8px; font-weight: 600; text-decoration: none; }
+}
+
+// ── Stub ──────────────────────────────────────────────────
+.lpd-stub {
+  min-height: 60vh; display: flex; align-items: center; justify-content: center; padding: 2rem;
+  .lpd-stub-inner { max-width: 520px; text-align: center; background: $white; border-radius: $radius; padding: 3rem 2.5rem; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+  .lpd-stub-icon { width: 88px; height: 88px; border-radius: 50%; background: $green; color: $white; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+  .lpd-stub-title { font-size: 1.5rem; font-weight: 700; color: $text; margin: 0 0 0.75rem; }
+  .lpd-stub-sub { color: $muted; margin-bottom: 2rem; line-height: 1.6; }
+  .lpd-stub-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .lpd-stub-wa { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; background: #25d366; color: $white; border-radius: 8px; font-weight: 600; text-decoration: none; }
+  .lpd-stub-email { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; background: $green; color: $white; border-radius: 8px; font-weight: 600; text-decoration: none; }
+  .lpd-stub-back { display: inline-block; color: $green; font-size: 0.9rem; text-decoration: none; font-weight: 500; }
+}
+
+// ── Page wrapper ──────────────────────────────────────────
+.lpd-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem 3rem;
+}
+
+// ── Breadcrumb ────────────────────────────────────────────
+.lpd-breadcrumb {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; color: $muted;
+  margin-bottom: 1rem; flex-wrap: wrap;
+  .lpd-bc-link { color: $muted; text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem; &:hover { color: $green; } }
+  .lpd-bc-sep { color: #d1d5db; }
+  .lpd-bc-current { color: $text; font-weight: 500; }
+}
+
+// ── Title row ─────────────────────────────────────────────
+.lpd-title-row {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 1.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;
+}
+.lpd-title-left { flex: 1; min-width: 0; }
+.lpd-main-title {
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  font-weight: 800; color: $text;
+  margin: 0 0 0.6rem;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.lpd-title-meta {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+.lpd-title-loc, .lpd-title-dev {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.83rem; color: $muted;
+  svg { flex-shrink: 0; }
+}
+.lpd-status-chip {
+  display: inline-block; font-size: 0.7rem; font-weight: 700;
+  padding: 0.22rem 0.65rem; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  &.status--ready { background: #d1fae5; color: #065f46; }
+  &.status--offplan { background: #fef3c7; color: #92400e; }
+  &.status--construction { background: #dbeafe; color: #1e40af; }
+}
+.lpd-title-right { flex-shrink: 0; }
+.lpd-price-badge {
+  background: $white; border: 1px solid $border; border-radius: $radius;
+  padding: 0.9rem 1.25rem; text-align: right;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.lpd-price-lbl-sm { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: $muted; }
+.lpd-price-val-lg { font-size: 1.6rem; font-weight: 800; color: $green; margin: 0.1rem 0; }
+.lpd-price-sqft-sm { font-size: 0.76rem; color: $muted; }
+
+// ── Gallery grid ─────────────────────────────────────────
+.lpd-gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: $radius;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lpd-gallery-main {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  background: #111;
+  cursor: pointer;
+  border-radius: $radius 0 0 $radius;
+
+  @media (max-width: 768px) {
+    border-radius: $radius $radius 0 0;
+    aspect-ratio: 16/9;
+  }
+
+  .lpd-main-img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.4s ease;
+    &:hover { transform: scale(1.02); }
+  }
+
+  .lpd-badge {
+    position: absolute; top: 0.85rem; left: 0.85rem;
+    background: $gold; color: $white;
+    font-size: 0.7rem; font-weight: 700;
+    padding: 0.22rem 0.6rem; border-radius: 4px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+}
+
+.lpd-view-all-btn {
+  position: absolute; bottom: 0.85rem; right: 0.85rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  background: rgba(0,0,0,.6); color: $white;
+  border: 1.5px solid rgba($white,.3);
+  border-radius: 6px; font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; backdrop-filter: blur(4px);
+  transition: background .15s;
+  &:hover { background: rgba(0,0,0,.8); }
+}
+
+.lpd-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba($white,.9); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  transition: background .15s;
+  &:hover { background: $white; }
+  &.lpd-nav-prev { left: 0.65rem; }
+  &.lpd-nav-next { right: 0.65rem; }
+}
+
+.lpd-gallery-thumbs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr;
+  }
+}
+
+.lpd-thumb-cell {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #111;
+  border-radius: 6px;
+
+  &:last-child { border-radius: 0 $radius $radius 0; @media (max-width: 768px) { border-radius: 0 0 $radius 0; } }
+
+  img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+  &:hover img { transform: scale(1.06); }
+
+  &.active { outline: 2.5px solid $green; }
+
+  .lpd-thumb-more {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center;
+    color: $white; font-weight: 700; font-size: 1rem;
+  }
+}
+
+// ── Specs bar ─────────────────────────────────────────────
+.lpd-specs-bar {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  background: $white; border-radius: $radius;
+  padding: 0.9rem 1.25rem; margin-bottom: 1.5rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,.05);
+}
+
+.lpd-spec-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  border-right: 1px solid $border;
+  &:last-child { border-right: none; }
+  svg { color: $gold; flex-shrink: 0; }
+  .lpd-spec-v { font-size: 0.9rem; font-weight: 700; color: $text; }
+  .lpd-spec-l { font-size: 0.73rem; color: $muted; margin-left: 0.2rem; }
+}
+
+// ── Two-column body ───────────────────────────────────────
+.lpd-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lpd-body-left {
+  display: flex; flex-direction: column; gap: 1.25rem;
+}
+
+// ── Sections ──────────────────────────────────────────────
+.lpd-section {
+  background: $white;
+  border-radius: $radius;
+  padding: 1.75rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,.05);
+}
+
+.lpd-sec-title {
+  font-size: 1.05rem; font-weight: 700; color: $text;
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 2px solid $green-light;
+}
+
+// About
+.lpd-about-wrap { margin-bottom: 1.25rem; }
+.lpd-about {
+  color: #374151; line-height: 1.8; font-size: 0.93rem; margin: 0;
+  &.truncated {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+.lpd-read-more {
+  background: none; border: none; color: $green; font-size: 0.85rem;
+  font-weight: 600; cursor: pointer; padding: 0.35rem 0; margin-top: 0.25rem;
+  &:hover { text-decoration: underline; }
+}
+
+.lpd-about-details {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem;
+  border-top: 1px solid $border; padding-top: 1rem;
+  @media (max-width: 520px) { grid-template-columns: 1fr; }
+}
+.lpd-about-row {
+  display: flex; gap: 0.5rem; font-size: 0.85rem;
+  .lpd-ad-lbl { color: $muted; flex-shrink: 0; min-width: 110px; }
+  .lpd-ad-val { font-weight: 600; color: $text; }
+}
+
+// Ask agent
+.lpd-ask { display: flex; flex-direction: column; gap: 1rem; }
+.lpd-ask-agent {
+  display: flex; align-items: center; gap: 0.85rem;
+  .lpd-ask-av { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid $green-light; }
+  .lpd-ask-name { font-weight: 700; color: $text; font-size: 0.9rem; }
+  .lpd-ask-role { font-size: 0.78rem; color: $muted; }
+}
+.lpd-ask-badge {
+  margin-left: auto; background: $gold; color: $white;
+  font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.lpd-ask-ta {
+  width: 100%; padding: 0.85rem; border: 1.5px solid $border;
+  border-radius: 8px; font-size: 0.9rem; resize: vertical;
+  font-family: inherit; color: $text; box-sizing: border-box;
+  &:focus { outline: none; border-color: $green; }
+}
+.lpd-ask-submit {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.75rem; background: $green; color: $white;
+  border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 0.88rem;
+  transition: opacity .15s; &:hover { opacity: .88; }
+}
+
+// Mortgage
+.lpd-mort-fields {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;
+  margin-bottom: 1.25rem;
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+.lpd-mort-field {
+  display: flex; flex-direction: column; gap: 0.35rem;
+  label { font-size: 0.78rem; font-weight: 600; color: $muted; }
+}
+.lpd-mort-in {
+  padding: 0.65rem 0.85rem; border: 1.5px solid $border;
+  border-radius: 8px; font-size: 0.9rem; color: $text;
+  &:focus { outline: none; border-color: $green; }
+  &[readonly] { background: $bg; color: $muted; cursor: not-allowed; }
+}
+.lpd-mort-out-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+.lpd-mort-out-item {
+  flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 0.3rem;
+  padding: 1rem 1.25rem; border-radius: 10px; background: $bg; border: 1px solid $border;
+  &.lpd-mort-out-highlight {
+    background: $green; border-color: $green;
+    .lpd-mort-out-l { color: rgba($white,.75); }
+    .lpd-mort-out-v { color: $white; }
+    .lpd-mort-out-sub { color: rgba($white,.7); font-size: 0.72rem; }
+  }
+}
+.lpd-mort-out-l { font-size: 0.75rem; color: $muted; text-transform: uppercase; letter-spacing: 0.05em; }
+.lpd-mort-out-v { font-size: 1.1rem; font-weight: 800; color: $text; }
+.lpd-mort-big { font-size: 1.35rem !important; }
+.lpd-mort-out-sub { font-size: 0.75rem; color: $muted; }
+.lpd-mort-note { font-size: 0.74rem; color: $muted; margin: 0.85rem 0 0; }
+
+// Amenities
+.lpd-amenities {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.55rem;
+}
+.lpd-amenity {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.86rem; color: #374151;
+  svg { color: $green; flex-shrink: 0; }
+}
+
+// Map
+.lpd-map { border-radius: 10px; overflow: hidden; iframe { display: block; } }
+
+// Schools
+.lpd-schools { display: flex; flex-direction: column; gap: 0.75rem; }
+.lpd-school {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.9rem 1rem; border: 1px solid $border; border-radius: 8px; background: $bg;
+}
+.lpd-school-ico {
+  width: 40px; height: 40px; border-radius: 8px; background: $green-light; color: $green;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.lpd-school-body { flex: 1; }
+.lpd-school-name { font-weight: 600; color: $text; font-size: 0.88rem; }
+.lpd-school-dist { font-size: 0.76rem; color: $muted; }
+.lpd-school-rating { display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem; font-weight: 700; color: #d97706; }
+
+// QR
+.lpd-qr-section {}
+.lpd-qr-inner {
+  display: flex; align-items: center; gap: 1.5rem;
+  @media (max-width: 480px) { flex-direction: column; text-align: center; }
+}
+.lpd-qr-img { width: 100px; height: 100px; border-radius: 8px; border: 1px solid $border; flex-shrink: 0; }
+.lpd-qr-title { font-size: 0.95rem; font-weight: 700; color: $text; margin-bottom: 0.35rem; }
+.lpd-qr-sub { font-size: 0.82rem; color: $muted; line-height: 1.5; }
+
+// ── Right sticky card ─────────────────────────────────────
+.lpd-body-right {
+  @media (max-width: 1024px) { order: -1; }
+}
+
+.lpd-sticky-card {
+  position: sticky;
+  top: 84px;
+  background: $white;
+  border-radius: $radius;
+  box-shadow: 0 4px 24px rgba(0,0,0,.1);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+.lpd-sc-price {
+  background: $green; padding: 1.25rem 1.5rem;
+  .lpd-sc-price-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: rgba($white,.7); }
+  .lpd-sc-price-val { font-size: 1.55rem; font-weight: 800; color: $white; margin: 0.15rem 0; }
+  .lpd-sc-price-sqft { font-size: 0.76rem; color: rgba($white,.7); }
+}
+
+.lpd-sc-agent {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 1rem 1.5rem; border-bottom: 1px solid $border;
+  .lpd-sc-av { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid $green-light; flex-shrink: 0; }
+  .lpd-sc-agent-name { font-weight: 700; color: $text; font-size: 0.9rem; }
+  .lpd-sc-agent-role { font-size: 0.74rem; color: $muted; }
+}
+
+.lpd-sc-btns {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 1rem 1.5rem; border-bottom: 1px solid $border;
+}
+.lpd-sc-btn {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.65rem 1rem; border-radius: 8px;
+  font-size: 0.85rem; font-weight: 600; text-decoration: none;
+  transition: opacity .15s; border: none; cursor: pointer;
+  &:hover { opacity: .88; }
+  &--call { background: $green-light; color: $green; }
+  &--wa { background: #dcfce7; color: #16a34a; }
+  &--email { background: #eff6ff; color: #2563eb; }
+}
+
+.lpd-sc-facts {
+  padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;
+  border-bottom: 1px solid $border;
+}
+.lpd-sc-fact {
+  display: flex; justify-content: space-between; font-size: 0.83rem;
+  .lpd-sc-fact-l { color: $muted; }
+  .lpd-sc-fact-v { font-weight: 600; color: $text; text-align: right; }
+}
+
+.lpd-sc-follow {
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.85rem; background: none; border: none; cursor: pointer;
+  font-size: 0.83rem; font-weight: 600; color: $muted;
+  transition: color .15s;
+  &:hover { color: $green; }
+  svg { flex-shrink: 0; }
+}

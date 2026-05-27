@@ -1,0 +1,290 @@
+<div class="brd-page" *ngIf="property() as p; else notFound">
+
+  <!-- Breadcrumb -->
+  <div class="brd-breadcrumb">
+    <a routerLink="/" class="brd-bc-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </a>
+    <span class="brd-bc-sep">›</span>
+    <a routerLink="/branded-residences" class="brd-bc-link">Branded Residences</a>
+    <span class="brd-bc-sep">›</span>
+    <span class="brd-bc-current">{{ p.title }}</span>
+  </div>
+
+  <!-- Title row -->
+  <div class="brd-title-row">
+    <div>
+      <h1 class="brd-title">{{ p.title }}</h1>
+      <div class="brd-meta-row">
+        <span class="brd-brand-tag">{{ p.brand }}</span>
+        <span class="brd-meta-sep">·</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+        <span class="brd-meta-loc">{{ p.location }}</span>
+        <span class="brd-meta-sep">·</span>
+        <span class="brd-status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+      </div>
+    </div>
+    <div class="brd-price-badge">
+      <div class="brd-price-lbl">Starting From</div>
+      <div class="brd-price-val">{{ p.startingPrice }}</div>
+      <div class="brd-price-sub">{{ p.pricePerSqft }} / sqft</div>
+    </div>
+  </div>
+
+  <!-- Gallery -->
+  <div class="brd-gallery">
+    <div class="brd-gallery-main">
+      <img [src]="p.images[activeImage()]" [alt]="p.title" class="brd-gallery-main-img">
+      <div class="brd-gallery-overlay">
+        <button class="brd-gallery-nav brd-gallery-prev" (click)="activeImage.set((activeImage() - 1 + p.images.length) % p.images.length)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="brd-gallery-nav brd-gallery-next" (click)="activeImage.set((activeImage() + 1) % p.images.length)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="brd-photo-count">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          View all {{ p.images.length }} photos
+        </div>
+      </div>
+    </div>
+    <div class="brd-gallery-thumbs">
+      <div *ngFor="let img of p.images.slice(1, 5); let i = index"
+           class="brd-thumb-wrap"
+           [class.active]="activeImage() === i + 1"
+           (click)="activeImage.set(i + 1)">
+        <img [src]="img" [alt]="p.title + ' ' + (i+2)" class="brd-thumb-img">
+      </div>
+    </div>
+  </div>
+
+  <!-- Highlights bar -->
+  <div class="brd-highlights">
+    <div *ngFor="let h of p.highlights" class="brd-highlight-item">
+      <div class="brd-hl-label">{{ h.label }}</div>
+      <div class="brd-hl-value">{{ h.value }}</div>
+    </div>
+    <div class="brd-highlight-item">
+      <div class="brd-hl-label">Beds</div>
+      <div class="brd-hl-value">{{ p.beds }}</div>
+    </div>
+    <div class="brd-highlight-item">
+      <div class="brd-hl-label">Developer</div>
+      <div class="brd-hl-value">{{ p.developer }}</div>
+    </div>
+  </div>
+
+  <!-- Body: two-col -->
+  <div class="brd-body">
+
+    <!-- LEFT -->
+    <div class="brd-left">
+
+      <!-- Experts -->
+      <div class="brd-section">
+        <h2 class="brd-section-title">{{ p.title }} Experts</h2>
+        <div class="brd-agents-row">
+          <div *ngFor="let a of p.agents" class="brd-agent-card">
+            <div class="brd-agent-avatar-wrap">
+              <img [src]="a.avatar" [alt]="a.name" class="brd-agent-avatar">
+              <span class="brd-agent-online"></span>
+            </div>
+            <div class="brd-agent-name">{{ a.name }}</div>
+            <div class="brd-agent-title">{{ a.title }}</div>
+            <a [href]="'tel:' + a.phone" class="brd-agent-call-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.38 2 2 0 0 1 3.59 1H6.5a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.27 8.91a16 16 0 0 0 6.29 6.29l1.04-1.04a2 2 0 0 1 2.1-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.5z"/></svg>
+              Call
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Plans -->
+      <div class="brd-section">
+        <h2 class="brd-section-title">Payment plans</h2>
+        <div class="brd-payment-plans">
+          <div *ngFor="let plan of p.paymentPlan" class="brd-plan-item">
+            <div class="brd-plan-circle">
+              <svg viewBox="0 0 36 36" class="brd-plan-svg">
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e5e7eb" stroke-width="3"/>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1a5c3a" stroke-width="3"
+                  [attr.stroke-dasharray]="plan.percent > 0 ? (plan.percent + ' 100') : '0 100'"
+                  stroke-dashoffset="25" stroke-linecap="round"/>
+              </svg>
+              <span class="brd-plan-pct">{{ plan.percent > 0 ? plan.percent + '%' : '—' }}</span>
+            </div>
+            <div class="brd-plan-label">{{ plan.label }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location map -->
+      <div class="brd-section">
+        <h2 class="brd-section-title">Location</h2>
+        <div class="brd-map-tabs">
+          <button class="brd-map-tab" [class.active]="activeMapTab() === 'location'" (click)="activeMapTab.set('location')">Map</button>
+          <button class="brd-map-tab" [class.active]="activeMapTab() === 'community'" (click)="activeMapTab.set('community')">Community</button>
+        </div>
+        <div class="brd-map-wrap">
+          <iframe [src]="mapSrc()" class="brd-map-iframe" frameborder="0" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="brd-map-links">
+          <a href="#" class="brd-map-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 1 8 8c0 5.25-8 13-8 13S4 15.25 4 10a8 8 0 0 1 8-8z"/></svg>
+            Community Map
+          </a>
+        </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="brd-section">
+        <h2 class="brd-section-title">Recent Transactions</h2>
+        <div class="brd-table-wrap">
+          <table class="brd-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Price</th>
+                <th>Price/sqft</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let t of p.transactions">
+                <td>{{ t.date }}</td>
+                <td>{{ t.type }}</td>
+                <td>{{ t.size }}</td>
+                <td>{{ t.price }}</td>
+                <td>{{ t.pricePerSqft }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Amenities -->
+      <div class="brd-section">
+        <h2 class="brd-section-title">Amenities</h2>
+        <div class="brd-amenities">
+          <div *ngFor="let a of p.amenities" class="brd-amenity-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            {{ a }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview -->
+      <div class="brd-section">
+        <h2 class="brd-section-title">{{ p.title }} Overview</h2>
+        <div class="brd-overview" [class.truncated]="!overviewExpanded()">{{ p.overview }}</div>
+        <button class="brd-read-more" (click)="overviewExpanded.set(!overviewExpanded())">
+          {{ overviewExpanded() ? 'Show Less ↑' : 'Read More ↓' }}
+        </button>
+      </div>
+
+      <!-- FAQ -->
+      <div class="brd-section">
+        <h2 class="brd-section-title">{{ p.title }} FAQ's</h2>
+        <div class="brd-faqs">
+          <div *ngFor="let faq of p.faqs; let i = index" class="brd-faq-item" [class.open]="openFaqIndex() === i">
+            <button class="brd-faq-q" (click)="toggleFaq(i)">
+              {{ faq.q }}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="brd-faq-icon">
+                <polyline *ngIf="openFaqIndex() !== i" points="6 9 12 15 18 9"/>
+                <polyline *ngIf="openFaqIndex() === i" points="18 15 12 9 6 15"/>
+              </svg>
+            </button>
+            <div class="brd-faq-a" *ngIf="openFaqIndex() === i">{{ faq.a }}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Sticky enquiry card -->
+    <div class="brd-right">
+      <div class="brd-sticky-card">
+        <div class="brd-sc-price-header">
+          <div class="brd-sc-price-lbl">Starting From</div>
+          <div class="brd-sc-price-val">{{ p.startingPrice }}</div>
+        </div>
+        <div class="brd-sc-body">
+          <div class="brd-sc-fact-row">
+            <span class="brd-sc-fact-lbl">Developer</span>
+            <span class="brd-sc-fact-val">{{ p.developer }}</span>
+          </div>
+          <div class="brd-sc-fact-row">
+            <span class="brd-sc-fact-lbl">Brand</span>
+            <span class="brd-sc-fact-val">{{ p.brand }}</span>
+          </div>
+          <div class="brd-sc-fact-row">
+            <span class="brd-sc-fact-lbl">Location</span>
+            <span class="brd-sc-fact-val">{{ p.location }}</span>
+          </div>
+          <div class="brd-sc-fact-row">
+            <span class="brd-sc-fact-lbl">Beds</span>
+            <span class="brd-sc-fact-val">{{ p.beds }}</span>
+          </div>
+          <div class="brd-sc-fact-row">
+            <span class="brd-sc-fact-lbl">Handover</span>
+            <span class="brd-sc-fact-val">{{ p.completionDate }}</span>
+          </div>
+          <div class="brd-sc-fact-row">
+            <span class="brd-sc-fact-lbl">Status</span>
+            <span class="brd-sc-fact-val">
+              <span class="brd-status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+            </span>
+          </div>
+          <div class="brd-sc-fact-row">
+            <span class="brd-sc-fact-lbl">Price/sqft</span>
+            <span class="brd-sc-fact-val">{{ p.pricePerSqft }}</span>
+          </div>
+
+          <!-- Lead agent -->
+          <div class="brd-sc-agent" *ngIf="p.agents[0] as agent">
+            <img [src]="agent.avatar" [alt]="agent.name" class="brd-sc-agent-img">
+            <div class="brd-sc-agent-info">
+              <div class="brd-sc-agent-name">{{ agent.name }}</div>
+              <div class="brd-sc-agent-title">{{ agent.title }}</div>
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="brd-sc-actions">
+            <a [href]="'tel:' + p.agents[0]?.phone" class="brd-sc-btn brd-sc-btn--call">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.38 2 2 0 0 1 3.59 1H6.5a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.27 8.91a16 16 0 0 0 6.29 6.29l1.04-1.04a2 2 0 0 1 2.1-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.5z"/></svg>
+              Call
+            </a>
+            <a href="https://wa.me/971501234567" target="_blank" class="brd-sc-btn brd-sc-btn--whatsapp">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+            <a href="mailto:info@livwelldubai.com" class="brd-sc-btn brd-sc-btn--email">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Email
+            </a>
+          </div>
+
+          <!-- Follow / Enquire -->
+          <button class="brd-sc-follow-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Follow Project
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <app-newsletter-section></app-newsletter-section>
+  <app-seo-links-section></app-seo-links-section>
+
+</div>
+
+<ng-template #notFound>
+  <div class="brd-not-found">
+    <h2>Property not found</h2>
+    <a routerLink="/branded-residences">← Back to Branded Residences</a>
+  </div>
+</ng-template>

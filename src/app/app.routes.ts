@@ -18,6 +18,8 @@ export const routes: Routes = [
       { path: 'blog', loadComponent: () => import('./public/blog/blog.component').then(m => m.BlogComponent) },
       { path: 'contact', loadComponent: () => import('./public/contact/contact.component').then(m => m.ContactComponent) },
       { path: 'luxury-projects', loadComponent: () => import('./public/luxury-projects/luxury-projects.component').then(m => m.LuxuryProjectsComponent) },
+      { path: 'branded-residences', loadComponent: () => import('./public/branded-residences/branded-residences.component').then(m => m.BrandedResidencesComponent) },
+      { path: 'branded-residence/:slug', loadComponent: () => import('./public/branded-residence-detail/branded-residence-detail.component').then(m => m.BrandedResidenceDetailComponent) },
       { path: 'terms-of-use', loadComponent: () => import('./public/terms-of-use/terms-of-use').then(m => m.TermsOfUse) },
       { path: 'privacy-policy', loadComponent: () => import('./public/privacy-policy/privacy-policy').then(m => m.PrivacyPolicy) },
     ],

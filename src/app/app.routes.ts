@@ -21,6 +21,7 @@ export const routes: Routes = [
       { path: 'ultra-luxury-projects', loadComponent: () => import('./public/ultra-luxury-projects/ultra-luxury-projects.component').then(m => m.UltraLuxuryProjectsComponent) },
       { path: 'luxury-properties-for-sale', loadComponent: () => import('./public/luxury-properties-for-sale/luxury-properties-for-sale.component').then(m => m.LuxuryPropertiesForSaleComponent) },
       { path: 'luxury-properties-for-rent', redirectTo: '/luxury-properties-for-sale?intent=Rent' },
+      { path: 'branded-residences', loadComponent: () => import('./public/branded-residences/branded-residences.component').then(m => m.BrandedResidencesComponent) },
       { path: 'luxury-project/:id', loadComponent: () => import('./public/luxury-project-detail/luxury-project-detail.component').then(m => m.LuxuryProjectDetailComponent) },
       { path: 'luxury-property/:id', loadComponent: () => import('./public/luxury-property-detail/luxury-property-detail.component').then(m => m.LuxuryPropertyDetailComponent) },
       { path: 'terms-of-use', loadComponent: () => import('./public/terms-of-use/terms-of-use').then(m => m.TermsOfUse) },

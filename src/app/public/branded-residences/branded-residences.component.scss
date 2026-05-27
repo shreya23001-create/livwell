@@ -1,0 +1,270 @@
+$green: #1a5c3a;
+$green2: #22754a;
+$green-light: #e8f4ee;
+$gold: #c8a84b;
+$text: #111827;
+$muted: #6b7280;
+$border: #e5e7eb;
+$bg: #f9fafb;
+$white: #fff;
+$radius: 10px;
+
+.br-page {
+  min-height: 100vh;
+  background: $bg;
+  padding-top: 72px;
+}
+
+// ── Header ────────────────────────────────────────────────
+.br-header {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 1.25rem;
+}
+
+.br-breadcrumb {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.8rem; color: $muted; margin-bottom: 1rem;
+  .br-bc-link { color: $muted; text-decoration: none; display: flex; align-items: center; &:hover { color: $green; } }
+  .br-bc-sep { color: #d1d5db; }
+  .br-bc-current { color: $text; font-weight: 500; }
+}
+
+.br-title {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 800; color: $text; margin: 0 0 0.4rem;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.br-desc {
+  font-size: 0.92rem; color: $muted; margin: 0 0 1.25rem; max-width: 640px;
+}
+
+// Filters
+.br-filters {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+.br-search-wrap {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: $white; border: 1.5px solid $border; border-radius: 8px;
+  padding: 0.5rem 0.9rem; min-width: 260px;
+  svg { color: $muted; flex-shrink: 0; }
+}
+.br-search {
+  border: none; outline: none; font-size: 0.85rem; color: $text;
+  background: transparent; width: 100%;
+  &::placeholder { color: $muted; }
+}
+.br-filter-chips {
+  display: flex; gap: 0.4rem; flex-wrap: wrap;
+}
+.br-chip {
+  padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+  border: 1.5px solid $border; background: $white; color: $muted; cursor: pointer;
+  transition: all 0.15s;
+  &:hover { border-color: $green; color: $green; }
+  &.active { background: $green; border-color: $green; color: $white; }
+}
+
+// ── Split layout ──────────────────────────────────────────
+.br-split {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  height: calc(100vh - 220px);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem 1.5rem;
+  gap: 1.25rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+// ── Card list ─────────────────────────────────────────────
+.br-list-col {
+  display: flex; flex-direction: column; gap: 0.75rem;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: $border; border-radius: 4px; }
+}
+
+.br-count {
+  font-size: 0.82rem; color: $muted; padding: 0.25rem 0; flex-shrink: 0;
+}
+
+.br-list {
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+
+.br-card {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $radius;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+
+  &:hover, &.hovered {
+    border-color: $green;
+    box-shadow: 0 4px 20px rgba(26, 92, 58, 0.12);
+    transform: translateX(3px);
+  }
+}
+
+.br-card-img-wrap {
+  position: relative; overflow: hidden;
+  img.br-card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+  .br-card:hover & img.br-card-img { transform: scale(1.06); }
+}
+
+.br-badge {
+  position: absolute; top: 0.5rem; left: 0.5rem;
+  background: $gold; color: $white;
+  font-size: 0.62rem; font-weight: 700; padding: 0.18rem 0.5rem;
+  border-radius: 3px; letter-spacing: 0.05em; text-transform: uppercase;
+}
+
+.br-status {
+  position: absolute; top: 0.5rem; right: 0.5rem;
+  font-size: 0.62rem; font-weight: 700; padding: 0.18rem 0.5rem;
+  border-radius: 3px; letter-spacing: 0.04em;
+  &.status--ready { background: #d1fae5; color: #065f46; }
+  &.status--offplan { background: #fef3c7; color: #92400e; }
+  &.status--construction { background: #dbeafe; color: #1e40af; }
+}
+
+.br-card-body {
+  padding: 0.75rem 1rem;
+  display: flex; flex-direction: column; gap: 0.2rem;
+}
+
+.br-card-brand {
+  font-size: 0.68rem; font-weight: 700; color: $gold;
+  text-transform: uppercase; letter-spacing: 0.07em;
+}
+
+.br-card-developer {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.75rem; color: $muted;
+  svg { flex-shrink: 0; }
+}
+
+.br-card-title {
+  font-size: 0.92rem; font-weight: 700; color: $text; margin: 0.1rem 0;
+  line-height: 1.3;
+}
+
+.br-card-loc {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.75rem; color: $muted;
+  svg { flex-shrink: 0; color: $green; }
+}
+
+.br-card-meta {
+  font-size: 0.75rem; color: $muted; display: flex; align-items: center; gap: 0.35rem;
+  .br-sep { color: $border; }
+}
+
+.br-card-price {
+  margin-top: 0.25rem;
+  .br-price-lbl { font-size: 0.68rem; color: $muted; margin-right: 0.25rem; }
+  .br-price-val { font-size: 0.88rem; font-weight: 800; color: $green; }
+}
+
+// Empty state
+.br-empty {
+  text-align: center; padding: 2.5rem 1rem;
+  p { color: $muted; margin: 0.75rem 0 1rem; font-size: 0.9rem; }
+}
+.br-reset-btn {
+  padding: 0.5rem 1.25rem; background: $green; color: $white;
+  border: none; border-radius: 7px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  &:hover { background: $green2; }
+}
+
+// ── Map column ────────────────────────────────────────────
+.br-map-col {
+  position: sticky;
+  top: 84px;
+  height: calc(100vh - 220px);
+
+  @media (max-width: 900px) {
+    position: relative;
+    top: 0;
+    height: 400px;
+  }
+}
+
+.br-map-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: $radius;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+
+.br-map-tabs {
+  position: absolute; top: 0.75rem; left: 0.75rem; z-index: 10;
+  display: flex; gap: 0.3rem;
+}
+.br-map-tab {
+  padding: 0.35rem 0.85rem; font-size: 0.75rem; font-weight: 600;
+  background: $white; border: 1px solid $border; border-radius: 5px;
+  cursor: pointer; color: $text;
+  &.active { background: $green; color: $white; border-color: $green; }
+}
+
+.br-map-iframe {
+  width: 100%; height: 100%; border: 0; display: block;
+  transition: opacity 0.3s;
+}
+
+// Popup on hover
+.br-map-popup {
+  position: absolute;
+  top: 3.5rem;
+  right: 0.75rem;
+  width: 220px;
+  background: $white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+  z-index: 20;
+  animation: popupIn 0.2s ease;
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.br-popup-img {
+  width: 100%; height: 110px; object-fit: cover; display: block;
+}
+
+.br-popup-body {
+  padding: 0.65rem 0.85rem;
+}
+
+.br-popup-price {
+  font-size: 0.95rem; font-weight: 800; color: $green; margin-bottom: 0.15rem;
+}
+
+.br-popup-title {
+  font-size: 0.82rem; font-weight: 700; color: $text; margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+
+.br-popup-loc {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.74rem; color: $muted;
+  svg { color: $green; flex-shrink: 0; }
+}

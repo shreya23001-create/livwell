@@ -1822,10 +1822,28 @@ $gold-light: #e8c870;
 }
 
 .type-icon {
-  font-size: 2rem;
-  margin-bottom: 0.75rem;
-  display: block;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.3s;
+
+  svg {
+    width: 28px;
+    height: 28px;
+    padding: 14px;
+    box-sizing: content-box;
+    background: #e8f4ee;
+    color: #1a5c3a;
+    border-radius: 50%;
+    transition: background 0.3s, color 0.3s;
+    flex-shrink: 0;
+  }
+}
+
+.type-card:hover .type-icon svg {
+  background: #1a5c3a;
+  color: #fff;
 }
 
 .type-label {

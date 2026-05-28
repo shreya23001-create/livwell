@@ -28,12 +28,17 @@
 
         <div class="nl-perks">
           <div *ngFor="let perk of [
-            { icon: '📊', label: 'Weekly market reports' },
-            { icon: '🏠', label: 'New listings first' },
-            { icon: '💡', label: 'Investment tips' },
-            { icon: '🔔', label: 'Price drop alerts' }
+            { icon: 'chart', label: 'Weekly market reports' },
+            { icon: 'home', label: 'New listings first' },
+            { icon: 'bulb', label: 'Investment tips' },
+            { icon: 'bell', label: 'Price drop alerts' }
           ]" class="nl-perk">
-            <span class="nl-perk-icon">{{ perk.icon }}</span>
+            <span class="nl-perk-icon">
+              <i *ngIf="perk.icon === 'chart'" class="fa-solid fa-chart-bar"></i>
+              <i *ngIf="perk.icon === 'home'" class="fa-solid fa-house"></i>
+              <i *ngIf="perk.icon === 'bulb'" class="fa-solid fa-lightbulb"></i>
+              <i *ngIf="perk.icon === 'bell'" class="fa-solid fa-bell"></i>
+            </span>
             <span>{{ perk.label }}</span>
           </div>
         </div>

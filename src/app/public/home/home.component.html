@@ -689,7 +689,7 @@
 
     <div class="offplan-cta-banner animate-on-scroll">
       <div class="offplan-banner-content">
-        <div class="offplan-banner-icon">🏗️</div>
+        <div class="offplan-banner-icon"><i class="fa-solid fa-city"></i></div>
         <div>
           <div class="offplan-banner-title">Explore All Off-Plan Projects</div>
           <div class="offplan-banner-sub">Get exclusive pre-launch prices and flexible payment plans</div>
@@ -718,8 +718,21 @@
 
     <div class="types-grid">
       <a *ngFor="let type of propertyTypes; let i = index" routerLink="/properties" class="type-card animate-on-scroll"
-        [class]="'delay-' + ((i % 3) * 100 + 100)">
-        <div class="type-icon">{{ type.icon }}</div>
+        [ngClass]="'delay-' + ((i % 3) * 100 + 100)">
+        <div class="type-icon">
+          <!-- Apartments: building -->
+          <svg *ngIf="type.label === 'Apartments'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg>
+          <!-- Villas: house -->
+          <svg *ngIf="type.label === 'Villas'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+          <!-- Townhouses: houses -->
+          <svg *ngIf="type.label === 'Townhouses'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" /></svg>
+          <!-- Offices: briefcase -->
+          <svg *ngIf="type.label === 'Offices'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+          <!-- Retail: shopping bag -->
+          <svg *ngIf="type.label === 'Retail'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z" /></svg>
+          <!-- Plots: map -->
+          <svg *ngIf="type.label === 'Plots'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" /></svg>
+        </div>
         <div class="type-label">{{ type.label }}</div>
         <div class="type-count">{{ type.count }}</div>
         <div class="type-arrow">→</div>
@@ -744,12 +757,17 @@
 
         <div class="features-list">
           <div *ngFor="let feature of [
-            { title: 'Market Expertise', desc: 'Deep insights into UAE property trends and valuations', icon: '📊' },
-            { title: 'Verified Listings', desc: 'Every property is verified and legally compliant', icon: '✅' },
-            { title: 'Dedicated Support', desc: 'Personal agent assigned to every client', icon: '🤝' },
-            { title: 'Seamless Process', desc: 'End-to-end assistance from search to handover', icon: '🔑' }
+            { title: 'Market Expertise', desc: 'Deep insights into UAE property trends and valuations', icon: 'chart' },
+            { title: 'Verified Listings', desc: 'Every property is verified and legally compliant', icon: 'check' },
+            { title: 'Dedicated Support', desc: 'Personal agent assigned to every client', icon: 'users' },
+            { title: 'Seamless Process', desc: 'End-to-end assistance from search to handover', icon: 'key' }
           ]" class="feature-item">
-            <div class="feature-icon">{{ feature.icon }}</div>
+            <div class="feature-icon">
+              <i *ngIf="feature.icon === 'chart'" class="fa-solid fa-chart-bar"></i>
+              <i *ngIf="feature.icon === 'check'" class="fa-solid fa-circle-check"></i>
+              <i *ngIf="feature.icon === 'users'" class="fa-solid fa-users"></i>
+              <i *ngIf="feature.icon === 'key'" class="fa-solid fa-key"></i>
+            </div>
             <div>
               <div class="feature-title">{{ feature.title }}</div>
               <div class="feature-desc">{{ feature.desc }}</div>
@@ -952,7 +970,7 @@
       </div>
       <div class="cta-visual">
         <div class="cta-float-card">
-          <div class="cta-float-icon">🏠</div>
+          <div class="cta-float-icon"><i class="fa-solid fa-house"></i></div>
           <div>
             <div class="cta-float-title">Free Property Valuation</div>
             <div class="cta-float-sub">Get your property valued by experts</div>

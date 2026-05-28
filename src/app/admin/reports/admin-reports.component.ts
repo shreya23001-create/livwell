@@ -84,14 +84,14 @@ export class AdminReportsComponent {
   ];
 
   readonly recentActivity: Activity[] = [
-    { icon: '🏆', text: 'Deal closed — Khalid Al-Maktoum, Business Bay Penthouse (AED 4M)',  time: '2 hours ago',   type: 'deal'     },
-    { icon: '👤', text: 'New lead — Robert Wilson via Social Media (AED 10M+ budget)',        time: '3 hours ago',   type: 'lead'     },
-    { icon: '🏠', text: 'New property listed — Marina Heights, 3BHK Apartment (AED 2.8M)',   time: '5 hours ago',   type: 'property' },
-    { icon: '✅', text: 'Lead qualified — David Kim, Jumeirah Village Townhouse',             time: '7 hours ago',   type: 'lead'     },
-    { icon: '👥', text: 'New agent joined — Omar Al-Farsi (pending verification)',            time: '1 day ago',     type: 'user'     },
-    { icon: '🏆', text: 'Deal closed — James Carter, Palm Jumeirah Villa (AED 5.2M)',         time: '2 days ago',    type: 'deal'     },
-    { icon: '🏠', text: 'Property sold — Skyline Residences Unit 804, Downtown Dubai',        time: '2 days ago',    type: 'property' },
-    { icon: '👤', text: 'New lead — Tariq Ibrahim via Website (AED 3M–4M budget)',            time: '3 days ago',    type: 'lead'     },
+    { icon: 'fa-solid fa-trophy',        text: 'Deal closed — Khalid Al-Maktoum, Business Bay Penthouse (AED 4M)',  time: '2 hours ago',   type: 'deal'     },
+    { icon: 'fa-solid fa-user',          text: 'New lead — Robert Wilson via Social Media (AED 10M+ budget)',        time: '3 hours ago',   type: 'lead'     },
+    { icon: 'fa-solid fa-house',         text: 'New property listed — Marina Heights, 3BHK Apartment (AED 2.8M)',   time: '5 hours ago',   type: 'property' },
+    { icon: 'fa-solid fa-circle-check',  text: 'Lead qualified — David Kim, Jumeirah Village Townhouse',             time: '7 hours ago',   type: 'lead'     },
+    { icon: 'fa-solid fa-users',         text: 'New agent joined — Omar Al-Farsi (pending verification)',            time: '1 day ago',     type: 'user'     },
+    { icon: 'fa-solid fa-trophy',        text: 'Deal closed — James Carter, Palm Jumeirah Villa (AED 5.2M)',         time: '2 days ago',    type: 'deal'     },
+    { icon: 'fa-solid fa-house',         text: 'Property sold — Skyline Residences Unit 804, Downtown Dubai',        time: '2 days ago',    type: 'property' },
+    { icon: 'fa-solid fa-user',          text: 'New lead — Tariq Ibrahim via Website (AED 3M–4M budget)',            time: '3 days ago',    type: 'lead'     },
   ];
 
   maxAgentLeads = computed(() => Math.max(...this.topAgents.map(a => a.leads)));

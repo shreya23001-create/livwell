@@ -59,11 +59,9 @@
 }
 
 .logo-img {
-  height: 42px;
-  width: 102px;
-  /* Logo is dark/colored — no invert needed on white navbar */
-  filter: none;
-  transition: none;
+  height: 40px;
+  width: auto;
+  display: block;
 }
 
 .logo-img-footer {

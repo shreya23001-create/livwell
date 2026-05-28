@@ -283,12 +283,12 @@ export class HomeComponent implements OnInit {
   ];
 
   propertyTypes = [
-    { label: 'Apartments', icon: '🏢', count: '1,240+' },
-    { label: 'Villas', icon: '🏡', count: '380+' },
-    { label: 'Townhouses', icon: '🏘️', count: '290+' },
-    { label: 'Offices', icon: '🏛️', count: '180+' },
-    { label: 'Retail', icon: '🏪', count: '95+' },
-    { label: 'Plots', icon: '🗺️', count: '210+' },
+    { label: 'Apartments', icon: 'fa-solid fa-building', count: '1,240+' },
+    { label: 'Villas', icon: 'fa-solid fa-house', count: '380+' },
+    { label: 'Townhouses', icon: 'fa-solid fa-house-chimney', count: '290+' },
+    { label: 'Offices', icon: 'fa-solid fa-landmark', count: '180+' },
+    { label: 'Retail', icon: 'fa-solid fa-store', count: '95+' },
+    { label: 'Plots', icon: 'fa-solid fa-map', count: '210+' },
   ];
 
   offPlanProjects = [

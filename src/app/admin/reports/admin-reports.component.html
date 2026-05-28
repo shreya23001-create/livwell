@@ -169,7 +169,13 @@
       </div>
       <div class="activity-list">
         <div class="activity-item" *ngFor="let a of recentActivity">
-          <div class="activity-icon activity-icon--{{ a.type }}">{{ a.icon }}</div>
+          <div class="activity-icon activity-icon--{{ a.type }}">
+            <i *ngIf="a.icon === 'fa-solid fa-trophy'" class="fa-solid fa-trophy"></i>
+            <i *ngIf="a.icon === 'fa-solid fa-user'" class="fa-solid fa-user"></i>
+            <i *ngIf="a.icon === 'fa-solid fa-house'" class="fa-solid fa-house"></i>
+            <i *ngIf="a.icon === 'fa-solid fa-circle-check'" class="fa-solid fa-circle-check"></i>
+            <i *ngIf="a.icon === 'fa-solid fa-users'" class="fa-solid fa-users"></i>
+          </div>
           <div class="activity-body">
             <p class="activity-text">{{ a.text }}</p>
             <span class="activity-time">{{ a.time }}</span>

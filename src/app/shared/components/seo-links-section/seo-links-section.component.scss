@@ -21,6 +21,11 @@
     grid-template-columns: repeat(2, 1fr);
     max-width: 640px;
   }
+
+  &.ft-row--3col {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 960px;
+  }
 }
 
 .ft-divider {

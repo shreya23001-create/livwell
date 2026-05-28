@@ -75,8 +75,7 @@ export class HomeComponent implements OnInit {
 
   heroSlides = [
     {
-      // Dark moody city skyline at dusk — towers lit up, stormy sky
-      image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=90',
+      image: 'images/img1.jpeg',
       project: 'Creek Horizon Residences',
       location: 'Dubai Creek Harbour',
       desc: 'Contemporary waterfront living with panoramic creek and skyline views in the heart of the new Dubai.',
@@ -84,8 +83,7 @@ export class HomeComponent implements OnInit {
       paymentPlan: '20 / 60 / 20 %',
     },
     {
-      // Night city skyline — glowing towers, deep blue hour
-      image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=90',
+      image: 'images/img2.jpeg',
       project: 'Downtown Heights',
       location: 'Downtown Dubai',
       desc: 'Iconic residences steps from Burj Khalifa — where luxury meets the pulse of the city.',
@@ -93,8 +91,7 @@ export class HomeComponent implements OnInit {
       paymentPlan: '10 / 65 / 25 %',
     },
     {
-      // Golden hour city skyline wide — warm towers, hazy horizon
-      image: 'https://images.unsplash.com/photo-1470219556762-1771e7f9427d?w=1920&q=90',
+      image: 'images/img3.jpeg',
       project: 'Marina Cove',
       location: 'Dubai Marina',
       desc: 'Elegant apartments with full marina views. Lifestyle living at its finest.',
@@ -102,8 +99,7 @@ export class HomeComponent implements OnInit {
       paymentPlan: '20 / 55 / 25 %',
     },
     {
-      // Deep blue hour city panorama — distant glowing skyline
-      image: 'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=1920&q=90',
+      image: 'images/img4.jpeg',
       project: 'Business Bay Towers',
       location: 'Business Bay',
       desc: 'Premium high-rise residences at the centre of Dubai\'s dynamic business and lifestyle district.',
@@ -111,8 +107,7 @@ export class HomeComponent implements OnInit {
       paymentPlan: '10 / 60 / 30 %',
     },
     {
-      // Aerial city dusk — warm orange glow across dense skyline
-      image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=90',
+      image: 'images/img5.jpeg',
       project: 'Jumeirah Living',
       location: 'Jumeirah Beach Residence',
       desc: 'Beachfront residences with sweeping sea views and direct access to the finest dining and leisure.',
@@ -120,8 +115,7 @@ export class HomeComponent implements OnInit {
       paymentPlan: '20 / 55 / 25 %',
     },
     {
-      // Luxury villa with pool — warm evening light, one villa slide
-      image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1920&q=90',
+      image: 'images/img6.jpeg',
       project: 'Emerald Hills Villa',
       location: 'Emirates Hills',
       desc: 'Sprawling private villa with lush gardens, infinity pool and panoramic city views.',
@@ -129,13 +123,20 @@ export class HomeComponent implements OnInit {
       paymentPlan: '20 / 50 / 30 %',
     },
     {
-      // Contemporary villa exterior — minimalist, one villa slide
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=90',
+      image: 'images/img7.jpeg',
       project: 'Palm Vista Villas',
       location: 'Palm Jumeirah',
       desc: 'Exclusive beachfront villas on the iconic Palm — the pinnacle of Dubai luxury.',
       startingPrice: 'AED 12.5M',
       paymentPlan: '15 / 55 / 30 %',
+    },
+    {
+      image: 'images/img8.jpeg',
+      project: 'Sobha Hartland Estates',
+      location: 'Mohammed Bin Rashid City',
+      desc: 'Ultra-luxury villas and mansions set within a lush green master community.',
+      startingPrice: 'AED 5.2M',
+      paymentPlan: '10 / 60 / 30 %',
     },
   ];
 

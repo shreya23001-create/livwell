@@ -1,0 +1,73 @@
+<div class="faq-page">
+
+  <!-- Hero -->
+  <div class="faq-hero">
+    <div class="faq-hero-content">
+      <div class="faq-hero-text">
+        <div class="faq-hero-label">Dubai Property FAQ's</div>
+        <h1 class="faq-hero-title">Dubai Property FAQ's</h1>
+        <p class="faq-hero-desc">These are some of the most frequently asked questions and answers about properties in Dubai</p>
+      </div>
+      <div class="faq-hero-img-wrap">
+        <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=700&q=85" alt="Dubai Property FAQ" class="faq-hero-img">
+      </div>
+    </div>
+  </div>
+
+  <!-- Category filter chips -->
+  <div class="faq-cats">
+    <div class="faq-cats-inner">
+      <button *ngFor="let cat of categories" class="faq-cat-chip"
+        [class.active]="activeCategory() === cat"
+        (click)="setCategory(cat)">{{ cat }}</button>
+    </div>
+  </div>
+
+  <!-- FAQ List -->
+  <div class="faq-body">
+    <div class="faq-list">
+      <div *ngFor="let faq of pagedFaqs()" class="faq-item" [class.open]="openId() === faq.id">
+
+        <button class="faq-q-row" (click)="toggle(faq.id)">
+          <div class="faq-q-left">
+            <img [src]="faq.avatar" [alt]="faq.author" class="faq-avatar">
+            <div class="faq-q-info">
+              <div class="faq-question">{{ faq.question }}</div>
+              <div class="faq-meta">{{ faq.date }}</div>
+            </div>
+          </div>
+          <div class="faq-toggle-btn" [class.open]="openId() === faq.id">
+            <svg *ngIf="openId() !== faq.id" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg *ngIf="openId() === faq.id" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          </div>
+        </button>
+
+        <div class="faq-answer" *ngIf="openId() === faq.id">
+          <p>{{ faq.answer }}</p>
+          <div class="faq-answer-meta">
+            <span class="faq-cat-tag">{{ faq.category }}</span>
+            <span class="faq-answer-author">Answered by {{ faq.author }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="faq-pagination" *ngIf="totalPages() > 1">
+      <button class="faq-page-btn faq-page-nav" (click)="setPage(currentPage() - 1)" [disabled]="currentPage() === 1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button *ngFor="let p of pages()" class="faq-page-btn" [class.active]="currentPage() === p" (click)="setPage(p)">{{ p }}</button>
+      <button class="faq-page-btn faq-page-nav" (click)="setPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        Next ›
+      </button>
+    </div>
+
+  </div>
+
+  <app-newsletter-section></app-newsletter-section>
+  <app-seo-links-section></app-seo-links-section>
+
+</div>

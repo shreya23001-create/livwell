@@ -267,11 +267,11 @@
           </svg>
         </button>
         <div class="nav-dropdown nav-dropdown--right">
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Careers</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">News</a>
+          <a routerLink="/careers" class="nav-dd-item" (click)="closeMobileMenu()">Careers</a>
+          <a routerLink="/news" class="nav-dd-item" (click)="closeMobileMenu()">News</a>
           <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Guides</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">FAQs</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Why Invest in Dubai?</a>
+          <a routerLink="/faq" class="nav-dd-item" (click)="closeMobileMenu()">FAQs</a>
+          <a routerLink="/why-invest" class="nav-dd-item" (click)="closeMobileMenu()">Why Invest in Dubai?</a>
           <!-- About Livwell flyout -->
           <div class="nav-dd-flyout-wrap">
             <span class="nav-dd-item nav-dd-has-flyout">
@@ -292,22 +292,13 @@
 
     <!-- Desktop Actions -->
     <div class="nav-actions">
-      @if (auth.isLoggedIn()) {
-      @if (auth.isAdmin()) {
-      <a routerLink="/admin/dashboard" class="btn-nav-portal">Admin Portal</a>
-      } @else if (auth.isAgent()) {
-      <a routerLink="/agent/dashboard" class="btn-nav-portal">Agent Portal</a>
-      }
+      <a routerLink="/" fragment="business-associates" class="btn-associates" [class.btn-associates--dark]="navbarWhite()">
+        Our Business Associates
+      </a>
+      @if (auth.isLoggedIn() && !auth.isAdmin() && !auth.isAgent()) {
       <button class="btn-logout" (click)="auth.logout()">Logout</button>
-      } @else {
-      <!-- <a routerLink="/contact" class="btn-valuation">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <polyline points="9 22 9 12 15 12 15 22" />
-        </svg>
-        Valuation
-      </a> -->
-      <a routerLink="/customer" class="btn-signin">Sign In</a>
+      } @else if (!auth.isLoggedIn()) {
+      <a routerLink="/customer" class="btn-signin" [class.btn-signin--dark]="navbarWhite()">Sign In</a>
       }
     </div>
 
@@ -411,6 +402,15 @@
             <li><a routerLink="/properties">Townhouses</a></li>
             <li><a routerLink="/properties">Offices</a></li>
             <li><a routerLink="/properties">Off-Plan</a></li>
+          </ul>
+        </div>
+
+        <!-- Portals -->
+        <div class="footer-col">
+          <h4>Portals</h4>
+          <ul>
+            <li><a routerLink="/agent/login">Agent Sign In</a></li>
+            <li><a routerLink="/admin/login">Admin Sign In</a></li>
           </ul>
         </div>
 

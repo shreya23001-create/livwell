@@ -340,19 +340,61 @@
   margin-left: auto;
 }
 
-.btn-signin {
-  padding: 0.5rem 1rem;
-  color: #fff;
+.btn-associates {
+  padding: 0.45rem 1.1rem;
+  color: #000;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   border-radius: 0.375rem;
   transition: all 0.2s;
-  border: 1px solid transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  background: white;
+  white-space: nowrap;
 
   &:hover {
-    color: #c8a84b;
-    border-color: #c8a84b;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #fff;
+  }
+
+  &.btn-associates--dark {
+    color: #1a5c3a;
+    border-color: #1a5c3a;
+    background: transparent;
+
+    &:hover {
+      background: #1a5c3a;
+      color: #fff;
+    }
+  }
+}
+
+.btn-signin {
+  padding: 0.45rem 1.1rem;
+  color: #000;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  background: white;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #fff;
+  }
+
+  // On white/scrolled navbar — dark text with border
+  &.btn-signin--dark {
+    color: #1a5c3a;
+    border-color: #1a5c3a;
+    background: transparent;
+
+    &:hover {
+      background: #1a5c3a;
+      color: #fff;
+    }
   }
 }
 
@@ -539,8 +581,8 @@
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr 1.2fr;
-  gap: 3rem;
+  grid-template-columns: 1.6fr 1fr 1fr 0.8fr 1.2fr;
+  gap: 2rem;
 }
 
 .footer-brand {

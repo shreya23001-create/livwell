@@ -1,0 +1,141 @@
+<div class="news-page">
+
+  <!-- Breadcrumb -->
+  <div class="news-breadcrumb">
+    <div class="news-container">
+      <a routerLink="/" class="news-bc-link">Home</a>
+      <span class="news-bc-sep">›</span>
+      <span class="news-bc-current">Dubai Real Estate News</span>
+    </div>
+  </div>
+
+  <!-- Page header -->
+  <div class="news-header">
+    <div class="news-container">
+      <h1 class="news-title">Dubai Real Estate News</h1>
+      <p class="news-subtitle">Stay up to date with the latest property market insights, trends, and guides</p>
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="news-container news-layout">
+
+    <!-- LEFT: Article list -->
+    <div class="news-main">
+
+      <div class="news-list">
+        <article *ngFor="let a of pagedArticles()" class="news-card">
+          <a [routerLink]="['/blog']" class="news-card-img-wrap">
+            <img [src]="a.image" [alt]="a.title" class="news-card-img" loading="lazy">
+            <span class="news-cat-badge">{{ a.category }}</span>
+          </a>
+          <div class="news-card-body">
+            <a [routerLink]="['/blog']" class="news-card-title">{{ a.title }}</a>
+            <p class="news-card-excerpt">{{ a.excerpt }}</p>
+            <div class="news-card-meta">
+              <img [src]="a.avatar" [alt]="a.author" class="news-meta-avatar">
+              <div class="news-meta-info">
+                <span class="news-meta-author">{{ a.author }}</span>
+                <span class="news-meta-date">{{ a.date }} · {{ a.readTime }}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Pagination -->
+      <div class="news-pagination" *ngIf="totalPages() > 1">
+        <button class="news-page-btn news-page-nav" (click)="setPage(currentPage() - 1)" [disabled]="currentPage() === 1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button *ngFor="let p of pages()" class="news-page-btn" [class.active]="currentPage() === p" (click)="setPage(p)">{{ p }}</button>
+        <button class="news-page-btn news-page-nav" (click)="setPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          Next ›
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Sidebar -->
+    <aside class="news-sidebar">
+
+      <!-- Subscribe -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-heading">Subscribe to Get Properties</h3>
+        <p class="sidebar-sub">Get the latest Dubai real estate news directly to your inbox</p>
+        <div *ngIf="!subscribed()" class="sidebar-subscribe-form">
+          <input type="email" class="sidebar-email-input" placeholder="Email Address"
+            [value]="subscribeEmail()" (input)="subscribeEmail.set($any($event.target).value)">
+          <button class="sidebar-subscribe-btn" (click)="subscribe()">SUBSCRIBE</button>
+        </div>
+        <div *ngIf="subscribed()" class="sidebar-subscribed">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#1a5c3a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Thank you for subscribing!
+        </div>
+      </div>
+
+      <!-- Featured Posts -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-heading">Featured Posts</h3>
+        <div class="sidebar-featured-list">
+          <a *ngFor="let a of featuredArticles()" [routerLink]="['/blog']" class="sidebar-featured-item">
+            <img [src]="a.image" [alt]="a.title" class="sidebar-feat-img">
+            <div class="sidebar-feat-info">
+              <span class="sidebar-feat-title">{{ a.title }}</span>
+              <span class="sidebar-feat-date">{{ a.date }}</span>
+            </div>
+          </a>
+          <!-- Add a few more manually -->
+          <a routerLink="/blog" class="sidebar-featured-item">
+            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=80&q=70" alt="post" class="sidebar-feat-img">
+            <div class="sidebar-feat-info">
+              <span class="sidebar-feat-title">Dubai Property Market – Pricing Right in Uncertain Times</span>
+              <span class="sidebar-feat-date">May 16, 2025</span>
+            </div>
+          </a>
+          <a routerLink="/blog" class="sidebar-featured-item">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=70" alt="post" class="sidebar-feat-img">
+            <div class="sidebar-feat-info">
+              <span class="sidebar-feat-title">Real Estate Agents Earn in Commission in Dubai</span>
+              <span class="sidebar-feat-date">May 14, 2025</span>
+            </div>
+          </a>
+          <a routerLink="/blog" class="sidebar-featured-item">
+            <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=80&q=70" alt="post" class="sidebar-feat-img">
+            <div class="sidebar-feat-info">
+              <span class="sidebar-feat-title">The Dubai Advantage: A Historic Moment for C...</span>
+              <span class="sidebar-feat-date">Apr 28, 2025</span>
+            </div>
+          </a>
+          <a routerLink="/blog" class="sidebar-featured-item">
+            <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=80&q=70" alt="post" class="sidebar-feat-img">
+            <div class="sidebar-feat-info">
+              <span class="sidebar-feat-title">10 Best Practices to Rent Your Property in Dubai</span>
+              <span class="sidebar-feat-date">Apr 26, 2025</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Blog categories -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-heading">Blog categories</h3>
+        <div class="sidebar-cats">
+          <button *ngFor="let cat of categories" class="sidebar-cat-chip"
+            [class.active]="activeCategory() === cat.label"
+            (click)="setCategory(cat.label)">
+            {{ cat.label }}
+            <span class="sidebar-cat-count">{{ cat.count }}</span>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <app-newsletter-section></app-newsletter-section>
+  <app-seo-links-section></app-seo-links-section>
+
+</div>

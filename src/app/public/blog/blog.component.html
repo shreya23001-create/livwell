@@ -1,0 +1,77 @@
+<!-- ── Hero Banner ─────────────────────────────────────── -->
+<section class="guides-hero">
+  <div class="guides-hero__overlay"></div>
+  <div class="guides-hero__content">
+    <span class="guides-hero__eyebrow">Knowledge Hub</span>
+    <h1 class="guides-hero__title">Dubai Property<br>Investment Guides</h1>
+    <p class="guides-hero__sub">Expert guides to help you buy, rent, sell, or invest in Dubai real estate with confidence.</p>
+  </div>
+</section>
+
+<!-- ── Guide Cards Grid ────────────────────────────────── -->
+<section class="guides-section">
+  <div class="guides-container">
+    <div class="guides-grid">
+      <article class="guide-card" *ngFor="let g of guides">
+        <div class="guide-card__icon-wrap" [style.background]="g.color + '18'">
+          <svg class="guide-card__icon" [style.color]="g.color" xmlns="http://www.w3.org/2000/svg"
+            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="g.iconPath" />
+          </svg>
+        </div>
+        <div class="guide-card__body">
+          <span class="guide-card__cat" [style.color]="g.color" [style.background]="g.color + '15'">{{ g.category }}</span>
+          <h3 class="guide-card__title">{{ g.title }}</h3>
+          <p class="guide-card__desc">{{ g.description }}</p>
+        </div>
+        <div class="guide-card__footer">
+          <span class="guide-card__time">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            {{ g.readTime }}
+          </span>
+          <a [routerLink]="['/guides', g.slug]" class="guide-card__cta">
+            Read Guide
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Empty state -->
+    <div class="guides-empty" *ngIf="guides.length === 0">
+      <p>No guides found for this category.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Newsletter ──────────────────────────────────────── -->
+<section class="newsletter-section">
+  <div class="guides-container">
+    <div class="newsletter-card">
+      <div class="newsletter-card__text">
+        <h2>Stay ahead of the Dubai property market</h2>
+        <p>Sign up to receive expert guides, market reports, and investment insights — delivered straight to your inbox.</p>
+      </div>
+      <div class="newsletter-card__form" *ngIf="!subscribed()">
+        <input
+          type="email"
+          placeholder="Your email address"
+          [value]="email()"
+          (input)="email.set($any($event.target).value)"
+          class="newsletter-input" />
+        <button class="newsletter-btn" (click)="subscribe()">Subscribe</button>
+      </div>
+      <div class="newsletter-success" *ngIf="subscribed()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <span>You're subscribed! Welcome to Livwell Insights.</span>
+      </div>
+    </div>
+  </div>
+</section>
+

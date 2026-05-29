@@ -24,12 +24,8 @@
         <svg class="lpfs-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input
-          class="lpfs-search-input"
-          type="text"
-          placeholder="Search area, community or project…"
-          [value]="searchArea()"
-          (input)="searchArea.set($any($event.target).value)" />
+        <input class="lpfs-search-input" type="text" placeholder="Search area, community or project…"
+          [value]="searchArea()" (input)="searchArea.set($any($event.target).value)" />
       </div>
 
       <div class="lpfs-divider-v"></div>
@@ -49,11 +45,10 @@
           <p class="lpfs-dd-label" style="margin-top:1.1rem">Property status</p>
           <div class="lpfs-chip-grid">
             <button *ngFor="let s of statusOptions" class="lpfs-chip"
-              [class.active]="activeStatus() === s"
-              (click)="activeStatus.set(s)">{{ s }}</button>
+              [class.active]="activeStatus() === s" (click)="activeStatus.set(s)">{{ s }}</button>
           </div>
           <div class="lpfs-dd-actions">
-            <button class="lpfs-dd-reset" (click)="setIntent('Buy'); activeStatus.set('All')">Reset</button>
+            <button class="lpfs-dd-reset" (click)="setIntent('Buy'); activeStatus.set('Any')">Reset</button>
             <button class="lpfs-dd-done" (click)="closeDropdown('intent')">Done</button>
           </div>
         </div>
@@ -71,42 +66,13 @@
           <p class="lpfs-dd-label">Property Type</p>
           <div class="lpfs-chip-grid">
             <button *ngFor="let t of propertyTypes" class="lpfs-chip"
-              [class.active]="activeType() === t"
-              (click)="activeType.set(t)">
+              [class.active]="activeType() === t" (click)="activeType.set(t)">
               {{ t === 'Any' ? 'Any' : t + 's' }}
             </button>
           </div>
           <div class="lpfs-dd-actions">
             <button class="lpfs-dd-reset" (click)="activeType.set('Any')">Reset</button>
             <button class="lpfs-dd-done" (click)="closeDropdown('type')">Done</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="lpfs-divider-v"></div>
-
-      <!-- Beds -->
-      <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'beds'">
-        <button class="lpfs-dd-btn" (click)="toggleDropdown('beds'); $event.stopPropagation()">
-          {{ bedsLabel() }}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <div class="lpfs-dd-panel" (click)="$event.stopPropagation()">
-          <p class="lpfs-dd-label">Bedrooms</p>
-          <div class="lpfs-chip-grid">
-            <button *ngFor="let b of bedOptions" class="lpfs-chip"
-              [class.active]="activeBeds() === b"
-              (click)="activeBeds.set(b)">{{ b === 'Any' ? 'Any' : b === 'Studio' ? 'Studio' : b + ' Bed' }}</button>
-          </div>
-          <p class="lpfs-dd-label" style="margin-top:1rem">Bathrooms</p>
-          <div class="lpfs-chip-grid">
-            <button *ngFor="let b of bathOptions" class="lpfs-chip"
-              [class.active]="activeBaths() === b"
-              (click)="activeBaths.set(b)">{{ b === 'Any' ? 'Any' : b + ' Bath' }}</button>
-          </div>
-          <div class="lpfs-dd-actions">
-            <button class="lpfs-dd-reset" (click)="activeBeds.set('Any'); activeBaths.set('Any')">Reset</button>
-            <button class="lpfs-dd-done" (click)="closeDropdown('beds')">Done</button>
           </div>
         </div>
       </div>
@@ -141,44 +107,69 @@
 
       <div class="lpfs-divider-v"></div>
 
+      <!-- Status -->
+      <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'status'">
+        <button class="lpfs-dd-btn" (click)="toggleDropdown('status'); $event.stopPropagation()">
+          {{ activeStatus() === 'Any' ? 'Status' : activeStatus() }}
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="lpfs-dd-panel" (click)="$event.stopPropagation()">
+          <p class="lpfs-dd-label">Property Status</p>
+          <div class="lpfs-chip-grid">
+            <button *ngFor="let s of statusOptions" class="lpfs-chip"
+              [class.active]="activeStatus() === s" (click)="activeStatus.set(s)">{{ s }}</button>
+          </div>
+          <div class="lpfs-dd-actions">
+            <button class="lpfs-dd-reset" (click)="activeStatus.set('Any')">Reset</button>
+            <button class="lpfs-dd-done" (click)="closeDropdown('status')">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lpfs-divider-v"></div>
+
       <!-- More Filters -->
       <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'more'">
         <button class="lpfs-dd-btn lpfs-dd-btn--filters" (click)="toggleDropdown('more'); $event.stopPropagation()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
           </svg>
-          Filters
+          More
           <span *ngIf="activeFiltersCount() > 0" class="lpfs-filter-badge">{{ activeFiltersCount() }}</span>
         </button>
         <div class="lpfs-dd-panel lpfs-dd-panel--more" (click)="$event.stopPropagation()">
-          <p class="lpfs-dd-label">Interested to</p>
-          <div class="lpfs-toggle-row">
-            <button class="lpfs-toggle-btn" [class.active]="interestedTo() === 'Buy'" (click)="setIntent('Buy')">Buy</button>
-            <button class="lpfs-toggle-btn" [class.active]="interestedTo() === 'Rent'" (click)="setIntent('Rent')">Rent</button>
-          </div>
-          <p class="lpfs-dd-label" style="margin-top:1.1rem">Property status</p>
-          <div class="lpfs-chip-grid">
-            <button *ngFor="let s of statusOptions" class="lpfs-chip"
-              [class.active]="activeStatus() === s"
-              (click)="activeStatus.set(s)">{{ s }}</button>
-          </div>
-          <p class="lpfs-dd-label" style="margin-top:1rem">Area (sqft)</p>
+
+          <!-- Size (sqft) -->
+          <p class="lpfs-dd-label">Size (sqft)</p>
           <div class="lpfs-range-row">
             <div class="lpfs-range-field">
               <label>Min</label>
-              <input type="number" placeholder="Any" [value]="areaMin()" (input)="areaMin.set($any($event.target).value)" />
+              <input type="number" placeholder="Any" [value]="sizeMin()" (input)="sizeMin.set($any($event.target).value)" />
             </div>
             <span class="lpfs-range-dash">–</span>
             <div class="lpfs-range-field">
               <label>Max</label>
-              <input type="number" placeholder="Any" [value]="areaMax()" (input)="areaMax.set($any($event.target).value)" />
+              <input type="number" placeholder="Any" [value]="sizeMax()" (input)="sizeMax.set($any($event.target).value)" />
             </div>
           </div>
+
+          <!-- View -->
+          <p class="lpfs-dd-label" style="margin-top:1rem">View</p>
+          <select class="lpfs-select" [value]="activeView()" (change)="activeView.set($any($event.target).value)">
+            <option *ngFor="let v of viewOptions" [value]="v">{{ v }}</option>
+          </select>
+
+          <!-- Ref No -->
+          <p class="lpfs-dd-label" style="margin-top:1rem">Ref. No.</p>
+          <input type="text" class="lpfs-text-input" placeholder="e.g. COM-001"
+            [value]="refNo()" (input)="refNo.set($any($event.target).value)" />
+
+          <!-- Features -->
           <p class="lpfs-dd-label" style="margin-top:1rem">Features</p>
           <div class="lpfs-checkbox-grid">
             <label class="lpfs-checkbox">
-              <input type="checkbox" [checked]="filterFurnished()" (change)="filterFurnished.set($any($event.target).checked)" />
-              <span>Furnished</span>
+              <input type="checkbox" [checked]="filterReducedPrice()" (change)="filterReducedPrice.set($any($event.target).checked)" />
+              <span>Reduced Price</span>
             </label>
             <label class="lpfs-checkbox">
               <input type="checkbox" [checked]="filterWaterfront()" (change)="filterWaterfront.set($any($event.target).checked)" />
@@ -188,9 +179,18 @@
               <input type="checkbox" [checked]="filterBeachfront()" (change)="filterBeachfront.set($any($event.target).checked)" />
               <span>Beachfront</span>
             </label>
+            <label class="lpfs-checkbox">
+              <input type="checkbox" [checked]="filterFurnished()" (change)="filterFurnished.set($any($event.target).checked)" />
+              <span>Furnished</span>
+            </label>
+            <label class="lpfs-checkbox">
+              <input type="checkbox" [checked]="filter360Tour()" (change)="filter360Tour.set($any($event.target).checked)" />
+              <span>360° Tour</span>
+            </label>
           </div>
+
           <div class="lpfs-dd-actions">
-            <button class="lpfs-dd-reset" (click)="setIntent('Buy'); activeStatus.set('All'); areaMin.set(''); areaMax.set(''); filterFurnished.set(false); filterWaterfront.set(false); filterBeachfront.set(false)">Reset</button>
+            <button class="lpfs-dd-reset" (click)="resetMoreFilters()">Reset</button>
             <button class="lpfs-dd-done" (click)="closeDropdown('more')">Done</button>
           </div>
         </div>
@@ -214,7 +214,7 @@
       <div class="lpfs-sort-wrap">
         <label class="lpfs-sort-label">Sort by</label>
         <select class="lpfs-sort-select" [value]="sortBy()" (change)="sortBy.set($any($event.target).value)">
-          <option value="default">Default</option>
+          <option value="default">Newest</option>
           <option value="price-asc">Price (Low – High)</option>
           <option value="price-desc">Price (High – Low)</option>
           <option value="area-desc">Largest Area</option>
@@ -228,14 +228,14 @@
     <div class="lpfs-list">
       <div *ngFor="let p of filteredProperties()" class="lpfs-card">
 
-        <a [routerLink]="['/luxury-property', detailLink(p)]" class="lpfs-card-img-wrap">
+        <a [routerLink]="['/commercial', p.id]" class="lpfs-card-img-wrap">
           <img [src]="p.image" [alt]="p.title" class="lpfs-card-img" loading="lazy">
           <span *ngIf="p.badge" class="lpfs-badge">{{ p.badge }}</span>
           <span class="lpfs-status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+          <span *ngIf="p.tour360" class="lpfs-badge-360">360°</span>
         </a>
 
         <div class="lpfs-card-body">
-          <!-- Heart + Share icons top-right -->
           <div class="lpfs-card-actions-top">
             <button class="lpfs-icon-btn" title="Save">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -244,12 +244,16 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </button>
           </div>
+
           <div class="lpfs-card-top">
             <div class="lpfs-card-meta">
               <span class="lpfs-tag">{{ p.type }}</span>
+              <span *ngIf="p.reducedPrice" class="lpfs-tag lpfs-tag--red">Reduced Price</span>
               <span *ngIf="p.furnished" class="lpfs-tag lpfs-tag--green">Furnished</span>
             </div>
-            <h2 class="lpfs-card-title"><a [routerLink]="['/luxury-property', detailLink(p)]" class="lpfs-card-title-link">{{ p.title }}</a></h2>
+            <h2 class="lpfs-card-title">
+              <a [routerLink]="['/commercial', p.id]" class="lpfs-card-title-link">{{ p.title }}</a>
+            </h2>
             <div class="lpfs-card-sub">
               <span class="lpfs-card-info">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -264,19 +268,32 @@
                 </svg>
                 {{ p.location }}, Dubai
               </span>
+              <span *ngIf="p.view && p.view !== 'Street View'" class="lpfs-card-info">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                </svg>
+                {{ p.view }}
+              </span>
             </div>
             <div class="lpfs-specs">
               <div class="lpfs-spec">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16M22 4v16M2 12h20M6 4v4M10 4v4M14 4v4M18 4v4"/></svg>
-                {{ p.beds === 'Studio' ? 'Studio' : p.beds + ' Beds' }}
-              </div>
-              <div class="lpfs-spec">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4 3 2 5 2 5l3 3"/><path d="m9 6 4 4"/><path d="m12 10 4 4"/><path d="m12 10-4.5 4.5"/><path d="m15 14 3 3"/><path d="M2 22l7.5-7.5"/><path d="M19.5 6.5 21 8l-7 7-4-4 6.5-6.5z"/></svg>
-                {{ p.baths }} Baths
-              </div>
-              <div class="lpfs-spec">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                </svg>
                 {{ p.areaDisplay }}
+              </div>
+              <div class="lpfs-spec">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Ref: {{ p.refNo }}
+              </div>
+              <div class="lpfs-spec">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                </svg>
+                {{ p.pricePerSqft }} / sqft
               </div>
             </div>
           </div>
@@ -286,17 +303,15 @@
               <span class="lpfs-price-label">{{ interestedTo() === 'Rent' ? 'Rental Price' : 'Sale Price' }}</span>
               <span class="lpfs-price-value">{{ p.priceDisplay }}</span>
             </div>
-            <div class="lpfs-price-sqft">{{ p.pricePerSqft }} / sqft</div>
           </div>
 
-          <a [routerLink]="['/luxury-property', detailLink(p)]" class="lpfs-view-details-btn">
+          <a [routerLink]="['/commercial', p.id]" class="lpfs-view-details-btn">
             View Details
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-
         </div>
 
-        <!-- Agent bar — outside card-body, spans full right column bottom -->
+        <!-- Agent bar -->
         <div class="lpfs-agent-bar">
           <div class="lpfs-agent-name-strip">
             <img [src]="p.agent.avatar" [alt]="p.agent.name" class="lpfs-agent-av">
@@ -313,10 +328,6 @@
             <a [href]="'mailto:' + p.agent.email" class="lpfs-ab-icon lpfs-ab-icon--email" title="Email">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
             </a>
-            <button class="lpfs-ab-follow">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              Follow
-            </button>
           </div>
         </div>
 
@@ -328,7 +339,6 @@
         <p>No properties match your filters.</p>
         <button class="lpfs-btn-primary" (click)="resetAll()">Clear Filters</button>
       </div>
-
     </div>
   </div>
 

@@ -25,6 +25,7 @@ interface LuxuryProperty {
   waterfront?: boolean;
   beachfront?: boolean;
   forRent?: boolean;
+  detailSlug?: string;
   agent: { name: string; phone: string; email: string; avatar: string };
 }
 
@@ -190,7 +191,7 @@ export class LuxuryPropertiesForSaleComponent {
       agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
     },
     {
-      id: 16, title: 'Six Senses Palm Residences', developer: 'Select Group', location: 'Palm Jumeirah',
+      id: 16, title: 'Six Senses Palm Residences', detailSlug: 'six-senses-residences', developer: 'Select Group', location: 'Palm Jumeirah',
       type: 'Apartment', status: 'Ready', price: 350000, priceDisplay: 'AED 350,000 / yr',
       pricePerSqft: 'AED 204', beds: 2, baths: 3, area: 1718, areaDisplay: '1,718 sqft',
       image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=900&q=85',
@@ -199,7 +200,7 @@ export class LuxuryPropertiesForSaleComponent {
     },
     // ── For Rent — Villas ─────────────────────────────────
     {
-      id: 15, title: 'Bulgari Ocean Mansion Villa', developer: 'Meraas', location: 'Jumeira Bay Island',
+      id: 15, title: 'Bulgari Ocean Mansion Villa', detailSlug: 'bulgari-ocean-mansions', developer: 'Meraas', location: 'Jumeira Bay Island',
       type: 'Villa', status: 'Ready', price: 2800000, priceDisplay: 'AED 2,800,000 / yr',
       pricePerSqft: 'AED 233', beds: 6, baths: 8, area: 12000, areaDisplay: '12,000 sqft',
       image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=85',
@@ -216,7 +217,7 @@ export class LuxuryPropertiesForSaleComponent {
     },
     // ── For Rent — Homes ──────────────────────────────────
     {
-      id: 21, title: 'Sobha Hartland Forest Home', developer: 'Sobha Realty', location: 'MBR City',
+      id: 21, title: 'Sobha Hartland Forest Home', detailSlug: 'sobha-hartland-forest-villas', developer: 'Sobha Realty', location: 'MBR City',
       type: 'Home', status: 'Ready', price: 480000, priceDisplay: 'AED 480,000 / yr',
       pricePerSqft: 'AED 100', beds: 4, baths: 5, area: 4800, areaDisplay: '4,800 sqft',
       image: 'https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=900&q=85',
@@ -224,7 +225,7 @@ export class LuxuryPropertiesForSaleComponent {
       agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
     },
     {
-      id: 22, title: 'Tilal Al Ghaf Luxury Home', developer: 'Majid Al Futtaim', location: 'Tilal Al Ghaf',
+      id: 22, title: 'Tilal Al Ghaf Luxury Home', detailSlug: 'lanai-islands-by-majid-al-futtaim', developer: 'Majid Al Futtaim', location: 'Tilal Al Ghaf',
       type: 'Home', status: 'Ready', price: 380000, priceDisplay: 'AED 380,000 / yr',
       pricePerSqft: 'AED 80', beds: 4, baths: 4, area: 4750, areaDisplay: '4,750 sqft',
       image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=900&q=85',
@@ -241,7 +242,7 @@ export class LuxuryPropertiesForSaleComponent {
       agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
     },
     {
-      id: 23, title: 'Como Residences Sky Penthouse', developer: 'Nakheel', location: 'Palm Jumeirah',
+      id: 23, title: 'Como Residences Sky Penthouse', detailSlug: 'nakheel-como-residences-penthouse', developer: 'Nakheel', location: 'Palm Jumeirah',
       type: 'Penthouse', status: 'Ready', price: 2400000, priceDisplay: 'AED 2,400,000 / yr',
       pricePerSqft: 'AED 245', beds: 5, baths: 6, area: 9800, areaDisplay: '9,800 sqft',
       image: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=900&q=85',
@@ -250,7 +251,7 @@ export class LuxuryPropertiesForSaleComponent {
     },
     // ── For Rent — Townhouses ─────────────────────────────
     {
-      id: 24, title: 'Cherrywoods Townhouse Rental', developer: 'Meraas', location: 'Dubai Science Park',
+      id: 24, title: 'Cherrywoods Townhouse Rental', detailSlug: 'cherrywoods-townhouses', developer: 'Meraas', location: 'Dubai Science Park',
       type: 'Townhouse', status: 'Ready', price: 185000, priceDisplay: 'AED 185,000 / yr',
       pricePerSqft: 'AED 81', beds: 3, baths: 4, area: 2285, areaDisplay: '2,285 sqft',
       image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=900&q=85',
@@ -400,6 +401,10 @@ export class LuxuryPropertiesForSaleComponent {
 
   slugify(title: string): string {
     return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+
+  detailLink(p: LuxuryProperty): string {
+    return p.detailSlug ?? this.slugify(p.title);
   }
 
   statusClass(status: string): string {

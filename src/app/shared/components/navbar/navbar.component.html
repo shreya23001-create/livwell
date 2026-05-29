@@ -170,17 +170,22 @@
           </svg>
         </button>
         <div class="nav-dropdown">
-          <a routerLink="/properties" [queryParams]="{type:'Office',status:'Sale'}" class="nav-dd-item"
+          <a routerLink="/commercial" [queryParams]="{type:'Office',status:'Sale'}" class="nav-dd-item"
             (click)="closeMobileMenu()">Offices for Sale</a>
-          <a routerLink="/properties" [queryParams]="{type:'Office',status:'Rent'}" class="nav-dd-item"
+          <a routerLink="/commercial" [queryParams]="{type:'Office',status:'Rent'}" class="nav-dd-item"
             (click)="closeMobileMenu()">Offices for Rent</a>
-          <a routerLink="/properties" [queryParams]="{type:'Shop',status:'Sale'}" class="nav-dd-item"
+          <a routerLink="/commercial" [queryParams]="{type:'Shop',status:'Sale'}" class="nav-dd-item"
             (click)="closeMobileMenu()">Shops for Sale</a>
-          <a routerLink="/properties" [queryParams]="{type:'Shop',status:'Rent'}" class="nav-dd-item"
+          <a routerLink="/commercial" [queryParams]="{type:'Shop',status:'Rent'}" class="nav-dd-item"
             (click)="closeMobileMenu()">Shops for Rent</a>
-          <a routerLink="/properties" [queryParams]="{type:'Plot',status:'Sale',plotType:'Commercial'}"
-            class="nav-dd-item" (click)="closeMobileMenu()">Plots for Sale</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Plot',status:'Sale'}" class="nav-dd-item"
+            (click)="closeMobileMenu()">Plots for Sale</a>
         </div>
+      </li>
+
+      <!-- Services link -->
+      <li>
+        <a routerLink="/services" class="nav-link" routerLinkActive="active" (click)="closeMobileMenu()">Services</a>
       </li>
 
       <!-- Trends dropdown with flyouts -->
@@ -191,12 +196,12 @@
           </svg>
         </button>
         <div class="nav-dropdown">
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Investment Map</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Investment Analysis</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Top Investment Areas</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Projects Map</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">New Developments</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Population Calculator</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Investment Map</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Investment Analysis</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Top Investment Areas</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Projects Map</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">New Developments</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Population Calculator</a>
           <!-- Projects flyout -->
           <div class="nav-dd-flyout-wrap">
             <span class="nav-dd-item nav-dd-has-flyout">
@@ -206,7 +211,7 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Landmark Towers in Dubai</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Landmark Towers in Dubai</a>
               <a routerLink="/off-plan" class="nav-dd-item" (click)="closeMobileMenu()">All Projects</a>
             </div>
           </div>
@@ -219,10 +224,10 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Market Performance</a>
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Property Price in 2026</a>
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Property Price Index</a>
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Market in Numbers</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Market Performance</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Property Price in 2026</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Property Price Index</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Market in Numbers</a>
             </div>
           </div>
           <!-- Transactions & Supply flyout -->
@@ -234,15 +239,15 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Projects Sales Transactions</a>
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Sold Properties</a>
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Property Supply</a>
-              <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Projects Status</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Projects Sales Transactions</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Sold Properties</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Property Supply</a>
+              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Projects Status</a>
             </div>
           </div>
           <div class="nav-dd-divider"></div>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Monthly Market Updates</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Quarterly Market Updates</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Monthly Market Updates</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Quarterly Market Updates</a>
         </div>
       </li>
 
@@ -254,8 +259,8 @@
           </svg>
         </button>
         <div class="nav-dropdown">
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Areas</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Developers</a>
+          <a routerLink="/areas" class="nav-dd-item" (click)="closeMobileMenu()">Areas</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Developers</a>
         </div>
       </li>
 
@@ -269,7 +274,7 @@
         <div class="nav-dropdown nav-dropdown--right">
           <a routerLink="/careers" class="nav-dd-item" (click)="closeMobileMenu()">Careers</a>
           <a routerLink="/news" class="nav-dd-item" (click)="closeMobileMenu()">News</a>
-          <a routerLink="/blog" class="nav-dd-item" (click)="closeMobileMenu()">Guides</a>
+          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Guides</a>
           <a routerLink="/faq" class="nav-dd-item" (click)="closeMobileMenu()">FAQs</a>
           <a routerLink="/why-invest" class="nav-dd-item" (click)="closeMobileMenu()">Why Invest in Dubai?</a>
           <!-- About Livwell flyout -->
@@ -317,8 +322,9 @@
       <li><a routerLink="/properties" [queryParams]="{status:'Rent'}" (click)="closeMobileMenu()">Rent</a></li>
       <li><a routerLink="/properties" [queryParams]="{type:'Penthouse'}" (click)="closeMobileMenu()">Luxe</a></li>
       <li><a routerLink="/contact" (click)="closeMobileMenu()">Sell</a></li>
+      <li><a routerLink="/services" (click)="closeMobileMenu()">Services</a></li>
       <li><a routerLink="/agents" (click)="closeMobileMenu()">Agents</a></li>
-      <li><a routerLink="/blog" (click)="closeMobileMenu()">News & Trends</a></li>
+      <li><a routerLink="/guides" (click)="closeMobileMenu()">News & Trends</a></li>
       <li><a routerLink="/about" (click)="closeMobileMenu()">About Us</a></li>
       <li><a routerLink="/contact" (click)="closeMobileMenu()">Contact</a></li>
     </ul>
@@ -388,7 +394,7 @@
             <li><a routerLink="/">Home</a></li>
             <li><a routerLink="/properties">Properties</a></li>
             <li><a routerLink="/agents">Our Agents</a></li>
-            <li><a routerLink="/blog">Blog & News</a></li>
+            <li><a routerLink="/guides">Blog & News</a></li>
             <li><a routerLink="/contact">Contact Us</a></li>
           </ul>
         </div>

@@ -1,0 +1,545 @@
+$gold: #c8a84b;
+$dark: #0a1628;
+$navy: #1a2f4e;
+$text: #111827;
+$mid: #374151;
+$muted: #6b7280;
+$border: #e5e7eb;
+$bg: #f9fafb;
+$white: #ffffff;
+$radius: 14px;
+
+.areas-page { background: $bg; min-height: 100vh; color: $text; }
+.areas-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; &--narrow { max-width: 800px; } }
+
+// ── Hero ─────────────────────────────────────────────────────
+.areas-hero {
+  position: relative;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, $dark 0%, $navy 60%, #0f2340 100%);
+  overflow: hidden;
+  padding-top: 68px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1600&q=60') center/cover no-repeat;
+    opacity: 0.15;
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba($dark, 0.92) 45%, rgba($dark, 0.5));
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $gold;
+    border: 1px solid rgba($gold, 0.4);
+    border-radius: 100px;
+    padding: 0.25rem 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 700;
+    color: $white;
+    line-height: 1.12;
+    margin: 0 0 1rem;
+    font-family: Georgia, serif;
+  }
+
+  &__sub {
+    font-size: 1rem;
+    color: rgba($white, 0.72);
+    max-width: 540px;
+    line-height: 1.65;
+    margin: 0 0 2rem;
+  }
+}
+
+// ── Search Bar ───────────────────────────────────────────────
+.areas-search {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: $white;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.5rem 0.5rem 1.1rem;
+  max-width: 580px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+
+  svg { color: $muted; flex-shrink: 0; }
+
+  &__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    color: $text;
+    background: transparent;
+    min-width: 0;
+    &::placeholder { color: $muted; }
+  }
+
+  &__btn {
+    padding: 0.6rem 1.5rem;
+    background: $gold;
+    color: $dark;
+    font-weight: 700;
+    font-size: 0.88rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.18s;
+    white-space: nowrap;
+    &:hover { background: #d4b86a; }
+  }
+}
+
+// ── Filters ──────────────────────────────────────────────────
+.areas-filters {
+  background: $white;
+  border-bottom: 1px solid $border;
+  padding: 1rem 0;
+  position: sticky;
+  top: 64px;
+  z-index: 50;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  &__group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $muted;
+    white-space: nowrap;
+  }
+
+  &__count {
+    margin-left: auto;
+    font-size: 0.82rem;
+    color: $muted;
+    strong { color: $text; }
+  }
+}
+
+.areas-pill-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.areas-pill {
+  padding: 0.32rem 0.9rem;
+  border-radius: 100px;
+  border: 1.5px solid $border;
+  background: $white;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: $mid;
+  cursor: pointer;
+  transition: all 0.16s;
+  white-space: nowrap;
+  &:hover { border-color: $gold; color: $gold; }
+  &--active { background: $dark; border-color: $dark; color: $white; }
+}
+
+// ── Section ──────────────────────────────────────────────────
+.areas-section {
+  padding: 3.5rem 0 2rem;
+
+  &--all { padding-top: 2.5rem; padding-bottom: 4rem; }
+
+  &__header { margin-bottom: 1.75rem; }
+  &__title { font-size: 1.5rem; font-weight: 700; color: $text; margin: 0 0 0.4rem; }
+  &__sub { font-size: 0.92rem; color: $muted; margin: 0; }
+}
+
+// ── Featured Cards (large, 3-col) ────────────────────────────
+.areas-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 640px)  { grid-template-columns: 1fr; }
+}
+
+.areas-featured-card {
+  display: flex;
+  flex-direction: column;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius;
+  overflow: hidden;
+  text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.2s;
+
+  &:hover {
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
+  }
+
+  &__img-wrap {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+  }
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+    .areas-featured-card:hover & { transform: scale(1.05); }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba($dark, 0.5), transparent 50%);
+  }
+
+  &__cat {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.65rem;
+    border-radius: 100px;
+    background: rgba($dark, 0.75);
+    color: $white;
+    &.fh { background: rgba($gold, 0.9); color: $dark; }
+  }
+
+  &__body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+
+  &__location {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    color: $muted;
+    svg { color: $gold; }
+  }
+
+  &__name { font-size: 1.1rem; font-weight: 700; color: $text; margin: 0; }
+  &__desc { font-size: 0.82rem; color: $muted; line-height: 1.55; margin: 0; flex: 1; }
+
+  &__stats {
+    display: flex;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid $border;
+    margin-top: auto;
+  }
+}
+
+// ── All Areas Grid (smaller cards) ──────────────────────────
+.areas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 1100px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px)  { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px)  { grid-template-columns: 1fr; }
+}
+
+.area-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius;
+  overflow: hidden;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s, transform 0.2s;
+
+  &:hover {
+    box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+  }
+
+  &__img-wrap {
+    position: relative;
+    height: 150px;
+    overflow: hidden;
+  }
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+    .area-card:hover & { transform: scale(1.06); }
+  }
+
+  &__cat {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.18rem 0.55rem;
+    border-radius: 100px;
+    background: rgba($dark, 0.72);
+    color: $white;
+    &.fh { background: rgba($gold, 0.9); color: $dark; }
+  }
+
+  &__body { padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
+
+  &__location {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.68rem;
+    color: $muted;
+    svg { color: $gold; }
+  }
+
+  &__name { font-size: 0.92rem; font-weight: 700; color: $text; margin: 0; line-height: 1.3; }
+  &__desc { font-size: 0.75rem; color: $muted; line-height: 1.5; margin: 0; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.6rem;
+    border-top: 1px solid $border;
+    margin-top: auto;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__stat-pair {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.68rem;
+    color: $muted;
+    strong { color: $text; font-weight: 700; }
+  }
+
+  &__avg { font-size: 0.68rem; font-weight: 700; color: $gold; white-space: nowrap; }
+}
+
+// ── Shared: type tags, stats ─────────────────────────────────
+.areas-type-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.18rem 0.55rem;
+  border-radius: 100px;
+  border: 1px solid $border;
+  color: $mid;
+  background: $bg;
+  white-space: nowrap;
+}
+
+.areas-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+
+  &__val { font-size: 0.88rem; font-weight: 700; color: $text; }
+  &__lbl { font-size: 0.65rem; color: $muted; text-transform: uppercase; letter-spacing: 0.06em; }
+}
+
+.areas-featured-card__types,
+.area-card__types {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+// ── Stats Banner ─────────────────────────────────────────────
+.areas-stats-banner {
+  background: $dark;
+  padding: 3rem 0;
+}
+
+.areas-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  text-align: center;
+
+  @media (max-width: 640px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.areas-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &__val { font-size: 2rem; font-weight: 800; color: $gold; line-height: 1; }
+  &__lbl { font-size: 0.8rem; color: rgba($white, 0.65); text-transform: uppercase; letter-spacing: 0.08em; }
+}
+
+// ── FAQ ──────────────────────────────────────────────────────
+.areas-faq {
+  padding: 4rem 0;
+  background: $white;
+
+  .areas-section__title { margin-bottom: 2rem; }
+}
+
+.areas-faq-list { display: flex; flex-direction: column; gap: 0; }
+
+.areas-faq-item {
+  border-bottom: 1px solid $border;
+
+  &:first-child { border-top: 1px solid $border; }
+}
+
+.areas-faq-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  background: transparent;
+  border: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: $text;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.18s;
+
+  svg { flex-shrink: 0; transition: transform 0.25s; }
+
+  .areas-faq-item.open & {
+    color: $gold;
+    svg { transform: rotate(180deg); }
+  }
+}
+
+.areas-faq-a {
+  padding: 0 0 1.1rem;
+  p { font-size: 0.88rem; color: $muted; line-height: 1.7; margin: 0; }
+}
+
+// ── Newsletter ───────────────────────────────────────────────
+.areas-newsletter {
+  background: $bg;
+  padding: 3.5rem 0 4rem;
+}
+
+.areas-newsletter__card {
+  background: linear-gradient(135deg, $dark 0%, $navy 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.areas-newsletter__text {
+  flex: 1;
+  min-width: 220px;
+  h2 { font-size: 1.4rem; font-weight: 700; color: $white; margin: 0 0 0.5rem; }
+  p  { font-size: 0.9rem; color: rgba($white, 0.7); margin: 0; }
+}
+
+.areas-newsletter__form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  min-width: 300px;
+}
+
+.areas-newsletter__input {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba($white, 0.2);
+  background: rgba($white, 0.1);
+  color: $white;
+  font-size: 0.88rem;
+  outline: none;
+  &::placeholder { color: rgba($white, 0.45); }
+  &:focus { border-color: $gold; }
+}
+
+.areas-newsletter__btn {
+  padding: 0.7rem 1.75rem;
+  background: $gold;
+  color: $dark;
+  font-weight: 700;
+  font-size: 0.88rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s;
+  &:hover { background: #d4b86a; }
+}
+
+// ── Empty state / Clear ──────────────────────────────────────
+.areas-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: $muted;
+  text-align: center;
+}
+
+.areas-clear-btn {
+  padding: 0.55rem 1.5rem;
+  background: $dark;
+  color: $white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  &:hover { opacity: 0.85; }
+}
+
+// ── Responsive ───────────────────────────────────────────────
+@media (max-width: 768px) {
+  .areas-hero { min-height: 360px; }
+  .areas-filters__row { gap: 0.75rem; }
+  .areas-newsletter__card { padding: 2rem 1.5rem; }
+  .areas-stats-banner { padding: 2rem 0; }
+}

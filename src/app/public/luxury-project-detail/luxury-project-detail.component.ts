@@ -31,8 +31,8 @@ export interface ProjectDetail {
 }
 
 const PROJECTS: Record<string, ProjectDetail> = {
-  'one-zaabeel-residences': {
-    id: 'one-zaabeel-residences',
+  'one-za-abeel-residences': {
+    id: 'one-za-abeel-residences',
     title: "One Za'abeel Residences",
     subtitle: "Luxury Apartments & Penthouse",
     developer: 'Ithra Dubai',

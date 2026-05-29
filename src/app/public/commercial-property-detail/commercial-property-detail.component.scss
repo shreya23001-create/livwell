@@ -1,0 +1,70 @@
+$gold: #c8a84b;
+$green: #1a5c3a;
+$border: #e5e7eb;
+$muted: #6b7280;
+$text: #111827;
+$bg: #f9fafb;
+$white: #fff;
+
+.cpd-page { background: $bg; min-height: 100vh; color: $text; padding-top: 68px; }
+
+.cpd-breadcrumb { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: $muted; }
+.cpd-bc-link { color: $muted; text-decoration: none; display: flex; align-items: center; &:hover { color: $gold; } }
+.cpd-bc-sep { font-size: 1rem; }
+.cpd-bc-current { color: $text; font-weight: 500; }
+
+// ── Gallery ─────────────────────────────────────────────────
+.cpd-gallery { max-width: 1200px; margin: 1rem auto 0; padding: 0 1.5rem; }
+.cpd-gallery-main { position: relative; border-radius: 1rem; overflow: hidden; height: 480px; background: #000; @media(max-width:768px){ height: 240px; } }
+.cpd-gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cpd-gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.55); border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: background 0.2s; &:hover { background: rgba(0,0,0,0.8); } &--prev { left: 1rem; } &--next { right: 1rem; } }
+.cpd-gallery-counter { position: absolute; bottom: 1rem; right: 1rem; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.75rem; padding: 0.25rem 0.65rem; border-radius: 2rem; }
+.cpd-status-badge { position: absolute; top: 1rem; left: 1rem; font-size: 0.68rem; font-weight: 600; padding: 0.28rem 0.75rem; border-radius: 2rem; &.status--ready { background: rgba(16,185,129,0.12); color: #059669; border: 1px solid rgba(16,185,129,0.3); } &.status--offplan { background: rgba($gold,0.1); color: #ae8a28; border: 1px solid rgba($gold,0.3); } &.status--construction { background: rgba(99,102,241,0.1); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); } }
+.cpd-gallery-thumbs { display: flex; gap: 0.5rem; margin-top: 0.625rem; overflow-x: auto; }
+.cpd-gallery-thumb { width: 100px; height: 68px; object-fit: cover; border-radius: 0.5rem; cursor: pointer; opacity: 0.6; transition: opacity 0.2s, outline 0.15s; flex-shrink: 0; &.active, &:hover { opacity: 1; outline: 2px solid $gold; } @media(max-width:768px){ width: 72px; height: 50px; } }
+
+// ── Layout ──────────────────────────────────────────────────
+.cpd-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+.cpd-layout { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; @media(max-width:1024px){ grid-template-columns: 1fr; } }
+
+// ── Title block ─────────────────────────────────────────────
+.cpd-title-block { margin-bottom: 1.25rem; }
+.cpd-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.cpd-tag { font-size: 0.72rem; font-weight: 600; padding: 0.22rem 0.7rem; border-radius: 2rem; border: 1px solid $border; color: $muted; background: $white; &--green { color: #059669; border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.06); } &--blue { color: #2563eb; border-color: rgba(37,99,235,0.25); background: rgba(37,99,235,0.06); } }
+.cpd-title { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 700; color: $text; font-family: Georgia, serif; margin: 0 0 0.5rem; line-height: 1.2; }
+.cpd-location { display: flex; align-items: center; gap: 0.35rem; font-size: 0.88rem; color: $muted; svg { color: $gold; } }
+
+// ── Specs bar ───────────────────────────────────────────────
+.cpd-specs-bar { display: flex; gap: 1.5rem; flex-wrap: wrap; padding: 1.25rem; background: $white; border: 1px solid $border; border-radius: 0.875rem; margin-bottom: 2rem; }
+.cpd-spec { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; min-width: 80px; svg { color: $gold; } span { font-size: 0.9rem; font-weight: 700; color: $text; } label { font-size: 0.68rem; color: $muted; text-transform: uppercase; letter-spacing: 0.06em; } }
+
+// ── Sections ────────────────────────────────────────────────
+.cpd-section { margin-bottom: 2.5rem; }
+.cpd-section-title { font-size: 1.1rem; font-weight: 700; color: $text; margin: 0 0 1rem; padding-bottom: 0.625rem; border-bottom: 2px solid $gold; display: inline-block; }
+.cpd-about { font-size: 0.92rem; color: $muted; line-height: 1.75; margin: 0; }
+.cpd-features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem 1.25rem; @media(max-width:600px){ grid-template-columns: repeat(2,1fr); } }
+.cpd-feature { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: $text; svg { color: $green; flex-shrink: 0; } }
+.cpd-map-wrap { border-radius: 0.875rem; overflow: hidden; border: 1px solid $border; height: 360px; }
+.cpd-map { width: 100%; height: 100%; border: none; display: block; }
+
+// ── Sidebar ─────────────────────────────────────────────────
+.cpd-sidebar { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.cpd-price-card { background: $white; border: 1.5px solid $border; border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.cpd-price-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: $muted; margin: 0; }
+.cpd-price-value { font-size: 1.5rem; font-weight: 700; color: $green; margin: 0; line-height: 1; }
+.cpd-price-sqft { font-size: 0.78rem; color: $muted; margin: 0; }
+
+.cpd-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.7rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; transition: opacity 0.18s, transform 0.15s; &:hover { opacity: 0.88; transform: translateY(-1px); } &--wa { background: #25d366; color: #fff; } &--call { background: $green; color: #fff; } &--email { background: $bg; border: 1.5px solid $border; color: $text; } }
+
+.cpd-agent-card { background: $white; border: 1px solid $border; border-radius: 1rem; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; }
+.cpd-agent-av { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid $border; flex-shrink: 0; }
+.cpd-agent-name { font-size: 0.9rem; font-weight: 700; color: $text; margin: 0 0 0.2rem; }
+.cpd-agent-role { font-size: 0.75rem; color: $muted; margin: 0; }
+
+.cpd-facts-card { background: $white; border: 1px solid $border; border-radius: 1rem; padding: 1.25rem; }
+.cpd-facts-title { font-size: 0.85rem; font-weight: 700; color: $text; margin: 0 0 1rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.cpd-fact-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid $border; font-size: 0.82rem; &:last-child { border-bottom: none; } span { color: $muted; } strong { color: $text; } }
+
+// ── Not found ───────────────────────────────────────────────
+.cpd-not-found { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 8rem 1rem; text-align: center; h2 { font-size: 1.5rem; font-weight: 700; color: $text; } p { color: $muted; } }

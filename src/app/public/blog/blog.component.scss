@@ -1,0 +1,281 @@
+$gold: #c8a84b;
+$dark: #111827;
+$mid: #374151;
+$muted: #6b7280;
+$border: #e5e7eb;
+$bg-light: #f9fafb;
+$white: #ffffff;
+$radius: 14px;
+
+.guides-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+// ── Hero ─────────────────────────────────────────────────
+.guides-hero {
+  position: relative;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  padding-top: 68px;
+  background: linear-gradient(135deg, #0a1628 0%, #1a2f4e 60%, #0f2340 100%);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/images/dubai-skyline.jpg') center/cover no-repeat;
+    opacity: 0.18;
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(10,22,40,0.95) 40%, rgba(10,22,40,0.5));
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    padding: 0 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: $gold;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba($gold, 0.4);
+    border-radius: 100px;
+    padding: 0.25rem 0.875rem;
+  }
+
+  &__title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    color: $white;
+    line-height: 1.15;
+    margin: 0 0 1rem;
+  }
+
+  &__sub {
+    font-size: 1rem;
+    color: rgba($white, 0.72);
+    max-width: 500px;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// ── Cards Grid ───────────────────────────────────────────
+.guides-section {
+  padding: 3.5rem 0 4rem;
+  background: $bg-light;
+}
+
+.guides-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 620px)  { grid-template-columns: 1fr; }
+}
+
+.guide-card {
+  background: $white;
+  border-radius: $radius;
+  border: 1px solid $border;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+
+  &:hover {
+    box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+  }
+
+  &__icon-wrap {
+    padding: 1.5rem 1.75rem 0;
+  }
+
+  &__icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.6rem;
+    border-radius: 10px;
+    background: inherit;
+  }
+
+  &__body {
+    padding: 1rem 1.75rem 0.75rem;
+    flex: 1;
+  }
+
+  &__cat {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    padding: 0.2rem 0.7rem;
+    margin-bottom: 0.6rem;
+  }
+
+  &__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $dark;
+    margin: 0 0 0.5rem;
+    line-height: 1.35;
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: $muted;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  &__footer {
+    padding: 1rem 1.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid $border;
+    margin-top: 1rem;
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    color: $muted;
+
+    svg { width: 14px; height: 14px; flex-shrink: 0; }
+  }
+
+  &__cta {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: $dark;
+    text-decoration: none;
+    transition: gap 0.18s, color 0.18s;
+
+    svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    &:hover { color: $gold; gap: 0.6rem; }
+  }
+}
+
+.guides-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: $muted;
+  font-size: 1rem;
+}
+
+// ── Newsletter ───────────────────────────────────────────
+.newsletter-section {
+  padding: 3.5rem 0;
+  background: $white;
+}
+
+.newsletter-card {
+  background: linear-gradient(135deg, #0a1628 0%, #1a2f4e 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+
+  &__text {
+    flex: 1;
+    min-width: 240px;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $white;
+      margin: 0 0 0.75rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: rgba($white, 0.72);
+      margin: 0;
+      line-height: 1.6;
+    }
+  }
+
+  &__form {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    min-width: 320px;
+  }
+}
+
+.newsletter-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid rgba($white, 0.2);
+  background: rgba($white, 0.1);
+  color: $white;
+  font-size: 0.9rem;
+  outline: none;
+
+  &::placeholder { color: rgba($white, 0.45); }
+  &:focus { border-color: $gold; }
+}
+
+.newsletter-btn {
+  padding: 0.75rem 1.75rem;
+  background: $gold;
+  color: $dark;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s;
+
+  &:hover { background: #d4b86a; }
+}
+
+.newsletter-success {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #6ee7b7;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 320px;
+
+  svg { width: 24px; height: 24px; flex-shrink: 0; }
+}
+
+@media (max-width: 768px) {
+  .newsletter-card { padding: 2rem 1.5rem; }
+  .guides-hero { height: 260px; }
+}

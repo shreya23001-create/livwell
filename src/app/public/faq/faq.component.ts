@@ -1,6 +1,5 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 
@@ -17,7 +16,7 @@ export interface Faq {
 @Component({
   selector: 'app-faq',
   standalone: true,
-  imports: [CommonModule, RouterLink, NewsletterSectionComponent, SeoLinksSectionComponent],
+  imports: [CommonModule, NewsletterSectionComponent, SeoLinksSectionComponent],
   templateUrl: './faq.component.html',
   styleUrl: './faq.component.scss',
 })

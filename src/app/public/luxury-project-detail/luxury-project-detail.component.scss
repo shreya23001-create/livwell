@@ -1,15 +1,23 @@
-$gold:    #c8a84b;
-$green:   #1a5c3a;
-$green2:  #22754a;
-$dark:    #0a1628;
-$border:  #e5e7eb;
-$muted:   #6b7280;
-$text:    #111827;
-$bg:      #f9fafb;
-$white:   #fff;
+$gold: #c8a84b;
+$green: #1a5c3a;
+$green2: #22754a;
+$dark: #0a1628;
+$border: #e5e7eb;
+$muted: #6b7280;
+$text: #111827;
+$bg: #f9fafb;
+$white: #fff;
 
-.lpd-page { background: $bg; min-height: 100vh; }
-.lpd-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+.lpd-page {
+  background: $bg;
+  min-height: 100vh;
+}
+
+.lpd-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
 
 // ── Breadcrumb ─────────────────────────────────────────────
 .lpd-breadcrumb-bar {
@@ -24,15 +32,26 @@ $white:   #fff;
   color: $muted;
   text-decoration: none;
   transition: color 0.2s;
-  &:hover { color: $gold; }
+
+  &:hover {
+    color: $gold;
+  }
 }
 
-.lpd-bc-sep { font-size: 0.9rem; color: $muted; margin: 0 0.4rem; }
-.lpd-bc-current { font-size: 0.8rem; color: $text; }
+.lpd-bc-sep {
+  font-size: 0.9rem;
+  color: $muted;
+  margin: 0 0.4rem;
+}
+
+.lpd-bc-current {
+  font-size: 0.8rem;
+  color: $text;
+}
 
 // ── Gallery ────────────────────────────────────────────────
 .lpd-gallery-section {
-  background: #111;
+  // background: #111;
   padding: 1.5rem 0;
 }
 
@@ -83,9 +102,23 @@ $white:   #fff;
   padding: 0.3rem 0.8rem;
   border-radius: 2rem;
 
-  &.status--ready        { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-  &.status--offplan      { background: rgba($gold,0.12);      color: $gold;   border: 1px solid rgba($gold,0.3); }
-  &.status--construction { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+  &.status--ready {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  &.status--offplan {
+    background: rgba($gold, 0.12);
+    color: $gold;
+    border: 1px solid rgba($gold, 0.3);
+  }
+
+  &.status--construction {
+    background: rgba(99, 102, 241, 0.15);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+  }
 }
 
 .lpd-gallery-thumbs {
@@ -94,7 +127,10 @@ $white:   #fff;
   gap: 0.5rem;
   overflow-y: auto;
 
-  @media (max-width: 768px) { flex-direction: row; overflow-x: auto; }
+  @media (max-width: 768px) {
+    flex-direction: row;
+    overflow-x: auto;
+  }
 }
 
 .lpd-gallery-thumb {
@@ -106,12 +142,24 @@ $white:   #fff;
   transition: border-color 0.2s;
   height: 95px;
 
-  &.active { border-color: $gold; }
-  &:hover  { border-color: rgba($gold, 0.6); }
+  &.active {
+    border-color: $gold;
+  }
 
-  img { width: 100%; height: 100%; object-fit: cover; }
+  &:hover {
+    border-color: rgba($gold, 0.6);
+  }
 
-  @media (max-width: 768px) { width: 120px; height: 80px; }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 768px) {
+    width: 120px;
+    height: 80px;
+  }
 }
 
 // ── Hero Info ──────────────────────────────────────────────
@@ -127,10 +175,16 @@ $white:   #fff;
   gap: 2rem;
   align-items: start;
 
-  @media (max-width: 900px) { grid-template-columns: 1fr; }
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
-.lpd-hero-dev { font-size: 0.82rem; color: $muted; margin: 0 0 0.4rem; }
+.lpd-hero-dev {
+  font-size: 0.82rem;
+  color: $muted;
+  margin: 0 0 0.4rem;
+}
 
 .lpd-hero-title {
   font-size: clamp(1.6rem, 3vw, 2.25rem);
@@ -140,7 +194,11 @@ $white:   #fff;
   margin: 0 0 0.3rem;
 }
 
-.lpd-hero-subtitle { font-size: 0.9rem; color: $muted; margin: 0 0 1.25rem; }
+.lpd-hero-subtitle {
+  font-size: 0.9rem;
+  color: $muted;
+  margin: 0 0 1.25rem;
+}
 
 .lpd-hero-specs {
   display: flex;
@@ -160,9 +218,24 @@ $white:   #fff;
   padding: 0.65rem 1.1rem;
 }
 
-.lpd-spec-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; color: $muted; }
-.lpd-spec-val   { font-size: 0.88rem; font-weight: 700; color: $text; }
-.lpd-spec-divider { width: 1px; background: $border; align-self: stretch; }
+.lpd-spec-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $muted;
+}
+
+.lpd-spec-val {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: $text;
+}
+
+.lpd-spec-divider {
+  width: 1px;
+  background: $border;
+  align-self: stretch;
+}
 
 // ── Price card ─────────────────────────────────────────────
 .lpd-price-card {
@@ -175,10 +248,25 @@ $white:   #fff;
   gap: 0.5rem;
 }
 
-.lpd-price-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: $muted; }
-.lpd-price-value { font-size: 1.6rem; font-weight: 700; color: $green; margin-bottom: 0.5rem; }
+.lpd-price-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $muted;
+}
 
-.lpd-price-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+.lpd-price-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: $green;
+  margin-bottom: 0.5rem;
+}
+
+.lpd-price-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
 .lpd-btn-wa {
   display: inline-flex;
@@ -192,9 +280,14 @@ $white:   #fff;
   border-radius: 0.5rem;
   text-decoration: none;
   transition: background 0.2s;
-  &:hover { background: #1ebe5c; }
 
-  &--full { justify-content: center; }
+  &:hover {
+    background: #1ebe5c;
+  }
+
+  &--full {
+    justify-content: center;
+  }
 }
 
 .lpd-btn-outline-full {
@@ -209,13 +302,20 @@ $white:   #fff;
   border-radius: 0.5rem;
   text-decoration: none;
   transition: border-color 0.2s;
-  &:hover { border-color: $gold; color: $gold; }
+
+  &:hover {
+    border-color: $gold;
+    color: $gold;
+  }
 }
 
 // ── Sections ───────────────────────────────────────────────
 .lpd-section {
   padding: 3rem 0;
-  &--alt { background: $white; }
+
+  &--alt {
+    background: $white;
+  }
 }
 
 .lpd-section-title {
@@ -247,7 +347,10 @@ $white:   #fff;
   flex: 1;
   min-width: 260px;
   transition: border-color 0.2s;
-  &:hover { border-color: rgba($gold, 0.4); }
+
+  &:hover {
+    border-color: rgba($gold, 0.4);
+  }
 }
 
 .lpd-expert-avatar {
@@ -259,11 +362,27 @@ $white:   #fff;
   flex-shrink: 0;
 }
 
-.lpd-expert-info { flex: 1; }
-.lpd-expert-name { font-size: 0.9rem; font-weight: 700; color: $text; margin: 0 0 0.2rem; }
-.lpd-expert-role { font-size: 0.75rem; color: $muted; margin: 0; }
+.lpd-expert-info {
+  flex: 1;
+}
 
-.lpd-expert-actions { display: flex; gap: 0.4rem; }
+.lpd-expert-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0 0 0.2rem;
+}
+
+.lpd-expert-role {
+  font-size: 0.75rem;
+  color: $muted;
+  margin: 0;
+}
+
+.lpd-expert-actions {
+  display: flex;
+  gap: 0.4rem;
+}
 
 .lpd-expert-wa {
   display: inline-flex;
@@ -288,7 +407,11 @@ $white:   #fff;
   padding: 0.4rem 0.75rem;
   border-radius: 0.4rem;
   text-decoration: none;
-  &:hover { border-color: $gold; color: $gold; }
+
+  &:hover {
+    border-color: $gold;
+    color: $gold;
+  }
 }
 
 // ── Payment Plan ───────────────────────────────────────────
@@ -316,14 +439,21 @@ $white:   #fff;
   margin-bottom: 0.4rem;
 }
 
-.lpd-payment-label { font-size: 0.82rem; color: $muted; font-weight: 500; }
+.lpd-payment-label {
+  font-size: 0.82rem;
+  color: $muted;
+  font-weight: 500;
+}
 
 // ── Overview ───────────────────────────────────────────────
 .lpd-overview-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
-  @media (max-width: 768px) { grid-template-columns: 1fr; }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .lpd-overview-text {
@@ -348,7 +478,12 @@ $white:   #fff;
   gap: 0.5rem;
   font-size: 0.85rem;
   color: $text;
-  svg { color: $green; flex-shrink: 0; margin-top: 2px; }
+
+  svg {
+    color: $green;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
 }
 
 // ── Amenities ──────────────────────────────────────────────
@@ -356,7 +491,10 @@ $white:   #fff;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
-  @media (max-width: 640px) { grid-template-columns: repeat(3, 1fr); }
+
+  @media (max-width: 640px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .lpd-amenity {
@@ -370,14 +508,28 @@ $white:   #fff;
   padding: 0.875rem 0.5rem;
   text-align: center;
   transition: border-color 0.2s;
-  &:hover { border-color: rgba($gold, 0.4); }
+
+  &:hover {
+    border-color: rgba($gold, 0.4);
+  }
 }
 
-.lpd-amenity-icon { font-size: 1.4rem; }
-.lpd-amenity-label { font-size: 0.72rem; color: $muted; font-weight: 500; }
+.lpd-amenity-icon {
+  font-size: 1.4rem;
+}
+
+.lpd-amenity-label {
+  font-size: 0.72rem;
+  color: $muted;
+  font-weight: 500;
+}
 
 // ── Table ──────────────────────────────────────────────────
-.lpd-table-wrap { overflow-x: auto; border-radius: 0.75rem; border: 1px solid $border; }
+.lpd-table-wrap {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid $border;
+}
 
 .lpd-table {
   width: 100%;
@@ -400,23 +552,43 @@ $white:   #fff;
     padding: 0.75rem 1rem;
     color: $text;
     border-bottom: 1px solid $border;
-    &:last-child { border-bottom: none; }
+
+    &:last-child {
+      border-bottom: none;
+    }
   }
 
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: $bg; }
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background: $bg;
+  }
 }
 
-.lpd-table-price { font-weight: 700; color: $green; }
+.lpd-table-price {
+  font-weight: 700;
+  color: $green;
+}
 
 // ── FAQs ───────────────────────────────────────────────────
-.lpd-faqs-wrap { max-width: 780px; }
+.lpd-faqs-wrap {
+  max-width: 780px;
+}
 
-.lpd-faqs { display: flex; flex-direction: column; gap: 0; }
+.lpd-faqs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 
 .lpd-faq {
   border-bottom: 1px solid $border;
-  &:first-child { border-top: 1px solid $border; }
+
+  &:first-child {
+    border-top: 1px solid $border;
+  }
 }
 
 .lpd-faq-q {
@@ -434,8 +606,15 @@ $white:   #fff;
   cursor: pointer;
   text-align: left;
   transition: color 0.2s;
-  &:hover { color: $gold; }
-  svg { flex-shrink: 0; color: $gold; }
+
+  &:hover {
+    color: $gold;
+  }
+
+  svg {
+    flex-shrink: 0;
+    color: $gold;
+  }
 }
 
 .lpd-faq-a {
@@ -459,15 +638,29 @@ $white:   #fff;
   flex-wrap: wrap;
 }
 
-.lpd-cta-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin: 0 0 0.4rem; }
-.lpd-cta-desc  { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin: 0; }
+.lpd-cta-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.4rem;
+}
 
-.lpd-cta-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.lpd-cta-desc {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.lpd-cta-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
 
 .lpd-btn-email-cta {
   display: inline-flex;
   align-items: center;
-  border: 1.5px solid rgba(255,255,255,0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   color: #fff;
   font-size: 0.82rem;
   font-weight: 600;
@@ -475,7 +668,10 @@ $white:   #fff;
   border-radius: 0.5rem;
   text-decoration: none;
   transition: border-color 0.2s;
-  &:hover { border-color: $gold; }
+
+  &:hover {
+    border-color: $gold;
+  }
 }
 
 // ── No-data / Not-found hero ───────────────────────────────
@@ -495,10 +691,13 @@ $white:   #fff;
   border-radius: 1.25rem;
   padding: 3rem 2.5rem;
   text-align: center;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.lpd-nodata-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.lpd-nodata-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
 
 .lpd-nodata-badge {
   display: inline-block;
@@ -523,12 +722,17 @@ $white:   #fff;
 
 .lpd-nodata-desc {
   font-size: 0.9rem;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255, 255, 255, 0.65);
   line-height: 1.8;
   margin: 0 0 2rem;
 }
 
-.lpd-nodata-actions { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
+.lpd-nodata-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
 
 .lpd-btn-primary {
   display: inline-flex;
@@ -544,13 +748,16 @@ $white:   #fff;
   border: none;
   cursor: pointer;
   transition: opacity 0.2s;
-  &:hover { opacity: 0.88; }
+
+  &:hover {
+    opacity: 0.88;
+  }
 }
 
 .lpd-btn-outline {
   display: inline-flex;
   align-items: center;
-  border: 1.5px solid rgba(255,255,255,0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   color: #fff;
   font-size: 0.85rem;
   font-weight: 600;
@@ -558,5 +765,8 @@ $white:   #fff;
   border-radius: 0.5rem;
   text-decoration: none;
   transition: border-color 0.2s;
-  &:hover { border-color: $gold; }
+
+  &:hover {
+    border-color: $gold;
+  }
 }

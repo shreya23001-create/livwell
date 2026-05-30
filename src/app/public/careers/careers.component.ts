@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -33,7 +32,7 @@ interface Faq {
 @Component({
   selector: 'app-careers',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, NewsletterSectionComponent, SeoLinksSectionComponent],
+  imports: [CommonModule, FormsModule, NewsletterSectionComponent, SeoLinksSectionComponent],
   templateUrl: './careers.component.html',
   styleUrl: './careers.component.scss',
 })
@@ -62,7 +61,7 @@ export class CareersComponent {
   ];
 
   readonly team: TeamMember[] = [
-    { name: 'Ankush Sharma', role: 'CEO & Founder', avatar: 'images/ceo.png' },
+    { name: 'Ankush Sharma', role: 'CEO & Founder', avatar: 'images/ceo-new.png' },
     { name: 'Anuj Verma', role: 'Senior Property Advisor', avatar: 'images/Anuj.jpeg' },
     { name: 'Niket Shah', role: 'Off-Plan Specialist', avatar: 'images/Niket .jpeg' },
     { name: 'Yash Patel', role: 'Leasing Consultant', avatar: 'images/Yash.jpeg' },

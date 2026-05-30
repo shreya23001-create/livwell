@@ -1,0 +1,88 @@
+$gold: #c8a84b;
+$dark: #1a1a2e;
+$green: #1a5c3a;
+$text: #111827;
+$muted: #6b7280;
+$border: #e5e7eb;
+$bg: #f9fafb;
+$white: #fff;
+
+.ard-page { background: $bg; min-height: 100vh; padding-top: 68px; }
+
+.ard-breadcrumb { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: $muted; }
+.ard-bc-link { color: $muted; text-decoration: none; display: flex; align-items: center; &:hover { color: $gold; } }
+.ard-bc-sep { font-size: 1rem; }
+.ard-bc-current { color: $text; font-weight: 500; }
+
+// ── Gallery ─────────────────────────────────────────────────
+.ard-gallery { max-width: 1200px; margin: 1rem auto 0; padding: 0 1.5rem; }
+.ard-gallery__main { position: relative; border-radius: 1rem; overflow: hidden; height: 460px; background: #000; @media(max-width:768px){ height: 220px; } }
+.ard-gallery__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ard-gallery__nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; &:hover { background: rgba(0,0,0,0.8); } &--prev { left: 1rem; } &--next { right: 1rem; } }
+.ard-gallery__counter { position: absolute; bottom: 1rem; right: 1rem; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.75rem; padding: 0.25rem 0.65rem; border-radius: 2rem; }
+.ard-gallery__thumbs { display: flex; gap: 0.5rem; margin-top: 0.5rem; overflow-x: auto; }
+.ard-gallery__thumb { width: 100px; height: 68px; object-fit: cover; border-radius: 6px; cursor: pointer; opacity: 0.6; transition: opacity 0.2s, outline 0.15s; flex-shrink: 0; &.active, &:hover { opacity: 1; outline: 2px solid $gold; } @media(max-width:768px){ width: 72px; height: 50px; } }
+
+// ── Layout ──────────────────────────────────────────────────
+.ard-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.ard-layout { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; @media(max-width:1024px){ grid-template-columns: 1fr; } }
+
+// ── Title ───────────────────────────────────────────────────
+.ard-title-block { margin-bottom: 1.25rem; }
+.ard-cat-badge { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.7rem; border-radius: 100px; margin-bottom: 0.75rem; background: rgba($dark,0.08); color: $dark; &.fh { background: rgba($gold,0.15); color: darken($gold,15%); } }
+.ard-title { font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 700; color: $text; font-family: Georgia, serif; margin: 0 0 0.5rem; line-height: 1.2; }
+.ard-location { display: flex; align-items: center; gap: 0.35rem; font-size: 0.88rem; color: $muted; svg { color: $gold; } }
+
+// ── Stats bar ───────────────────────────────────────────────
+.ard-stats-bar { display: flex; gap: 1.5rem; flex-wrap: wrap; padding: 1.25rem; background: $white; border: 1px solid $border; border-radius: 0.875rem; margin: 1.25rem 0; }
+.ard-stat { display: flex; flex-direction: column; gap: 0.15rem; &__val { font-size: 1rem; font-weight: 700; color: $text; } &__lbl { font-size: 0.65rem; color: $muted; text-transform: uppercase; letter-spacing: 0.06em; } }
+
+// ── Type tags ───────────────────────────────────────────────
+.ard-types { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+.ard-type-tag { font-size: 0.72rem; font-weight: 600; padding: 0.22rem 0.7rem; border-radius: 100px; border: 1px solid $border; color: $muted; background: $white; }
+
+// ── Sections ────────────────────────────────────────────────
+.ard-section { margin-bottom: 2.5rem; }
+.ard-section-title { font-size: 1.15rem; font-weight: 700; color: $text; margin: 0 0 1rem; padding-bottom: 0.625rem; border-bottom: 2px solid $gold; display: inline-block; }
+.ard-about { font-size: 0.9rem; color: $muted; line-height: 1.75; margin: 0 0 0.75rem; }
+
+.ard-bullet-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem;
+  li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.88rem; color: $text; svg { color: $green; flex-shrink: 0; margin-top: 2px; } }
+}
+
+.ard-lifestyle-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; @media(max-width:600px){ grid-template-columns: 1fr; } }
+.ard-lifestyle-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: $text; padding: 0.75rem 1rem; background: $white; border: 1px solid $border; border-radius: 8px; svg { color: $gold; flex-shrink: 0; } }
+
+// ── CTA ─────────────────────────────────────────────────────
+.ard-cta-row { display: flex; gap: 0.875rem; flex-wrap: wrap; }
+.ard-cta-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.7rem 1.5rem; border-radius: 6px; font-size: 0.88rem; font-weight: 700; text-decoration: none; transition: all 0.18s;
+  &--primary { background: $dark; color: $white; border: 2px solid $dark; &:hover { background: lighten($dark, 10%); } }
+  &--outline { background: transparent; color: $dark; border: 2px solid $dark; &:hover { background: $dark; color: $white; } }
+}
+
+// ── FAQ ─────────────────────────────────────────────────────
+.ard-faq-list { display: flex; flex-direction: column; }
+.ard-faq-item { border-bottom: 1px solid $border; &:first-child { border-top: 1px solid $border; } }
+.ard-faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; background: transparent; border: none; font-size: 0.88rem; font-weight: 600; color: $text; cursor: pointer; text-align: left; svg { flex-shrink: 0; transition: transform 0.25s; } .ard-faq-item.open & { color: $gold; svg { transform: rotate(180deg); } } }
+.ard-faq-a { padding: 0 0 1rem; p { font-size: 0.85rem; color: $muted; line-height: 1.7; margin: 0; } }
+
+// ── Map ─────────────────────────────────────────────────────
+.ard-map-wrap { border-radius: 0.875rem; overflow: hidden; border: 1px solid $border; height: 380px; }
+.ard-map { width: 100%; height: 100%; border: none; display: block; }
+
+// ── Sidebar ─────────────────────────────────────────────────
+.ard-sidebar { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.ard-agent-card { background: $white; border: 1px solid $border; border-radius: 1rem; padding: 1.25rem; &__title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: $muted; margin: 0 0 1rem; } }
+.ard-agent { display: flex; align-items: center; gap: 0.875rem; margin-bottom: 1rem; &__av { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid $border; } &__name { font-size: 0.9rem; font-weight: 700; color: $text; margin: 0 0 0.2rem; } &__role { font-size: 0.75rem; color: $muted; margin: 0; } &__btns { display: flex; gap: 0.6rem; } }
+.ard-agent-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.6rem 0.875rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: opacity 0.18s; &--call { background: $dark; color: $white; } &--wa { background: #25d366; color: $white; } &:hover { opacity: 0.85; } }
+
+.ard-facts-card { background: $white; border: 1px solid $border; border-radius: 1rem; padding: 1.25rem; }
+.ard-facts-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: $muted; margin: 0 0 1rem; }
+.ard-fact-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid $border; font-size: 0.82rem; &:last-child { border-bottom: none; } span { color: $muted; } strong { color: $text; } }
+
+.ard-nearby-card { background: $white; border: 1px solid $border; border-radius: 1rem; padding: 1.25rem; }
+.ard-nearby-list { display: flex; flex-direction: column; gap: 0.25rem; }
+.ard-nearby-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0; font-size: 0.85rem; color: $text; text-decoration: none; border-bottom: 1px solid $border; transition: color 0.15s; svg { color: $gold; } &:last-child { border-bottom: none; } &:hover { color: $gold; } }
+
+.ard-not-found { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 8rem 1rem; text-align: center; padding-top: calc(68px + 4rem); h2 { font-size: 1.5rem; font-weight: 700; color: $text; } p { color: $muted; } }

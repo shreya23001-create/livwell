@@ -1,163 +1,72 @@
 <!-- ── Page Wrapper ──────────────────────────────────────── -->
 <div class="areas-page">
 
-  <!-- ── Hero ─────────────────────────────────────────────── -->
-  <section class="areas-hero">
-    <div class="areas-hero__overlay"></div>
-    <div class="areas-hero__content">
-      <span class="areas-hero__eyebrow">Explore Dubai</span>
-      <h1 class="areas-hero__title">Dubai's Top Areas &amp;<br>Neighbourhoods</h1>
-      <p class="areas-hero__sub">Discover the best communities to live, invest, and thrive in Dubai — from vibrant waterfronts to serene family suburbs.</p>
-
-      <!-- Search bar -->
-      <div class="areas-search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input
-          type="text"
-          placeholder="Search areas, e.g. Dubai Marina, Villas, Freehold…"
-          [value]="searchQuery()"
-          (input)="searchQuery.set($any($event.target).value)"
-          class="areas-search__input" />
-        <button class="areas-search__btn" (click)="$event.preventDefault()">Search</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Filters ───────────────────────────────────────────── -->
-  <div class="areas-filters">
+  <!-- ── Page Header ───────────────────────────────────────── -->
+  <div class="areas-header">
     <div class="areas-container">
-      <div class="areas-filters__row">
-        <div class="areas-filters__group">
-          <label class="areas-filters__label">Ownership</label>
-          <div class="areas-pill-row">
-            <button *ngFor="let c of categories" class="areas-pill"
-              [class.areas-pill--active]="activeCategory() === c"
-              (click)="activeCategory.set(c)">{{ c }}</button>
-          </div>
-        </div>
-        <div class="areas-filters__group">
-          <label class="areas-filters__label">Property Type</label>
-          <div class="areas-pill-row">
-            <button *ngFor="let t of propertyTypes" class="areas-pill"
-              [class.areas-pill--active]="activeType() === t"
-              (click)="activeType.set(t)">{{ t }}</button>
-          </div>
-        </div>
-        <div class="areas-filters__count">
-          <strong>{{ filtered().length }}</strong> areas found
-        </div>
+      <h1 class="areas-header__title">Best Areas to Buy &amp; Rent Property in Dubai</h1>
+      <div class="areas-header__desc-wrap">
+        <p class="areas-header__desc">Explore Dubai's top residential and commercial neighbourhoods. Whether you're looking to buy, rent, or invest, get an in-depth look at Dubai's best areas — complete with insights on lifestyle, amenities, and investment potential for each location.</p>
       </div>
     </div>
   </div>
 
-  <!-- ── Featured Areas ────────────────────────────────────── -->
-  <section class="areas-section" *ngIf="searchQuery() === '' && activeCategory() === 'All' && activeType() === 'All'">
+  <!-- ── Search & Filter Bar ───────────────────────────────── -->
+  <div class="areas-filters">
     <div class="areas-container">
-      <div class="areas-section__header">
-        <h2 class="areas-section__title">Featured Areas</h2>
-        <p class="areas-section__sub">Dubai's most sought-after communities for buyers and investors</p>
-      </div>
-      <div class="areas-featured-grid">
-        <a *ngFor="let a of featured()" [routerLink]="['/areas', a.slug]" class="areas-featured-card">
-          <div class="areas-featured-card__img-wrap">
-            <img [src]="a.image" [alt]="a.name" class="areas-featured-card__img" loading="lazy" />
-            <div class="areas-featured-card__overlay"></div>
-            <span class="areas-featured-card__cat" [class.fh]="a.category === 'Freehold'">{{ a.category }}</span>
-          </div>
-          <div class="areas-featured-card__body">
-            <div class="areas-featured-card__location">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
-              {{ a.location }}
-            </div>
-            <h3 class="areas-featured-card__name">{{ a.name }}</h3>
-            <p class="areas-featured-card__desc">{{ a.description }}</p>
-            <div class="areas-featured-card__types">
-              <span *ngFor="let t of a.types" class="areas-type-tag">{{ t }}</span>
-            </div>
-            <div class="areas-featured-card__stats">
-              <div class="areas-stat">
-                <span class="areas-stat__val">{{ a.propertiesForSale }}</span>
-                <span class="areas-stat__lbl">For Sale</span>
-              </div>
-              <div class="areas-stat">
-                <span class="areas-stat__val">{{ a.propertiesForRent }}</span>
-                <span class="areas-stat__lbl">For Rent</span>
-              </div>
-              <div class="areas-stat">
-                <span class="areas-stat__val">{{ a.avgPriceSale }}</span>
-                <span class="areas-stat__lbl">Avg. Sale</span>
-              </div>
-            </div>
-          </div>
-        </a>
+      <div class="areas-filters__row">
+        <div class="areas-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search areas…"
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            class="areas-search__input" />
+        </div>
+        <div class="areas-pill-row">
+          <button *ngFor="let t of propertyTypes" class="areas-pill"
+            [class.areas-pill--active]="activeType() === t"
+            (click)="activeType.set(t)">{{ t }}</button>
+        </div>
+        <span class="areas-filters__count"><strong>{{ filtered().length }}</strong> Areas</span>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ── All Areas Grid ────────────────────────────────────── -->
-  <section class="areas-section areas-section--all">
+  <!-- ── Areas Grid ─────────────────────────────────────────── -->
+  <section class="areas-section">
     <div class="areas-container">
-      <div class="areas-section__header">
-        <h2 class="areas-section__title">
-          {{ searchQuery() || activeCategory() !== 'All' || activeType() !== 'All' ? 'Search Results' : 'All Areas' }}
-        </h2>
-      </div>
 
       <!-- Empty state -->
       <div class="areas-empty" *ngIf="filtered().length === 0">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <p>No areas match your search. Try a different keyword.</p>
-        <button class="areas-clear-btn" (click)="searchQuery.set(''); activeCategory.set('All'); activeType.set('All')">Clear Filters</button>
+        <p>No areas match your search.</p>
+        <button class="areas-clear-btn" (click)="searchQuery.set(''); activeType.set('All')">Clear Filters</button>
       </div>
 
       <div class="areas-grid" *ngIf="filtered().length > 0">
-        <a *ngFor="let a of filtered()" [routerLink]="['/areas', a.slug]" class="area-card">
+        <div *ngFor="let a of filtered()" class="area-card" (click)="goToArea(a.slug)">
+          <!-- Image -->
           <div class="area-card__img-wrap">
             <img [src]="a.image" [alt]="a.name" class="area-card__img" loading="lazy" />
-            <span class="area-card__cat" [class.fh]="a.category === 'Freehold'">{{ a.category }}</span>
-          </div>
-          <div class="area-card__body">
-            <div class="area-card__location">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
-              {{ a.location }}
+            <!-- Price badge -->
+            <div class="area-card__price-badge">
+              <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><path d="M5 0L0 5h3v9h4V5h3L5 0z"/></svg>
+              from {{ a.avgPriceSale }}
             </div>
+          </div>
+          <!-- Body -->
+          <div class="area-card__body">
             <h3 class="area-card__name">{{ a.name }}</h3>
             <p class="area-card__desc">{{ a.description }}</p>
-            <div class="area-card__types">
-              <span *ngFor="let t of a.types.slice(0,3)" class="areas-type-tag">{{ t }}</span>
-            </div>
             <div class="area-card__footer">
-              <div class="area-card__stat-pair">
-                <span><strong>{{ a.propertiesForSale }}</strong> For Sale</span>
-                <span><strong>{{ a.propertiesForRent }}</strong> For Rent</span>
-              </div>
-              <span class="area-card__avg">Avg. {{ a.avgPriceSale }}</span>
+              <a [routerLink]="['/areas', a.slug]" class="area-card__btn" (click)="$event.stopPropagation()">
+                <span>{{ a.propertiesForSale + a.propertiesForRent }} PROPERTIES</span>
+                <span class="area-card__btn-icon">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                </span>
+              </a>
             </div>
           </div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Stats Banner ──────────────────────────────────────── -->
-  <section class="areas-stats-banner">
-    <div class="areas-container">
-      <div class="areas-stats-grid">
-        <div class="areas-stat-item">
-          <span class="areas-stat-item__val">60+</span>
-          <span class="areas-stat-item__lbl">Freehold Areas</span>
-        </div>
-        <div class="areas-stat-item">
-          <span class="areas-stat-item__val">200+</span>
-          <span class="areas-stat-item__lbl">Communities</span>
-        </div>
-        <div class="areas-stat-item">
-          <span class="areas-stat-item__val">7–9%</span>
-          <span class="areas-stat-item__lbl">Avg. Rental Yield</span>
-        </div>
-        <div class="areas-stat-item">
-          <span class="areas-stat-item__val">AED 0%</span>
-          <span class="areas-stat-item__lbl">Capital Gains Tax</span>
         </div>
       </div>
     </div>
@@ -166,7 +75,7 @@
   <!-- ── FAQ ──────────────────────────────────────────────── -->
   <section class="areas-faq">
     <div class="areas-container areas-container--narrow">
-      <h2 class="areas-section__title">Frequently Asked Questions</h2>
+      <h2 class="areas-faq__title">FAQ's</h2>
       <div class="areas-faq-list">
         <div *ngFor="let f of faqs; let i = index" class="areas-faq-item" [class.open]="openFaq() === i">
           <button class="areas-faq-q" (click)="toggleFaq(i)">
@@ -186,12 +95,11 @@
     <div class="areas-container">
       <div class="areas-newsletter__card">
         <div class="areas-newsletter__text">
-          <h2>Stay up to date on the Dubai property market</h2>
-          <p>Get area guides, investment reports, and new listing alerts — free in your inbox.</p>
+          <h2>Sign up for our newsletter to stay up to date on the Dubai property market.</h2>
         </div>
         <div class="areas-newsletter__form">
-          <input type="email" placeholder="Your email address" class="areas-newsletter__input" />
-          <button class="areas-newsletter__btn">Subscribe</button>
+          <input type="email" placeholder="Email Address" class="areas-newsletter__input" />
+          <button class="areas-newsletter__btn">SUBSCRIBE</button>
         </div>
       </div>
     </div>

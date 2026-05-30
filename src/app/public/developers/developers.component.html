@@ -1,0 +1,173 @@
+<div class="dev-page">
+
+  <!-- ── Header ─────────────────────────────────────────────── -->
+  <div class="dev-header">
+    <div class="dev-container">
+      <h1 class="dev-header__title">Top Property Developers in Dubai</h1>
+      <p class="dev-header__desc">Explore Dubai's most trusted real estate developers — from Emaar and DAMAC to boutique luxury developers. Find off-plan and ready projects by your preferred developer.</p>
+    </div>
+  </div>
+
+  <!-- ── Filter Bar ─────────────────────────────────────────── -->
+  <div class="dev-filters">
+    <div class="dev-container">
+      <div class="dev-filters__row">
+        <div class="dev-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search developers…"
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            class="dev-search__input" />
+        </div>
+        <div class="dev-pill-row">
+          <button *ngFor="let f of filters" class="dev-pill"
+            [class.dev-pill--active]="activeFilter() === f"
+            (click)="activeFilter.set(f)">{{ f }}</button>
+        </div>
+        <span class="dev-count"><strong>{{ filtered().length }}</strong> Developers</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Featured Strip ────────────────────────────────────── -->
+  <section class="dev-section" *ngIf="searchQuery() === '' && activeFilter() === 'All'">
+    <div class="dev-container">
+      <div class="dev-section__header">
+        <h2 class="dev-section__title">Featured Developers</h2>
+        <p class="dev-section__sub">Dubai's most established and trusted real estate developers</p>
+      </div>
+      <div class="dev-featured-grid">
+        <a *ngFor="let d of featuredDevs()" [routerLink]="['/developers', d.slug]" class="dev-featured-card">
+          <div class="dev-featured-card__logo-wrap">
+            <img [src]="d.logo" [alt]="d.name" class="dev-featured-card__logo" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+            <span class="dev-featured-card__logo-fallback" style="display:none">{{ d.name.charAt(0) }}</span>
+          </div>
+          <div class="dev-featured-card__body">
+            <h3 class="dev-featured-card__name">{{ d.name }}</h3>
+            <p class="dev-featured-card__about">{{ d.about }}</p>
+            <div class="dev-featured-card__stats">
+              <div class="dev-mini-stat">
+                <span class="dev-mini-stat__val">{{ d.projects }}</span>
+                <span class="dev-mini-stat__lbl">Projects</span>
+              </div>
+              <div class="dev-mini-stat">
+                <span class="dev-mini-stat__val">{{ d.deliveredProjects }}</span>
+                <span class="dev-mini-stat__lbl">Delivered</span>
+              </div>
+              <div class="dev-mini-stat">
+                <span class="dev-mini-stat__val">{{ d.established }}</span>
+                <span class="dev-mini-stat__lbl">Est.</span>
+              </div>
+            </div>
+          </div>
+          <div class="dev-featured-card__footer">
+            <span class="dev-featured-card__btn">
+              View Projects
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── All Developers Grid ───────────────────────────────── -->
+  <section class="dev-section dev-section--all">
+    <div class="dev-container">
+      <div class="dev-section__header">
+        <h2 class="dev-section__title">
+          {{ searchQuery() || activeFilter() !== 'All' ? 'Search Results' : 'All Developers' }}
+        </h2>
+      </div>
+
+      <!-- Empty -->
+      <div class="dev-empty" *ngIf="filtered().length === 0">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <p>No developers match your search.</p>
+        <button class="dev-clear-btn" (click)="searchQuery.set(''); activeFilter.set('All')">Clear Filters</button>
+      </div>
+
+      <div class="dev-grid" *ngIf="filtered().length > 0">
+        <a *ngFor="let d of filtered()" [routerLink]="['/developers', d.slug]" class="dev-card">
+          <!-- Logo area -->
+          <div class="dev-card__logo-wrap">
+            <img [src]="d.logo" [alt]="d.name" class="dev-card__logo" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+            <span class="dev-card__logo-fallback" style="display:none">{{ d.name.charAt(0) }}</span>
+          </div>
+          <!-- Info -->
+          <div class="dev-card__body">
+            <h3 class="dev-card__name">{{ d.name }}</h3>
+            <p class="dev-card__about">{{ d.about }}</p>
+          </div>
+          <!-- Stats row -->
+          <div class="dev-card__stats">
+            <div class="dev-card__stat">
+              <span class="dev-card__stat-val">{{ d.projects }}</span>
+              <span class="dev-card__stat-lbl">Projects</span>
+            </div>
+            <div class="dev-card__stat">
+              <span class="dev-card__stat-val">{{ d.deliveredProjects }}</span>
+              <span class="dev-card__stat-lbl">Delivered</span>
+            </div>
+            <div class="dev-card__stat">
+              <span class="dev-card__stat-val">{{ d.established }}</span>
+              <span class="dev-card__stat-lbl">Est.</span>
+            </div>
+          </div>
+          <!-- Footer btn -->
+          <div class="dev-card__footer">
+            <span class="dev-card__btn">
+              {{ d.projects }} Projects
+              <span class="dev-card__btn-icon">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+              </span>
+            </span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats Banner ───────────────────────────────────────── -->
+  <section class="dev-stats-banner">
+    <div class="dev-container">
+      <div class="dev-stats-grid">
+        <div class="dev-stat-item">
+          <span class="dev-stat-item__val">500+</span>
+          <span class="dev-stat-item__lbl">Registered Developers</span>
+        </div>
+        <div class="dev-stat-item">
+          <span class="dev-stat-item__val">2,500+</span>
+          <span class="dev-stat-item__lbl">Off-Plan Projects</span>
+        </div>
+        <div class="dev-stat-item">
+          <span class="dev-stat-item__val">AED 0%</span>
+          <span class="dev-stat-item__lbl">Capital Gains Tax</span>
+        </div>
+        <div class="dev-stat-item">
+          <span class="dev-stat-item__val">RERA</span>
+          <span class="dev-stat-item__lbl">Regulated Market</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Newsletter ────────────────────────────────────────── -->
+  <section class="dev-newsletter">
+    <div class="dev-container">
+      <div class="dev-newsletter__card">
+        <div class="dev-newsletter__text">
+          <h2>Stay updated on new developer launches</h2>
+          <p>Get notified about new off-plan launches, payment plans, and exclusive early-bird deals.</p>
+        </div>
+        <div class="dev-newsletter__form">
+          <input type="email" placeholder="Your email address" class="dev-newsletter__input" />
+          <button class="dev-newsletter__btn">Subscribe</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

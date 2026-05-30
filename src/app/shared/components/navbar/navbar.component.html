@@ -119,8 +119,8 @@
           <a routerLink="/luxury-projects" class="nav-dd-item" (click)="closeMobileMenu()">Luxury Projects</a>
           <a routerLink="/ultra-luxury-projects" class="nav-dd-item" (click)="closeMobileMenu()">Ultra Luxury
             Projects</a>
-          <a routerLink="/branded-residences" class="nav-dd-item"
-            (click)="closeMobileMenu()">Dubai Branded Residences</a>
+          <a routerLink="/branded-residences" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Branded
+            Residences</a>
           <!-- Luxury for Sale flyout -->
           <div class="nav-dd-flyout-wrap">
             <span class="nav-dd-item nav-dd-has-flyout">
@@ -130,14 +130,14 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Apartment',intent:'Buy'}" class="nav-dd-item"
-                (click)="closeMobileMenu()">Apartments</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Villa',intent:'Buy'}" class="nav-dd-item"
-                (click)="closeMobileMenu()">Villas</a>
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Apartment',intent:'Buy'}"
+                class="nav-dd-item" (click)="closeMobileMenu()">Apartments</a>
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Villa',intent:'Buy'}"
+                class="nav-dd-item" (click)="closeMobileMenu()">Villas</a>
               <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Home',intent:'Buy'}" class="nav-dd-item"
                 (click)="closeMobileMenu()">Homes</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Penthouse',intent:'Buy'}" class="nav-dd-item"
-                (click)="closeMobileMenu()">Penthouses</a>
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Penthouse',intent:'Buy'}"
+                class="nav-dd-item" (click)="closeMobileMenu()">Penthouses</a>
             </div>
           </div>
           <!-- Luxury for Rent flyout -->
@@ -151,10 +151,10 @@
             <div class="nav-dd-flyout">
               <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Apartment',intent:'Rent'}"
                 class="nav-dd-item" (click)="closeMobileMenu()">Apartments</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Villa',intent:'Rent'}" class="nav-dd-item"
-                (click)="closeMobileMenu()">Villas</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Home',intent:'Rent'}" class="nav-dd-item"
-                (click)="closeMobileMenu()">Homes</a>
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Villa',intent:'Rent'}"
+                class="nav-dd-item" (click)="closeMobileMenu()">Villas</a>
+              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Home',intent:'Rent'}"
+                class="nav-dd-item" (click)="closeMobileMenu()">Homes</a>
               <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Penthouse',intent:'Rent'}"
                 class="nav-dd-item" (click)="closeMobileMenu()">Penthouses</a>
             </div>
@@ -188,69 +188,6 @@
         <a routerLink="/services" class="nav-link" routerLinkActive="active" (click)="closeMobileMenu()">Services</a>
       </li>
 
-      <!-- Trends dropdown with flyouts -->
-      <li class="nav-item-drop">
-        <button class="nav-link nav-drop-btn">Trends
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        </button>
-        <div class="nav-dropdown">
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Investment Map</a>
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Investment Analysis</a>
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Top Investment Areas</a>
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Projects Map</a>
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">New Developments</a>
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Population Calculator</a>
-          <!-- Projects flyout -->
-          <div class="nav-dd-flyout-wrap">
-            <span class="nav-dd-item nav-dd-has-flyout">
-              Projects
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="m9 18 6-6-6-6" />
-              </svg>
-            </span>
-            <div class="nav-dd-flyout">
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Landmark Towers in Dubai</a>
-              <a routerLink="/off-plan" class="nav-dd-item" (click)="closeMobileMenu()">All Projects</a>
-            </div>
-          </div>
-          <!-- Market Performance flyout -->
-          <div class="nav-dd-flyout-wrap">
-            <span class="nav-dd-item nav-dd-has-flyout">
-              Market Performance
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="m9 18 6-6-6-6" />
-              </svg>
-            </span>
-            <div class="nav-dd-flyout">
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Market Performance</a>
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Property Price in 2026</a>
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Property Price Index</a>
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Market in Numbers</a>
-            </div>
-          </div>
-          <!-- Transactions & Supply flyout -->
-          <div class="nav-dd-flyout-wrap">
-            <span class="nav-dd-item nav-dd-has-flyout">
-              Transactions &amp; Supply
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="m9 18 6-6-6-6" />
-              </svg>
-            </span>
-            <div class="nav-dd-flyout">
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Projects Sales Transactions</a>
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Sold Properties</a>
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Property Supply</a>
-              <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Projects Status</a>
-            </div>
-          </div>
-          <div class="nav-dd-divider"></div>
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Monthly Market Updates</a>
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Quarterly Market Updates</a>
-        </div>
-      </li>
-
       <!-- Explore dropdown -->
       <li class="nav-item-drop">
         <button class="nav-link nav-drop-btn">Explore
@@ -260,7 +197,7 @@
         </button>
         <div class="nav-dropdown">
           <a routerLink="/areas" class="nav-dd-item" (click)="closeMobileMenu()">Areas</a>
-          <a routerLink="/guides" class="nav-dd-item" (click)="closeMobileMenu()">Developers</a>
+          <a routerLink="/developers" class="nav-dd-item" (click)="closeMobileMenu()">Developers</a>
         </div>
       </li>
 
@@ -297,7 +234,8 @@
 
     <!-- Desktop Actions -->
     <div class="nav-actions">
-      <a routerLink="/" fragment="business-associates" class="btn-associates" [class.btn-associates--dark]="navbarWhite()">
+      <a routerLink="/" fragment="business-associates" class="btn-associates"
+        [class.btn-associates--dark]="navbarWhite()">
         Our Business Associates
       </a>
       @if (auth.isLoggedIn() && !auth.isAdmin() && !auth.isAgent()) {

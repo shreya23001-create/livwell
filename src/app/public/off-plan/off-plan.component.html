@@ -70,7 +70,7 @@
     </div>
 
     <div class="op-grid">
-      <article *ngFor="let p of filteredProjects()" class="op-card" [routerLink]="['/off-plan', p.id]">
+      <article *ngFor="let p of filteredProjects()" class="op-card" [routerLink]="['/off-plan', p.slug]">
         <div class="op-card-img-wrap">
           <img [src]="p.image" [alt]="p.title" class="op-card-img" loading="lazy">
           <div class="op-card-badges">

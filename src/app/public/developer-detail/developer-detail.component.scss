@@ -1,0 +1,97 @@
+$gold: #c8a84b;
+$dark: #1a1a2e;
+$green: #1a5c3a;
+$text: #111827;
+$muted: #6b7280;
+$border: #e5e7eb;
+$bg: #f9fafb;
+$white: #fff;
+
+.dd-page { background: $bg; min-height: 100vh; padding-top: 68px; }
+.dd-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+// ── Breadcrumb ────────────────────────────────────────────────
+.dd-breadcrumb { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 0; display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: $muted; }
+.dd-bc-link { color: $muted; text-decoration: none; display: flex; align-items: center; &:hover { color: $gold; } }
+.dd-bc-sep { font-size: 1rem; }
+.dd-bc-current { color: $text; font-weight: 500; }
+
+// ── Hero ──────────────────────────────────────────────────────
+.dd-hero { background: $white; border-bottom: 1px solid $border; padding: 1.75rem 0; margin-top: 0.75rem; }
+.dd-hero__inner { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+.dd-hero__logo-wrap { width: 140px; height: 80px; display: flex; align-items: center; justify-content: center; background: $bg; border: 1px solid $border; border-radius: 12px; padding: 1rem; flex-shrink: 0; }
+.dd-hero__logo { max-width: 110px; max-height: 55px; object-fit: contain; }
+.dd-hero__logo-fallback { width: 60px; height: 60px; border-radius: 50%; background: $dark; color: $white; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.dd-hero__name { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 700; color: $text; font-family: Georgia, serif; margin: 0 0 0.6rem; }
+.dd-hero__meta { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.dd-meta-tag { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; font-weight: 500; color: $muted; background: $bg; border: 1px solid $border; border-radius: 100px; padding: 0.2rem 0.7rem; &--green { color: #16a34a; background: #dcfce7; border-color: #bbf7d0; } }
+
+// ── KPI Bar ───────────────────────────────────────────────────
+.dd-kpi-bar { background: $white; border-bottom: 1px solid $border; padding: 1.5rem 0; }
+.dd-kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; @media(max-width:900px){ grid-template-columns: repeat(3, 1fr); } @media(max-width:600px){ grid-template-columns: repeat(2, 1fr); } }
+.dd-kpi { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1.5rem; border-right: 1px solid $border; &:last-child { border-right: none; } @media(max-width:900px){ border-right: 1px solid $border; border-bottom: 1px solid $border; } }
+.dd-kpi__icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dd-kpi__lbl { font-size: 0.72rem; color: $muted; margin: 0 0 0.2rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.dd-kpi__val { font-size: 1.3rem; font-weight: 700; color: $text; margin: 0; line-height: 1; }
+
+// ── Layout ───────────────────────────────────────────────────
+.dd-layout { display: grid; grid-template-columns: 1fr 300px; gap: 2rem; padding: 2rem 0 4rem; @media(max-width:1024px){ grid-template-columns: 1fr; } }
+
+// ── Sections ─────────────────────────────────────────────────
+.dd-section { margin-bottom: 2.75rem; }
+.dd-section-title { font-size: 1.15rem; font-weight: 700; color: $text; margin: 0 0 1rem; padding-bottom: 0.625rem; border-bottom: 2px solid $gold; display: inline-block; }
+.dd-about { font-size: 0.9rem; color: $muted; line-height: 1.75; margin: 0 0 0.75rem; }
+
+.dd-highlights { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem;
+  li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.88rem; color: $text; svg { color: $green; flex-shrink: 0; margin-top: 2px; } }
+}
+
+// ── Project Cards ─────────────────────────────────────────────
+.dd-projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; @media(max-width:700px){ grid-template-columns: 1fr; } }
+
+.dd-proj-card {
+  background: $white; border: 1px solid $border; border-radius: 12px; overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  &:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.1); transform: translateY(-2px); }
+
+  &__img-wrap { position: relative; height: 180px; overflow: hidden; }
+  &__img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s; .dd-proj-card:hover & { transform: scale(1.04); } }
+
+  &__status { position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: 700; padding: 0.22rem 0.65rem; border-radius: 100px;
+    &.st--ready { background: rgba(16,185,129,0.12); color: #059669; border: 1px solid rgba(16,185,129,0.3); }
+    &.st--offplan { background: rgba($gold,0.12); color: #92660a; border: 1px solid rgba($gold,0.35); }
+    &.st--construction { background: rgba(99,102,241,0.1); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); }
+  }
+
+  &__handover { position: absolute; bottom: 0; left: 0; background: rgba($dark,0.75); color: $white; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.65rem; }
+
+  &__body { padding: 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+  &__type { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: $muted; }
+  &__name { font-size: 0.95rem; font-weight: 700; color: $text; margin: 0; line-height: 1.25; }
+  &__loc { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: $muted; svg { color: $gold; } }
+  &__specs { display: flex; gap: 0.75rem; font-size: 0.75rem; color: $muted; padding: 0.4rem 0; border-top: 1px solid $border; border-bottom: 1px solid $border; span { &::before { content: '• '; } &:first-child::before { content: ''; } } }
+  &__price { font-size: 1rem; font-weight: 700; color: $green; }
+
+  &__btn { display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.25rem; font-size: 0.8rem; font-weight: 600; color: $dark; text-decoration: none; border: 1.5px solid $dark; padding: 0.4rem 1rem; border-radius: 6px; transition: background 0.18s, color 0.18s; &:hover { background: $dark; color: $white; } }
+}
+
+// ── Awards ───────────────────────────────────────────────────
+.dd-awards-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+.dd-award-item { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.88rem; color: $text; padding: 0.875rem 1rem; background: $white; border: 1px solid $border; border-radius: 10px; svg { color: $gold; flex-shrink: 0; margin-top: 1px; } }
+
+// ── Sidebar ──────────────────────────────────────────────────
+.dd-sidebar { display: flex; flex-direction: column; gap: 1.25rem; padding-top: 2rem; }
+
+.dd-facts-card { background: $white; border: 1px solid $border; border-radius: 12px; padding: 1.25rem; }
+.dd-facts-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: $muted; margin: 0 0 1rem; }
+.dd-fact-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid $border; font-size: 0.82rem; &:last-child { border-bottom: none; } span { color: $muted; } strong { color: $text; } }
+
+.dd-cta-card { background: $dark; border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.875rem; h3 { font-size: 1rem; font-weight: 700; color: $white; margin: 0; } p { font-size: 0.82rem; color: rgba($white,0.7); margin: 0; } }
+.dd-cta-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.7rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: opacity 0.18s;
+  &--wa { background: #25d366; color: $white; &:hover { opacity: 0.88; } }
+  &--outline { background: transparent; color: $white; border: 1.5px solid rgba($white,0.4); &:hover { border-color: $white; } }
+}
+
+.dd-all-projects-link { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; background: $white; border: 1px solid $border; border-radius: 12px; text-decoration: none; color: $text; font-size: 0.85rem; font-weight: 600; transition: border-color 0.18s, box-shadow 0.18s; svg:first-child { color: $gold; flex-shrink: 0; } &:hover { border-color: $gold; box-shadow: 0 4px 16px rgba(0,0,0,0.07); } }
+
+.dd-not-found { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 8rem 1rem; text-align: center; h2 { font-size: 1.5rem; font-weight: 700; color: $text; } p { color: $muted; } }

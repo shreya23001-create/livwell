@@ -1,0 +1,205 @@
+<div class="ard-page" *ngIf="area() as a; else notFoundTpl">
+
+  <!-- ── Breadcrumb ─────────────────────────────────────── -->
+  <div class="ard-breadcrumb">
+    <a routerLink="/" class="ard-bc-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </a>
+    <span class="ard-bc-sep">›</span>
+    <a routerLink="/areas" class="ard-bc-link">Areas</a>
+    <span class="ard-bc-sep">›</span>
+    <span class="ard-bc-current">{{ a.name }}</span>
+  </div>
+
+  <!-- ── Hero Gallery ───────────────────────────────────── -->
+  <div class="ard-gallery">
+    <div class="ard-gallery__main">
+      <img [src]="a.images[activeImage()]" [alt]="a.name" class="ard-gallery__img" />
+      <button class="ard-gallery__nav ard-gallery__nav--prev" (click)="prevImage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="ard-gallery__nav ard-gallery__nav--next" (click)="nextImage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <span class="ard-gallery__counter">{{ activeImage() + 1 }} / {{ a.images.length }}</span>
+    </div>
+    <div class="ard-gallery__thumbs">
+      <img *ngFor="let img of a.images; let i = index" [src]="img" [alt]="a.name"
+        class="ard-gallery__thumb" [class.active]="activeImage() === i" (click)="activeImage.set(i)" />
+    </div>
+  </div>
+
+  <!-- ── Main Content ───────────────────────────────────── -->
+  <div class="ard-container">
+    <div class="ard-layout">
+
+      <!-- Left Column -->
+      <div class="ard-main">
+
+        <!-- Title -->
+        <div class="ard-title-block">
+          <div class="ard-cat-badge" [class.fh]="a.category === 'Freehold'">{{ a.category }}</div>
+          <h1 class="ard-title">Buy and rent properties in {{ a.name }}</h1>
+          <div class="ard-location">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+            {{ a.location }}, Dubai
+          </div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="ard-stats-bar">
+          <div class="ard-stat">
+            <span class="ard-stat__val">{{ a.propertiesForSale }}</span>
+            <span class="ard-stat__lbl">For Sale</span>
+          </div>
+          <div class="ard-stat">
+            <span class="ard-stat__val">{{ a.propertiesForRent }}</span>
+            <span class="ard-stat__lbl">For Rent</span>
+          </div>
+          <div class="ard-stat">
+            <span class="ard-stat__val">{{ a.avgPriceSale }}</span>
+            <span class="ard-stat__lbl">Avg. Sale Price</span>
+          </div>
+          <div class="ard-stat">
+            <span class="ard-stat__val">{{ a.avgPriceRent }}</span>
+            <span class="ard-stat__lbl">Avg. Rent/yr</span>
+          </div>
+          <div class="ard-stat">
+            <span class="ard-stat__val">{{ a.avgRoi }}</span>
+            <span class="ard-stat__lbl">Avg. ROI</span>
+          </div>
+        </div>
+
+        <!-- Type tags -->
+        <div class="ard-types">
+          <span *ngFor="let t of a.types" class="ard-type-tag">{{ t }}</span>
+        </div>
+
+        <!-- About -->
+        <div class="ard-section">
+          <h2 class="ard-section-title">About {{ a.name }}</h2>
+          <p class="ard-about" *ngFor="let para of a.about.split('\n\n')">{{ para }}</p>
+        </div>
+
+        <!-- Why Invest -->
+        <div class="ard-section">
+          <h2 class="ard-section-title">Why Invest in {{ a.name }}</h2>
+          <ul class="ard-bullet-list">
+            <li *ngFor="let w of a.whyInvest">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+              {{ w }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Lifestyle -->
+        <div class="ard-section">
+          <h2 class="ard-section-title">{{ a.name }} Lifestyle</h2>
+          <div class="ard-lifestyle-grid">
+            <div *ngFor="let l of a.lifestyle" class="ard-lifestyle-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              {{ l }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Properties CTA -->
+        <div class="ard-section">
+          <div class="ard-cta-row">
+            <a [routerLink]="['/properties']" [queryParams]="{area: a.name, status: 'Sale'}" class="ard-cta-btn ard-cta-btn--primary">
+              Properties for Sale
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a [routerLink]="['/properties']" [queryParams]="{area: a.name, status: 'Rent'}" class="ard-cta-btn ard-cta-btn--outline">
+              Properties for Rent
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="ard-section">
+          <h2 class="ard-section-title">FAQs</h2>
+          <div class="ard-faq-list">
+            <div *ngFor="let f of a.faqs; let i = index" class="ard-faq-item" [class.open]="openFaq() === i">
+              <button class="ard-faq-q" (click)="toggleFaq(i)">
+                {{ f.q }}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="ard-faq-a" *ngIf="openFaq() === i"><p>{{ f.a }}</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div class="ard-section">
+          <h2 class="ard-section-title">Location</h2>
+          <div class="ard-map-wrap">
+            <iframe [src]="safeUrl(a.mapUrl)" class="ard-map" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="ard-sidebar">
+
+        <!-- Area Specialists -->
+        <div class="ard-agent-card">
+          <h3 class="ard-agent-card__title">{{ a.name }} Specialists</h3>
+          <div class="ard-agent">
+            <img [src]="a.agent.avatar" [alt]="a.agent.name" class="ard-agent__av" />
+            <div>
+              <p class="ard-agent__name">{{ a.agent.name }}</p>
+              <p class="ard-agent__role">{{ a.agent.role }}</p>
+            </div>
+          </div>
+          <div class="ard-agent__btns">
+            <a [href]="'tel:' + a.agent.phone" class="ard-agent-btn ard-agent-btn--call">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.18 2 2 0 0 1 3.64 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.97-.97a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Call
+            </a>
+            <a [href]="'https://wa.me/' + a.agent.phone.replace('+','') + '?text=I am interested in properties in ' + a.name"
+               target="_blank" rel="noopener" class="ard-agent-btn ard-agent-btn--wa">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Facts -->
+        <div class="ard-facts-card">
+          <h3 class="ard-facts-title">Quick Facts</h3>
+          <div class="ard-fact-row"><span>Ownership</span><strong>{{ a.category }}</strong></div>
+          <div class="ard-fact-row"><span>Avg. Sale Price</span><strong>{{ a.avgPriceSale }}</strong></div>
+          <div class="ard-fact-row"><span>Avg. Rent/yr</span><strong>{{ a.avgPriceRent }}</strong></div>
+          <div class="ard-fact-row"><span>Avg. ROI</span><strong>{{ a.avgRoi }}</strong></div>
+          <div class="ard-fact-row"><span>Properties for Sale</span><strong>{{ a.propertiesForSale }}</strong></div>
+          <div class="ard-fact-row"><span>Properties for Rent</span><strong>{{ a.propertiesForRent }}</strong></div>
+          <div class="ard-fact-row" *ngFor="let t of a.types"><span>Type</span><strong>{{ t }}</strong></div>
+        </div>
+
+        <!-- Nearby Areas -->
+        <div class="ard-nearby-card" *ngIf="a.nearbyAreas.length > 0">
+          <h3 class="ard-facts-title">Nearby Areas</h3>
+          <div class="ard-nearby-list">
+            <a *ngFor="let n of a.nearbyAreas" [routerLink]="['/areas', n.toLowerCase().replace(/ /g, '-')]" class="ard-nearby-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+              {{ n }}
+            </a>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #notFoundTpl>
+  <div class="ard-not-found">
+    <h2>Area not found</h2>
+    <p>This area guide does not exist yet.</p>
+    <a routerLink="/areas" class="ard-cta-btn ard-cta-btn--primary">Browse All Areas</a>
+  </div>
+</ng-template>

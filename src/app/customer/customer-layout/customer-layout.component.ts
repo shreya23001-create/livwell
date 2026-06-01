@@ -32,7 +32,7 @@ export class CustomerLayoutComponent {
   toggleMenu(): void { this.menuOpen.update(v => !v); }
   closeMenu(): void  { this.menuOpen.set(false); }
 
-  logout(): void { this.auth.logout(); }
+  logout(): void { this.auth.logout().catch(() => {}); }
 
   initials(): string {
     const name = this.auth.currentUser()?.name ?? '';

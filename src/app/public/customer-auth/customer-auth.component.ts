@@ -97,7 +97,7 @@ export class CustomerAuthComponent {
     this.attemptsLeft.set(null);
   }
 
-  submitSignIn(): void {
+  async submitSignIn(): Promise<void> {
     const errs: Record<string, string> = {};
     const { email, password } = this.signInForm;
     if (!email.trim()) errs['email'] = 'Email is required.';
@@ -110,34 +110,33 @@ export class CustomerAuthComponent {
     this.signInServerError.set('');
     this.attemptsLeft.set(null);
 
-    setTimeout(() => {
-      const result = this.auth.login(this.signInForm.email, this.signInForm.password);
-      this.loading.set(false);
+    const result = await this.auth.login(this.signInForm.email, this.signInForm.password);
+    this.loading.set(false);
 
-      if (result.success) {
-        const user = this.auth.currentUser();
-        if (user) this.auth.redirectByRole(user.role);
-      } else {
-        switch (result.error) {
-          case 'invalid_credentials':
-            if (result.attemptsLeft !== undefined && result.attemptsLeft <= 2) this.attemptsLeft.set(result.attemptsLeft);
-            this.signInServerError.set('Invalid email or password.');
-            break;
-          case 'account_locked':
-            this.signInServerError.set('Account locked after too many failed attempts. Try again in 30 minutes.');
-            break;
-          case 'account_suspended':
-            this.signInServerError.set('Your account has been suspended. Please contact support.');
-            break;
-          case 'pending_verification':
-            this.signInServerError.set('Please verify your email before signing in.');
-            break;
-        }
+    if (result.success) {
+      const user = this.auth.currentUser();
+      if (user) this.auth.redirectByRole(user.role);
+    } else {
+      switch (result.error) {
+        case 'invalid_credentials':
+          this.signInServerError.set('Invalid email or password.');
+          break;
+        case 'account_locked':
+          this.signInServerError.set('Account locked. Try again later.');
+          break;
+        case 'account_suspended':
+          this.signInServerError.set('Your account has been suspended. Please contact support.');
+          break;
+        case 'pending_verification':
+          this.signInServerError.set('Please verify your email before signing in.');
+          break;
+        default:
+          this.signInServerError.set('Something went wrong. Please try again.');
       }
-    }, 600);
+    }
   }
 
-  submitSignUp(): void {
+  async submitSignUp(): Promise<void> {
     const errs: Record<string, string> = {};
     const { name, email, phone, password, confirmPassword, agreePolicy } = this.signUpForm;
 
@@ -166,17 +165,18 @@ export class CustomerAuthComponent {
     this.loading.set(true);
     this.signUpServerError.set('');
 
-    setTimeout(() => {
-      const result = this.auth.register(name, email, phone, password);
-      this.loading.set(false);
+    const result = await this.auth.register(name, email, phone, password);
+    this.loading.set(false);
 
-      if (result.success) {
-        const user = this.auth.currentUser();
-        if (user) this.auth.redirectByRole(user.role);
-      } else if (result.error === 'email_exists') {
-        this.signUpErrors.update(e => ({ ...e, email: 'An account with this email already exists.' }));
-      }
-    }, 700);
+    if (result.success) {
+      const user = this.auth.currentUser();
+      if (user) this.auth.redirectByRole(user.role);
+      else this.signUpServerError.set('Account created! Please check your email to verify.');
+    } else if (result.error === 'email_exists') {
+      this.signUpErrors.update(e => ({ ...e, email: 'An account with this email already exists.' }));
+    } else {
+      this.signUpServerError.set('Something went wrong. Please try again.');
+    }
   }
 
   clearSignInError(field: string): void {

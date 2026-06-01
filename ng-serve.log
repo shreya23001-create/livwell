@@ -1,0 +1,308 @@
+[33m>[39m Building...
+[32m√[39m Building...
+Application bundle generation failed. [8.807 seconds] - 2026-05-29T08:18:19.371Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of CareersComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/public/careers/careers.component.ts:36:26:
+[37m      36 │   imports: [CommonModule, [32mRouterLink[37m, FormsModule, NewsletterSecti...
+         ╵                           [32m~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of FaqComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/public/faq/faq.component.ts:20:26:
+[37m      20 │   imports: [CommonModule, [32mRouterLink[37m, NewsletterSectionComponent, ...
+         ╵                           [32m~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/blog/blog.component.scss:263:24:
+[37m      263 │   &:hover { background: [32m[37mlighten($gold, 8%); }
+          ╵                         [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/blog/blog.component.scss:263:24:
+[37m      263 │   &:hover { background: [32m[37mlighten($gold, 8%); }
+          ╵                         [32m^[0m
+
+
+  lighten() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: 17.3617021277%)
+  color.adjust($color, $lightness: 8%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/careers/careers.component.scss:89:24:
+[37m      89 │   &:hover { background: [32m[37mdarken($gold, 8%); transform: translateY(-...
+         ╵                         [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/careers/careers.component.scss:89:24:
+[37m      89 │   &:hover { background: [32m[37mdarken($gold, 8%); transform: translateY(-...
+         ╵                         [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -14.8363636364%)
+  color.adjust($color, $lightness: -8%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/commercial-properties/commercial-properties.component.scss:71:315:
+[37m      71 │ ...ground: rgba($gold,0.1); color: [32m[37mdarken($gold,10%); border: 1px ...
+         ╵                                    [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/commercial-properties/commercial-properties.component.scss:71:315:
+[37m      71 │ ...ground: rgba($gold,0.1); color: [32m[37mdarken($gold,10%); border: 1px ...
+         ╵                                    [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -18.5454545455%)
+  color.adjust($color, $lightness: -10%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/commercial-property-detail/commercial-property-detail.component.scss:22:315:
+[37m      22 │ ...ground: rgba($gold,0.1); color: [32m[37mdarken($gold,10%); border: 1px ...
+         ╵                                    [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/commercial-property-detail/commercial-property-detail.component.scss:22:315:
+[37m      22 │ ...ground: rgba($gold,0.1); color: [32m[37mdarken($gold,10%); border: 1px ...
+         ╵                                    [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -18.5454545455%)
+  color.adjust($color, $lightness: -10%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/luxury-properties-for-sale/luxury-properties-for-sale.component.scss:566:11:
+[37m      566 │     color: [32m[37mdarken($gold, 10%);
+          ╵            [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/luxury-properties-for-sale/luxury-properties-for-sale.component.scss:566:11:
+[37m      566 │     color: [32m[37mdarken($gold, 10%);
+          ╵            [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -18.5454545455%)
+  color.adjust($color, $lightness: -10%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/news/news.component.scss:284:24:
+[37m      284 │   &:hover { background: [32m[37mdarken($red, 8%); }
+          ╵                         [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/news/news.component.scss:284:24:
+[37m      284 │   &:hover { background: [32m[37mdarken($red, 8%); }
+          ╵                         [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -15.9375%)
+  color.adjust($color, $lightness: -8%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/why-invest/why-invest.component.scss:403:18:
+[37m      403 │       background: [32m[37mdarken($gold, 8%);
+          ╵                   [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/why-invest/why-invest.component.scss:403:18:
+[37m      403 │       background: [32m[37mdarken($gold, 8%);
+          ╵                   [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -14.8363636364%)
+  color.adjust($color, $lightness: -8%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1137: Expression or comma expected.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/public/commercial-property-detail/commercial-property-detail.component.ts:171:0:
+[37m      171 │ [32m}[37m;
+          ╵ [32m^[0m
+
+[39m[22m
+Watch mode enabled. Watching for file changes...
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m                               [2m | [22m [1mRaw size[22m
+[32mstyles.css[39m         [2m | [22m[2mstyles[22m                              [2m | [22m [36m25.52 kB[39m[2m | [22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m                                [2m | [22m [36m11.46 kB[39m[2m | [22m
+[32mchunk-P5YZPY4R.js[39m  [2m | [22m[2m-[22m                                   [2m | [22m  [36m8.87 kB[39m[2m | [22m
+[32mchunk-653SOEEV.js[39m  [2m | [22m[2m-[22m                                   [2m | [22m  [36m1.51 kB[39m[2m | [22m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m                       [2m | [22m [1m47.37 kB[22m
+
+[1mLazy chunk files[22m   [2m | [22m[1mNames[22m                               [2m | [22m [1mRaw size[22m
+[32mchunk-AHFZTZA4.js[39m  [2m | [22m[2mhome-component[22m                      [2m | [22m[36m277.45 kB[39m[2m | [22m
+[32mchunk-J6CTRNEI.js[39m  [2m | [22m[2mproperties-component[22m                [2m | [22m[36m222.64 kB[39m[2m | [22m
+[32mchunk-PBF46VRC.js[39m  [2m | [22m[2mproperty-detail-component[22m           [2m | [22m[36m167.23 kB[39m[2m | [22m
+[32mchunk-JOQECIEA.js[39m  [2m | [22m[2mluxury-property-detail-component[22m    [2m | [22m[36m161.21 kB[39m[2m | [22m
+[32mchunk-K3THBRZD.js[39m  [2m | [22m[2moff-plan-detail-component[22m           [2m | [22m[36m156.67 kB[39m[2m | [22m
+[32mchunk-VYOXQ3CZ.js[39m  [2m | [22m[2mcustomer-auth-component[22m             [2m | [22m[36m141.10 kB[39m[2m | [22m
+[32mchunk-OLYIWPLB.js[39m  [2m | [22m[2mluxury-properties-for-sale-component[22m[2m | [22m[36m130.71 kB[39m[2m | [22m
+[32mchunk-MEDFZYVI.js[39m  [2m | [22m[2mcommercial-properties-component[22m     [2m | [22m[36m123.39 kB[39m[2m | [22m
+[32mchunk-4UZT6RLE.js[39m  [2m | [22m[2mnavbar-component[22m                    [2m | [22m[36m122.36 kB[39m[2m | [22m
+[32mchunk-WFWD3Z6A.js[39m  [2m | [22m[2madmin-properties-component[22m          [2m | [22m[36m120.42 kB[39m[2m | [22m
+[32mchunk-K37YHJ4C.js[39m  [2m | [22m[2madmin-cms-component[22m                 [2m | [22m[36m110.20 kB[39m[2m | [22m
+[32mchunk-VQIQQF3L.js[39m  [2m | [22m[2mbranded-residence-detail-component[22m  [2m | [22m[36m108.41 kB[39m[2m | [22m
+[32mchunk-OMA4QBAM.js[39m  [2m | [22m[2magent-profile-component[22m             [2m | [22m[36m104.56 kB[39m[2m | [22m
+[32mchunk-KLGU5AQE.js[39m  [2m | [22m[2madmin-leads-component[22m               [2m | [22m[36m100.82 kB[39m[2m | [22m
+[32mchunk-AAYXXTYP.js[39m  [2m | [22m[2mauth-component[22m                      [2m | [22m[36m100.57 kB[39m[2m | [22m
+[2m...and 36 more lazy chunks files. Use "--verbose" to show all the files.[22m
+
+Application bundle generation complete. [9.120 seconds] - 2026-05-29T08:20:24.868Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of CareersComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/public/careers/careers.component.ts:36:26:
+[37m      36 │   imports: [CommonModule, [32mRouterLink[37m, FormsModule, NewsletterSecti...
+         ╵                           [32m~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of FaqComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/public/faq/faq.component.ts:20:26:
+[37m      20 │   imports: [CommonModule, [32mRouterLink[37m, NewsletterSectionComponent, ...
+         ╵                           [32m~~~~~~~~~~[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/commercial-property-detail/commercial-property-detail.component.scss:22:315:
+[37m      22 │ ...ground: rgba($gold,0.1); color: [32m[37mdarken($gold,10%); border: 1px ...
+         ╵                                    [32m^[0m
+
+
+  Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+  Use color.adjust instead.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/public/commercial-property-detail/commercial-property-detail.component.scss:22:315:
+[37m      22 │ ...ground: rgba($gold,0.1); color: [32m[37mdarken($gold,10%); border: 1px ...
+         ╵                                    [32m^[0m
+
+
+  darken() is deprecated. Suggestions:
+  
+  color.scale($color, $lightness: -18.5454545455%)
+  color.adjust($color, $lightness: -10%)
+  
+  More info: [4mhttps://sass-lang.com/d/color-functions[0m
+
+[39m[22m
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+[1m[31mAn unhandled exception occurred: Port 4200 is already in use
+See "C:\Users\yshre\AppData\Local\Temp\ng-H9L1tb\angular-errors.log" for further details.[39m[22m
+D:\Projects\AI projects\livWell\engineering-app\node_modules\rxjs\dist\cjs\internal\util\reportUnhandledError.js:13
+            throw err;
+            ^
+
+Error: Port 4200 is already in use
+    at Server.onError$1 (file:///D:/Projects/AI%20projects/livWell/engineering-app/node_modules/vite/dist/node/chunks/config.js:14933:28)
+    at Server.emit (node:events:519:28)
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+
+Node.js v22.22.3

@@ -68,7 +68,7 @@ export class AuthComponent {
     });
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     const errs: Record<string, string> = {};
     if (!this.form.email.trim()) errs['email'] = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) errs['email'] = 'Enter a valid email.';
@@ -80,28 +80,27 @@ export class AuthComponent {
     this.serverError.set('');
     this.attemptsLeft.set(null);
 
-    setTimeout(() => {
-      const result = this.auth.login(this.form.email, this.form.password);
-      this.loading.set(false);
+    const result = await this.auth.login(this.form.email, this.form.password);
+    this.loading.set(false);
 
-      if (result.success) {
-        const user = this.auth.currentUser();
-        if (user) this.auth.redirectByRole(user.role);
-      } else {
-        switch (result.error) {
-          case 'invalid_credentials':
-            if (result.attemptsLeft !== undefined && result.attemptsLeft <= 2) this.attemptsLeft.set(result.attemptsLeft);
-            this.serverError.set('Invalid email or password.');
-            break;
-          case 'account_locked':
-            this.serverError.set('Account locked after too many failed attempts. Try again in 30 minutes.');
-            break;
-          case 'account_suspended':
-            this.serverError.set('Your account has been suspended. Please contact support.');
-            break;
-        }
+    if (result.success) {
+      const user = this.auth.currentUser();
+      if (user) this.auth.redirectByRole(user.role);
+    } else {
+      switch (result.error) {
+        case 'invalid_credentials':
+          this.serverError.set('Invalid email or password.');
+          break;
+        case 'account_locked':
+          this.serverError.set('Account locked. Try again later.');
+          break;
+        case 'account_suspended':
+          this.serverError.set('Your account has been suspended. Please contact support.');
+          break;
+        default:
+          this.serverError.set('Something went wrong. Please try again.');
       }
-    }, 600);
+    }
   }
 
   clearError(field: string): void {

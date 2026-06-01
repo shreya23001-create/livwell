@@ -1,61 +1,105 @@
 <div class="cust-shell">
 
-  <!-- Top navbar -->
-  <header class="cust-nav">
-    <div class="cust-nav-inner">
-      <!-- Brand -->
+  <!-- ── Top Header ── -->
+  <header class="cust-header">
+    <div class="cust-header-inner">
       <a routerLink="/" class="cust-brand">
         <span class="cust-brand-logo">LW</span>
         <span class="cust-brand-name">Livwell</span>
       </a>
-
-      <!-- Desktop nav links -->
-      <nav class="cust-nav-links">
-        @for (item of navItems; track item.route) {
-          <a [routerLink]="item.route" routerLinkActive="active" class="cust-nav-link">
-            {{ item.label }}
-          </a>
-        }
-      </nav>
-
-      <!-- Right side -->
-      <div class="cust-nav-right">
+      <div class="cust-header-right">
         <div class="cust-user-pill">
           <div class="cust-avatar">{{ initials() }}</div>
           <span class="cust-user-name">{{ auth.currentUser()?.name }}</span>
         </div>
         <button class="cust-logout-btn" (click)="logout()" title="Sign out">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
           </svg>
         </button>
-
-        <!-- Mobile hamburger -->
         <button class="cust-hamburger" (click)="toggleMenu()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
       </div>
     </div>
-
-    <!-- Mobile drawer -->
-    @if (menuOpen()) {
-      <div class="cust-mobile-menu" (click)="closeMenu()">
-        @for (item of navItems; track item.route) {
-          <a [routerLink]="item.route" routerLinkActive="active" class="cust-mobile-link">
-            {{ item.label }}
-          </a>
-        }
-        <button class="cust-mobile-logout" (click)="logout()">Sign Out</button>
-      </div>
-    }
   </header>
 
-  <!-- Page content -->
-  <main class="cust-main">
-    <router-outlet />
-  </main>
+  <!-- ── Body ── -->
+  <div class="cust-body">
+
+    <!-- Sidebar -->
+    <aside class="cust-sidebar" [class.open]="menuOpen()">
+      <nav class="cust-sidenav">
+        @for (item of navItems; track item.route) {
+          <a [routerLink]="item.route" routerLinkActive="active" class="cust-side-link" (click)="closeMenu()">
+            <span class="cust-side-icon">
+              @if (item.icon === 'grid') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              }
+              @if (item.icon === 'heart') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              }
+              @if (item.icon === 'mail') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              }
+              @if (item.icon === 'shortlist') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 12 2 2 4-4"/></svg>
+              }
+              @if (item.icon === 'tag') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              }
+              @if (item.icon === 'bell') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              }
+              @if (item.icon === 'tracker') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+              }
+              @if (item.icon === 'calendar') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              }
+              @if (item.icon === 'star') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              }
+              @if (item.icon === 'user') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              }
+              @if (item.icon === 'lock') {
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              }
+            </span>
+            <span class="cust-side-label">{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+
+      <div class="cust-sidebar-footer">
+        <div class="cust-sidebar-user">
+          <div class="cust-sidebar-avatar">{{ initials() }}</div>
+          <div>
+            <div class="cust-sidebar-name">{{ auth.currentUser()?.name }}</div>
+            <div class="cust-sidebar-role">Customer</div>
+          </div>
+        </div>
+        <button class="cust-sidebar-logout" (click)="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    @if (menuOpen()) {
+      <div class="cust-overlay" (click)="closeMenu()"></div>
+    }
+
+    <!-- Main content -->
+    <main class="cust-main">
+      <router-outlet />
+    </main>
+
+  </div>
 
   <!-- Footer -->
   <footer class="cust-footer">

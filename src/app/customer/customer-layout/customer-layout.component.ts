@@ -14,10 +14,17 @@ export class CustomerLayoutComponent {
   menuOpen = signal(false);
 
   readonly navItems = [
-    { route: '/my/dashboard',   label: 'Dashboard',           icon: 'grid' },
-    { route: '/my/properties',  label: 'Saved Properties',    icon: 'heart' },
-    { route: '/my/enquiries',   label: 'My Enquiries',        icon: 'mail' },
-    { route: '/my/profile',     label: 'Profile & Settings',  icon: 'user' },
+    { route: '/my/dashboard',       label: 'Dashboard',             icon: 'grid' },
+    { route: '/my/properties',      label: 'Saved Properties',      icon: 'heart' },
+    { route: '/my/enquiries',       label: 'My Enquiries',          icon: 'mail' },
+    { route: '/my/shortlist',       label: 'My Shortlist',          icon: 'shortlist' },
+    { route: '/my/followed-prices', label: 'My Followed Prices',    icon: 'tag' },
+    { route: '/my/notifications',   label: 'Notifications',         icon: 'bell' },
+    { route: '/my/value-tracker',   label: 'Property Value Tracker',icon: 'tracker' },
+    { route: '/my/future-interest', label: 'Future Interest',       icon: 'calendar' },
+    { route: '/my/ratings',         label: 'My Project Ratings',    icon: 'star' },
+    { route: '/my/profile',         label: 'Profile & Settings',    icon: 'user' },
+    { route: '/my/change-password', label: 'Change Your Password',  icon: 'lock' },
   ];
 
   constructor(public auth: AuthService) {}

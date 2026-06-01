@@ -7,7 +7,8 @@ import { GoogleLoginProvider, SocialAuthServiceConfig, SOCIAL_AUTH_CONFIG } from
 import { routes } from './app.routes';
 
 // Replace with your real Google Client ID from console.cloud.google.com
-export const GOOGLE_CLIENT_ID = '491554011088-pvlr7ccntg9lvjd688933qii69goh5dv.apps.googleusercontent.com';
+//export const GOOGLE_CLIENT_ID = '491554011088-pvlr7ccntg9lvjd688933qii69goh5dv.apps.googleusercontent.com';
+export const GOOGLE_CLIENT_ID = '26089520489-qvl9lcb2mk0fa5lt7b4hn0h36osfgkgf.apps.googleusercontent.com'
 
 export const appConfig: ApplicationConfig = {
   providers: [

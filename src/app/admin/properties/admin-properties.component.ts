@@ -21,8 +21,7 @@ export interface Property {
   bathrooms:    number;
   location:     string;
   community:    string;
-  agent_id:     string | null;
-  agent_name?:  string;
+  agent_name:   string;
   created_at:   string;
   views:        number;
   is_featured:  boolean;
@@ -36,7 +35,7 @@ const EMPTY_FORM = (): Partial<Property> => ({
   title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
   price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', address: '', description: '',
-  furnishing: 'Unfurnished', agent_id: null, is_featured: false, images: [],
+  furnishing: 'Unfurnished', agent_name: '', is_featured: false, images: [],
 });
 
 @Component({
@@ -51,7 +50,7 @@ export class AdminPropertiesComponent implements OnInit {
 
   // ── Data ──────────────────────────────────────────────
   properties  = signal<Property[]>([]);
-  agents      = signal<{ id: string; name: string }[]>([]);
+  agents      = signal<{ name: string }[]>([]);
   loading     = signal(true);
   saving      = signal(false);
 
@@ -132,26 +131,25 @@ export class AdminPropertiesComponent implements OnInit {
     this.loading.set(true);
     const { data, error } = await this.sb
       .from('properties')
-      .select('*, profiles(name)')
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (!error && data) {
       this.properties.set(data.map((p: any) => ({
         ...p,
-        agent_name: p.profiles?.name ?? '—',
+        agent_name: p.agent_name || '—',
       })));
     }
     this.loading.set(false);
   }
 
   async loadAgents(): Promise<void> {
-    // Load from admin_users table (standalone users management)
     const { data } = await this.sb
       .from('admin_users')
-      .select('id, name')
+      .select('name')
       .eq('role', 'agent')
       .order('name');
-    if (data) this.agents.set(data.map((a: any) => ({ id: String(a.id), name: a.name })));
+    if (data) this.agents.set(data.map((a: any) => ({ name: a.name })));
   }
 
   // ── Sorting / Filtering ───────────────────────────────
@@ -276,7 +274,8 @@ export class AdminPropertiesComponent implements OnInit {
       address:      f.address?.trim()   || '',
       description:  f.description?.trim() || '',
       furnishing:   f.furnishing    || 'Unfurnished',
-      agent_id:     f.agent_id      || null,
+      agent_name:   f.agent_name    || null,
+      agent_id:     null,
       is_featured:  f.is_featured   ?? false,
       images:       this.uploadedImages(),
     };
@@ -350,8 +349,8 @@ export class AdminPropertiesComponent implements OnInit {
     return `AED ${price.toLocaleString()}`;
   }
 
-  agentName(id: string | null): string {
-    return this.agents().find(a => a.id === id)?.name ?? '—';
+  agentName(name: string | null): string {
+    return name || '—';
   }
 
   pages(): number[] {

@@ -2,6 +2,34 @@ import { Injectable, signal, inject } from '@angular/core';
 import { UserRole, UserStatus } from '../models/user.model';
 import { SupabaseService } from './supabase.service';
 
+export type BannerStatus      = 'active' | 'inactive';
+export type AnnouncementType  = 'info' | 'success' | 'warning';
+export type AuditModule       = 'auth' | 'property' | 'lead' | 'user' | 'cms' | 'config' | 'report';
+export type AuditStatus       = 'success' | 'warning' | 'error';
+export type AuditActorRole    = 'admin' | 'agent' | 'customer' | 'system';
+
+export interface CmsBanner {
+  id: number; title: string; subtitle: string;
+  ctaText: string; ctaLink: string;
+  status: BannerStatus; order: number;
+}
+
+export interface CmsAnnouncement {
+  id: number; title: string; body: string;
+  type: AnnouncementType; active: boolean; expiresOn: string;
+}
+
+export interface CmsPage {
+  id: string; label: string; heading: string; subheading: string; body: string;
+}
+
+export interface AuditLog {
+  id: number; timestamp: string;
+  actor: string; actorRole: AuditActorRole;
+  action: string; module: AuditModule;
+  detail: string; ip: string; status: AuditStatus;
+}
+
 export type LeadStatus   = 'new' | 'contacted' | 'qualified' | 'negotiating' | 'won' | 'lost';
 export type LeadSource   = 'website' | 'referral' | 'walk_in' | 'social_media' | 'portal' | 'cold_call';
 export type LeadCategory = 'buy' | 'rent' | 'invest';
@@ -47,12 +75,24 @@ export class AdminDataService {
   readonly usersError   = signal('');
   readonly leadsError   = signal('');
 
+  // ── CMS Signals ───────────────────────────────────────
+  readonly banners       = signal<CmsBanner[]>([]);
+  readonly announcements = signal<CmsAnnouncement[]>([]);
+  readonly pages         = signal<CmsPage[]>([]);
+  readonly cmsLoading    = signal(true);
+
+  // ── Audit Signals ─────────────────────────────────────
+  readonly auditLogs     = signal<AuditLog[]>([]);
+  readonly auditLoading  = signal(true);
+
   constructor() {
     this.loadUsers();
     this.loadLeads();
+    this.loadCms();
+    this.loadAuditLogs();
   }
 
-  private log(tag: string, error: any, data: any): void {
+  private dbLog(tag: string, error: any, data: any): void {
     if (error) console.error(`[AdminData] ${tag} ERROR:`, error);
     else       console.log(`[AdminData] ${tag} OK — ${data?.length ?? 0} rows`);
   }
@@ -66,7 +106,7 @@ export class AdminDataService {
       .select('*')
       .order('created_at', { ascending: false });
 
-    this.log('loadUsers', error, data);
+    this.dbLog('loadUsers', error, data);
     if (error) {
       this.usersError.set(error.message);
     } else if (data) {
@@ -145,7 +185,7 @@ export class AdminDataService {
       .select('*')
       .order('created_at', { ascending: false });
 
-    this.log('loadLeads', error, data);
+    this.dbLog('loadLeads', error, data);
     if (error) {
       this.leadsError.set(error.message);
     } else if (data) {
@@ -202,6 +242,15 @@ export class AdminDataService {
     await this.loadLeads();
   }
 
+  // Convenience: log a lead action (called by components after save/delete)
+  async logLeadAction(actor: string, actorRole: AuditActorRole, action: string, detail: string, status: AuditStatus = 'success'): Promise<void> {
+    await this.log(actor, actorRole, action, 'lead', detail, status);
+  }
+
+  async logUserAction(actor: string, actorRole: AuditActorRole, action: string, detail: string, status: AuditStatus = 'success'): Promise<void> {
+    await this.log(actor, actorRole, action, 'user', detail, status);
+  }
+
   async importLeads(leads: Omit<Lead, 'id'>[]): Promise<string | null> {
     const rows = leads.map(l => ({
       name:           l.name,
@@ -221,5 +270,101 @@ export class AdminDataService {
     if (error) return error.message;
     await this.loadLeads();
     return null;
+  }
+
+  // ── CMS ───────────────────────────────────────────────
+  async loadCms(): Promise<void> {
+    this.cmsLoading.set(true);
+    const [b, a, p] = await Promise.all([
+      this.sb.from('cms_banners').select('*').order('sort_order'),
+      this.sb.from('cms_announcements').select('*').order('created_at', { ascending: false }),
+      this.sb.from('cms_pages').select('*').order('id'),
+    ]);
+    if (b.data) this.banners.set(b.data.map((r: any) => ({
+      id: r.id, title: r.title, subtitle: r.subtitle || '',
+      ctaText: r.cta_text || '', ctaLink: r.cta_link || '',
+      status: r.status, order: r.sort_order,
+    })));
+    if (a.data) this.announcements.set(a.data.map((r: any) => ({
+      id: r.id, title: r.title, body: r.body,
+      type: r.type, active: r.active,
+      expiresOn: r.expires_on || '',
+    })));
+    if (p.data) this.pages.set(p.data.map((r: any) => ({
+      id: r.id, label: r.label, heading: r.heading || '',
+      subheading: r.subheading || '', body: r.body || '',
+    })));
+    this.cmsLoading.set(false);
+  }
+
+  async saveBanner(f: Partial<CmsBanner>, editingId: number | null): Promise<string | null> {
+    const payload = { title: f.title, subtitle: f.subtitle, cta_text: f.ctaText, cta_link: f.ctaLink, status: f.status, sort_order: f.order };
+    const { error } = editingId
+      ? await this.sb.from('cms_banners').update(payload).eq('id', editingId)
+      : await this.sb.from('cms_banners').insert(payload);
+    if (error) return error.message;
+    await this.loadCms();
+    return null;
+  }
+
+  async deleteBanner(id: number): Promise<void> {
+    await this.sb.from('cms_banners').delete().eq('id', id);
+    await this.loadCms();
+  }
+
+  async toggleBannerStatus(id: number, current: BannerStatus): Promise<void> {
+    await this.sb.from('cms_banners').update({ status: current === 'active' ? 'inactive' : 'active' }).eq('id', id);
+    await this.loadCms();
+  }
+
+  async saveAnnouncement(f: Partial<CmsAnnouncement>, editingId: number | null): Promise<string | null> {
+    const payload = { title: f.title, body: f.body, type: f.type, active: f.active, expires_on: f.expiresOn || null };
+    const { error } = editingId
+      ? await this.sb.from('cms_announcements').update(payload).eq('id', editingId)
+      : await this.sb.from('cms_announcements').insert(payload);
+    if (error) return error.message;
+    await this.loadCms();
+    return null;
+  }
+
+  async deleteAnnouncement(id: number): Promise<void> {
+    await this.sb.from('cms_announcements').delete().eq('id', id);
+    await this.loadCms();
+  }
+
+  async toggleAnnouncement(id: number, current: boolean): Promise<void> {
+    await this.sb.from('cms_announcements').update({ active: !current }).eq('id', id);
+    await this.loadCms();
+  }
+
+  async savePage(id: string, f: { heading: string; subheading: string; body: string }): Promise<string | null> {
+    const { error } = await this.sb.from('cms_pages').update({ ...f, updated_at: new Date().toISOString() }).eq('id', id);
+    if (error) return error.message;
+    await this.loadCms();
+    return null;
+  }
+
+  // ── Audit Logs ────────────────────────────────────────
+  async loadAuditLogs(): Promise<void> {
+    this.auditLoading.set(true);
+    const { data } = await this.sb.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(200);
+    if (data) this.auditLogs.set(data.map((r: any) => ({
+      id:        r.id,
+      timestamp: r.created_at?.replace('T', ' ').slice(0, 19) ?? '',
+      actor:     r.actor,
+      actorRole: r.actor_role,
+      action:    r.action,
+      module:    r.module,
+      detail:    r.detail || '',
+      ip:        r.ip || '—',
+      status:    r.status,
+    })));
+    this.auditLoading.set(false);
+  }
+
+  async log(actor: string, actorRole: AuditActorRole, action: string, module: AuditModule, detail: string, status: AuditStatus = 'success'): Promise<void> { // public audit log method
+    await this.sb.from('audit_logs').insert({ actor, actor_role: actorRole, action, module, detail, status });
+    // Refresh only if audit logs are already loaded (non-blocking)
+    this.loadAuditLogs();
   }
 }

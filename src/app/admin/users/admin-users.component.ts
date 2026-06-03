@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import { UserRole, UserStatus } from '../../shared/models/user.model';
 import { AdminDataService, AdminUser } from '../../shared/services/admin-data.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 export type { AdminUser };
 
@@ -24,6 +25,7 @@ const EMPTY_FORM = (): Partial<AdminUser> => ({
 export class AdminUsersComponent {
 
   dataSvc = inject(AdminDataService);
+  private auth = inject(AuthService);
 
   users   = this.dataSvc.users;
   loading = this.dataSvc.usersLoading;
@@ -130,10 +132,14 @@ export class AdminUsersComponent {
 
     this.saving.set(true);
     this.saveError.set('');
-    const err = await this.dataSvc.saveUser(this.form(), this.editingId());
+    const f = this.form();
+    const err = await this.dataSvc.saveUser(f, this.editingId());
     this.saving.set(false);
     if (err) { this.saveError.set(err); return; }
     this.closeModal();
+    const actor = this.auth.currentUser()?.email ?? 'admin';
+    const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
+    this.dataSvc.logUserAction(actor, role, this.editingId() ? 'Update User' : 'Create User', `User "${f.name}" (${f.role}) ${this.editingId() ? 'updated' : 'created'}`);
   }
 
   private validateForm(): Record<string, string> {
@@ -165,6 +171,9 @@ export class AdminUsersComponent {
     const u = this.deleteTarget();
     if (!u) return;
     await this.dataSvc.deleteUser(Number(u.id));
+    const actor = this.auth.currentUser()?.email ?? 'admin';
+    const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
+    this.dataSvc.logUserAction(actor, role, 'Delete User', `User "${u.name}" deleted`, 'warning');
     this.deleteTarget.set(null);
   }
 

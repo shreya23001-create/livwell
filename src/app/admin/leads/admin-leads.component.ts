@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import { AdminDataService, LeadStatus, LeadSource, LeadCategory, Lead } from '../../shared/services/admin-data.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 export type { LeadStatus, LeadSource, LeadCategory, Lead };
 
@@ -25,6 +26,7 @@ const EMPTY_FORM = (): Partial<Lead> => ({
 export class AdminLeadsComponent {
 
   dataSvc = inject(AdminDataService);
+  private auth = inject(AuthService);
   leads   = this.dataSvc.leads;
   loading = this.dataSvc.leadsLoading;
 
@@ -147,6 +149,9 @@ export class AdminLeadsComponent {
     this.saving.set(false);
     if (err) { this.saveError.set(err); return; }
     this.showModal.set(false);
+    const actor = this.auth.currentUser()?.email ?? 'admin';
+    const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
+    this.dataSvc.logLeadAction(actor, role, this.editId() ? 'Update Lead' : 'Add Lead', `Lead "${f.name}" ${this.editId() ? 'updated' : 'created'}`);
   }
 
   confirmDelete(lead: Lead): void { this.deleteTarget.set(lead); this.showDeleteModal.set(true); }
@@ -157,6 +162,9 @@ export class AdminLeadsComponent {
     if (!t) return;
     await this.dataSvc.deleteLead(t.id);
     this.showDeleteModal.set(false);
+    const actor = this.auth.currentUser()?.email ?? 'admin';
+    const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
+    this.dataSvc.logLeadAction(actor, role, 'Delete Lead', `Lead "${t.name}" deleted`, 'warning');
     this.deleteTarget.set(null);
   }
 

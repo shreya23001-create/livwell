@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AdminDataService } from '../../shared/services/admin-data.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -10,96 +13,136 @@ import { RouterLink } from '@angular/router';
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent {
+  private dataSvc  = inject(AdminDataService);
+  private sb       = inject(SupabaseService).client;
 
   readonly today = new Date();
 
-  readonly kpis = [
-    { label: 'Total Properties', value: '248', change: '+12', up: true, icon: 'home', color: 'blue' },
-    { label: 'Active Leads', value: '1,284', change: '+84', up: true, icon: 'leads', color: 'gold' },
-    { label: 'Active Agents', value: '32', change: '-2', up: false, icon: 'agents', color: 'green' },
-    { label: 'Revenue (AED)', value: '4.2M', change: '+8.3%', up: true, icon: 'revenue', color: 'purple' },
-  ];
+  // ── Live signals from service ─────────────────────────
+  leads = this.dataSvc.leads;
+  users = this.dataSvc.users;
 
-  readonly revenueMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  readonly revenueValues = [280000, 310000, 295000, 420000, 380000, 510000, 490000, 620000, 580000, 710000, 680000, 750000];
+  // Properties count from Supabase directly
+  propertiesCount = signal(0);
+  propertiesPublished = signal(0);
 
-  readonly leadSources = [
-    { label: 'Website', pct: 38, color: '#6366f1' },
-    { label: 'WhatsApp', pct: 27, color: '#6366f1' },
-    { label: 'Referral', pct: 18, color: '#3b82f6' },
-    { label: 'Social Media', pct: 11, color: '#8b5cf6' },
-    { label: 'Other', pct: 6, color: '#9ca3af' },
-  ];
+  constructor() {
+    this.loadPropertyStats();
+  }
 
-  readonly recentLeads = [
-    { name: 'Mohammed Al-Rashidi', email: 'mo.rashidi@gmail.com', property: 'Binghatti Zenith', status: 'New', time: '5 min ago', avatar: 'M' },
-    { name: 'Sarah Williams', email: 'sarah.w@hotmail.com', property: 'Emaar Skyrise', status: 'Contacted', time: '22 min ago', avatar: 'S' },
-    { name: 'Raj Patel', email: 'raj.patel@yahoo.com', property: 'Nakheel Gardens', status: 'Qualified', time: '1 hr ago', avatar: 'R' },
-    { name: 'Fatima Al-Zahra', email: 'fatima.z@gmail.com', property: 'Creek Horizon', status: 'New', time: '2 hr ago', avatar: 'F' },
-    { name: 'James Chen', email: 'j.chen@outlook.com', property: 'Sobha Seahaven', status: 'Qualified', time: '3 hr ago', avatar: 'J' },
-  ];
+  private async loadPropertyStats(): Promise<void> {
+    const { data } = await this.sb.from('properties').select('status');
+    if (data) {
+      this.propertiesCount.set(data.length);
+      this.propertiesPublished.set(data.filter((p: any) => p.status === 'Published').length);
+    }
+  }
 
-  readonly recentProperties = [
-    { title: 'Luxury Penthouse with Burj View', community: 'Downtown Dubai', type: 'Penthouse', status: 'Sale', price: 'AED 4.5M', badge: 'Featured' },
-    { title: 'Modern Villa with Private Pool', community: 'Palm Jumeirah', type: 'Villa', status: 'Sale', price: 'AED 8.2M', badge: 'Hot' },
-    { title: 'Marina View 1BR Apartment', community: 'Dubai Marina', type: 'Apartment', status: 'Rent', price: 'AED 85K/yr', badge: '' },
-    { title: 'Sky View Studio Business Bay', community: 'Business Bay', type: 'Apartment', status: 'Sale', price: 'AED 980K', badge: 'Reduced' },
-    { title: '2BR Apartment JVC with Pool', community: 'JVC', type: 'Apartment', status: 'Sale', price: 'AED 1.35M', badge: '' },
-  ];
+  // ── KPIs ─────────────────────────────────────────────
+  kpis = computed(() => {
+    const leads   = this.leads();
+    const users   = this.users();
+    const active  = leads.filter(l => !['won','lost'].includes(l.status)).length;
+    const agents  = users.filter(u => u.role === 'agent' && u.status === 'active').length;
+    const won     = leads.filter(l => l.status === 'won').length;
+    const conv    = leads.length > 0 ? ((won / leads.length) * 100).toFixed(1) : '0.0';
 
-  readonly activity = [
-    { text: 'New lead from Mohammed Al-Rashidi for Binghatti Zenith', time: '5 min ago', type: 'lead' },
-    { text: 'Property "Luxury Penthouse" marked as Featured', time: '18 min ago', type: 'property' },
-    { text: 'Agent Sarah Al-Mansouri closed deal — AED 4.5M', time: '1 hr ago', type: 'deal' },
-    { text: 'New user registered: raj.patel@yahoo.com', time: '2 hr ago', type: 'user' },
-    { text: 'Off-plan project "Emaar Skyrise" published', time: '3 hr ago', type: 'property' },
-    { text: 'Lead status updated: Fatima Al-Zahra → Qualified', time: '4 hr ago', type: 'lead' },
-    { text: 'Agent Ahmed Hassan updated 3 listings', time: '5 hr ago', type: 'property' },
-  ];
+    return [
+      { label: 'Total Properties', value: String(this.propertiesCount()), sub: `${this.propertiesPublished()} published`, icon: 'home',    color: 'blue'   },
+      { label: 'Active Leads',     value: String(active),                  sub: `${leads.filter(l=>l.status==='new').length} new today`,  icon: 'leads',   color: 'gold'   },
+      { label: 'Active Agents',    value: String(agents),                  sub: `${users.filter(u=>u.role==='agent').length} total`,       icon: 'agents',  color: 'green'  },
+      { label: 'Conversion Rate',  value: `${conv}%`,                      sub: `${won} deals won`,                                        icon: 'revenue', color: 'purple' },
+    ];
+  });
 
-  readonly topAgents = [
-    { name: 'Sarah Al-Mansouri', deals: 14, revenue: 'AED 24.5M', avatar: 'S', rank: 1 },
-    { name: 'Ahmed Hassan', deals: 11, revenue: 'AED 18.2M', avatar: 'A', rank: 2 },
-    { name: 'Priya Sharma', deals: 9, revenue: 'AED 14.8M', avatar: 'P', rank: 3 },
-    { name: 'Michael Chen', deals: 7, revenue: 'AED 11.4M', avatar: 'M', rank: 4 },
-  ];
+  // ── Lead sources breakdown ────────────────────────────
+  leadSources = computed(() => {
+    const leads = this.leads();
+    if (!leads.length) return [];
+    const counts: Record<string, number> = {};
+    leads.forEach(l => { counts[l.source] = (counts[l.source] || 0) + 1; });
+    const colors: Record<string, string> = {
+      website: '#6366f1', portal: '#3b82f6', referral: '#10b981',
+      social_media: '#8b5cf6', walk_in: '#f59e0b', cold_call: '#9ca3af',
+    };
+    const labels: Record<string, string> = {
+      website: 'Website', portal: 'Portal', referral: 'Referral',
+      social_media: 'Social Media', walk_in: 'Walk-in', cold_call: 'Cold Call',
+    };
+    const total = leads.length;
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([src, count]) => ({
+        label: labels[src] || src,
+        pct:   Math.round((count / total) * 100),
+        color: colors[src] || '#9ca3af',
+      }));
+  });
 
-  getRevenueBarHeight(val: number): number {
-    return Math.round((val / Math.max(...this.revenueValues)) * 100);
+  // ── Recent leads ──────────────────────────────────────
+  recentLeads = computed(() =>
+    this.leads()
+      .slice(0, 5)
+      .map(l => ({
+        name:   l.name,
+        email:  l.email,
+        status: this.statusLabel(l.status),
+        agent:  l.assignedAgent,
+        avatar: l.name.charAt(0).toUpperCase(),
+        date:   l.createdDate,
+      }))
+  );
+
+  // ── Top agents ────────────────────────────────────────
+  topAgents = computed(() => {
+    const leads = this.leads();
+    return this.users()
+      .filter(u => u.role === 'agent')
+      .map(a => {
+        const aLeads = leads.filter(l => l.assignedAgent === a.name);
+        const won    = aLeads.filter(l => l.status === 'won').length;
+        return { name: a.name, leads: aLeads.length, won, avatar: a.name.charAt(0).toUpperCase() };
+      })
+      .sort((a, b) => b.leads - a.leads)
+      .slice(0, 5);
+  });
+
+  // ── Lead pipeline breakdown ───────────────────────────
+  pipeline = computed(() => {
+    const leads = this.leads();
+    const statuses = ['new','contacted','qualified','negotiating','won','lost'] as const;
+    const colors: Record<string, string> = {
+      new: '#f59e0b', contacted: '#3b82f6', qualified: '#10b981',
+      negotiating: '#8b5cf6', won: '#6366f1', lost: '#ef4444',
+    };
+    const max = Math.max(...statuses.map(s => leads.filter(l => l.status === s).length), 1);
+    return statuses.map(s => {
+      const count = leads.filter(l => l.status === s).length;
+      return { label: s.charAt(0).toUpperCase() + s.slice(1), count, pct: Math.round(count / max * 100), color: colors[s] };
+    });
+  });
+
+  // ── Helpers ───────────────────────────────────────────
+  statusLabel(s: string): string {
+    const map: Record<string, string> = { new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' };
+    return map[s] || s;
+  }
+
+  getStatusClass(status: string): string {
+    const map: Record<string, string> = { New: 'status--new', Contacted: 'status--contacted', Qualified: 'status--qualified', Won: 'status--won', Lost: 'status--lost' };
+    return map[status] || '';
   }
 
   getLeadSourceOffset(index: number): number {
-    const r = 40;
-    const circ = 2 * Math.PI * r;
+    const r = 40, circ = 2 * Math.PI * r;
     let offset = 0;
-    for (let i = 0; i < index; i++) {
-      offset += (this.leadSources[i].pct / 100) * circ;
-    }
+    const sources = this.leadSources();
+    for (let i = 0; i < index; i++) offset += (sources[i].pct / 100) * circ;
     return -offset;
   }
 
   getLeadSourceDash(pct: number): string {
-    const r = 40;
-    const circ = 2 * Math.PI * r;
+    const r = 40, circ = 2 * Math.PI * r;
     return `${(pct / 100) * circ} ${circ}`;
-  }
-
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'New': return 'status--new';
-      case 'Contacted': return 'status--contacted';
-      case 'Qualified': return 'status--qualified';
-      case 'Lost': return 'status--lost';
-      default: return '';
-    }
-  }
-
-  getActivityIcon(type: string): string {
-    switch (type) {
-      case 'lead': return '#6366f1';
-      case 'deal': return '#6366f1';
-      case 'user': return '#3b82f6';
-      default: return '#6b7280';
-    }
   }
 }

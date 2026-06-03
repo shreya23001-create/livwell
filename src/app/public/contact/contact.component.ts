@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
+import { AdminDataService } from '../../shared/services/admin-data.service';
 
 interface ContactForm {
   firstName: string;
@@ -28,6 +29,13 @@ interface Office {
   styleUrl: './contact.component.scss',
 })
 export class ContactComponent {
+  private dataSvc = inject(AdminDataService);
+
+  // CMS-driven contact page content
+  contactPage = computed(() => this.dataSvc.pages().find(p => p.id === 'contact-info'));
+  heroTitle    = computed(() => this.contactPage()?.heading    || 'Get in Touch');
+  heroSubtitle = computed(() => this.contactPage()?.subheading || 'Our team of experts is ready to help you find, buy, rent, or sell in Dubai.');
+
   enquiryTypes = ['Buy Property', 'Rent Property', 'Sell Property', 'Investment', 'General Enquiry'];
   activeType = signal('Buy Property');
   submitted = signal(false);

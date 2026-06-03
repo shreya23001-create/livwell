@@ -277,6 +277,7 @@ export class AdminDataService {
   // ── CMS ───────────────────────────────────────────────
   async loadCms(): Promise<void> {
     this.cmsLoading.set(true);
+    try {
     const [b, a, p] = await Promise.all([
       this.sb.from('cms_banners').select('*').order('sort_order'),
       this.sb.from('cms_announcements').select('*').order('created_at', { ascending: false }),
@@ -304,7 +305,11 @@ export class AdminDataService {
       id: r.id, label: r.label, heading: r.heading || '',
       subheading: r.subheading || '', body: r.body || '',
     })));
-    this.cmsLoading.set(false);
+    } catch (e) {
+      console.warn('[AdminData] CMS tables not found — run cms-and-audit-tables.sql in Supabase');
+    } finally {
+      this.cmsLoading.set(false);
+    }
   }
 
   async saveBanner(f: Partial<CmsBanner>, editingId: number | null): Promise<string | null> {
@@ -357,19 +362,24 @@ export class AdminDataService {
   // ── Audit Logs ────────────────────────────────────────
   async loadAuditLogs(): Promise<void> {
     this.auditLoading.set(true);
-    const { data } = await this.sb.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(200);
-    if (data) this.auditLogs.set(data.map((r: any) => ({
-      id:        r.id,
-      timestamp: r.created_at?.replace('T', ' ').slice(0, 19) ?? '',
-      actor:     r.actor,
-      actorRole: r.actor_role,
-      action:    r.action,
-      module:    r.module,
-      detail:    r.detail || '',
-      ip:        r.ip || '—',
-      status:    r.status,
-    })));
-    this.auditLoading.set(false);
+    try {
+      const { data } = await this.sb.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(200);
+      if (data) this.auditLogs.set(data.map((r: any) => ({
+        id:        r.id,
+        timestamp: r.created_at?.replace('T', ' ').slice(0, 19) ?? '',
+        actor:     r.actor,
+        actorRole: r.actor_role,
+        action:    r.action,
+        module:    r.module,
+        detail:    r.detail || '',
+        ip:        r.ip || '—',
+        status:    r.status,
+      })));
+    } catch (e) {
+      console.warn('[AdminData] audit_logs table not found — run cms-and-audit-tables.sql');
+    } finally {
+      this.auditLoading.set(false);
+    }
   }
 
   async log(actor: string, actorRole: AuditActorRole, action: string, module: AuditModule, detail: string, status: AuditStatus = 'success'): Promise<void> { // public audit log method

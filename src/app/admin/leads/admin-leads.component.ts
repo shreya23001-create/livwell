@@ -7,7 +7,6 @@ import { AuthService } from '../../shared/services/auth.service';
 
 export type { LeadStatus, LeadSource, LeadCategory, Lead };
 
-const AGENTS = ['Sarah Al-Mansouri', 'Ahmed Hassan', 'Rania Khalid', 'Omar Al-Farsi', 'Unassigned'];
 
 const EMPTY_FORM = (): Partial<Lead> => ({
   name: '', email: '', phone: '', status: 'new', source: 'website', category: 'buy',
@@ -55,7 +54,11 @@ export class AdminLeadsComponent {
   importError   = signal('');
   importSuccess = signal('');
 
-  readonly agents     = AGENTS;
+  // Agent names from admin_users table (role=agent) + Unassigned
+  agents = computed(() => [
+    'Unassigned',
+    ...this.dataSvc.users().filter(u => u.role === 'agent').map(u => u.name),
+  ]);
   readonly statuses: LeadStatus[]     = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
   readonly sources:  LeadSource[]     = ['website', 'referral', 'walk_in', 'social_media', 'portal', 'cold_call'];
   readonly categories: LeadCategory[] = ['buy', 'rent', 'invest'];

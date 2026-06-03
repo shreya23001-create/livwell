@@ -167,8 +167,8 @@
             <!-- Status -->
             <td class="prop-td">
               <select class="prop-status-select prop-status-select--{{ p.status | lowercase | slice:0:20 }}"
-                      [value]="p.status"
-                      (change)="updateStatus(p, $any($event.target).value)">
+                      [(ngModel)]="p.status"
+                      (ngModelChange)="updateStatus(p, $event)">
                 <option *ngFor="let s of statusList" [value]="s">{{ s }}</option>
               </select>
             </td>

@@ -104,7 +104,7 @@
     </select>
     <select [value]="filterAgent()" (change)="filterAgent.set($any($event.target).value); onFilter()">
       <option value="">All Agents</option>
-      <option *ngFor="let a of agents" [value]="a">{{ a }}</option>
+      <option *ngFor="let a of agents()" [value]="a">{{ a }}</option>
     </select>
   </div>
 
@@ -256,7 +256,7 @@
         <div class="form-field">
           <label>Assigned Agent</label>
           <select [value]="form()['assignedAgent']" (change)="updateForm({assignedAgent: $any($event.target).value})">
-            <option *ngFor="let a of agents" [value]="a">{{ a }}</option>
+            <option *ngFor="let a of agents()" [value]="a">{{ a }}</option>
           </select>
         </div>
       </div>

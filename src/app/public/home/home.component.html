@@ -543,7 +543,7 @@
      ============================================================ -->
 <section class="section-padding">
   <div class="container-custom">
-    <div class="section-header animate-on-scroll">
+    <div class="section-header">
       <div class="section-label">Our Selection</div>
       <h2 class="section-title">Featured Properties</h2>
       <p class="section-desc">Handpicked luxury properties across the UAE's most prestigious communities</p>
@@ -551,7 +551,7 @@
 
     <div class="properties-grid">
       <a *ngFor="let property of featuredPropertiesLive(); let i = index" [routerLink]="['/properties', property.id]"
-        class="property-card animate-on-scroll" [class]="'delay-' + ((i % 3) * 100 + 100)">
+        class="property-card">
 
         <!-- Full image fills the card -->
         <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy">

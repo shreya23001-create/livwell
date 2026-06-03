@@ -277,7 +277,7 @@ export class AdminPropertiesComponent implements OnInit {
       agent_name:   f.agent_name    || null,
       agent_id:     null,
       is_featured:  f.is_featured   ?? false,
-      images:       this.uploadedImages(),
+      images:       this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
     };
 
     try {
@@ -297,7 +297,14 @@ export class AdminPropertiesComponent implements OnInit {
       }
 
       this.saving.set(false);
+      const editingId = this.editingId();
       this.closeModal();
+      // Update local signal immediately so table reflects change without waiting
+      if (editingId !== null) {
+        this.properties.update(list => list.map(p =>
+          p.id === editingId ? { ...p, ...payload } : p
+        ));
+      }
       await this.loadProperties();
 
     } catch (e: any) {
@@ -338,8 +345,15 @@ export class AdminPropertiesComponent implements OnInit {
 
   // ── Status quick-change ───────────────────────────────
   async updateStatus(p: Property, status: PropStatus): Promise<void> {
-    await this.sb.from('properties').update({ status }).eq('id', p.id);
-    await this.loadProperties();
+    const previous = p.status;
+    // ngModel already updated p.status on the object — also update the signal array
+    this.properties.update(list => list.map(x => x.id === p.id ? { ...x, status } : x));
+    const { error } = await this.sb.from('properties').update({ status }).eq('id', p.id);
+    if (error) {
+      // Revert on failure
+      this.properties.update(list => list.map(x => x.id === p.id ? { ...x, status: previous } : x));
+      this.saveError.set('Status update failed: ' + error.message);
+    }
   }
 
   // ── Helpers ───────────────────────────────────────────

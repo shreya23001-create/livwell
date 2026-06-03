@@ -78,7 +78,7 @@
         @for (p of featuredProperties(); track p.id) {
           <div class="featured-card" [class.is-featured]="p.featured">
             <div class="featured-card-head">
-              <div class="featured-order-badge">{{ p.order }}</div>
+              <div class="featured-order-badge">{{ p.type }}</div>
               <label class="feat-toggle-wrap">
                 <input type="checkbox" [checked]="p.featured" (change)="toggleFeatured(p.id)" />
                 <span class="feat-toggle"></span>

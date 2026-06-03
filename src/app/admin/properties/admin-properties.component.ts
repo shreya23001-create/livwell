@@ -145,12 +145,13 @@ export class AdminPropertiesComponent implements OnInit {
   }
 
   async loadAgents(): Promise<void> {
+    // Load from admin_users table (standalone users management)
     const { data } = await this.sb
-      .from('profiles')
+      .from('admin_users')
       .select('id, name')
       .eq('role', 'agent')
       .order('name');
-    if (data) this.agents.set(data);
+    if (data) this.agents.set(data.map((a: any) => ({ id: String(a.id), name: a.name })));
   }
 
   // ── Sorting / Filtering ───────────────────────────────

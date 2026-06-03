@@ -12,6 +12,8 @@ export interface CmsBanner {
   id: number; title: string; subtitle: string;
   ctaText: string; ctaLink: string;
   status: BannerStatus; order: number;
+  imageUrl?: string; locationTag?: string;
+  startingPrice?: string; paymentPlan?: string;
 }
 
 export interface CmsAnnouncement {
@@ -281,9 +283,17 @@ export class AdminDataService {
       this.sb.from('cms_pages').select('*').order('id'),
     ]);
     if (b.data) this.banners.set(b.data.map((r: any) => ({
-      id: r.id, title: r.title, subtitle: r.subtitle || '',
-      ctaText: r.cta_text || '', ctaLink: r.cta_link || '',
-      status: r.status, order: r.sort_order,
+      id:            r.id,
+      title:         r.title,
+      subtitle:      r.subtitle      || '',
+      ctaText:       r.cta_text      || '',
+      ctaLink:       r.cta_link      || '',
+      status:        r.status,
+      order:         r.sort_order,
+      imageUrl:      r.image_url     || '',
+      locationTag:   r.location_tag  || '',
+      startingPrice: r.starting_price || '',
+      paymentPlan:   r.payment_plan  || '',
     })));
     if (a.data) this.announcements.set(a.data.map((r: any) => ({
       id: r.id, title: r.title, body: r.body,

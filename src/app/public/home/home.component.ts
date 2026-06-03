@@ -1,9 +1,11 @@
-import { Component, OnInit, ElementRef, QueryList, ViewChild, ViewChildren, PLATFORM_ID, Inject, signal, computed } from '@angular/core';
+import { Component, OnInit, ElementRef, QueryList, ViewChild, ViewChildren, PLATFORM_ID, Inject, signal, computed, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser, UpperCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
+import { AdminDataService } from '../../shared/services/admin-data.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface Property {
   id: number;
@@ -62,6 +64,9 @@ interface NewsArticle {
   styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {
+  private dataSvc = inject(AdminDataService);
+  private sb      = inject(SupabaseService).client;
+
   searchQuery = signal('');
   searchType = signal('buy');
 
@@ -73,72 +78,26 @@ export class HomeComponent implements OnInit {
   activeTestimonial = signal(0);
   activeSlide = signal(0);
 
-  heroSlides = [
-    {
-      image: 'images/img1.jpeg',
-      project: 'Creek Horizon Residences',
-      location: 'Dubai Creek Harbour',
-      desc: 'Contemporary waterfront living with panoramic creek and skyline views in the heart of the new Dubai.',
-      startingPrice: 'AED 1.8M',
-      paymentPlan: '20 / 60 / 20 %',
-    },
-    {
-      image: 'images/img2.jpeg',
-      project: 'Downtown Heights',
-      location: 'Downtown Dubai',
-      desc: 'Iconic residences steps from Burj Khalifa — where luxury meets the pulse of the city.',
-      startingPrice: 'AED 2.4M',
-      paymentPlan: '10 / 65 / 25 %',
-    },
-    {
-      image: 'images/img3.jpeg',
-      project: 'Marina Cove',
-      location: 'Dubai Marina',
-      desc: 'Elegant apartments with full marina views. Lifestyle living at its finest.',
-      startingPrice: 'AED 950K',
-      paymentPlan: '20 / 55 / 25 %',
-    },
-    {
-      image: 'images/img4.jpeg',
-      project: 'Business Bay Towers',
-      location: 'Business Bay',
-      desc: 'Premium high-rise residences at the centre of Dubai\'s dynamic business and lifestyle district.',
-      startingPrice: 'AED 1.2M',
-      paymentPlan: '10 / 60 / 30 %',
-    },
-    {
-      image: 'images/img5.jpeg',
-      project: 'Jumeirah Living',
-      location: 'Jumeirah Beach Residence',
-      desc: 'Beachfront residences with sweeping sea views and direct access to the finest dining and leisure.',
-      startingPrice: 'AED 3.1M',
-      paymentPlan: '20 / 55 / 25 %',
-    },
-    {
-      image: 'images/img6.jpeg',
-      project: 'Emerald Hills Villa',
-      location: 'Emirates Hills',
-      desc: 'Sprawling private villa with lush gardens, infinity pool and panoramic city views.',
-      startingPrice: 'AED 8.9M',
-      paymentPlan: '20 / 50 / 30 %',
-    },
-    {
-      image: 'images/img7.jpeg',
-      project: 'Palm Vista Villas',
-      location: 'Palm Jumeirah',
-      desc: 'Exclusive beachfront villas on the iconic Palm — the pinnacle of Dubai luxury.',
-      startingPrice: 'AED 12.5M',
-      paymentPlan: '15 / 55 / 30 %',
-    },
-    {
-      image: 'images/img8.jpeg',
-      project: 'Sobha Hartland Estates',
-      location: 'Mohammed Bin Rashid City',
-      desc: 'Ultra-luxury villas and mansions set within a lush green master community.',
-      startingPrice: 'AED 5.2M',
-      paymentPlan: '10 / 60 / 30 %',
-    },
-  ];
+  // Hero slides driven by CMS banners (active only, ordered by sort_order)
+  heroSlides = computed(() => {
+    const banners = this.dataSvc.banners().filter(b => b.status === 'active');
+    if (banners.length) {
+      return banners.map(b => ({
+        image:         b.imageUrl      || 'images/img1.jpeg',
+        project:       b.title,
+        location:      b.locationTag   || '',
+        desc:          b.subtitle,
+        startingPrice: b.startingPrice || '',
+        paymentPlan:   b.paymentPlan   || '',
+      }));
+    }
+    // Fallback while CMS loads
+    return [
+      { image: 'images/img1.jpeg', project: 'Creek Horizon Residences',  location: 'Dubai Creek Harbour',         desc: 'Contemporary waterfront living with panoramic creek and skyline views.', startingPrice: 'AED 1.8M',  paymentPlan: '20 / 60 / 20 %' },
+      { image: 'images/img2.jpeg', project: 'Downtown Heights',           location: 'Downtown Dubai',              desc: 'Iconic residences steps from Burj Khalifa.',                              startingPrice: 'AED 2.4M',  paymentPlan: '10 / 65 / 25 %' },
+      { image: 'images/img3.jpeg', project: 'Marina Cove',                location: 'Dubai Marina',                desc: 'Elegant apartments with full marina views.',                              startingPrice: 'AED 950K',  paymentPlan: '20 / 55 / 25 %' },
+    ];
+  });
 
   stats: Stat[] = [
     { value: '2,500', label: 'Properties Listed', suffix: '+' },
@@ -147,67 +106,32 @@ export class HomeComponent implements OnInit {
     { value: '15', label: 'Years Experience', suffix: '+' },
   ];
 
-  featuredProperties: Property[] = [
-    {
-      id: 1,
-      title: 'Luxury Penthouse Suite',
-      location: 'Downtown Dubai, UAE',
-      price: 'AED 4,500,000',
-      beds: 4, baths: 3, sqft: '3,200',
-      type: 'Apartment',
-      badge: 'Featured',
-      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
-    },
-    {
-      id: 2,
-      title: 'Modern Villa with Pool',
-      location: 'Palm Jumeirah, Dubai',
-      price: 'AED 8,200,000',
-      beds: 5, baths: 5, sqft: '5,800',
-      type: 'Villa',
-      badge: 'Hot',
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
-    },
-    {
-      id: 3,
-      title: 'Beachfront Apartment',
-      location: 'JBR Walk, Dubai Marina',
-      price: 'AED 2,100,000',
-      beds: 2, baths: 2, sqft: '1,450',
-      type: 'Apartment',
-      badge: 'New',
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-    },
-    {
-      id: 4,
-      title: 'Contemporary Town House',
-      location: 'Arabian Ranches, Dubai',
-      price: 'AED 3,750,000',
-      beds: 4, baths: 3, sqft: '2,900',
-      type: 'Townhouse',
-      image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',
-    },
-    {
-      id: 5,
-      title: 'Sky View Studio',
-      location: 'Business Bay, Dubai',
-      price: 'AED 980,000',
-      beds: 1, baths: 1, sqft: '650',
-      type: 'Studio',
-      badge: 'Reduced',
-      image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
-    },
-    {
-      id: 6,
-      title: 'Heritage Mansion',
-      location: 'Emirates Hills, Dubai',
-      price: 'AED 22,000,000',
-      beds: 7, baths: 8, sqft: '12,400',
-      type: 'Villa',
-      badge: 'Exclusive',
-      image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',
-    },
-  ];
+  featuredPropertiesLive = signal<Property[]>([]);
+
+  private async loadFeaturedFromSupabase(): Promise<void> {
+    const { data } = await this.sb
+      .from('properties')
+      .select('id, title, location, community, price, bedrooms, bathrooms, area_sqft, type, images, badge')
+      .eq('is_featured', true)
+      .eq('status', 'Published')
+      .order('created_at', { ascending: false })
+      .limit(6);
+
+    if (data && data.length) {
+      this.featuredPropertiesLive.set(data.map((p: any) => ({
+        id:       p.id,
+        title:    p.title,
+        location: `${p.community || ''}, ${p.location || ''}`.replace(/^, |, $/, ''),
+        price:    `AED ${Number(p.price).toLocaleString()}`,
+        beds:     p.bedrooms  || 0,
+        baths:    p.bathrooms || 0,
+        sqft:     Number(p.area_sqft || 0).toLocaleString(),
+        type:     p.type,
+        badge:    p.badge || 'Featured',
+        image:    (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
+      })));
+    }
+  }
 
   topAgents: Agent[] = [
     { name: 'Anuj Sharma',      role: 'Business Associate', deals: 0, rating: 5.0, avatar: 'images/Anuj.jpeg',   phone: '+971542481813',  email: 'anuj@livwelldubai.ae'  },
@@ -403,6 +327,7 @@ export class HomeComponent implements OnInit {
   private slideInterval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
+    this.loadFeaturedFromSupabase();
     if (isPlatformBrowser(this.platformId)) {
       this.startSlideshow();
       this.startTestimonialRotation();
@@ -412,7 +337,8 @@ export class HomeComponent implements OnInit {
 
   private startSlideshow(): void {
     this.slideInterval = setInterval(() => {
-      this.activeSlide.set((this.activeSlide() + 1) % this.heroSlides.length);
+      const len = this.heroSlides().length;
+      this.activeSlide.set((this.activeSlide() + 1) % (len || 1));
     }, 5000);
   }
 
@@ -423,13 +349,13 @@ export class HomeComponent implements OnInit {
   }
 
   prevSlide(): void {
-    const prev = (this.activeSlide() - 1 + this.heroSlides.length) % this.heroSlides.length;
-    this.goToSlide(prev);
+    const len  = this.heroSlides().length || 1;
+    this.goToSlide((this.activeSlide() - 1 + len) % len);
   }
 
   nextSlide(): void {
-    const next = (this.activeSlide() + 1) % this.heroSlides.length;
-    this.goToSlide(next);
+    const len  = this.heroSlides().length || 1;
+    this.goToSlide((this.activeSlide() + 1) % len);
   }
 
   private startTestimonialRotation(): void {

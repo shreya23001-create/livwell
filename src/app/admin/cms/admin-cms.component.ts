@@ -1,8 +1,9 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService, CmsBanner, CmsAnnouncement, CmsPage, BannerStatus, AnnouncementType } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 type CmsTab = 'banners' | 'featured' | 'announcements' | 'pages';
 
@@ -13,9 +14,14 @@ type CmsTab = 'banners' | 'featured' | 'announcements' | 'pages';
   templateUrl: './admin-cms.component.html',
   styleUrl: './admin-cms.component.scss',
 })
-export class AdminCmsComponent {
+export class AdminCmsComponent implements OnInit {
+
+  ngOnInit(): void {
+    this.loadFeaturedProperties();
+  }
   private dataSvc = inject(AdminDataService);
   private auth    = inject(AuthService);
+  private sb      = inject(SupabaseService).client;
 
   activeTab   = signal<CmsTab>('banners');
   saveSuccess = signal('');
@@ -28,20 +34,36 @@ export class AdminCmsComponent {
   pages         = this.dataSvc.pages;
   loading       = this.dataSvc.cmsLoading;
 
-  // ── Featured Properties (local — not yet in Supabase) ─
-  featuredProperties = signal([
-    { id: 1, name: 'Luxury 2BR in Downtown Dubai',       location: 'Downtown Dubai',    price: 'AED 2,800,000', type: 'Apartment', featured: true,  order: 1 },
-    { id: 2, name: 'Spacious Villa in Arabian Ranches',  location: 'Arabian Ranches',   price: 'AED 6,500,000', type: 'Villa',     featured: true,  order: 2 },
-    { id: 3, name: 'Penthouse in Palm Jumeirah',         location: 'Palm Jumeirah',     price: 'AED 18,000,000',type: 'Penthouse', featured: true,  order: 3 },
-    { id: 4, name: 'Studio in JVC',                     location: 'Jumeirah Village Circle', price: 'AED 650,000', type: 'Studio', featured: false, order: 4 },
-    { id: 5, name: 'Modern 1BR in Business Bay',         location: 'Business Bay',      price: 'AED 7,500/mo',  type: 'Apartment', featured: false, order: 5 },
-    { id: 6, name: 'Townhouse in Dubai Hills',           location: 'Dubai Hills Estate',price: 'AED 3,200,000', type: 'Townhouse', featured: true,  order: 6 },
-  ]);
+  // ── Featured Properties (from Supabase properties table) ─
+  featuredProperties = signal<{ id: number; name: string; location: string; price: string; type: string; featured: boolean }[]>([]);
+  featuredPropsLoading = signal(true);
 
   featuredCount = computed(() => this.featuredProperties().filter(p => p.featured).length);
 
-  toggleFeatured(id: number): void {
-    this.featuredProperties.update(list => list.map(p => p.id === id ? { ...p, featured: !p.featured } : p));
+  async loadFeaturedProperties(): Promise<void> {
+    this.featuredPropsLoading.set(true);
+    const { data } = await this.sb
+      .from('properties')
+      .select('id, title, location, price, type, is_featured')
+      .order('created_at', { ascending: false });
+    if (data) {
+      this.featuredProperties.set(data.map((p: any) => ({
+        id:       p.id,
+        name:     p.title,
+        location: p.location || '',
+        price:    `AED ${Number(p.price).toLocaleString()}`,
+        type:     p.type,
+        featured: p.is_featured,
+      })));
+    }
+    this.featuredPropsLoading.set(false);
+  }
+
+  async toggleFeatured(id: number): Promise<void> {
+    const prop = this.featuredProperties().find(p => p.id === id);
+    if (!prop) return;
+    await this.sb.from('properties').update({ is_featured: !prop.featured }).eq('id', id);
+    await this.loadFeaturedProperties();
     this.flash('Featured properties updated.');
   }
 

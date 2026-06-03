@@ -5,7 +5,7 @@
 
   <!-- Background slides -->
   <div class="hero-bg">
-    <div *ngFor="let slide of heroSlides; let i = index" class="hero-slide" [class.active]="activeSlide() === i"
+    <div *ngFor="let slide of heroSlides(); let i = index" class="hero-slide" [class.active]="activeSlide() === i"
       [style.background-image]="'url(' + slide.image + ')'">
     </div>
     <div class="hero-overlay"></div>
@@ -15,19 +15,19 @@
   <div class="hero-counter">
     <span class="hero-counter-current">{{ (activeSlide() + 1).toString().padStart(2, '0') }}</span>
     <div class="hero-counter-track">
-      <div class="hero-counter-fill" [style.height.%]="((activeSlide() + 1) / heroSlides.length) * 100"></div>
+      <div class="hero-counter-fill" [style.height.%]="((activeSlide() + 1) / heroSlides().length) * 100"></div>
     </div>
-    <span class="hero-counter-total">{{ heroSlides.length.toString().padStart(2, '0') }}</span>
+    <span class="hero-counter-total">{{ heroSlides().length.toString().padStart(2, '0') }}</span>
   </div>
 
   <!-- Slide nav arrows — right edge -->
   <div class="hero-nav">
-    <button class="hero-nav-btn" (click)="activeSlide.set((activeSlide() - 1 + heroSlides.length) % heroSlides.length)">
+    <button class="hero-nav-btn" (click)="activeSlide.set((activeSlide() - 1 + heroSlides().length) % heroSlides().length)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
       </svg>
     </button>
-    <button class="hero-nav-btn" (click)="activeSlide.set((activeSlide() + 1) % heroSlides.length)">
+    <button class="hero-nav-btn" (click)="activeSlide.set((activeSlide() + 1) % heroSlides().length)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
       </svg>
@@ -93,7 +93,7 @@
   </div>
 
   <!-- BOTTOM: slide info left + stats strip right -->
-  <div class="hero-bottom" *ngIf="heroSlides[activeSlide()] as slide">
+  <div class="hero-bottom" *ngIf="heroSlides()[activeSlide()] as slide">
 
     <!-- Slide info -->
     <div class="hero-project">
@@ -550,7 +550,7 @@
     </div>
 
     <div class="properties-grid">
-      <a *ngFor="let property of featuredProperties; let i = index" [routerLink]="['/properties', property.id]"
+      <a *ngFor="let property of featuredPropertiesLive(); let i = index" [routerLink]="['/properties', property.id]"
         class="property-card animate-on-scroll" [class]="'delay-' + ((i % 3) * 100 + 100)">
 
         <!-- Full image fills the card -->

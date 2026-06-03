@@ -66,8 +66,20 @@ export interface Lead {
   lastContact: string;
 }
 
+// ── Master Data ───────────────────────────────────────────
+export interface MasterStatus { name: string; color: string; }
+
 @Injectable({ providedIn: 'root' })
 export class AdminDataService {
+
+  // ── Master Data Signals ───────────────────────────────
+  readonly categories   = signal<string[]>(['Sale', 'Rent', 'Off-Plan']);
+  readonly propTypes    = signal<string[]>(['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office']);
+  readonly propStatuses = signal<MasterStatus[]>([
+    { name: 'Draft', color: '#6b7280' }, { name: 'Pending Review', color: '#f59e0b' },
+    { name: 'Published', color: '#10b981' }, { name: 'Archived', color: '#8b5cf6' },
+    { name: 'Sold', color: '#3b82f6' }, { name: 'Rented', color: '#6366f1' },
+  ]);
   private sb = inject(SupabaseService).client;
 
   readonly users        = signal<AdminUser[]>([]);
@@ -88,10 +100,62 @@ export class AdminDataService {
   readonly auditLoading  = signal(true);
 
   constructor() {
+    this.loadMasterData();
     this.loadUsers();
     this.loadLeads();
     this.loadCms();
     this.loadAuditLogs();
+  }
+
+  // ── Master Data (Supabase) ────────────────────────────
+  async loadMasterData(): Promise<void> {
+    try {
+      const { data } = await this.sb
+        .from('master_data')
+        .select('*')
+        .order('sort_order');
+      if (data) {
+        this.categories.set(
+          data.filter((r: any) => r.type === 'category').map((r: any) => r.name)
+        );
+        this.propTypes.set(
+          data.filter((r: any) => r.type === 'property_type').map((r: any) => r.name)
+        );
+        this.propStatuses.set(
+          data.filter((r: any) => r.type === 'status').map((r: any) => ({
+            name:  r.name,
+            color: r.color || '#6b7280',
+          }))
+        );
+      }
+    } catch { /* table not created yet — defaults remain */ }
+  }
+
+  async addMasterItem(type: 'category' | 'property_type' | 'status', name: string, color?: string): Promise<string | null> {
+    const order = type === 'category'
+      ? this.categories().length + 1
+      : type === 'property_type'
+        ? this.propTypes().length + 1
+        : this.propStatuses().length + 1;
+    const { error } = await this.sb.from('master_data').insert({ type, name, color: color || null, sort_order: order });
+    if (error) return error.message;
+    await this.loadMasterData();
+    return null;
+  }
+
+  async removeMasterItem(type: 'category' | 'property_type' | 'status', name: string): Promise<string | null> {
+    // Optimistic update immediately
+    if (type === 'category')      this.categories.update(l => l.filter(x => x !== name));
+    if (type === 'property_type') this.propTypes.update(l => l.filter(x => x !== name));
+    if (type === 'status')        this.propStatuses.update(l => l.filter(x => x.name !== name));
+
+    const { error } = await this.sb.from('master_data').delete().eq('type', type).eq('name', name);
+    if (error) {
+      // Revert on failure by reloading
+      await this.loadMasterData();
+      return error.message;
+    }
+    return null;
   }
 
   private dbLog(tag: string, error: any, data: any): void {

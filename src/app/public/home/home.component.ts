@@ -68,6 +68,10 @@ export class HomeComponent implements OnInit {
   private sb      = inject(SupabaseService).client;
   private zone    = inject(NgZone);
 
+  homePage     = computed(() => this.dataSvc.pages().find(p => p.id === 'home-hero'));
+  heroHeadline = computed(() => this.homePage()?.heading    || 'Find Your Dream Property in Dubai');
+  heroSubline  = computed(() => this.homePage()?.subheading || 'Over 2,500 premium listings. Expert agents. End-to-end support.');
+
   searchQuery = signal('');
   searchType = signal('buy');
 

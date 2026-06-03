@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
+import { AdminDataService } from '../../shared/services/admin-data.service';
 
 interface Stat { value: string; label: string; }
 interface CoreValue { title: string; body: string; }
@@ -15,6 +16,11 @@ interface CoreValue { title: string; body: string; }
   styleUrl: './about.component.scss',
 })
 export class AboutComponent {
+  private dataSvc = inject(AdminDataService);
+
+  aboutPage    = computed(() => this.dataSvc.pages().find(p => p.id === 'about-hero'));
+  heroTitle    = computed(() => this.aboutPage()?.heading    || 'About Livwell');
+  heroSubtitle = computed(() => this.aboutPage()?.subheading || "Dubai's most trusted real estate partner — connecting people with exceptional properties since 2008.");
   stats: Stat[] = [
     { value: '950+',    label: 'Expert Agents' },
     { value: '17 Years', label: 'of Excellence' },

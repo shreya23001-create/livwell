@@ -94,6 +94,7 @@ export const routes: Routes = [
           { path: 'reports', loadComponent: () => import('./admin/reports/admin-reports.component').then(m => m.AdminReportsComponent) },
           { path: 'cms', loadComponent: () => import('./admin/cms/admin-cms.component').then(m => m.AdminCmsComponent) },
           { path: 'audit-logs', loadComponent: () => import('./admin/audit-logs/admin-audit-logs.component').then(m => m.AdminAuditLogsComponent) },
+          { path: 'master', loadComponent: () => import('./admin/master/admin-master.component').then(m => m.AdminMasterComponent) },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         ],
       },

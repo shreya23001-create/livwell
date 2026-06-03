@@ -1,0 +1,149 @@
+<div class="master-page">
+
+  <!-- ── Header ── -->
+  <div class="master-header">
+    <div>
+      <h1 class="master-title">Master Data</h1>
+      <p class="master-sub">Manage categories, property types and statuses used across the platform</p>
+    </div>
+  </div>
+
+  <!-- ── Stat Cards ── -->
+  <div class="master-stats">
+    <div class="master-stat" [class.active]="activeTab()==='categories'" (click)="activeTab.set('categories')">
+      <div class="master-stat-val">{{ counts().categories }}</div>
+      <div class="master-stat-lbl">Categories</div>
+    </div>
+    <div class="master-stat" [class.active]="activeTab()==='property-types'" (click)="activeTab.set('property-types')">
+      <div class="master-stat-val">{{ counts().types }}</div>
+      <div class="master-stat-lbl">Property Types</div>
+    </div>
+    <div class="master-stat" [class.active]="activeTab()==='statuses'" (click)="activeTab.set('statuses')">
+      <div class="master-stat-val">{{ counts().statuses }}</div>
+      <div class="master-stat-lbl">Statuses</div>
+    </div>
+  </div>
+
+  <!-- ── Tabs ── -->
+  <div class="master-tabs">
+    <button class="master-tab" [class.active]="activeTab()==='categories'"    (click)="activeTab.set('categories')">Categories</button>
+    <button class="master-tab" [class.active]="activeTab()==='property-types'" (click)="activeTab.set('property-types')">Property Types</button>
+    <button class="master-tab" [class.active]="activeTab()==='statuses'"      (click)="activeTab.set('statuses')">Statuses</button>
+  </div>
+
+  <!-- ══ CATEGORIES ══════════════════════════════════════ -->
+  @if (activeTab() === 'categories') {
+    <div class="master-card">
+      <div class="master-card-header">
+        <h2 class="master-card-title">Listing Categories</h2>
+        <p class="master-card-sub">Used as the listing type on properties (e.g. Sale, Rent, Off-Plan)</p>
+      </div>
+
+      <!-- Add form -->
+      <div class="master-add-row">
+        <input class="master-input" type="text" placeholder="e.g. Commercial"
+               [ngModel]="newCategory()" (ngModelChange)="newCategory.set($event)"
+               (keyup.enter)="addCategory()">
+        <button class="master-btn master-btn--primary" (click)="addCategory()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Add Category
+        </button>
+      </div>
+      @if (categoryError()) {
+        <p class="master-error">{{ categoryError() }}</p>
+      }
+
+      <!-- List -->
+      <div class="master-list">
+        @for (cat of categories(); track cat) {
+          <div class="master-item">
+            <span class="master-item-badge">{{ cat }}</span>
+            <span class="master-item-name">{{ cat }}</span>
+            <button class="master-item-del" (click)="removeCategory(cat)" title="Remove">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ══ PROPERTY TYPES ══════════════════════════════════ -->
+  @if (activeTab() === 'property-types') {
+    <div class="master-card">
+      <div class="master-card-header">
+        <h2 class="master-card-title">Property Types</h2>
+        <p class="master-card-sub">Types available when creating or editing a property listing</p>
+      </div>
+
+      <div class="master-add-row">
+        <input class="master-input" type="text" placeholder="e.g. Duplex"
+               [ngModel]="newType()" (ngModelChange)="newType.set($event)"
+               (keyup.enter)="addType()">
+        <button class="master-btn master-btn--primary" (click)="addType()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Add Type
+        </button>
+      </div>
+      @if (typeError()) {
+        <p class="master-error">{{ typeError() }}</p>
+      }
+
+      <div class="master-list">
+        @for (t of propertyTypes(); track t) {
+          <div class="master-item">
+            <span class="master-item-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+            </span>
+            <span class="master-item-name">{{ t }}</span>
+            <button class="master-item-del" (click)="removeType(t)" title="Remove">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ══ STATUSES ════════════════════════════════════════ -->
+  @if (activeTab() === 'statuses') {
+    <div class="master-card">
+      <div class="master-card-header">
+        <h2 class="master-card-title">Property Statuses</h2>
+        <p class="master-card-sub">Status options available on property listings</p>
+      </div>
+
+      <div class="master-add-row">
+        <input class="master-input" type="text" placeholder="e.g. Under Offer"
+               [ngModel]="newStatus()" (ngModelChange)="newStatus.set($event)"
+               (keyup.enter)="addStatus()">
+        <div class="master-color-wrap">
+          <label class="master-color-lbl">Color</label>
+          <input type="color" class="master-color-input"
+                 [ngModel]="newStatusColor()" (ngModelChange)="newStatusColor.set($event)">
+        </div>
+        <button class="master-btn master-btn--primary" (click)="addStatus()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Add Status
+        </button>
+      </div>
+      @if (statusError()) {
+        <p class="master-error">{{ statusError() }}</p>
+      }
+
+      <div class="master-list">
+        @for (s of statuses(); track s.name) {
+          <div class="master-item">
+            <span class="master-status-dot" [style.background]="s.color"></span>
+            <span class="master-item-name">{{ s.name }}</span>
+            <span class="master-status-badge" [style.background]="s.color + '22'" [style.color]="s.color">{{ s.name }}</span>
+            <button class="master-item-del" (click)="removeStatus(s.name)" title="Remove">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+</div>

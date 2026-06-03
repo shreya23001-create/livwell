@@ -75,9 +75,7 @@
     </div>
     <select class="prop-select" [value]="filterCategory()" (change)="filterCategory.set($any($event.target).value); onFilter()">
       <option value="">All Categories</option>
-      <option value="Sale">For Sale</option>
-      <option value="Rent">For Rent</option>
-      <option value="Off-Plan">Off-Plan</option>
+      <option *ngFor="let c of categoryList" [value]="c">{{ c }}</option>
     </select>
     <select class="prop-select" [value]="filterType()" (change)="filterType.set($any($event.target).value); onFilter()">
       <option value="">All Types</option>
@@ -265,9 +263,7 @@
       <div class="prop-form-field">
         <label class="prop-form-label">Category *</label>
         <select class="prop-form-input" [value]="form()['listing_type']" (change)="patchForm('listing_type', $any($event.target).value)">
-          <option value="Sale">For Sale</option>
-          <option value="Rent">For Rent</option>
-          <option value="Off-Plan">Off-Plan</option>
+          <option *ngFor="let c of categoryList" [value]="c">{{ c }}</option>
         </select>
       </div>
       <div class="prop-form-field">

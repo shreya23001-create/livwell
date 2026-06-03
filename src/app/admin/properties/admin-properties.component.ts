@@ -2,6 +2,7 @@ import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AdminDataService } from '../../shared/services/admin-data.service';
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import * as XLSX from 'xlsx';
 
@@ -46,7 +47,8 @@ const EMPTY_FORM = (): Partial<Property> => ({
   styleUrl: './admin-properties.component.scss',
 })
 export class AdminPropertiesComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb      = inject(SupabaseService).client;
+  private dataSvc = inject(AdminDataService);
 
   // ── Data ──────────────────────────────────────────────
   properties  = signal<Property[]>([]);
@@ -457,8 +459,9 @@ export class AdminPropertiesComponent implements OnInit {
     input.value = '';
   }
 
-  readonly statusList:   PropStatus[]   = ['Draft', 'Pending Review', 'Published', 'Archived', 'Sold', 'Rented'];
-  readonly typeList:     PropType[]     = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office'];
-  readonly categoryList: PropCategory[] = ['Sale', 'Rent', 'Off-Plan'];
+  // Read from master data service — updates when admin adds new items in Master
+  get statusList()   { return this.dataSvc.propStatuses().map(s => s.name) as PropStatus[]; }
+  get typeList()     { return this.dataSvc.propTypes() as PropType[]; }
+  get categoryList() { return this.dataSvc.categories() as PropCategory[]; }
   readonly furnishingList = ['Furnished', 'Unfurnished', 'Partly Furnished'];
 }

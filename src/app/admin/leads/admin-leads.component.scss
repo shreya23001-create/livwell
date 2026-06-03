@@ -51,6 +51,9 @@ $bg:      #f4f6fa;
   &:hover { background: #4f46e5; }
 }
 .btn-ghost {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   background: none;
   border: 1px solid $border;
   border-radius: 0.5rem;
@@ -58,8 +61,11 @@ $bg:      #f4f6fa;
   font-size: 0.875rem;
   color: $subtext;
   cursor: pointer;
+  white-space: nowrap;
   transition: background 0.15s;
+  svg { width: 1rem; height: 1rem; }
   &:hover { background: $bg; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .btn-danger {
   background: $red;
@@ -72,6 +78,31 @@ $bg:      #f4f6fa;
   cursor: pointer;
   transition: background 0.15s;
   &:hover { background: #dc2626; }
+}
+
+// ── Header actions ──
+.leads-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.btn-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid #e5e7eb;
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+.leads-msg {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  &--error   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  &--success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 }
 
 // ── Stats ──
@@ -384,5 +415,17 @@ $bg:      #f4f6fa;
 
 .delete-msg { font-size: 0.9rem; color: $subtext; line-height: 1.6; margin: 0;
   strong { color: $text; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.leads-loading {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 2rem; color: #6b7280; font-size: 0.9rem;
+}
+.leads-spinner {
+  width: 20px; height: 20px; border: 2px solid #e5e7eb;
+  border-top-color: $accent; border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 

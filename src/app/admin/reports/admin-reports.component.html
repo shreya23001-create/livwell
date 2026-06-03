@@ -4,7 +4,7 @@
   <div class="reports-header">
     <div>
       <h1 class="reports-title">Reports & Analytics</h1>
-      <p class="reports-subtitle">Platform performance overview</p>
+      <p class="reports-subtitle">Live data from users and leads</p>
     </div>
     <div class="period-tabs">
       <button [class.active]="period()==='week'"    (click)="period.set('week')">Week</button>
@@ -14,9 +14,9 @@
     </div>
   </div>
 
-  <!-- ── KPI Cards ── -->
+  <!-- ── KPI Cards (dynamic) ── -->
   <div class="kpi-grid">
-    <div class="kpi-card" *ngFor="let k of kpis">
+    <div class="kpi-card" *ngFor="let k of kpis()">
       <div class="kpi-top">
         <span class="kpi-label">{{ k.label }}</span>
         <span class="kpi-trend kpi-trend--{{ k.trend }}">
@@ -31,38 +31,17 @@
     </div>
   </div>
 
-  <!-- ── Row: Revenue Chart + Lead Pipeline ── -->
+  <!-- ── Row: Lead Pipeline + Leads by Source ── -->
   <div class="charts-row">
 
-    <!-- Revenue Bar Chart -->
+    <!-- Lead Pipeline -->
     <div class="chart-card chart-card--wide">
       <div class="chart-header">
-        <h3>Monthly Revenue (AED M)</h3>
-        <span class="chart-badge">2026</span>
-      </div>
-      <div class="bar-chart bar-chart--vertical">
-        <div class="bar-chart-grid">
-          <div class="bar-chart-bars">
-            <div class="vbar-item" *ngFor="let item of monthlyRevenue">
-              <div class="vbar-wrap">
-                <div class="vbar-fill" [style.height.%]="item.pct" [style.background]="item.color"></div>
-              </div>
-              <div class="vbar-val">{{ item.value }}M</div>
-              <div class="vbar-label">{{ item.label }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Lead Pipeline -->
-    <div class="chart-card">
-      <div class="chart-header">
         <h3>Lead Pipeline</h3>
-        <span class="chart-badge">{{ leadsByStatus[0].value + leadsByStatus[1].value + leadsByStatus[2].value + leadsByStatus[3].value + leadsByStatus[4].value + leadsByStatus[5].value }} total</span>
+        <span class="chart-badge">{{ totalLeadsPipeline() }} total</span>
       </div>
       <div class="hbar-list">
-        <div class="hbar-item" *ngFor="let item of leadsByStatus">
+        <div class="hbar-item" *ngFor="let item of leadsByStatus()">
           <div class="hbar-meta">
             <span class="hbar-label">{{ item.label }}</span>
             <span class="hbar-val">{{ item.value }}</span>
@@ -74,34 +53,13 @@
       </div>
     </div>
 
-  </div>
-
-  <!-- ── Row: Lead Sources + Property Types ── -->
-  <div class="charts-row charts-row--half">
-
+    <!-- Leads by Source -->
     <div class="chart-card">
       <div class="chart-header">
         <h3>Leads by Source</h3>
       </div>
       <div class="hbar-list">
-        <div class="hbar-item" *ngFor="let item of leadsBySource">
-          <div class="hbar-meta">
-            <span class="hbar-label">{{ item.label }}</span>
-            <span class="hbar-val">{{ item.value }}</span>
-          </div>
-          <div class="hbar-track">
-            <div class="hbar-fill" [style.width.%]="item.pct" [style.background]="item.color"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="chart-card">
-      <div class="chart-header">
-        <h3>Properties by Type</h3>
-      </div>
-      <div class="hbar-list">
-        <div class="hbar-item" *ngFor="let item of propertiesByType">
+        <div class="hbar-item" *ngFor="let item of leadsBySource()">
           <div class="hbar-meta">
             <span class="hbar-label">{{ item.label }}</span>
             <span class="hbar-val">{{ item.value }}</span>
@@ -115,30 +73,70 @@
 
   </div>
 
-  <!-- ── Row: Top Agents + Recent Activity ── -->
-  <div class="charts-row">
+  <!-- ── Row: Users by Role + Leads by Category ── -->
+  <div class="charts-row charts-row--half">
 
-    <!-- Top Agents Table -->
-    <div class="chart-card chart-card--wide">
+    <div class="chart-card">
       <div class="chart-header">
-        <h3>Top Agents</h3>
-        <span class="chart-badge">This month</span>
+        <h3>Users by Role</h3>
+        <span class="chart-badge">{{ dataSvc.users().length }} total</span>
+      </div>
+      <div class="hbar-list">
+        <div class="hbar-item" *ngFor="let item of usersByRole()">
+          <div class="hbar-meta">
+            <span class="hbar-label">{{ item.label }}</span>
+            <span class="hbar-val">{{ item.value }}</span>
+          </div>
+          <div class="hbar-track">
+            <div class="hbar-fill" [style.width.%]="item.pct" [style.background]="item.color"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Leads by Category</h3>
+      </div>
+      <div class="hbar-list">
+        <div class="hbar-item" *ngFor="let item of leadsByCategory()">
+          <div class="hbar-meta">
+            <span class="hbar-label">{{ item.label }}</span>
+            <span class="hbar-val">{{ item.value }}</span>
+          </div>
+          <div class="hbar-track">
+            <div class="hbar-fill" [style.width.%]="item.pct" [style.background]="item.color"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Top Agents (dynamic) ── -->
+  <div class="charts-row">
+    <div class="chart-card chart-card--full">
+      <div class="chart-header">
+        <h3>Agent Performance</h3>
+        <span class="chart-badge">{{ dataSvc.users().filter(u => u.role === 'agent').length }} agents</span>
       </div>
       <table class="agents-table">
         <thead>
           <tr>
+            <th>#</th>
             <th>Agent</th>
-            <th>Leads</th>
+            <th>Leads Assigned</th>
             <th>Won</th>
-            <th>Revenue</th>
             <th>Conversion</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let agent of topAgents; let i = index">
+          <tr *ngFor="let agent of topAgents(); let i = index">
+            <td>
+              <div class="agent-rank rank--{{ i < 3 ? i+1 : 'other' }}">{{ i+1 }}</div>
+            </td>
             <td>
               <div class="agent-cell">
-                <div class="agent-rank rank--{{ i+1 }}">{{ i+1 }}</div>
                 <div class="agent-avatar">{{ agent.name[0] }}</div>
                 <span class="agent-name">{{ agent.name }}</span>
               </div>
@@ -150,7 +148,6 @@
               </div>
             </td>
             <td><strong>{{ agent.won }}</strong></td>
-            <td class="td-revenue">{{ agent.revenue }}</td>
             <td>
               <div class="conv-wrap">
                 <div class="conv-bar" [style.width.%]="agent.conversion"></div>
@@ -158,32 +155,12 @@
               </div>
             </td>
           </tr>
+          <tr *ngIf="topAgents().length === 0">
+            <td colspan="5" style="text-align:center;padding:2rem;color:#9ca3af;">No agents found.</td>
+          </tr>
         </tbody>
       </table>
     </div>
-
-    <!-- Recent Activity -->
-    <div class="chart-card">
-      <div class="chart-header">
-        <h3>Recent Activity</h3>
-      </div>
-      <div class="activity-list">
-        <div class="activity-item" *ngFor="let a of recentActivity">
-          <div class="activity-icon activity-icon--{{ a.type }}">
-            <i *ngIf="a.icon === 'fa-solid fa-trophy'" class="fa-solid fa-trophy"></i>
-            <i *ngIf="a.icon === 'fa-solid fa-user'" class="fa-solid fa-user"></i>
-            <i *ngIf="a.icon === 'fa-solid fa-house'" class="fa-solid fa-house"></i>
-            <i *ngIf="a.icon === 'fa-solid fa-circle-check'" class="fa-solid fa-circle-check"></i>
-            <i *ngIf="a.icon === 'fa-solid fa-users'" class="fa-solid fa-users"></i>
-          </div>
-          <div class="activity-body">
-            <p class="activity-text">{{ a.text }}</p>
-            <span class="activity-time">{{ a.time }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
 </div>

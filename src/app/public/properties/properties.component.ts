@@ -1,7 +1,9 @@
-import { Component, OnInit, signal, computed, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, OnInit, signal, computed, PLATFORM_ID, Inject, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 export interface PropertyListing {
   id: number;
@@ -74,6 +76,8 @@ export class PropertiesComponent implements OnInit {
   activeMapProperty = signal<PropertyListing | null>(null);
   hoveredPropertyId = signal<number | null>(null);
 
+  private sb = inject(SupabaseService).client;
+
   // ── Data ─────────────────────────────────────────────────────
   readonly filterOptions = {
     types: ['Apartment', 'Villa', 'Townhouse', 'Hotel Apartment', 'Duplex', 'Penthouse', 'Mansion', 'Office', 'Shop', 'Residential Plot', 'Commercial Plot'],
@@ -97,7 +101,9 @@ export class PropertiesComponent implements OnInit {
     ],
   };
 
-  readonly allProperties: PropertyListing[] = [
+  allProperties = signal<PropertyListing[]>([]);
+
+  private readonly _mockProperties: PropertyListing[] = [
     {
       id: 1, title: 'Luxury Penthouse with Burj View', location: 'Downtown Dubai, UAE', community: 'Downtown Dubai',
       price: 4500000, priceLabel: 'AED 4,500,000', pricePerSqft: 'AED 1,406/sqft',
@@ -258,7 +264,7 @@ export class PropertiesComponent implements OnInit {
 
   // ── Computed: filtered + sorted + paginated ──────────────────
   filteredProperties = computed(() => {
-    let result = [...this.allProperties];
+    let result = [...this.allProperties()];
     const q = this.searchQuery().toLowerCase().trim();
     if (q) {
       result = result.filter(p =>
@@ -371,13 +377,20 @@ export class PropertiesComponent implements OnInit {
   // ── Card image index tracking ────────────────────────────────
   activeImageMap: Record<number, number> = {};
 
+  private sanitizer = inject(DomSanitizer);
+
+  safeImg(url: string): string {
+    // Return URL as-is — Angular doesn't block https:// in img src
+    return url || '';
+  }
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.route.queryParams.subscribe(params => {
       if (params['type']) this.selectedType.set(params['type']);
       if (params['status']) this.selectedStatus.set(params['status']);
@@ -387,6 +400,56 @@ export class PropertiesComponent implements OnInit {
       if (params['minPrice']) this.minPrice.set(Number(params['minPrice']));
       if (params['maxPrice']) this.maxPrice.set(Number(params['maxPrice']));
     });
+    await this.loadProperties();
+  }
+
+  private async loadProperties(): Promise<void> {
+    this.isLoading.set(true);
+    const { data, error } = await this.sb
+      .from('properties')
+      .select('*, profiles(name)')
+      .eq('status', 'Published')
+      .order('created_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      this.allProperties.set(data.map((p: any) => ({
+        id:          p.id,
+        title:       p.title,
+        location:    p.location ?? '',
+        community:   p.community ?? '',
+        price:       p.price,
+        priceLabel:  this.formatPrice(p.price, p.listing_type),
+        pricePerSqft: p.area_sqft ? `AED ${Math.round(p.price / p.area_sqft).toLocaleString()}/sqft` : '',
+        beds:        p.bedrooms === 0 ? 'Studio' : p.bedrooms,
+        baths:       p.bathrooms ?? 1,
+        sqft:        p.area_sqft ?? 0,
+        sqftLabel:   p.area_sqft ? `${p.area_sqft.toLocaleString()} sqft` : '',
+        type:        p.type as any,
+        status:      p.listing_type === 'Rent' ? 'Rent' : 'Sale',
+        furnished:   p.furnishing ?? 'Unfurnished',
+        badge:       p.badge,
+        images:      p.images?.length ? p.images : ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80'],
+        amenities:   p.amenities ?? [],
+        views:       p.views ?? 0,
+        postedDate:  p.created_at?.slice(0, 10) ?? '',
+        lat:         p.lat ?? 25.2,
+        lng:         p.lng ?? 55.27,
+        agentName:   p.profiles?.name ?? 'Livwell Agent',
+        agentAvatar: '',
+        agentPhone:  '',
+      })));
+    } else {
+      // Fall back to mock data if no real properties yet
+      this.allProperties.set(this._mockProperties);
+    }
+    this.isLoading.set(false);
+  }
+
+  private formatPrice(price: number, listingType: string): string {
+    const suffix = listingType === 'Rent' ? '/yr' : '';
+    if (price >= 1_000_000) return `AED ${(price / 1_000_000).toFixed(2)}M${suffix}`;
+    if (price >= 1_000) return `AED ${(price / 1_000).toFixed(0)}K${suffix}`;
+    return `AED ${price.toLocaleString()}${suffix}`;
   }
 
   // ── Actions ──────────────────────────────────────────────────

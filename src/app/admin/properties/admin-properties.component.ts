@@ -1,99 +1,97 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SupabaseService } from '../../shared/services/supabase.service';
+import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
+import * as XLSX from 'xlsx';
 
-export type PropStatus = 'active' | 'pending' | 'sold' | 'rented' | 'off_market';
-export type PropType   = 'apartment' | 'villa' | 'townhouse' | 'penthouse' | 'studio' | 'office';
-export type PropCategory = 'sale' | 'rent' | 'off_plan';
+export type PropStatus   = 'Draft' | 'Pending Review' | 'Published' | 'Archived' | 'Sold' | 'Rented';
+export type PropType     = 'Apartment' | 'Villa' | 'Townhouse' | 'Penthouse' | 'Studio' | 'Office';
+export type PropCategory = 'Sale' | 'Rent' | 'Off-Plan';
 
 export interface Property {
-  id: number;
-  title: string;
-  type: PropType;
-  category: PropCategory;
-  status: PropStatus;
-  price: number;
-  currency: string;
-  area: number;
-  bedrooms: number;
-  bathrooms: number;
-  location: string;
-  community: string;
-  agent: string;
-  listedDate: string;
-  images: number;
-  views: number;
-  leads: number;
-  featured: boolean;
+  id:           number;
+  title:        string;
+  type:         PropType;
+  listing_type: PropCategory;
+  status:       PropStatus;
+  price:        number;
+  area_sqft:    number;
+  bedrooms:     number;
+  bathrooms:    number;
+  location:     string;
+  community:    string;
+  agent_id:     string | null;
+  agent_name?:  string;
+  created_at:   string;
+  views:        number;
+  is_featured:  boolean;
+  description:  string;
+  address:      string;
+  furnishing:   string;
+  images:       string[];
 }
 
-const SAMPLE_PROPERTIES: Property[] = [
-  { id: 1,  title: 'Luxury 3BR Apartment in Downtown',     type: 'apartment',  category: 'sale',     status: 'active',     price: 2850000, currency: 'AED', area: 1850, bedrooms: 3, bathrooms: 3, location: 'Downtown Dubai',       community: 'Burj Views',         agent: 'Sarah Al-Mansouri', listedDate: '2026-04-10', images: 12, views: 342, leads: 8,  featured: true  },
-  { id: 2,  title: 'Spacious 2BR in Dubai Marina',         type: 'apartment',  category: 'rent',     status: 'active',     price: 120000,  currency: 'AED', area: 1240, bedrooms: 2, bathrooms: 2, location: 'Dubai Marina',          community: 'Marina Gate',        agent: 'Ahmed Hassan',      listedDate: '2026-04-15', images: 8,  views: 215, leads: 5,  featured: false },
-  { id: 3,  title: '4BR Villa with Private Pool',          type: 'villa',      category: 'sale',     status: 'active',     price: 7200000, currency: 'AED', area: 5200, bedrooms: 4, bathrooms: 5, location: 'Palm Jumeirah',         community: 'Signature Villas',   agent: 'Sarah Al-Mansouri', listedDate: '2026-03-22', images: 20, views: 589, leads: 14, featured: true  },
-  { id: 4,  title: 'Studio Apartment in JVC',              type: 'studio',     category: 'rent',     status: 'pending',    price: 45000,   currency: 'AED', area: 480,  bedrooms: 0, bathrooms: 1, location: 'Jumeirah Village Circle', community: 'Bloom Heights',      agent: 'Rania Khalid',      listedDate: '2026-05-01', images: 5,  views: 98,  leads: 3,  featured: false },
-  { id: 5,  title: 'Off-Plan 2BR in Dubai Creek Harbour',  type: 'apartment',  category: 'off_plan', status: 'active',     price: 1650000, currency: 'AED', area: 1100, bedrooms: 2, bathrooms: 2, location: 'Dubai Creek Harbour',   community: 'Creek Gate',         agent: 'Omar Al-Farsi',     listedDate: '2026-02-14', images: 15, views: 712, leads: 22, featured: true  },
-  { id: 6,  title: 'Penthouse with Full Burj View',        type: 'penthouse',  category: 'sale',     status: 'active',     price: 9500000, currency: 'AED', area: 6800, bedrooms: 5, bathrooms: 6, location: 'Downtown Dubai',       community: 'Opera Grand',        agent: 'Sarah Al-Mansouri', listedDate: '2026-01-30', images: 25, views: 1024,leads: 31, featured: true  },
-  { id: 7,  title: '3BR Townhouse in Arabian Ranches',     type: 'townhouse',  category: 'sale',     status: 'sold',       price: 3100000, currency: 'AED', area: 2800, bedrooms: 3, bathrooms: 4, location: 'Arabian Ranches',       community: 'Rasha',              agent: 'Ahmed Hassan',      listedDate: '2026-01-05', images: 10, views: 450, leads: 18, featured: false },
-  { id: 8,  title: '1BR in Business Bay',                  type: 'apartment',  category: 'rent',     status: 'rented',     price: 80000,   currency: 'AED', area: 750,  bedrooms: 1, bathrooms: 1, location: 'Business Bay',          community: 'Damac Towers',       agent: 'Rania Khalid',      listedDate: '2026-03-10', images: 7,  views: 180, leads: 6,  featured: false },
-  { id: 9,  title: 'Office Space in DIFC',                 type: 'office',     category: 'rent',     status: 'active',     price: 250000,  currency: 'AED', area: 2000, bedrooms: 0, bathrooms: 2, location: 'DIFC',                  community: 'Gate Village',       agent: 'Omar Al-Farsi',     listedDate: '2026-04-20', images: 6,  views: 134, leads: 4,  featured: false },
-  { id: 10, title: '5BR Villa in Emirates Hills',          type: 'villa',      category: 'sale',     status: 'off_market', price:15000000, currency: 'AED', area: 9500, bedrooms: 5, bathrooms: 7, location: 'Emirates Hills',        community: 'Sector E',           agent: 'Sarah Al-Mansouri', listedDate: '2026-02-28', images: 30, views: 890, leads: 25, featured: false },
-  { id: 11, title: '2BR Apartment in JBR',                 type: 'apartment',  category: 'rent',     status: 'active',     price: 140000,  currency: 'AED', area: 1300, bedrooms: 2, bathrooms: 2, location: 'Jumeirah Beach Residence','community': 'Sadaf',           agent: 'Ahmed Hassan',      listedDate: '2026-05-05', images: 9,  views: 201, leads: 7,  featured: false },
-  { id: 12, title: 'Off-Plan 1BR in MBR City',             type: 'apartment',  category: 'off_plan', status: 'pending',    price: 980000,  currency: 'AED', area: 720,  bedrooms: 1, bathrooms: 1, location: 'Mohammed Bin Rashid City','community': 'District One',   agent: 'Rania Khalid',      listedDate: '2026-05-10', images: 4,  views: 67,  leads: 2,  featured: false },
-];
-
 const EMPTY_FORM = (): Partial<Property> => ({
-  title: '', type: 'apartment', category: 'sale', status: 'active',
-  price: 0, currency: 'AED', area: 0, bedrooms: 1, bathrooms: 1,
-  location: '', community: '', agent: '', listedDate: new Date().toISOString().slice(0, 10),
-  images: 0, views: 0, leads: 0, featured: false,
+  title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
+  price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
+  location: '', community: '', address: '', description: '',
+  furnishing: 'Unfurnished', agent_id: null, is_featured: false, images: [],
 });
 
 @Component({
   selector: 'app-admin-properties',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SafeUrlPipe],
   templateUrl: './admin-properties.component.html',
   styleUrl: './admin-properties.component.scss',
 })
-export class AdminPropertiesComponent {
+export class AdminPropertiesComponent implements OnInit {
+  private sb = inject(SupabaseService).client;
 
   // ── Data ──────────────────────────────────────────────
-  properties = signal<Property[]>([...SAMPLE_PROPERTIES]);
+  properties  = signal<Property[]>([]);
+  agents      = signal<{ id: string; name: string }[]>([]);
+  loading     = signal(true);
+  saving      = signal(false);
 
   // ── Filters ───────────────────────────────────────────
-  search      = signal('');
+  search         = signal('');
   filterStatus   = signal<PropStatus | ''>('');
   filterType     = signal<PropType | ''>('');
   filterCategory = signal<PropCategory | ''>('');
-  sortField   = signal<keyof Property>('listedDate');
-  sortDir     = signal<'asc' | 'desc'>('desc');
+  sortField      = signal<keyof Property>('created_at');
+  sortDir        = signal<'asc' | 'desc'>('desc');
 
   // ── Pagination ────────────────────────────────────────
   page     = signal(1);
   pageSize = signal(10);
 
   // ── Modal ─────────────────────────────────────────────
-  modalOpen   = signal(false);
-  editingId   = signal<number | null>(null);
-  deleteModal = signal<Property | null>(null);
-  form        = signal<Partial<Property>>(EMPTY_FORM());
-  formErrors  = signal<Record<string, string>>({});
+  modalOpen      = signal(false);
+  editingId      = signal<number | null>(null);
+  deleteModal    = signal<Property | null>(null);
+  form           = signal<Partial<Property>>(EMPTY_FORM());
+  formErrors     = signal<Record<string, string>>({});
+  saveError      = signal('');
+  uploadingImages = signal(false);
+  uploadedImages  = signal<string[]>([]);   // final public URLs (saved to DB)
+  previewImages   = signal<string[]>([]);   // local blob URLs for instant preview
 
-  // ── Computed list ─────────────────────────────────────
+  // ── Computed ──────────────────────────────────────────
   filtered = computed(() => {
-    const q    = this.search().toLowerCase();
-    const s    = this.filterStatus();
-    const t    = this.filterType();
-    const c    = this.filterCategory();
-    const sf   = this.sortField();
-    const sd   = this.sortDir();
+    const q  = this.search().toLowerCase();
+    const s  = this.filterStatus();
+    const t  = this.filterType();
+    const c  = this.filterCategory();
+    const sf = this.sortField();
+    const sd = this.sortDir();
 
     let list = this.properties().filter(p => {
-      const matchQ = !q || p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q) || p.community.toLowerCase().includes(q) || p.agent.toLowerCase().includes(q);
+      const matchQ = !q || p.title.toLowerCase().includes(q) || (p.location ?? '').toLowerCase().includes(q) || (p.community ?? '').toLowerCase().includes(q) || (p.agent_name ?? '').toLowerCase().includes(q);
       const matchS = !s || p.status === s;
       const matchT = !t || p.type === t;
-      const matchC = !c || p.category === c;
+      const matchC = !c || p.listing_type === c;
       return matchQ && matchS && matchT && matchC;
     });
 
@@ -103,39 +101,64 @@ export class AdminPropertiesComponent {
       const cmp = av < bv ? -1 : av > bv ? 1 : 0;
       return sd === 'asc' ? cmp : -cmp;
     });
-
     return list;
   });
 
-  paginated = computed(() => {
+  paginated  = computed(() => {
     const start = (this.page() - 1) * this.pageSize();
     return this.filtered().slice(start, start + this.pageSize());
   });
-
   totalPages = computed(() => Math.ceil(this.filtered().length / this.pageSize()));
 
   stats = computed(() => {
     const all = this.properties();
     return {
-      total:      all.length,
-      active:     all.filter(p => p.status === 'active').length,
-      sold:       all.filter(p => p.status === 'sold').length,
-      pending:    all.filter(p => p.status === 'pending').length,
-      featured:   all.filter(p => p.featured).length,
+      total:     all.length,
+      published: all.filter(p => p.status === 'Published').length,
+      draft:     all.filter(p => p.status === 'Draft').length,
+      pending:   all.filter(p => p.status === 'Pending Review').length,
+      featured:  all.filter(p => p.is_featured).length,
     };
   });
 
-  // ── Sorting ───────────────────────────────────────────
-  sort(field: keyof Property): void {
-    if (this.sortField() === field) {
-      this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
-    } else {
-      this.sortField.set(field);
-      this.sortDir.set('asc');
-    }
-    this.page.set(1);
+  hasFilters = computed(() => !!(this.search() || this.filterStatus() || this.filterType() || this.filterCategory()));
+
+  // ── Lifecycle ─────────────────────────────────────────
+  async ngOnInit(): Promise<void> {
+    await Promise.all([this.loadProperties(), this.loadAgents()]);
   }
 
+  async loadProperties(): Promise<void> {
+    this.loading.set(true);
+    const { data, error } = await this.sb
+      .from('properties')
+      .select('*, profiles(name)')
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      this.properties.set(data.map((p: any) => ({
+        ...p,
+        agent_name: p.profiles?.name ?? '—',
+      })));
+    }
+    this.loading.set(false);
+  }
+
+  async loadAgents(): Promise<void> {
+    const { data } = await this.sb
+      .from('profiles')
+      .select('id, name')
+      .eq('role', 'agent')
+      .order('name');
+    if (data) this.agents.set(data);
+  }
+
+  // ── Sorting / Filtering ───────────────────────────────
+  sort(field: keyof Property): void {
+    if (this.sortField() === field) this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    else { this.sortField.set(field); this.sortDir.set('asc'); }
+    this.page.set(1);
+  }
   onSearch(): void { this.page.set(1); }
   onFilter(): void { this.page.set(1); }
   clearFilters(): void {
@@ -144,12 +167,13 @@ export class AdminPropertiesComponent {
     this.page.set(1);
   }
 
-  hasFilters = computed(() => !!(this.search() || this.filterStatus() || this.filterType() || this.filterCategory()));
-
   // ── Modal ─────────────────────────────────────────────
   openAdd(): void {
     this.form.set(EMPTY_FORM());
     this.formErrors.set({});
+    this.saveError.set('');
+    this.uploadedImages.set([]);
+    this.previewImages.set([]);
     this.editingId.set(null);
     this.modalOpen.set(true);
   }
@@ -157,38 +181,139 @@ export class AdminPropertiesComponent {
   openEdit(p: Property): void {
     this.form.set({ ...p });
     this.formErrors.set({});
+    this.saveError.set('');
+    this.uploadedImages.set(p.images ?? []);
+    this.previewImages.set(p.images ?? []);   // existing URLs are already public
     this.editingId.set(p.id);
     this.modalOpen.set(true);
   }
 
-  closeModal(): void { this.modalOpen.set(false); }
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const files = Array.from(input.files);
+    input.value = '';
+    this.runUpload(files);
+  }
 
-  saveProperty(): void {
+  private async runUpload(files: File[]): Promise<void> {
+    this.uploadingImages.set(true);
+    this.saveError.set('');
+
+    // Show instant local previews before upload starts
+    const blobs = files.map(f => URL.createObjectURL(f));
+    this.previewImages.update(p => [...p, ...blobs]);
+
+    const publicUrls: string[] = [];
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext  = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        const path = `properties/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+        const { data, error } = await this.sb.storage
+          .from('imagesFolder')
+          .upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
+
+        if (error) {
+          this.saveError.set(`Image ${i + 1} failed: ${error.message}`);
+          // Revoke the blob that failed
+          URL.revokeObjectURL(blobs[i]);
+          this.previewImages.update(p => p.filter(u => u !== blobs[i]));
+          break;
+        }
+
+        if (data) {
+          const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
+          // Replace the blob preview with the real public URL
+          this.previewImages.update(p => p.map(u => u === blobs[i] ? pub.publicUrl : u));
+          URL.revokeObjectURL(blobs[i]);
+          publicUrls.push(pub.publicUrl);
+        }
+      }
+    } catch (e: any) {
+      this.saveError.set('Upload error: ' + (e?.message ?? 'Unknown error'));
+    } finally {
+      this.uploadedImages.update(p => [...p, ...publicUrls]);
+      this.uploadingImages.set(false);
+    }
+  }
+
+  removeImage(index: number): void {
+    this.previewImages.update(imgs => imgs.filter((_, i) => i !== index));
+    this.uploadedImages.update(imgs => imgs.filter((_, i) => i !== index));
+  }
+
+
+  closeModal(): void {
+    this.modalOpen.set(false);
+    this.previewImages.set([]);
+    this.uploadedImages.set([]);
+  }
+
+  async saveProperty(): Promise<void> {
     const errs = this.validateForm();
     this.formErrors.set(errs);
     if (Object.keys(errs).length) return;
 
-    const f = this.form() as Property;
-    if (this.editingId() !== null) {
-      this.properties.update(list =>
-        list.map(p => p.id === this.editingId() ? { ...f, id: p.id } : p)
-      );
-    } else {
-      const newId = Math.max(...this.properties().map(p => p.id)) + 1;
-      this.properties.update(list => [{ ...f, id: newId, views: 0, leads: 0 } as Property, ...list]);
+    this.saving.set(true);
+    this.saveError.set('');
+    const f = this.form();
+
+    const payload: any = {
+      title:        f.title?.trim(),
+      type:         f.type         || 'Apartment',
+      listing_type: f.listing_type || 'Sale',
+      status:       f.status       || 'Draft',
+      price:        Number(f.price)    || 0,
+      area_sqft:    Number(f.area_sqft) || 0,
+      bedrooms:     Number(f.bedrooms)  || 0,
+      bathrooms:    Number(f.bathrooms) || 1,
+      location:     f.location?.trim()  || '',
+      community:    f.community?.trim() || '',
+      address:      f.address?.trim()   || '',
+      description:  f.description?.trim() || '',
+      furnishing:   f.furnishing    || 'Unfurnished',
+      agent_id:     f.agent_id      || null,
+      is_featured:  f.is_featured   ?? false,
+      images:       this.uploadedImages(),
+    };
+
+    try {
+      let error: any;
+
+      if (this.editingId() !== null) {
+        ({ error } = await this.sb.from('properties').update(payload).eq('id', this.editingId()));
+      } else {
+        ({ error } = await this.sb.from('properties').insert(payload));
+      }
+
+      if (error) {
+        console.error('Supabase save error:', error);
+        this.saveError.set(`Error: ${error.message || error.code || 'Unknown error'}`);
+        this.saving.set(false);
+        return;
+      }
+
+      this.saving.set(false);
+      this.closeModal();
+      await this.loadProperties();
+
+    } catch (e: any) {
+      console.error('Save exception:', e);
+      this.saveError.set('Unexpected error: ' + (e?.message || 'Please try again.'));
+      this.saving.set(false);
     }
-    this.closeModal();
   }
 
   private validateForm(): Record<string, string> {
     const errs: Record<string, string> = {};
     const f = this.form();
-    if (!f.title?.trim()) errs['title'] = 'Title is required.';
+    if (!f.title?.trim())    errs['title']    = 'Title is required.';
     if (!f.location?.trim()) errs['location'] = 'Location is required.';
-    if (!f.community?.trim()) errs['community'] = 'Community is required.';
-    if (!f.agent?.trim()) errs['agent'] = 'Agent is required.';
     if (!f.price || f.price <= 0) errs['price'] = 'Price must be greater than 0.';
-    if (!f.area || f.area <= 0) errs['area'] = 'Area must be greater than 0.';
+    if (!f.area_sqft || f.area_sqft <= 0) errs['area_sqft'] = 'Area must be greater than 0.';
     return errs;
   }
 
@@ -199,31 +324,33 @@ export class AdminPropertiesComponent {
 
   // ── Delete ────────────────────────────────────────────
   confirmDelete(p: Property): void { this.deleteModal.set(p); }
-  cancelDelete(): void { this.deleteModal.set(null); }
-  doDelete(): void {
+  cancelDelete(): void  { this.deleteModal.set(null); }
+
+  async doDelete(): Promise<void> {
     const p = this.deleteModal();
     if (!p) return;
-    this.properties.update(list => list.filter(x => x.id !== p.id));
-    this.deleteModal.set(null);
+    const { error } = await this.sb.from('properties').delete().eq('id', p.id);
+    if (!error) {
+      this.deleteModal.set(null);
+      await this.loadProperties();
+    }
+  }
+
+  // ── Status quick-change ───────────────────────────────
+  async updateStatus(p: Property, status: PropStatus): Promise<void> {
+    await this.sb.from('properties').update({ status }).eq('id', p.id);
+    await this.loadProperties();
   }
 
   // ── Helpers ───────────────────────────────────────────
-  formatPrice(price: number, currency: string): string {
-    if (price >= 1_000_000) return `${currency} ${(price / 1_000_000).toFixed(2)}M`;
-    if (price >= 1_000)    return `${currency} ${(price / 1_000).toFixed(0)}K`;
-    return `${currency} ${price.toLocaleString()}`;
+  formatPrice(price: number): string {
+    if (price >= 1_000_000) return `AED ${(price / 1_000_000).toFixed(2)}M`;
+    if (price >= 1_000)     return `AED ${(price / 1_000).toFixed(0)}K`;
+    return `AED ${price.toLocaleString()}`;
   }
 
-  statusLabel(s: PropStatus): string {
-    return { active: 'Active', pending: 'Pending', sold: 'Sold', rented: 'Rented', off_market: 'Off Market' }[s];
-  }
-
-  categoryLabel(c: PropCategory): string {
-    return { sale: 'For Sale', rent: 'For Rent', off_plan: 'Off-Plan' }[c];
-  }
-
-  typeLabel(t: PropType): string {
-    return { apartment: 'Apartment', villa: 'Villa', townhouse: 'Townhouse', penthouse: 'Penthouse', studio: 'Studio', office: 'Office' }[t];
+  agentName(id: string | null): string {
+    return this.agents().find(a => a.id === id)?.name ?? '—';
   }
 
   pages(): number[] {
@@ -235,7 +362,89 @@ export class AdminPropertiesComponent {
     return [1, -1, cur-1, cur, cur+1, -1, total];
   }
 
-  readonly statusList: PropStatus[]   = ['active', 'pending', 'sold', 'rented', 'off_market'];
-  readonly typeList: PropType[]       = ['apartment', 'villa', 'townhouse', 'penthouse', 'studio', 'office'];
-  readonly categoryList: PropCategory[] = ['sale', 'rent', 'off_plan'];
+  importError   = signal('');
+  importSuccess = signal('');
+  importing     = signal(false);
+
+  // ── Export ────────────────────────────────────────────
+  exportToExcel(): void {
+    const rows = this.properties().map(p => ({
+      'Title':        p.title,
+      'Type':         p.type,
+      'Category':     p.listing_type,
+      'Status':       p.status,
+      'Price (AED)':  p.price,
+      'Area (sqft)':  p.area_sqft,
+      'Bedrooms':     p.bedrooms,
+      'Bathrooms':    p.bathrooms,
+      'Location':     p.location,
+      'Community':    p.community,
+      'Address':      p.address,
+      'Furnishing':   p.furnishing,
+      'Description':  p.description,
+      'Featured':     p.is_featured ? 'Yes' : 'No',
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Properties');
+    XLSX.writeFile(wb, `livwell-properties-${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+
+  // ── Import ────────────────────────────────────────────
+  async importFromExcel(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    this.importing.set(true);
+    this.importError.set('');
+    this.importSuccess.set('');
+
+    const file   = input.files[0];
+    const buffer = await file.arrayBuffer();
+    const wb     = XLSX.read(buffer, { type: 'array' });
+    const ws     = wb.Sheets[wb.SheetNames[0]];
+    const rows   = XLSX.utils.sheet_to_json(ws) as any[];
+
+    if (!rows.length) {
+      this.importError.set('No data found in the file.');
+      this.importing.set(false);
+      return;
+    }
+
+    const records = rows.map(r => ({
+      title:        r['Title']       || '',
+      type:         r['Type']        || 'Apartment',
+      listing_type: r['Category']    || 'Sale',
+      status:       r['Status']      || 'Draft',
+      price:        Number(r['Price (AED)']) || 0,
+      area_sqft:    Number(r['Area (sqft)']) || 0,
+      bedrooms:     Number(r['Bedrooms'])    || 0,
+      bathrooms:    Number(r['Bathrooms'])   || 1,
+      location:     r['Location']    || '',
+      community:    r['Community']   || '',
+      address:      r['Address']     || '',
+      furnishing:   r['Furnishing']  || 'Unfurnished',
+      description:  r['Description'] || '',
+      is_featured:  r['Featured'] === 'Yes',
+      images:       [],
+    })).filter(r => r.title.trim());
+
+    const { error } = await this.sb.from('properties').insert(records);
+
+    if (error) {
+      this.importError.set('Import failed: ' + error.message);
+    } else {
+      this.importSuccess.set(`✓ ${records.length} properties imported successfully.`);
+      await this.loadProperties();
+    }
+
+    this.importing.set(false);
+    input.value = '';
+  }
+
+  readonly statusList:   PropStatus[]   = ['Draft', 'Pending Review', 'Published', 'Archived', 'Sold', 'Rented'];
+  readonly typeList:     PropType[]     = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office'];
+  readonly categoryList: PropCategory[] = ['Sale', 'Rent', 'Off-Plan'];
+  readonly furnishingList = ['Furnished', 'Unfurnished', 'Partly Furnished'];
 }

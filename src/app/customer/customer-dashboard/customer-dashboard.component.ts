@@ -34,6 +34,7 @@ interface Enquiry {
 })
 export class CustomerDashboardComponent {
   today = new Date().toLocaleDateString('en-AE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  showWelcome = signal(false);
 
   savedProperties = signal<SavedProperty[]>([
     { id: 1, title: 'Luxury 2BR in Downtown Dubai', location: 'Downtown Dubai', price: 'AED 2,800,000', type: 'Apartment', beds: 2, baths: 2, area: 1450, savedOn: '2 days ago', status: 'available' },
@@ -47,7 +48,14 @@ export class CustomerDashboardComponent {
     { id: 3, property: 'Penthouse in Palm Jumeirah', agent: 'Priya Nair', date: '2 weeks ago', status: 'closed', message: 'Is the price negotiable for a cash buyer?' },
   ]);
 
-  constructor(public auth: AuthService) {}
+  constructor(public auth: AuthService) {
+    if (auth.newlyRegistered()) {
+      this.showWelcome.set(true);
+      auth.clearNewlyRegistered();
+    }
+  }
+
+  dismissWelcome(): void { this.showWelcome.set(false); }
 
   greeting(): string {
     const h = new Date().getHours();

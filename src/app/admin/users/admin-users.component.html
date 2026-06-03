@@ -6,13 +6,39 @@
       <h1 class="usr-title">Users</h1>
       <p class="usr-sub">Manage all platform users — admins, agents and customers</p>
     </div>
-    <button class="usr-btn usr-btn--primary" (click)="openAdd()">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-      </svg>
-      Add User
-    </button>
+    <div class="usr-header-actions">
+      <!-- Import -->
+      <label class="usr-btn usr-btn--ghost" [class.usr-btn--loading]="importing()" title="Import from Excel">
+        <input type="file" accept=".xlsx,.xls,.csv" (change)="importFromExcel($event)" style="display:none" [disabled]="importing()">
+        @if (importing()) {
+          <span class="usr-btn-spinner"></span> Importing…
+        } @else {
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
+          Import Excel
+        }
+      </label>
+      <!-- Export -->
+      <button class="usr-btn usr-btn--ghost" (click)="exportToExcel()" [disabled]="users().length === 0" title="Export to Excel">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+        Export Excel
+      </button>
+      <!-- Add -->
+      <button class="usr-btn usr-btn--primary" (click)="openAdd()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add User
+      </button>
+    </div>
   </div>
+
+  <!-- Import feedback -->
+  @if (importError()) {
+    <div class="usr-msg usr-msg--error">{{ importError() }}</div>
+  }
+  @if (importSuccess()) {
+    <div class="usr-msg usr-msg--success">{{ importSuccess() }}</div>
+  }
 
   <!-- ── STAT CARDS ────────────────────────────────────── -->
   <div class="usr-stats">
@@ -71,12 +97,20 @@
     </button>
   </div>
 
-  <div class="usr-result-bar">
+  <!-- Loading / Error -->
+  <div *ngIf="loading()" class="usr-loading">
+    <div class="usr-spinner"></div> Loading users…
+  </div>
+  <div *ngIf="dataSvc.usersError() && !loading()" class="usr-msg usr-msg--error">
+    Supabase error: {{ dataSvc.usersError() }}
+  </div>
+
+  <div class="usr-result-bar" *ngIf="!loading()">
     <span class="usr-result-count">{{ filtered().length }} users</span>
   </div>
 
   <!-- ── TABLE ─────────────────────────────────────────── -->
-  <div class="usr-table-wrap">
+  <div class="usr-table-wrap" *ngIf="!loading()">
     <table class="usr-table">
       <thead>
         <tr>
@@ -288,9 +322,11 @@
 
   </div>
   <div class="usr-modal-footer">
+    <span *ngIf="saveError()" style="color:#dc2626;font-size:0.8rem;flex:1">{{ saveError() }}</span>
     <button class="usr-btn usr-btn--ghost" (click)="closeModal()">Cancel</button>
-    <button class="usr-btn usr-btn--primary" (click)="saveUser()">
-      {{ editingId() !== null ? 'Save Changes' : 'Add User' }}
+    <button class="usr-btn usr-btn--primary" (click)="saveUser()" [disabled]="saving()">
+      @if (saving()) { <span class="usr-btn-spinner"></span> Saving… }
+      @else { {{ editingId() !== null ? 'Save Changes' : 'Add User' }} }
     </button>
   </div>
 </div>

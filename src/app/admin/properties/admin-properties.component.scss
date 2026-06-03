@@ -340,7 +340,7 @@ $amber:   #d97706;
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.45);
-  z-index: 100;
+  z-index: 1000;
   backdrop-filter: blur(2px);
 }
 .prop-modal {
@@ -348,7 +348,7 @@ $amber:   #d97706;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 101;
+  z-index: 1001;
   background: #fff;
   border-radius: 1rem;
   width: 90%;
@@ -492,3 +492,96 @@ $amber:   #d97706;
   .prop-form-row--3 { grid-template-columns: 1fr 1fr; }
 }
 
+
+// ── Supabase additions ─────────────────────────────────────
+.prop-loading {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 3rem; justify-content: center; color: #6b7280; font-size: 0.9rem;
+}
+.prop-spinner {
+  width: 20px; height: 20px; border: 2px solid #e5e7eb;
+  border-top-color: #6366f1; border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.prop-status-select {
+  border: none; border-radius: 1rem; padding: 0.25rem 0.6rem;
+  font-size: 0.72rem; font-weight: 600; cursor: pointer;
+  &--draft            { background: #f3f4f6; color: #374151; }
+  &--pending-review   { background: #fef3c7; color: #92400e; }
+  &--published        { background: #d1fae5; color: #065f46; }
+  &--archived         { background: #f3f4f6; color: #9ca3af; }
+  &--sold             { background: #dbeafe; color: #1e40af; }
+  &--rented           { background: #ede9fe; color: #5b21b6; }
+}
+
+.prop-no-agent { font-size: 0.78rem; color: #9ca3af; font-style: italic; }
+
+.prop-save-error {
+  background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;
+  border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.83rem; margin-bottom: 1rem;
+}
+
+.prop-form-textarea { resize: vertical; min-height: 80px; }
+
+// ── Image Upload ───────────────────────────────────────────
+.prop-upload-area {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.5rem; border: 2px dashed #d1d5db; border-radius: 0.75rem;
+  padding: 1.75rem 1rem; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  color: #6b7280; font-size: 0.85rem; text-align: center;
+  &:hover { border-color: #6366f1; background: #f5f3ff; }
+  &.uploading { pointer-events: none; opacity: 0.7; }
+}
+.prop-upload-hint { font-size: 0.75rem; color: #9ca3af; }
+.prop-upload-spinner {
+  width: 22px; height: 22px; border: 2px solid #e5e7eb;
+  border-top-color: #6366f1; border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+
+.prop-img-previews {
+  display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.75rem;
+}
+.prop-img-preview {
+  position: relative; width: 120px; height: 90px; border-radius: 0.5rem; overflow: hidden;
+  border: 1px solid #e5e7eb; background: #f3f4f6; flex-shrink: 0;
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+.prop-img-remove {
+  position: absolute; top: 3px; right: 3px; width: 20px; height: 20px;
+  background: rgba(0,0,0,0.6); border: none; border-radius: 50%;
+  color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  &:hover { background: #ef4444; }
+}
+
+// ── Import / Export ────────────────────────────────────────
+.prop-header-actions {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+}
+.prop-btn-spinner {
+  width: 14px; height: 14px; border: 2px solid #e5e7eb;
+  border-top-color: #6366f1; border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+.prop-import-msg {
+  padding: 0.75rem 1rem; border-radius: 0.5rem;
+  font-size: 0.85rem; font-weight: 500; margin-bottom: 1rem;
+  &--error   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  &--success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+}
+
+.prop-modal-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  &-left { flex: 1; }
+  &-right { display: flex; gap: 0.6rem; }
+}
+.prop-footer-error {
+  font-size: 0.8rem; color: #dc2626; font-weight: 500;
+}
+
+.prop-img-url-hint {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.6); color: #fff;
+  font-size: 0.6rem; padding: 2px 4px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.prop-img-count { font-size: 0.78rem; color: #6b7280; margin-top: 0.4rem; }

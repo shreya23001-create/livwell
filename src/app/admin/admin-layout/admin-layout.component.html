@@ -27,7 +27,7 @@
          routerLinkActive="active"
          class="adm-nav-item"
          [title]="item.label">
-        <span class="adm-nav-icon" [innerHTML]="item.icon"></span>
+        <span class="adm-nav-icon" [innerHTML]="safeIcon(item.icon)"></span>
         <span class="adm-nav-label">{{ item.label }}</span>
       </a>
     </nav>

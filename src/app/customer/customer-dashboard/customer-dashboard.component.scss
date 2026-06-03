@@ -1,8 +1,51 @@
 $accent:  #6366f1;
 $accent2: #4f46e5;
+$green:   #1a5c3a;
 $border:  #e5e7eb;
 $muted:   #9ca3af;
 $text:    #111827;
+
+// ── Welcome Modal ──────────────────────────────────────────
+.welcome-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  z-index: 1000; display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.welcome-modal {
+  background: #fff; border-radius: 1rem; padding: 2.5rem 2rem;
+  max-width: 480px; width: 100%; text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: welcomeIn 0.3s ease;
+}
+@keyframes welcomeIn {
+  from { opacity: 0; transform: scale(0.92) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.welcome-icon { margin-bottom: 1rem; }
+.welcome-title { font-size: 1.5rem; font-weight: 800; color: $text; margin: 0 0 0.5rem; }
+.welcome-name { font-size: 0.95rem; color: $muted; margin: 0 0 0.75rem; strong { color: $text; } }
+.welcome-msg { font-size: 0.875rem; color: $muted; line-height: 1.6; margin: 0 0 1.5rem; }
+.welcome-features {
+  display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.75rem; text-align: left;
+}
+.welcome-feat {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-size: 0.85rem; color: $text; font-weight: 500;
+}
+.welcome-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+.welcome-btn-primary {
+  padding: 0.65rem 1.5rem; background: $green; color: #fff;
+  border-radius: 0.5rem; font-size: 0.9rem; font-weight: 600;
+  text-decoration: none; transition: background 0.2s;
+  &:hover { background: #154d31; }
+}
+.welcome-btn-outline {
+  padding: 0.65rem 1.5rem; background: transparent;
+  border: 1.5px solid $border; color: $text;
+  border-radius: 0.5rem; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; transition: border-color 0.2s;
+  &:hover { border-color: $green; color: $green; }
+}
 $sub:     #6b7280;
 $bg:      #f4f6fa;
 

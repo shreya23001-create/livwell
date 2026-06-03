@@ -37,7 +37,10 @@
               "includePaths": [
                 "src"
               ]
-            }
+            },
+            "allowedCommonJsDependencies": [
+              "xlsx"
+            ]
           },
           "configurations": {
             "production": {

@@ -116,6 +116,7 @@ $bg:      #f4f6fa;
   border-radius: 0.75rem;
   padding: 1.25rem 1.5rem;
   &--wide { /* already wider from grid */ }
+  &--full { grid-column: 1 / -1; }
 }
 .chart-header {
   display: flex;

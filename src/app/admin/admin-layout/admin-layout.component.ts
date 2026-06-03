@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
@@ -11,7 +12,12 @@ import { AuthService } from '../../shared/services/auth.service';
   styleUrl: './admin-layout.component.scss',
 })
 export class AdminLayoutComponent {
+  private sanitizer = inject(DomSanitizer);
   sidebarCollapsed = signal(false);
+
+  safeIcon(svg: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
 
   readonly navItems = [
     {

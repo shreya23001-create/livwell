@@ -6,11 +6,37 @@
       <h1 class="leads-title">Leads</h1>
       <p class="leads-subtitle">Track and manage all incoming leads</p>
     </div>
-    <button class="btn-primary" (click)="openAdd()">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-      Add Lead
-    </button>
+    <div class="leads-header-actions">
+      <!-- Import -->
+      <label class="btn-ghost" [class.btn-loading]="importing()" title="Import from Excel">
+        <input type="file" accept=".xlsx,.xls,.csv" (change)="importFromExcel($event)" style="display:none" [disabled]="importing()">
+        @if (importing()) {
+          <span class="btn-spinner"></span> Importing…
+        } @else {
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
+          Import Excel
+        }
+      </label>
+      <!-- Export -->
+      <button class="btn-ghost" (click)="exportToExcel()" [disabled]="leads().length === 0" title="Export to Excel">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+        Export Excel
+      </button>
+      <!-- Add -->
+      <button class="btn-primary" (click)="openAdd()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Add Lead
+      </button>
+    </div>
   </div>
+
+  <!-- Import feedback -->
+  @if (importError()) {
+    <div class="leads-msg leads-msg--error">{{ importError() }}</div>
+  }
+  @if (importSuccess()) {
+    <div class="leads-msg leads-msg--success">{{ importSuccess() }}</div>
+  }
 
   <!-- ── Stat Cards ── -->
   <div class="leads-stats">
@@ -82,8 +108,16 @@
     </select>
   </div>
 
+  <!-- ── Loading / Error ── -->
+  <div *ngIf="loading()" class="leads-loading">
+    <div class="leads-spinner"></div> Loading leads…
+  </div>
+  <div *ngIf="dataSvc.leadsError() && !loading()" class="leads-msg leads-msg--error">
+    Supabase error: {{ dataSvc.leadsError() }}
+  </div>
+
   <!-- ── Table ── -->
-  <div class="leads-table-wrap">
+  <div class="leads-table-wrap" *ngIf="!loading()">
     <table class="leads-table">
       <thead>
         <tr>
@@ -232,8 +266,12 @@
       </div>
     </div>
     <div class="modal-footer">
+      <span *ngIf="saveError()" style="color:#dc2626;font-size:0.8rem;flex:1">{{ saveError() }}</span>
       <button class="btn-ghost" (click)="closeModal()">Cancel</button>
-      <button class="btn-primary" (click)="saveLead()">{{ isEdit() ? 'Save Changes' : 'Add Lead' }}</button>
+      <button class="btn-primary" (click)="saveLead()" [disabled]="saving()">
+        @if (saving()) { <span class="btn-spinner"></span> Saving… }
+        @else { {{ isEdit() ? 'Save Changes' : 'Add Lead' }} }
+      </button>
     </div>
   </div>
 </div>

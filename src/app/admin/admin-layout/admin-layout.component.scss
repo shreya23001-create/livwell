@@ -13,8 +13,8 @@ $topbar-h:      60px;
 .adm-shell {
   display: flex;
   height: 100vh;
-  overflow: hidden;
   background: #f6f6fb;
+  position: relative;
 }
 
 // ── Sidebar ──────────────────────────────────────────────

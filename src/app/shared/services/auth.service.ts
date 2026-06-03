@@ -12,7 +12,7 @@ export interface LoginResult {
 
 export interface RegisterResult {
   success: boolean;
-  error?: 'email_exists' | 'phone_exists' | 'unknown';
+  error?: 'email_exists' | 'phone_exists' | 'pending_verification' | 'unknown';
 }
 
 @Injectable({ providedIn: 'root' })
@@ -20,7 +20,9 @@ export class AuthService {
   private supabase = inject(SupabaseService).client;
   private router   = inject(Router);
 
-  private _currentUser = signal<User | null>(null);
+  private _currentUser  = signal<User | null>(null);
+  private _sessionReady = false;
+  private _sessionPromise: Promise<void> | null = null;
 
   currentUser  = this._currentUser.asReadonly();
   isLoggedIn   = computed(() => !!this._currentUser());
@@ -31,12 +33,18 @@ export class AuthService {
   isCustomer   = computed(() => this._currentUser()?.role === 'customer');
 
   constructor() {
-    this.loadSession();
+    this._sessionPromise = this.loadSession();
+  }
+
+  // Guards call this to wait for session restore before checking isLoggedIn
+  waitForSession(): Promise<void> {
+    return this._sessionPromise ?? Promise.resolve();
   }
 
   private async loadSession(): Promise<void> {
     const { data: { session } } = await this.supabase.auth.getSession();
     if (session?.user) await this.loadProfile(session.user.id);
+    this._sessionReady = true;
 
     this.supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) await this.loadProfile(session.user.id);
@@ -44,8 +52,8 @@ export class AuthService {
     });
   }
 
-  private async loadProfile(userId: string): Promise<void> {
-    const { data } = await this.supabase
+  private async loadProfile(userId: string, retries = 3): Promise<void> {
+    const { data, error } = await this.supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -61,6 +69,10 @@ export class AuthService {
         status: data.status,
         avatar: data.avatar_url,
       });
+    } else if (error?.code === 'PGRST116' && retries > 0) {
+      // Profile not created yet by trigger — wait and retry
+      await new Promise(r => setTimeout(r, 800));
+      await this.loadProfile(userId, retries - 1);
     }
   }
 
@@ -90,11 +102,29 @@ export class AuthService {
       return { success: false, error: 'unknown' };
     }
     if (data.user) {
-      await this.loadProfile(data.user.id);
-      return { success: true };
+      // If session exists immediately — email confirmation is disabled
+      if (data.session) {
+        await this.loadProfile(data.user.id);
+        this._newlyRegistered.set({ name, email });
+        return { success: true };
+      }
+      // Fallback: try explicit login (works when email confirmation is off)
+      const loginResult = await this.supabase.auth.signInWithPassword({ email, password });
+      if (loginResult.data.user) {
+        await this.loadProfile(loginResult.data.user.id);
+        this._newlyRegistered.set({ name, email });
+        return { success: true };
+      }
+      // Email confirmation still on — account created but needs verification
+      return { success: false, error: 'pending_verification' };
     }
     return { success: false, error: 'unknown' };
   }
+
+  // Track newly registered user for welcome screen
+  private _newlyRegistered = signal<{ name: string; email: string } | null>(null);
+  newlyRegistered = this._newlyRegistered.asReadonly();
+  clearNewlyRegistered(): void { this._newlyRegistered.set(null); }
 
   // ── LOGOUT ───────────────────────────────────────────────
   async logout(): Promise<void> {

@@ -1,44 +1,12 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as XLSX from 'xlsx';
+import { AdminDataService, LeadStatus, LeadSource, LeadCategory, Lead } from '../../shared/services/admin-data.service';
 
-export type LeadStatus   = 'new' | 'contacted' | 'qualified' | 'negotiating' | 'won' | 'lost';
-export type LeadSource   = 'website' | 'referral' | 'walk_in' | 'social_media' | 'portal' | 'cold_call';
-export type LeadCategory = 'buy' | 'rent' | 'invest';
-
-export interface Lead {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  status: LeadStatus;
-  source: LeadSource;
-  category: LeadCategory;
-  budget: string;
-  location: string;
-  propertyType: string;
-  assignedAgent: string;
-  notes: string;
-  createdDate: string;
-  lastContact: string;
-}
+export type { LeadStatus, LeadSource, LeadCategory, Lead };
 
 const AGENTS = ['Sarah Al-Mansouri', 'Ahmed Hassan', 'Rania Khalid', 'Omar Al-Farsi', 'Unassigned'];
-
-const SAMPLE_LEADS: Lead[] = [
-  { id: 1,  name: 'Mohammed Al-Rashidi', email: 'mohammed@example.com', phone: '+971508888888', status: 'new',         source: 'website',      category: 'buy',    budget: 'AED 2M–3M',   location: 'Downtown Dubai',    propertyType: 'Apartment', assignedAgent: 'Sarah Al-Mansouri', notes: 'Looking for 2BHK with sea view.',           createdDate: '2026-05-01', lastContact: '2026-05-01' },
-  { id: 2,  name: 'Layla Hussain',       email: 'layla@example.com',    phone: '+971509999999', status: 'contacted',   source: 'referral',     category: 'rent',   budget: 'AED 80K/yr',  location: 'JBR',               propertyType: 'Studio',    assignedAgent: 'Ahmed Hassan',       notes: 'Needs parking.',                            createdDate: '2026-04-28', lastContact: '2026-05-10' },
-  { id: 3,  name: 'James Carter',        email: 'james@example.com',    phone: '+447700900123', status: 'qualified',   source: 'portal',       category: 'invest', budget: 'AED 5M+',     location: 'Palm Jumeirah',     propertyType: 'Villa',     assignedAgent: 'Sarah Al-Mansouri', notes: 'Investment for rental yield.',              createdDate: '2026-04-20', lastContact: '2026-05-15' },
-  { id: 4,  name: 'Priya Nair',          email: 'priya@example.com',    phone: '+919876543210', status: 'negotiating', source: 'social_media', category: 'buy',    budget: 'AED 1M–1.5M', location: 'Dubai Marina',      propertyType: 'Apartment', assignedAgent: 'Rania Khalid',       notes: 'First-time buyer.',                         createdDate: '2026-04-15', lastContact: '2026-05-18' },
-  { id: 5,  name: 'Khalid Al-Maktoum',   email: 'khalid@example.com',   phone: '+971501234567', status: 'won',         source: 'walk_in',      category: 'buy',    budget: 'AED 4M',      location: 'Business Bay',      propertyType: 'Penthouse', assignedAgent: 'Ahmed Hassan',       notes: 'Closed deal — Villa Bay Residences.',       createdDate: '2026-03-10', lastContact: '2026-05-02' },
-  { id: 6,  name: 'Ana Sousa',           email: 'ana@example.com',      phone: '+351912345678', status: 'lost',        source: 'cold_call',    category: 'rent',   budget: 'AED 60K/yr',  location: 'Deira',             propertyType: 'Apartment', assignedAgent: 'Omar Al-Farsi',      notes: 'Moved to a competitor.',                    createdDate: '2026-04-01', lastContact: '2026-04-25' },
-  { id: 7,  name: 'Tariq Ibrahim',       email: 'tariq@example.com',    phone: '+971553456789', status: 'new',         source: 'website',      category: 'buy',    budget: 'AED 3M–4M',   location: 'Arabian Ranches',   propertyType: 'Villa',     assignedAgent: 'Unassigned',         notes: 'Wants garden & pool.',                      createdDate: '2026-05-17', lastContact: '2026-05-17' },
-  { id: 8,  name: 'Elena Petrova',       email: 'elena@example.com',    phone: '+79161234567',  status: 'contacted',   source: 'referral',     category: 'invest', budget: 'AED 2M',      location: 'Dubai Hills',       propertyType: 'Apartment', assignedAgent: 'Rania Khalid',       notes: 'Referred by James Carter.',                 createdDate: '2026-05-08', lastContact: '2026-05-14' },
-  { id: 9,  name: 'David Kim',           email: 'david@example.com',    phone: '+821012345678', status: 'qualified',   source: 'portal',       category: 'buy',    budget: 'AED 1.5M',    location: 'Jumeirah Village',  propertyType: 'Townhouse', assignedAgent: 'Sarah Al-Mansouri', notes: 'Pre-approved mortgage.',                    createdDate: '2026-05-05', lastContact: '2026-05-16' },
-  { id: 10, name: 'Fatima Al-Zaabi',     email: 'fzaabi@example.com',   phone: '+971557654321', status: 'negotiating', source: 'walk_in',      category: 'rent',   budget: 'AED 120K/yr', location: 'DIFC',              propertyType: 'Apartment', assignedAgent: 'Ahmed Hassan',       notes: 'Corporate relocation.',                     createdDate: '2026-04-22', lastContact: '2026-05-19' },
-  { id: 11, name: 'Robert Wilson',       email: 'robert@example.com',   phone: '+12025551234',  status: 'new',         source: 'social_media', category: 'invest', budget: 'AED 10M+',    location: 'Palm Jumeirah',     propertyType: 'Villa',     assignedAgent: 'Unassigned',         notes: 'High-net-worth buyer — priority follow-up.', createdDate: '2026-05-18', lastContact: '2026-05-18' },
-  { id: 12, name: 'Nadia Benali',        email: 'nadia@example.com',    phone: '+21361234567',  status: 'contacted',   source: 'website',      category: 'rent',   budget: 'AED 70K/yr',  location: 'Barsha Heights',    propertyType: 'Studio',    assignedAgent: 'Omar Al-Farsi',      notes: 'Needs furnished unit.',                     createdDate: '2026-05-12', lastContact: '2026-05-15' },
-];
 
 const EMPTY_FORM = (): Partial<Lead> => ({
   name: '', email: '', phone: '', status: 'new', source: 'website', category: 'buy',
@@ -56,32 +24,41 @@ const EMPTY_FORM = (): Partial<Lead> => ({
 })
 export class AdminLeadsComponent {
 
-  leads = signal<Lead[]>([...SAMPLE_LEADS]);
+  dataSvc = inject(AdminDataService);
+  leads   = this.dataSvc.leads;
+  loading = this.dataSvc.leadsLoading;
 
-  search      = signal('');
+  search       = signal('');
   filterStatus = signal<LeadStatus | ''>('');
   filterSource = signal<LeadSource | ''>('');
   filterAgent  = signal('');
-  sortCol     = signal<keyof Lead>('createdDate');
-  sortDir     = signal<'asc' | 'desc'>('desc');
-  page        = signal(1);
-  pageSize    = 10;
+  sortCol      = signal<keyof Lead>('createdDate');
+  sortDir      = signal<'asc' | 'desc'>('desc');
+  page         = signal(1);
+  pageSize     = 10;
 
-  // Modal state
-  showModal      = signal(false);
-  isEdit         = signal(false);
-  editId         = signal<number | null>(null);
-  form           = signal<Partial<Lead>>(EMPTY_FORM());
-  formErrors     = signal<Record<string, string>>({});
+  // ── Modal ─────────────────────────────────────────────
+  showModal       = signal(false);
+  isEdit          = signal(false);
+  editId          = signal<number | null>(null);
+  form            = signal<Partial<Lead>>(EMPTY_FORM());
+  formErrors      = signal<Record<string, string>>({});
+  saveError       = signal('');
+  saving          = signal(false);
   showDeleteModal = signal(false);
-  deleteTarget   = signal<Lead | null>(null);
+  deleteTarget    = signal<Lead | null>(null);
 
-  readonly agents = AGENTS;
+  // ── Import / Export ───────────────────────────────────
+  importing     = signal(false);
+  importError   = signal('');
+  importSuccess = signal('');
 
-  readonly statuses: LeadStatus[]  = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
-  readonly sources: LeadSource[]   = ['website', 'referral', 'walk_in', 'social_media', 'portal', 'cold_call'];
+  readonly agents     = AGENTS;
+  readonly statuses: LeadStatus[]     = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
+  readonly sources:  LeadSource[]     = ['website', 'referral', 'walk_in', 'social_media', 'portal', 'cold_call'];
   readonly categories: LeadCategory[] = ['buy', 'rent', 'invest'];
 
+  // ── Computed ──────────────────────────────────────────
   stats = computed(() => {
     const all = this.leads();
     return {
@@ -94,52 +71,48 @@ export class AdminLeadsComponent {
   });
 
   filtered = computed(() => {
-    const q = this.search().toLowerCase();
-    const st = this.filterStatus();
+    const q   = this.search().toLowerCase();
+    const st  = this.filterStatus();
     const src = this.filterSource();
-    const ag = this.filterAgent();
+    const ag  = this.filterAgent();
     const col = this.sortCol();
     const dir = this.sortDir();
 
     let list = this.leads().filter(l => {
-      const matchQ  = !q  || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(q) || l.location.toLowerCase().includes(q);
+      const matchQ   = !q   || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(q) || l.location.toLowerCase().includes(q);
       const matchSt  = !st  || l.status === st;
       const matchSrc = !src || l.source === src;
       const matchAg  = !ag  || l.assignedAgent === ag;
       return matchQ && matchSt && matchSrc && matchAg;
     });
 
-    list = [...list].sort((a, b) => {
-      const av = a[col] as string;
-      const bv = b[col] as string;
+    return [...list].sort((a, b) => {
+      const av = (a[col] ?? '') as string;
+      const bv = (b[col] ?? '') as string;
       return dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
     });
-    return list;
   });
 
   totalPages = computed(() => Math.max(1, Math.ceil(this.filtered().length / this.pageSize)));
-
-  paginated = computed(() => {
+  paginated  = computed(() => {
     const p = Math.min(this.page(), this.totalPages());
     return this.filtered().slice((p - 1) * this.pageSize, p * this.pageSize);
   });
 
+  // ── Sort / Filter ─────────────────────────────────────
   sort(col: keyof Lead): void {
-    if (this.sortCol() === col) {
-      this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
-    } else {
-      this.sortCol.set(col);
-      this.sortDir.set('asc');
-    }
+    if (this.sortCol() === col) this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    else { this.sortCol.set(col); this.sortDir.set('asc'); }
     this.page.set(1);
   }
-
   onSearch(): void { this.page.set(1); }
   onFilter(): void { this.page.set(1); }
 
+  // ── Modal ─────────────────────────────────────────────
   openAdd(): void {
     this.form.set(EMPTY_FORM());
     this.formErrors.set({});
+    this.saveError.set('');
     this.isEdit.set(false);
     this.editId.set(null);
     this.showModal.set(true);
@@ -148,6 +121,7 @@ export class AdminLeadsComponent {
   openEdit(lead: Lead): void {
     this.form.set({ ...lead });
     this.formErrors.set({});
+    this.saveError.set('');
     this.isEdit.set(true);
     this.editId.set(lead.id);
     this.showModal.set(true);
@@ -155,45 +129,118 @@ export class AdminLeadsComponent {
 
   closeModal(): void { this.showModal.set(false); }
 
-  saveLead(): void {
+  async saveLead(): Promise<void> {
     const f = this.form();
     const errs: Record<string, string> = {};
-    if (!f.name?.trim())   errs['name']  = 'Name is required.';
-    if (!f.email?.trim())  errs['email'] = 'Email is required.';
+    if (!f.name?.trim())     errs['name']     = 'Name is required.';
+    if (!f.email?.trim())    errs['email']    = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errs['email'] = 'Enter a valid email.';
-    if (!f.phone?.trim())  errs['phone'] = 'Phone is required.';
-    if (!f.budget?.trim()) errs['budget'] = 'Budget is required.';
+    if (!f.phone?.trim())    errs['phone']    = 'Phone is required.';
+    if (!f.budget?.trim())   errs['budget']   = 'Budget is required.';
     if (!f.location?.trim()) errs['location'] = 'Location is required.';
     this.formErrors.set(errs);
     if (Object.keys(errs).length) return;
 
-    if (this.isEdit()) {
-      this.leads.update(list => list.map(l => l.id === this.editId() ? { ...l, ...(f as Lead) } : l));
-    } else {
-      const newId = Math.max(...this.leads().map(l => l.id)) + 1;
-      this.leads.update(list => [{ ...(f as Lead), id: newId }, ...list]);
-    }
+    this.saving.set(true);
+    this.saveError.set('');
+    const err = await this.dataSvc.saveLead(f, this.editId());
+    this.saving.set(false);
+    if (err) { this.saveError.set(err); return; }
     this.showModal.set(false);
   }
 
-  confirmDelete(lead: Lead): void {
-    this.deleteTarget.set(lead);
-    this.showDeleteModal.set(true);
-  }
-
+  confirmDelete(lead: Lead): void { this.deleteTarget.set(lead); this.showDeleteModal.set(true); }
   cancelDelete(): void { this.showDeleteModal.set(false); this.deleteTarget.set(null); }
 
-  doDelete(): void {
+  async doDelete(): Promise<void> {
     const t = this.deleteTarget();
-    if (t) this.leads.update(list => list.filter(l => l.id !== t.id));
+    if (!t) return;
+    await this.dataSvc.deleteLead(t.id);
     this.showDeleteModal.set(false);
     this.deleteTarget.set(null);
   }
 
-  updateForm(patch: Partial<Lead>): void {
-    this.form.update(f => ({ ...f, ...patch }));
+  updateForm(patch: Partial<Lead>): void { this.form.update(f => ({ ...f, ...patch })); }
+
+  // ── Export ────────────────────────────────────────────
+  exportToExcel(): void {
+    const rows = this.leads().map(l => ({
+      'Name':           l.name,
+      'Email':          l.email,
+      'Phone':          l.phone,
+      'Status':         this.labelStatus(l.status),
+      'Source':         this.labelSource(l.source),
+      'Category':       l.category,
+      'Budget':         l.budget,
+      'Location':       l.location,
+      'Property Type':  l.propertyType,
+      'Assigned Agent': l.assignedAgent,
+      'Notes':          l.notes,
+      'Created Date':   l.createdDate,
+      'Last Contact':   l.lastContact,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Leads');
+    XLSX.writeFile(wb, `livwell-leads-${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 
+  // ── Import ────────────────────────────────────────────
+  async importFromExcel(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    this.importing.set(true);
+    this.importError.set('');
+    this.importSuccess.set('');
+
+    const buffer = await input.files[0].arrayBuffer();
+    const wb     = XLSX.read(buffer, { type: 'array' });
+    const rows   = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) as any[];
+
+    if (!rows.length) {
+      this.importError.set('No data found in the file.');
+      this.importing.set(false);
+      input.value = '';
+      return;
+    }
+
+    const statusMap: Record<string, LeadStatus> = {
+      'New': 'new', 'Contacted': 'contacted', 'Qualified': 'qualified',
+      'Negotiating': 'negotiating', 'Won': 'won', 'Lost': 'lost',
+    };
+    const sourceMap: Record<string, LeadSource> = {
+      'Website': 'website', 'Referral': 'referral', 'Walk-in': 'walk_in',
+      'Social Media': 'social_media', 'Portal': 'portal', 'Cold Call': 'cold_call',
+    };
+
+    const toImport = rows
+      .filter(r => r['Name']?.toString().trim())
+      .map(r => ({
+        name:          r['Name']           || '',
+        email:         r['Email']          || '',
+        phone:         r['Phone']          || '',
+        status:        statusMap[r['Status']]   ?? 'new',
+        source:        sourceMap[r['Source']]   ?? 'website',
+        category:      (['buy','rent','invest'].includes(r['Category']) ? r['Category'] : 'buy') as LeadCategory,
+        budget:        r['Budget']         || '',
+        location:      r['Location']       || '',
+        propertyType:  r['Property Type']  || '',
+        assignedAgent: r['Assigned Agent'] || 'Unassigned',
+        notes:         r['Notes']          || '',
+        createdDate:   r['Created Date']   || new Date().toISOString().slice(0, 10),
+        lastContact:   r['Last Contact']   || new Date().toISOString().slice(0, 10),
+      }));
+
+    const err = await this.dataSvc.importLeads(toImport);
+    if (err) this.importError.set('Import failed: ' + err);
+    else     this.importSuccess.set(`✓ ${toImport.length} lead(s) imported.`);
+
+    this.importing.set(false);
+    input.value = '';
+  }
+
+  // ── Helpers ───────────────────────────────────────────
   labelStatus(s: LeadStatus): string {
     return { new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' }[s];
   }
@@ -204,10 +251,9 @@ export class AdminLeadsComponent {
 
   pageNumbers(): number[] {
     const total = this.totalPages();
-    const cur = this.page();
-    const delta = 2;
+    const cur   = this.page();
     const pages: number[] = [];
-    for (let i = Math.max(1, cur - delta); i <= Math.min(total, cur + delta); i++) pages.push(i);
+    for (let i = Math.max(1, cur - 2); i <= Math.min(total, cur + 2); i++) pages.push(i);
     return pages;
   }
 }

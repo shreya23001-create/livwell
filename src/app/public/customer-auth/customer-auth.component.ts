@@ -171,9 +171,10 @@ export class CustomerAuthComponent {
     if (result.success) {
       const user = this.auth.currentUser();
       if (user) this.auth.redirectByRole(user.role);
-      else this.signUpServerError.set('Account created! Please check your email to verify.');
     } else if (result.error === 'email_exists') {
       this.signUpErrors.update(e => ({ ...e, email: 'An account with this email already exists.' }));
+    } else if (result.error === 'pending_verification') {
+      this.signUpServerError.set('Account created! Please check your email and click the confirmation link to activate your account.');
     } else {
       this.signUpServerError.set('Something went wrong. Please try again.');
     }

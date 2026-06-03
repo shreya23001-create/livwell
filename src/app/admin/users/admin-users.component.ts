@@ -1,40 +1,16 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as XLSX from 'xlsx';
 import { UserRole, UserStatus } from '../../shared/models/user.model';
+import { AdminDataService, AdminUser } from '../../shared/services/admin-data.service';
 
-export interface AdminUser {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  role: UserRole;
-  status: UserStatus;
-  joinedDate: string;
-  lastActive: string;
-  propertiesCount?: number;
-  leadsCount?: number;
-  avatar?: string;
-}
-
-const SAMPLE_USERS: AdminUser[] = [
-  { id: 1,  name: 'Ankush Sharma',       email: 'superadmin@livwell.ae',  phone: '+971501111111', role: 'super_admin', status: 'active',               joinedDate: '2025-01-01', lastActive: '2026-05-19', propertiesCount: 0,  leadsCount: 0  },
-  { id: 2,  name: 'Admin User',           email: 'admin@livwell.ae',       phone: '+971502222222', role: 'admin',       status: 'active',               joinedDate: '2025-03-15', lastActive: '2026-05-18', propertiesCount: 0,  leadsCount: 0  },
-  { id: 3,  name: 'Sarah Al-Mansouri',    email: 'agent@livwell.ae',       phone: '+971503333333', role: 'agent',       status: 'active',               joinedDate: '2025-06-10', lastActive: '2026-05-19', propertiesCount: 14, leadsCount: 38 },
-  { id: 4,  name: 'Ahmed Hassan',         email: 'ahmed@livwell.ae',       phone: '+971504444444', role: 'agent',       status: 'active',               joinedDate: '2025-07-22', lastActive: '2026-05-17', propertiesCount: 9,  leadsCount: 21 },
-  { id: 5,  name: 'Rania Khalid',         email: 'rania@livwell.ae',       phone: '+971505555555', role: 'agent',       status: 'active',               joinedDate: '2025-09-05', lastActive: '2026-05-16', propertiesCount: 7,  leadsCount: 15 },
-  { id: 6,  name: 'Omar Al-Farsi',        email: 'omar@livwell.ae',        phone: '+971506666666', role: 'agent',       status: 'pending_verification', joinedDate: '2026-04-01', lastActive: '2026-04-01', propertiesCount: 2,  leadsCount: 4  },
-  { id: 7,  name: 'Fatima Al-Zaabi',      email: 'fatima@livwell.ae',      phone: '+971507777777', role: 'agent',       status: 'suspended',            joinedDate: '2025-11-12', lastActive: '2026-03-10', propertiesCount: 5,  leadsCount: 8  },
-  { id: 8,  name: 'Mohammed Al-Rashidi',  email: 'mohammed@example.com',   phone: '+971508888888', role: 'customer',    status: 'active',               joinedDate: '2026-01-14', lastActive: '2026-05-15', propertiesCount: 0,  leadsCount: 3  },
-  { id: 9,  name: 'Layla Hussain',        email: 'layla@example.com',      phone: '+971509999999', role: 'customer',    status: 'active',               joinedDate: '2026-02-20', lastActive: '2026-05-12', propertiesCount: 0,  leadsCount: 1  },
-  { id: 10, name: 'James Carter',         email: 'james@example.com',      phone: '+447700900123', role: 'customer',    status: 'active',               joinedDate: '2026-03-05', lastActive: '2026-05-18', propertiesCount: 0,  leadsCount: 5  },
-  { id: 11, name: 'Priya Nair',           email: 'priya@example.com',      phone: '+919876543210', role: 'customer',    status: 'pending_verification', joinedDate: '2026-05-10', lastActive: '2026-05-10', propertiesCount: 0,  leadsCount: 0  },
-  { id: 12, name: 'Khalid Al-Maktoum',    email: 'khalid@example.com',     phone: '+971501234567', role: 'customer',    status: 'locked',               joinedDate: '2026-04-18', lastActive: '2026-05-01', propertiesCount: 0,  leadsCount: 2  },
-];
+export type { AdminUser };
 
 const EMPTY_FORM = (): Partial<AdminUser> => ({
   name: '', email: '', phone: '', role: 'customer', status: 'active',
-  joinedDate: new Date().toISOString().slice(0, 10), lastActive: new Date().toISOString().slice(0, 10),
+  joinedDate: new Date().toISOString().slice(0, 10),
+  lastActive:  new Date().toISOString().slice(0, 10),
   propertiesCount: 0, leadsCount: 0,
 });
 
@@ -47,10 +23,13 @@ const EMPTY_FORM = (): Partial<AdminUser> => ({
 })
 export class AdminUsersComponent {
 
-  users = signal<AdminUser[]>([...SAMPLE_USERS]);
+  dataSvc = inject(AdminDataService);
+
+  users   = this.dataSvc.users;
+  loading = this.dataSvc.usersLoading;
 
   // ── Filters ───────────────────────────────────────────
-  search      = signal('');
+  search       = signal('');
   filterRole   = signal<UserRole | ''>('');
   filterStatus = signal<UserStatus | ''>('');
   sortField    = signal<keyof AdminUser>('joinedDate');
@@ -59,11 +38,18 @@ export class AdminUsersComponent {
   readonly pageSize = 10;
 
   // ── Modal ─────────────────────────────────────────────
-  modalOpen  = signal(false);
-  editingId  = signal<number | null>(null);
-  form       = signal<Partial<AdminUser>>(EMPTY_FORM());
-  formErrors = signal<Record<string, string>>({});
+  modalOpen    = signal(false);
+  editingId    = signal<number | null>(null);
+  form         = signal<Partial<AdminUser>>(EMPTY_FORM());
+  formErrors   = signal<Record<string, string>>({});
+  saveError    = signal('');
+  saving       = signal(false);
   deleteTarget = signal<AdminUser | null>(null);
+
+  // ── Import / Export ───────────────────────────────────
+  importing     = signal(false);
+  importError   = signal('');
+  importSuccess = signal('');
 
   // ── Computed ──────────────────────────────────────────
   filtered = computed(() => {
@@ -74,54 +60,55 @@ export class AdminUsersComponent {
     const sd = this.sortDir();
 
     let list = this.users().filter(u => {
-      const matchQ = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.phone.includes(q);
+      const matchQ = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || (u.phone || '').includes(q);
       const matchR = !r || u.role === r;
       const matchS = !s || u.status === s;
       return matchQ && matchR && matchS;
     });
 
     return [...list].sort((a, b) => {
-      const av = a[sf] as any;
-      const bv = b[sf] as any;
+      const av = (a[sf] ?? '') as any;
+      const bv = (b[sf] ?? '') as any;
       const cmp = av < bv ? -1 : av > bv ? 1 : 0;
       return sd === 'asc' ? cmp : -cmp;
     });
   });
 
-  paginated = computed(() => {
+  paginated  = computed(() => {
     const start = (this.page() - 1) * this.pageSize;
     return this.filtered().slice(start, start + this.pageSize);
   });
 
-  totalPages = computed(() => Math.ceil(this.filtered().length / this.pageSize));
+  totalPages = computed(() => Math.max(1, Math.ceil(this.filtered().length / this.pageSize)));
 
   stats = computed(() => {
     const all = this.users();
     return {
-      total:      all.length,
-      admins:     all.filter(u => u.role === 'super_admin' || u.role === 'admin').length,
-      agents:     all.filter(u => u.role === 'agent').length,
-      customers:  all.filter(u => u.role === 'customer').length,
-      suspended:  all.filter(u => u.status === 'suspended' || u.status === 'locked').length,
+      total:     all.length,
+      admins:    all.filter(u => u.role === 'super_admin' || u.role === 'admin').length,
+      agents:    all.filter(u => u.role === 'agent').length,
+      customers: all.filter(u => u.role === 'customer').length,
+      suspended: all.filter(u => u.status === 'suspended' || u.status === 'locked').length,
     };
   });
 
   hasFilters = computed(() => !!(this.search() || this.filterRole() || this.filterStatus()));
 
-  // ── Actions ───────────────────────────────────────────
+  // ── Sort / Filter ─────────────────────────────────────
   sort(field: keyof AdminUser): void {
     if (this.sortField() === field) this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
     else { this.sortField.set(field); this.sortDir.set('asc'); }
     this.page.set(1);
   }
-
   onSearch(): void { this.page.set(1); }
   onFilter(): void { this.page.set(1); }
   clearFilters(): void { this.search.set(''); this.filterRole.set(''); this.filterStatus.set(''); this.page.set(1); }
 
+  // ── Modal ─────────────────────────────────────────────
   openAdd(): void {
     this.form.set(EMPTY_FORM());
     this.formErrors.set({});
+    this.saveError.set('');
     this.editingId.set(null);
     this.modalOpen.set(true);
   }
@@ -129,24 +116,23 @@ export class AdminUsersComponent {
   openEdit(u: AdminUser): void {
     this.form.set({ ...u });
     this.formErrors.set({});
+    this.saveError.set('');
     this.editingId.set(u.id);
     this.modalOpen.set(true);
   }
 
   closeModal(): void { this.modalOpen.set(false); }
 
-  saveUser(): void {
+  async saveUser(): Promise<void> {
     const errs = this.validateForm();
     this.formErrors.set(errs);
     if (Object.keys(errs).length) return;
 
-    const f = this.form() as AdminUser;
-    if (this.editingId() !== null) {
-      this.users.update(list => list.map(u => u.id === this.editingId() ? { ...f, id: u.id } : u));
-    } else {
-      const newId = Math.max(...this.users().map(u => u.id)) + 1;
-      this.users.update(list => [{ ...f, id: newId } as AdminUser, ...list]);
-    }
+    this.saving.set(true);
+    this.saveError.set('');
+    const err = await this.dataSvc.saveUser(this.form(), this.editingId());
+    this.saving.set(false);
+    if (err) { this.saveError.set(err); return; }
     this.closeModal();
   }
 
@@ -169,18 +155,86 @@ export class AdminUsersComponent {
     this.formErrors.update(e => { const n = { ...e }; delete n[field]; return n; });
   }
 
-  toggleStatus(u: AdminUser): void {
-    const next: UserStatus = u.status === 'active' ? 'suspended' : 'active';
-    this.users.update(list => list.map(x => x.id === u.id ? { ...x, status: next } : x));
+  async toggleStatus(u: AdminUser): Promise<void> {
+    await this.dataSvc.toggleUserStatus(Number(u.id), u.status);
   }
 
   confirmDelete(u: AdminUser): void { this.deleteTarget.set(u); }
-  cancelDelete(): void { this.deleteTarget.set(null); }
-  doDelete(): void {
+  cancelDelete(): void  { this.deleteTarget.set(null); }
+  async doDelete(): Promise<void> {
     const u = this.deleteTarget();
     if (!u) return;
-    this.users.update(list => list.filter(x => x.id !== u.id));
+    await this.dataSvc.deleteUser(Number(u.id));
     this.deleteTarget.set(null);
+  }
+
+  // ── Export ────────────────────────────────────────────
+  exportToExcel(): void {
+    const rows = this.users().map(u => ({
+      'Name':             u.name,
+      'Email':            u.email,
+      'Phone':            u.phone,
+      'Role':             this.roleLabel(u.role),
+      'Status':           this.statusLabel(u.status),
+      'Joined Date':      u.joinedDate,
+      'Last Active':      u.lastActive,
+      'Properties Count': u.propertiesCount ?? 0,
+      'Leads Count':      u.leadsCount ?? 0,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Users');
+    XLSX.writeFile(wb, `livwell-users-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+
+  // ── Import ────────────────────────────────────────────
+  async importFromExcel(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    this.importing.set(true);
+    this.importError.set('');
+    this.importSuccess.set('');
+
+    const buffer = await input.files[0].arrayBuffer();
+    const wb     = XLSX.read(buffer, { type: 'array' });
+    const rows   = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) as any[];
+
+    if (!rows.length) {
+      this.importError.set('No data found in the file.');
+      this.importing.set(false);
+      input.value = '';
+      return;
+    }
+
+    const roleMap: Record<string, UserRole> = {
+      'Super Admin': 'super_admin', 'Admin': 'admin', 'Agent': 'agent', 'Customer': 'customer',
+    };
+    const statusMap: Record<string, UserStatus> = {
+      'Active': 'active', 'Pending': 'pending_verification',
+      'Suspended': 'suspended', 'Locked': 'locked',
+    };
+
+    const toImport = rows
+      .filter(r => r['Name']?.toString().trim())
+      .map(r => ({
+        name:            r['Name']    || '',
+        email:           r['Email']   || '',
+        phone:           r['Phone']   || '',
+        role:            roleMap[r['Role']]    ?? 'customer',
+        status:          statusMap[r['Status']] ?? 'active',
+        joinedDate:      r['Joined Date'] || new Date().toISOString().slice(0, 10),
+        lastActive:      r['Last Active'] || new Date().toISOString().slice(0, 10),
+        propertiesCount: Number(r['Properties Count']) || 0,
+        leadsCount:      Number(r['Leads Count'])      || 0,
+      }));
+
+    const err = await this.dataSvc.importUsers(toImport);
+    if (err) this.importError.set('Import failed: ' + err);
+    else     this.importSuccess.set(`✓ ${toImport.length} user(s) imported.`);
+
+    this.importing.set(false);
+    input.value = '';
   }
 
   // ── Helpers ───────────────────────────────────────────
@@ -209,6 +263,6 @@ export class AdminUsersComponent {
     return [1, -1, cur-1, cur, cur+1, -1, total];
   }
 
-  readonly roleList: UserRole[]     = ['super_admin', 'admin', 'agent', 'customer'];
+  readonly roleList:   UserRole[]   = ['super_admin', 'admin', 'agent', 'customer'];
   readonly statusList: UserStatus[] = ['active', 'pending_verification', 'suspended', 'locked'];
 }

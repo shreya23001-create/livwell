@@ -104,9 +104,12 @@ $bg:      #f4f6fa;
   font-weight: 700;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  &--pending { background: #fffbeb; color: #b45309; }
-  &--replied { background: #f0fdf4; color: #4f46e5; }
-  &--closed  { background: #f1f5f9; color: #475569; }
+  &--new       { background: #fffbeb; color: #b45309; }
+  &--contacted { background: #eff6ff; color: #1d4ed8; }
+  &--qualified { background: #f0fdf4; color: #16a34a; }
+  &--closed    { background: #f1f5f9; color: #475569; }
+  &--pending   { background: #fffbeb; color: #b45309; }
+  &--replied   { background: #f0fdf4; color: #4f46e5; }
 }
 .enq-date { font-size: 0.72rem; color: $muted; }
 .enq-chevron {

@@ -31,14 +31,7 @@ export class CustomerPropertiesComponent {
   filterStatus = signal('all');
   filterType   = signal('all');
 
-  properties = signal<SavedProperty[]>([
-    { id: 1, title: 'Luxury 2BR in Downtown Dubai', location: 'Downtown Dubai', price: 'AED 2,800,000', priceNum: 2800000, type: 'Apartment', category: 'sale', beds: 2, baths: 2, area: 1450, savedOn: '2 days ago', status: 'available', agent: 'Sarah Al-Mansouri' },
-    { id: 2, title: 'Spacious Villa in Arabian Ranches', location: 'Arabian Ranches', price: 'AED 6,500,000', priceNum: 6500000, type: 'Villa', category: 'sale', beds: 4, baths: 5, area: 4200, savedOn: '5 days ago', status: 'available', agent: 'Ahmed Hassan' },
-    { id: 3, title: 'Studio in JVC with Pool View', location: 'Jumeirah Village Circle', price: 'AED 650,000', priceNum: 650000, type: 'Studio', category: 'sale', beds: 0, baths: 1, area: 480, savedOn: '1 week ago', status: 'reserved', agent: 'Priya Nair' },
-    { id: 4, title: 'Modern 1BR in Business Bay', location: 'Business Bay', price: 'AED 7,500 / mo', priceNum: 7500, type: 'Apartment', category: 'rent', beds: 1, baths: 1, area: 780, savedOn: '1 week ago', status: 'available', agent: 'Omar Khalid' },
-    { id: 5, title: 'Penthouse in Palm Jumeirah', location: 'Palm Jumeirah', price: 'AED 18,000,000', priceNum: 18000000, type: 'Penthouse', category: 'sale', beds: 5, baths: 6, area: 8500, savedOn: '2 weeks ago', status: 'available', agent: 'Sarah Al-Mansouri' },
-    { id: 6, title: 'Townhouse in Dubai Hills', location: 'Dubai Hills Estate', price: 'AED 3,200,000', priceNum: 3200000, type: 'Townhouse', category: 'sale', beds: 3, baths: 3, area: 2200, savedOn: '3 weeks ago', status: 'sold', agent: 'Ahmed Hassan' },
-  ]);
+  properties = signal<SavedProperty[]>([]);
 
   filtered = computed(() => {
     const q   = this.search().toLowerCase();

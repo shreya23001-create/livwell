@@ -1,27 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
-
-interface SavedProperty {
-  id: number;
-  title: string;
-  location: string;
-  price: string;
-  type: string;
-  beds: number;
-  baths: number;
-  area: number;
-  savedOn: string;
-  status: 'available' | 'reserved' | 'sold';
-}
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface Enquiry {
   id: number;
   property: string;
   agent: string;
   date: string;
-  status: 'pending' | 'replied' | 'closed';
+  status: 'new' | 'contacted' | 'qualified' | 'closed';
   message: string;
 }
 
@@ -32,27 +20,47 @@ interface Enquiry {
   templateUrl: './customer-dashboard.component.html',
   styleUrl: './customer-dashboard.component.scss',
 })
-export class CustomerDashboardComponent {
+export class CustomerDashboardComponent implements OnInit {
+  auth = inject(AuthService);
+  private sb = inject(SupabaseService).client;
+
   today = new Date().toLocaleDateString('en-AE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   showWelcome = signal(false);
+  loading = signal(true);
 
-  savedProperties = signal<SavedProperty[]>([
-    { id: 1, title: 'Luxury 2BR in Downtown Dubai', location: 'Downtown Dubai', price: 'AED 2,800,000', type: 'Apartment', beds: 2, baths: 2, area: 1450, savedOn: '2 days ago', status: 'available' },
-    { id: 2, title: 'Spacious Villa in Arabian Ranches', location: 'Arabian Ranches', price: 'AED 6,500,000', type: 'Villa', beds: 4, baths: 5, area: 4200, savedOn: '5 days ago', status: 'available' },
-    { id: 3, title: 'Studio in JVC with Pool View', location: 'Jumeirah Village Circle', price: 'AED 650,000', type: 'Studio', beds: 0, baths: 1, area: 480, savedOn: '1 week ago', status: 'reserved' },
-  ]);
+  savedProperties = signal<any[]>([]);
+  recentEnquiries = signal<Enquiry[]>([]);
 
-  recentEnquiries = signal<Enquiry[]>([
-    { id: 1, property: 'Luxury 2BR in Downtown Dubai', agent: 'Sarah Al-Mansouri', date: '2 days ago', status: 'replied', message: 'I am interested in scheduling a viewing this weekend.' },
-    { id: 2, property: 'Studio in JVC with Pool View', agent: 'Ahmed Hassan', date: '5 days ago', status: 'pending', message: 'Can you share more details about the payment plan?' },
-    { id: 3, property: 'Penthouse in Palm Jumeirah', agent: 'Priya Nair', date: '2 weeks ago', status: 'closed', message: 'Is the price negotiable for a cash buyer?' },
-  ]);
-
-  constructor(public auth: AuthService) {
-    if (auth.newlyRegistered()) {
+  constructor() {
+    if (this.auth.newlyRegistered()) {
       this.showWelcome.set(true);
-      auth.clearNewlyRegistered();
+      this.auth.clearNewlyRegistered();
     }
+  }
+
+  async ngOnInit(): Promise<void> {
+    const user = this.auth.currentUser();
+    if (!user?.email) { this.loading.set(false); return; }
+
+    const { data } = await this.sb
+      .from('admin_leads')
+      .select('id, name, notes, status, assigned_agent, created_at, location, property_type')
+      .eq('email', user.email)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (data) {
+      this.recentEnquiries.set(data.map((r: any) => ({
+        id:       r.id,
+        property: r.property_type || r.location || 'Property Enquiry',
+        agent:    r.assigned_agent || 'Unassigned',
+        date:     new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
+        status:   r.status || 'new',
+        message:  r.notes || '',
+      })));
+    }
+
+    this.loading.set(false);
   }
 
   dismissWelcome(): void { this.showWelcome.set(false); }
@@ -69,6 +77,6 @@ export class CustomerDashboardComponent {
   }
 
   statusLabel(s: string): string {
-    return { available: 'Available', reserved: 'Reserved', sold: 'Sold', pending: 'Pending', replied: 'Replied', closed: 'Closed' }[s] ?? s;
+    return { new: 'New', contacted: 'Contacted', qualified: 'Qualified', closed: 'Closed', available: 'Available', reserved: 'Reserved', sold: 'Sold' }[s] ?? s;
   }
 }

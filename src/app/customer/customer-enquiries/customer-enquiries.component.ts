@@ -1,19 +1,19 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../shared/services/auth.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface Enquiry {
   id: number;
   property: string;
   location: string;
-  price: string;
+  budget: string;
   agent: string;
   agentInitials: string;
   date: string;
-  status: 'pending' | 'replied' | 'closed';
+  status: 'new' | 'contacted' | 'qualified' | 'closed';
   message: string;
-  reply?: string;
-  replyDate?: string;
 }
 
 @Component({
@@ -23,62 +23,15 @@ interface Enquiry {
   templateUrl: './customer-enquiries.component.html',
   styleUrl: './customer-enquiries.component.scss',
 })
-export class CustomerEnquiriesComponent {
+export class CustomerEnquiriesComponent implements OnInit {
+  private auth = inject(AuthService);
+  private sb   = inject(SupabaseService).client;
+
   filterStatus = signal('all');
   expandedId   = signal<number | null>(null);
+  loading      = signal(true);
 
-  enquiries = signal<Enquiry[]>([
-    {
-      id: 1,
-      property: 'Luxury 2BR in Downtown Dubai',
-      location: 'Downtown Dubai',
-      price: 'AED 2,800,000',
-      agent: 'Sarah Al-Mansouri',
-      agentInitials: 'SA',
-      date: '18 May 2026',
-      status: 'replied',
-      message: 'I am interested in scheduling a viewing this weekend. Is the property available for Saturday morning?',
-      reply: 'Hello! Yes, the property is available for viewing on Saturday between 10am–1pm. I will send you a confirmation shortly.',
-      replyDate: '19 May 2026',
-    },
-    {
-      id: 2,
-      property: 'Studio in JVC with Pool View',
-      location: 'Jumeirah Village Circle',
-      price: 'AED 650,000',
-      agent: 'Ahmed Hassan',
-      agentInitials: 'AH',
-      date: '15 May 2026',
-      status: 'pending',
-      message: 'Can you share more details about the payment plan? Is there a post-handover plan available?',
-    },
-    {
-      id: 3,
-      property: 'Penthouse in Palm Jumeirah',
-      location: 'Palm Jumeirah',
-      price: 'AED 18,000,000',
-      agent: 'Priya Nair',
-      agentInitials: 'PN',
-      date: '5 May 2026',
-      status: 'closed',
-      message: 'Is the price negotiable for a cash buyer? We are ready to move fast.',
-      reply: 'Thank you for your interest. Unfortunately the seller has accepted another offer. We have similar properties — shall I share options?',
-      replyDate: '6 May 2026',
-    },
-    {
-      id: 4,
-      property: 'Modern 1BR in Business Bay',
-      location: 'Business Bay',
-      price: 'AED 7,500 / mo',
-      agent: 'Omar Khalid',
-      agentInitials: 'OK',
-      date: '12 May 2026',
-      status: 'replied',
-      message: 'Is the apartment furnished? And are pets allowed in the building?',
-      reply: 'The apartment is semi-furnished. Pets are allowed with a refundable deposit of AED 2,000.',
-      replyDate: '13 May 2026',
-    },
-  ]);
+  enquiries = signal<Enquiry[]>([]);
 
   filtered = computed(() => {
     const s = this.filterStatus();
@@ -86,17 +39,44 @@ export class CustomerEnquiriesComponent {
   });
 
   stats = computed(() => ({
-    total:   this.enquiries().length,
-    pending: this.enquiries().filter(e => e.status === 'pending').length,
-    replied: this.enquiries().filter(e => e.status === 'replied').length,
-    closed:  this.enquiries().filter(e => e.status === 'closed').length,
+    total:     this.enquiries().length,
+    new:       this.enquiries().filter(e => e.status === 'new').length,
+    contacted: this.enquiries().filter(e => e.status === 'contacted').length,
+    qualified: this.enquiries().filter(e => e.status === 'qualified').length,
+    closed:    this.enquiries().filter(e => e.status === 'closed').length,
   }));
+
+  async ngOnInit(): Promise<void> {
+    const user = this.auth.currentUser();
+    if (!user?.email) { this.loading.set(false); return; }
+
+    const { data } = await this.sb
+      .from('admin_leads')
+      .select('id, name, notes, status, assigned_agent, created_at, location, property_type, budget')
+      .eq('email', user.email)
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      this.enquiries.set(data.map((r: any) => ({
+        id:            r.id,
+        property:      r.property_type || 'General Enquiry',
+        location:      r.location      || '',
+        budget:        r.budget        || '',
+        agent:         r.assigned_agent || 'Unassigned',
+        agentInitials: (r.assigned_agent || 'UA').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+        date:          new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
+        status:        r.status || 'new',
+        message:       r.notes  || '',
+      })));
+    }
+    this.loading.set(false);
+  }
 
   toggleExpand(id: number): void {
     this.expandedId.update(v => v === id ? null : id);
   }
 
   statusLabel(s: string): string {
-    return { pending: 'Pending', replied: 'Replied', closed: 'Closed' }[s] ?? s;
+    return { new: 'New', contacted: 'Contacted', qualified: 'Qualified', closed: 'Closed' }[s] ?? s;
   }
 }

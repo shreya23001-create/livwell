@@ -129,11 +129,11 @@ export class AuthService {
   // ── LOGOUT ───────────────────────────────────────────────
   async logout(): Promise<void> {
     const role = this._currentUser()?.role;
-    await this.supabase.auth.signOut();
     this._currentUser.set(null);
-    if (role === 'admin' || role === 'super_admin') this.router.navigate(['/admin/login']);
-    else if (role === 'agent') this.router.navigate(['/agent/login']);
-    else this.router.navigate(['/customer']);
+    if (role === 'admin' || role === 'super_admin') await this.router.navigate(['/admin/login']);
+    else if (role === 'agent') await this.router.navigate(['/agent/login']);
+    else await this.router.navigate(['/customer']);
+    await this.supabase.auth.signOut();
   }
 
   // ── PASSWORD ─────────────────────────────────────────────

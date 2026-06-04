@@ -247,9 +247,12 @@ $bg:      #f4f6fa;
   border-radius: 999px;
   white-space: nowrap;
   flex-shrink: 0;
-  &--pending { background: #fffbeb; color: #b45309; }
-  &--replied { background: #f0fdf4; color: #4f46e5; }
-  &--closed  { background: #f1f5f9; color: #475569; }
+  &--new       { background: #fffbeb; color: #b45309; }
+  &--contacted { background: #eff6ff; color: #1d4ed8; }
+  &--qualified { background: #f0fdf4; color: #16a34a; }
+  &--closed    { background: #f1f5f9; color: #475569; }
+  &--pending   { background: #fffbeb; color: #b45309; }
+  &--replied   { background: #f0fdf4; color: #4f46e5; }
 }
 .cdash-enq-msg {
   font-size: 0.78rem;
@@ -267,6 +270,54 @@ $bg:      #f4f6fa;
   justify-content: space-between;
   font-size: 0.72rem;
   color: $muted;
+}
+
+// Browse card
+.cdash-browse-card {
+  display: flex;
+  align-items: stretch;
+}
+.cdash-browse-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  flex: 1;
+  gap: 0.5rem;
+}
+.cdash-browse-icon {
+  width: 3rem; height: 3rem;
+  color: $accent;
+  margin-bottom: 0.5rem;
+}
+.cdash-browse-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0;
+}
+.cdash-browse-sub {
+  font-size: 0.85rem;
+  color: $muted;
+  margin: 0 0 0.75rem;
+}
+.cdash-browse-card .cdash-cta-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.cdash-browse-card .cdash-cta-btn--primary {
+  background: $accent;
+  color: #fff;
+  &:hover { background: $accent2; }
+}
+.cdash-browse-card .cdash-cta-btn--ghost {
+  background: transparent;
+  color: $accent;
+  border: 1px solid $accent;
+  &:hover { background: #f5f5ff; }
 }
 
 // CTA Banner

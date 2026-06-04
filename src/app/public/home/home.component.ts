@@ -111,22 +111,14 @@ export class HomeComponent implements OnInit {
     { value: '15', label: 'Years Experience', suffix: '+' },
   ];
 
-  // Start with static data immediately — replaced by DB data when it loads
-  featuredPropertiesLive = signal<Property[]>([
-    { id: 1, title: 'Luxury Penthouse Suite',  location: 'Downtown Dubai',  price: 'AED 4,500,000',  beds: 4, baths: 3, sqft: '3,200',  type: 'Apartment', badge: 'Featured',  image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80' },
-    { id: 2, title: 'Modern Villa with Pool',  location: 'Palm Jumeirah',   price: 'AED 8,200,000',  beds: 5, baths: 5, sqft: '5,800',  type: 'Villa',     badge: 'Hot',       image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80' },
-    { id: 3, title: 'Beachfront Apartment',    location: 'JBR Walk, Marina',price: 'AED 2,100,000',  beds: 2, baths: 2, sqft: '1,450',  type: 'Apartment', badge: 'New',       image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80' },
-    { id: 4, title: 'Contemporary Town House', location: 'Arabian Ranches', price: 'AED 3,750,000',  beds: 4, baths: 3, sqft: '2,900',  type: 'Townhouse', badge: '',          image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80' },
-    { id: 5, title: 'Sky View Studio',         location: 'Business Bay',    price: 'AED 980,000',    beds: 1, baths: 1, sqft: '650',    type: 'Studio',    badge: 'Reduced',   image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80' },
-    { id: 6, title: 'Heritage Mansion',        location: 'Emirates Hills',  price: 'AED 22,000,000', beds: 7, baths: 8, sqft: '12,400', type: 'Villa',     badge: 'Exclusive', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80' },
-  ]);
+  // Empty until DB loads — avoids showing fake IDs that break property detail navigation
+  featuredPropertiesLive = signal<Property[]>([]);
 
   private async loadFeaturedFromSupabase(): Promise<void> {
     let { data } = await this.sb
       .from('properties')
       .select('id, title, location, community, price, bedrooms, bathrooms, area_sqft, type, images, is_featured, status')
       .eq('is_featured', true)
-      .eq('status', 'Published')
       .order('created_at', { ascending: false })
       .limit(6);
 
@@ -134,13 +126,12 @@ export class HomeComponent implements OnInit {
       ({ data } = await this.sb
         .from('properties')
         .select('id, title, location, community, price, bedrooms, bathrooms, area_sqft, type, images, is_featured, status')
-        .eq('status', 'Published')
         .order('created_at', { ascending: false })
         .limit(6));
     }
 
     if (data && data.length) {
-      const mapped = data.map((p: any) => ({
+      this.featuredPropertiesLive.set(data.map((p: any) => ({
         id:       p.id,
         title:    p.title,
         location: [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
@@ -151,9 +142,9 @@ export class HomeComponent implements OnInit {
         type:     p.type,
         badge:    p.is_featured ? 'Featured' : '',
         image:    (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
-      }));
-      this.featuredPropertiesLive.set(mapped);
+      })));
     }
+    // If no DB data, section stays hidden (ngIf on section handles this)
   }
 
   topAgents: Agent[] = [

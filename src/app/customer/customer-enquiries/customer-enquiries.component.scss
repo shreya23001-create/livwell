@@ -1,5 +1,6 @@
 $accent:  #6366f1;
 $accent2: #4f46e5;
+$green:   #1a5c3a;
 $border:  #e5e7eb;
 $muted:   #9ca3af;
 $text:    #111827;
@@ -12,34 +13,41 @@ $bg:      #f4f6fa;
 .page-title  { font-size: 1.5rem; font-weight: 800; color: $text; margin: 0 0 0.25rem; }
 .page-sub    { font-size: 0.85rem; color: $sub; margin: 0; }
 
-// Stats (clickable filter tabs)
+// Stats row
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 .stat-card {
   background: #fff;
   border: 1px solid $border;
   border-radius: 0.75rem;
-  padding: 1rem 1.25rem;
+  padding: 0.875rem 1rem;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
   border-top: 3px solid $border;
   &:hover { border-color: rgba(99,102,241,0.4); }
-  &.active { border-color: $accent; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
-  &--pending.active { border-top-color: #f59e0b; }
-  &--replied.active { border-top-color: $accent; }
-  &--closed.active  { border-top-color: #9ca3af; }
-  &--all.active     { border-top-color: $accent; }
+  &.active { box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+  &--all.active         { border-top-color: $accent; border-color: $accent; }
+  &--new.active         { border-top-color: #f59e0b; border-color: #f59e0b; }
+  &--contacted.active   { border-top-color: $accent; border-color: $accent; }
+  &--qualified.active   { border-top-color: #16a34a; border-color: #16a34a; }
+  &--negotiating.active { border-top-color: #7c3aed; border-color: #7c3aed; }
+  &--won.active         { border-top-color: $green; border-color: $green; }
 }
-.stat-val { font-size: 1.75rem; font-weight: 800; color: $text; }
-.stat-lbl { font-size: 0.75rem; color: $muted; font-weight: 500; }
+.stat-val { font-size: 1.5rem; font-weight: 800; color: $text; }
+.stat-lbl { font-size: 0.72rem; color: $muted; font-weight: 500; margin-top: 0.1rem; }
 
-.empty-state { text-align: center; color: $muted; padding: 3rem; font-size: 0.875rem; }
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+  text-align: center; color: $muted; padding: 3rem; font-size: 0.875rem;
+  p { margin: 0; }
+}
+.empty-link { font-size: 0.875rem; color: $accent; font-weight: 600; text-decoration: none; &:hover { text-decoration: underline; } }
 
-// Enquiry cards
+// Cards
 .enq-list { display: flex; flex-direction: column; gap: 0.75rem; }
 
 .enq-card {
@@ -61,104 +69,192 @@ $bg:      #f4f6fa;
 }
 
 .agent-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
+  width: 2.5rem; height: 2.5rem; border-radius: 50%;
   background: linear-gradient(135deg, $accent, #8b5cf6);
-  color: #fff;
-  font-size: 0.78rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  color: #fff; font-size: 0.78rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
 .enq-info { flex: 1; min-width: 0; }
 .enq-prop {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: $text;
-  margin-bottom: 0.2rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.9rem; font-weight: 700; color: $text; margin-bottom: 0.2rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .enq-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  font-size: 0.75rem;
-  color: $muted;
+  display: flex; flex-wrap: wrap; gap: 0.3rem;
+  font-size: 0.75rem; color: $muted;
+  strong { color: $sub; font-weight: 600; }
+  .dot { color: $border; }
 }
+.unassigned-tag { font-style: italic; color: $muted; }
 
 .enq-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.3rem;
-  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; flex-shrink: 0;
 }
 .enq-badge {
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  &--new       { background: #fffbeb; color: #b45309; }
-  &--contacted { background: #eff6ff; color: #1d4ed8; }
-  &--qualified { background: #f0fdf4; color: #16a34a; }
-  &--closed    { background: #f1f5f9; color: #475569; }
-  &--pending   { background: #fffbeb; color: #b45309; }
-  &--replied   { background: #f0fdf4; color: #4f46e5; }
+  font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px;
+  &--new         { background: #fffbeb; color: #b45309; }
+  &--contacted   { background: #eff6ff; color: #1d4ed8; }
+  &--qualified   { background: #f0fdf4; color: #16a34a; }
+  &--negotiating { background: #f5f3ff; color: #7c3aed; }
+  &--won         { background: #ecfdf5; color: $green; }
+  &--lost        { background: #fef2f2; color: #dc2626; }
+  &--closed      { background: #f1f5f9; color: #475569; }
 }
 .enq-date { font-size: 0.72rem; color: $muted; }
 .enq-chevron {
-  width: 1rem;
-  height: 1rem;
-  color: $muted;
-  transition: transform 0.2s;
+  width: 1rem; height: 1rem; color: $muted; transition: transform 0.2s;
   &.open { transform: rotate(180deg); }
 }
 
 // Expanded body
-.enq-body { padding: 0 1.25rem 1.25rem; }
+.enq-body { padding: 0 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
 
-.enq-thread { display: flex; flex-direction: column; gap: 1rem; }
-.thread-item { display: flex; flex-direction: column; gap: 0.35rem; }
-.thread-label { font-size: 0.72rem; font-weight: 600; color: $muted; }
+// Status pipeline
+.pipeline-wrap {
+  background: #f9fafb; border: 1px solid $border; border-radius: 0.625rem; padding: 1rem 1.25rem;
+}
+.pipeline {
+  display: flex; align-items: center; gap: 0;
+}
+.pipeline-step {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  flex-shrink: 0;
+}
+.pipeline-dot {
+  width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  border: 2px solid $border; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
 
-.thread-bubble {
-  padding: 0.75rem 1rem;
-  border-radius: 0.625rem;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  max-width: 85%;
-  &--customer {
-    background: rgba(99,102,241,0.08);
-    color: $text;
-    border: 1px solid rgba(99,102,241,0.2);
-    align-self: flex-end;
+  .pipeline-step.done & { background: $green; border-color: $green; }
+  .pipeline-step.current & { background: $accent; border-color: $accent; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+}
+.pipeline-label {
+  font-size: 0.65rem; font-weight: 600; color: $muted; white-space: nowrap;
+  .pipeline-step.done & { color: $green; }
+  .pipeline-step.current & { color: $accent; }
+}
+.pipeline-line {
+  flex: 1; height: 2px; background: $border; margin: 0 0.25rem; margin-bottom: 1.1rem;
+  &.done { background: $green; }
+}
+
+.closed-banner {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: #f8fafc; border: 1px solid $border; border-radius: 0.5rem;
+  padding: 0.75rem 1rem; font-size: 0.85rem; color: $sub;
+  svg { flex-shrink: 0; }
+}
+.won-banner {
+  display: flex; align-items: center; gap: 0.625rem;
+  background: #f0fdf4; border: 1px solid #86efac; border-radius: 0.625rem;
+  padding: 0.875rem 1rem; font-size: 0.875rem; color: #15803d; font-weight: 600;
+  margin-bottom: 1rem;
+  svg { flex-shrink: 0; color: #16a34a; }
+}
+.lost-banner {
+  display: flex; align-items: center; gap: 0.625rem;
+  background: #fef2f2; border: 1px solid #fca5a5; border-radius: 0.625rem;
+  padding: 0.875rem 1rem; font-size: 0.875rem; color: #dc2626; font-weight: 500;
+  margin-bottom: 1rem;
+  svg { flex-shrink: 0; }
+}
+.thread-waiting {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.8rem; color: $muted; font-style: italic; margin-top: 0.25rem;
+  svg { flex-shrink: 0; }
+}
+
+// Agent info row
+.enq-agent-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem; background: #f9fafb; border: 1px solid $border; border-radius: 0.625rem;
+}
+.enq-agent-avatar {
+  width: 2.25rem; height: 2.25rem; border-radius: 50%;
+  background: linear-gradient(135deg, $accent, #8b5cf6);
+  color: #fff; font-size: 0.75rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.enq-agent-name { font-size: 0.875rem; font-weight: 700; color: $text; }
+.enq-agent-sub  { font-size: 0.75rem; color: $muted; }
+
+// Thread
+.thread-wrap {
+  display: flex; flex-direction: column;
+  border: 1px solid $border; border-radius: 0.875rem; overflow: hidden; background: #fff;
+}
+.thread-loading, .thread-empty {
+  padding: 1.5rem 1.25rem; font-size: 0.82rem; color: $muted; text-align: center;
+}
+.thread-messages {
+  display: flex; flex-direction: column; gap: 0.875rem;
+  padding: 1rem 1.25rem; max-height: 300px; overflow-y: auto; background: #f9fafb;
+}
+.thread-msg {
+  display: flex; flex-direction: column; gap: 0.2rem;
+  &--mine {
+    align-items: flex-end;
+    .thread-msg-bubble {
+      background: $accent; color: #fff;
+      border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
+    }
+    .thread-msg-meta { text-align: right; }
   }
   &--agent {
-    background: $bg;
-    color: $text;
-    border: 1px solid $border;
-    align-self: flex-start;
+    align-items: flex-start;
+    .thread-msg-bubble {
+      background: #fff; color: $text;
+      border: 1px solid $border;
+      border-radius: 1.25rem 1.25rem 1.25rem 0.25rem;
+    }
   }
 }
+.thread-msg-bubble {
+  padding: 0.625rem 1rem; font-size: 0.875rem; line-height: 1.5; max-width: 75%;
+  word-break: break-word; white-space: pre-wrap; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.thread-msg-meta { font-size: 0.68rem; color: $muted; padding: 0 0.375rem; }
 
-.enq-awaiting {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  color: $muted;
-  font-style: italic;
-  padding: 0.5rem 0;
-  svg { width: 0.9rem; height: 0.9rem; flex-shrink: 0; }
+// Composer
+.thread-composer {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.625rem 0.875rem; border-top: 1px solid $border; background: #fff;
+}
+.thread-composer-input {
+  flex: 1; border: 1px solid $border; border-radius: 1.5rem; outline: none; resize: none;
+  padding: 0.5rem 0.875rem; font-size: 0.875rem; font-family: inherit; line-height: 1.5;
+  color: $text; background: #f9fafb; transition: border-color 0.15s; max-height: 120px;
+  overflow-y: auto;
+  &::placeholder { color: $muted; }
+  &:focus { border-color: $accent; background: #fff; }
+}
+.thread-composer-btn {
+  width: 2.25rem; height: 2.25rem; border-radius: 50%; flex-shrink: 0;
+  background: $accent; color: #fff; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+  &:hover:not(:disabled) { background: $accent2; transform: scale(1.05); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  svg { flex-shrink: 0; }
 }
 
-@media (max-width: 768px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .enq-meta  { display: none; }
+.enq-prop-link {
+  margin-left: 0.5rem; font-size: 0.75rem; color: $accent;
+  font-weight: 600; text-decoration: none;
+  &:hover { text-decoration: underline; }
 }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+// Detail rows
+.enq-detail-row {
+  display: flex; gap: 1rem; font-size: 0.82rem;
+  border-top: 1px solid $border; padding-top: 0.75rem;
+}
+.enq-detail-label { min-width: 80px; font-weight: 600; color: $sub; }
+.enq-detail-val   { color: $text; }
+
+@media (max-width: 1024px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px)  { .stats-row { grid-template-columns: repeat(2, 1fr); } .enq-meta { display: none; } }

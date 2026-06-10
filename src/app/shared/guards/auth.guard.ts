@@ -1,24 +1,21 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { UserRole } from '../models/user.model';
 
 export const authGuard = (roles: UserRole[], loginUrl: string): CanActivateFn => {
-  return async () => {
+  return async (): Promise<boolean | UrlTree> => {
     const auth   = inject(AuthService);
     const router = inject(Router);
 
-    // Wait for Supabase session to be restored (max 3s)
     await auth.waitForSession();
 
     if (!auth.isLoggedIn()) {
-      router.navigate([loginUrl]);
-      return false;
+      return router.createUrlTree([loginUrl]);
     }
 
     if (roles.length && !auth.hasRole(roles)) {
-      router.navigate(['/']);
-      return false;
+      return router.createUrlTree(['/']);
     }
 
     return true;

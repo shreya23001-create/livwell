@@ -57,7 +57,7 @@
             <div class="pd-price">{{ formatPrice(p.price) }}</div>
             <div *ngIf="p.area_sqft" class="pd-price-sqft">AED {{ (p.price / p.area_sqft | number:'1.0-0') }}/sqft</div>
             <div class="pd-price-actions">
-              <button class="pd-fav-btn" [class.active]="isFaved()" (click)="isFaved.set(!isFaved())" title="Save">
+              <button class="pd-fav-btn" [class.active]="isFaved()" (click)="toggleFav()" [title]="isFaved() ? 'Remove from saved' : 'Save property'">
                 <svg xmlns="http://www.w3.org/2000/svg" [attr.fill]="isFaved() ? 'currentColor' : 'none'"
                   viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round"
@@ -537,11 +537,25 @@
         <!-- Inquiry form -->
         <div class="pd-inquiry-form">
           <div class="pd-inquiry-title">Send Inquiry</div>
-          <input type="text" placeholder="Your Name" class="pd-input" />
-          <input type="tel" placeholder="Your Phone" class="pd-input" />
-          <input type="email" placeholder="Your Email" class="pd-input" />
-          <textarea placeholder="I'm interested in this property..." class="pd-textarea" rows="3"></textarea>
-          <button class="pd-submit-btn">Send Message</button>
+          @if (inquirySent()) {
+            <div class="pd-inquiry-success">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Inquiry sent! An agent will contact you shortly.
+            </div>
+          } @else {
+            <form (ngSubmit)="submitInquiry(p)" #inquiryForm="ngForm">
+              <input type="text" placeholder="Your Name *" class="pd-input" [(ngModel)]="inquiryForm_name" name="inqName" required />
+              <input type="tel" placeholder="Your Phone *" class="pd-input" [(ngModel)]="inquiryForm_phone" name="inqPhone" required />
+              <input type="email" placeholder="Your Email *" class="pd-input" [(ngModel)]="inquiryForm_email" name="inqEmail" required />
+              <textarea placeholder="I'm interested in this property..." class="pd-textarea" rows="3" [(ngModel)]="inquiryForm_message" name="inqMessage"></textarea>
+              @if (inquiryError()) {
+                <p class="pd-inquiry-error">{{ inquiryError() }}</p>
+              }
+              <button type="submit" class="pd-submit-btn" [disabled]="inquirySubmitting()">
+                {{ inquirySubmitting() ? 'Sending…' : 'Send Message' }}
+              </button>
+            </form>
+          }
         </div>
       </div>
 

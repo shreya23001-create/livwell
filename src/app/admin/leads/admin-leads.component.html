@@ -217,22 +217,22 @@
         </div>
         <div class="form-field">
           <label>Category</label>
-          <select [value]="form()['category']" (change)="updateForm({category: $any($event.target).value})">
-            <option *ngFor="let c of categories" [value]="c">{{ c | titlecase }}</option>
+          <select (change)="updateForm({category: $any($event.target).value})">
+            <option *ngFor="let c of categories" [value]="c" [selected]="form()['category'] === c">{{ c | titlecase }}</option>
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
           <label>Status</label>
-          <select [value]="form()['status']" (change)="updateForm({status: $any($event.target).value})">
-            <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
+          <select (change)="updateForm({status: $any($event.target).value})">
+            <option *ngFor="let s of statuses" [value]="s" [selected]="form()['status'] === s">{{ labelStatus(s) }}</option>
           </select>
         </div>
         <div class="form-field">
           <label>Source</label>
-          <select [value]="form()['source']" (change)="updateForm({source: $any($event.target).value})">
-            <option *ngFor="let s of sources" [value]="s">{{ labelSource(s) }}</option>
+          <select (change)="updateForm({source: $any($event.target).value})">
+            <option *ngFor="let s of sources" [value]="s" [selected]="form()['source'] === s">{{ labelSource(s) }}</option>
           </select>
         </div>
       </div>
@@ -255,8 +255,8 @@
         </div>
         <div class="form-field">
           <label>Assigned Agent</label>
-          <select [value]="form()['assignedAgent']" (change)="updateForm({assignedAgent: $any($event.target).value})">
-            <option *ngFor="let a of agents()" [value]="a">{{ a }}</option>
+          <select (change)="updateForm({assignedAgent: $any($event.target).value})">
+            <option *ngFor="let a of agents()" [value]="a" [selected]="form()['assignedAgent'] === a">{{ a }}</option>
           </select>
         </div>
       </div>

@@ -9,49 +9,49 @@
 
   <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-card stat-card--all" (click)="filterStatus.set('all')" [class.active]="filterStatus() === 'all'">
-      <div class="stat-val">{{ stats().total }}</div>
-      <div class="stat-lbl">Total</div>
-    </div>
-    <div class="stat-card stat-card--pending" (click)="filterStatus.set('new')" [class.active]="filterStatus() === 'new'">
-      <div class="stat-val">{{ stats().new }}</div>
-      <div class="stat-lbl">New</div>
-    </div>
-    <div class="stat-card stat-card--replied" (click)="filterStatus.set('contacted')" [class.active]="filterStatus() === 'contacted'">
-      <div class="stat-val">{{ stats().contacted }}</div>
-      <div class="stat-lbl">Contacted</div>
-    </div>
-    <div class="stat-card stat-card--closed" (click)="filterStatus.set('closed')" [class.active]="filterStatus() === 'closed'">
-      <div class="stat-val">{{ stats().closed }}</div>
-      <div class="stat-lbl">Closed</div>
-    </div>
+    <div class="stat-card stat-card--all"         (click)="filterStatus.set('all')"         [class.active]="filterStatus() === 'all'">         <div class="stat-val">{{ stats().total }}</div>       <div class="stat-lbl">Total</div></div>
+    <div class="stat-card stat-card--new"         (click)="filterStatus.set('new')"         [class.active]="filterStatus() === 'new'">         <div class="stat-val">{{ stats().new }}</div>         <div class="stat-lbl">New</div></div>
+    <div class="stat-card stat-card--contacted"   (click)="filterStatus.set('contacted')"   [class.active]="filterStatus() === 'contacted'">   <div class="stat-val">{{ stats().contacted }}</div>   <div class="stat-lbl">Contacted</div></div>
+    <div class="stat-card stat-card--qualified"   (click)="filterStatus.set('qualified')"   [class.active]="filterStatus() === 'qualified'">   <div class="stat-val">{{ stats().qualified }}</div>   <div class="stat-lbl">Qualified</div></div>
+    <div class="stat-card stat-card--negotiating" (click)="filterStatus.set('negotiating')" [class.active]="filterStatus() === 'negotiating'"> <div class="stat-val">{{ stats().negotiating }}</div> <div class="stat-lbl">Negotiating</div></div>
+    <div class="stat-card stat-card--won"         (click)="filterStatus.set('won')"         [class.active]="filterStatus() === 'won'">         <div class="stat-val">{{ stats().won }}</div>         <div class="stat-lbl">Won</div></div>
   </div>
 
   <!-- List -->
   @if (loading()) {
     <div class="empty-state">Loading enquiries…</div>
+  } @else if (enquiries().length === 0) {
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <p>No enquiries yet.</p>
+      <a routerLink="/properties" class="empty-link">Browse properties and send an enquiry →</a>
+    </div>
   } @else if (filtered().length === 0) {
-    <div class="empty-state">No enquiries found.</div>
+    <div class="empty-state">No enquiries match the selected filter.</div>
   } @else {
     <div class="enq-list">
       @for (enq of filtered(); track enq.id) {
         <div class="enq-card" [class.enq-card--expanded]="expandedId() === enq.id">
 
+          <!-- Card header -->
           <div class="enq-card-header" (click)="toggleExpand(enq.id)">
-            <!-- Agent avatar -->
             <div class="agent-avatar">{{ enq.agentInitials }}</div>
-
-            <!-- Main info -->
             <div class="enq-info">
-              <div class="enq-prop">{{ enq.property }}</div>
+              <div class="enq-prop">
+                {{ enq.property }}
+                @if (enq.propertyId) {
+                  <a [routerLink]="['/property', enq.propertyId]" (click)="$event.stopPropagation()" class="enq-prop-link">View →</a>
+                }
+              </div>
               <div class="enq-meta">
-                @if (enq.location) { <span>{{ enq.location }}</span><span>·</span> }
-                @if (enq.budget)   { <span>Budget: {{ enq.budget }}</span><span>·</span> }
-                <span>Agent: {{ enq.agent }}</span>
+                @if (enq.location) { <span>{{ enq.location }}</span><span class="dot">·</span> }
+                @if (enq.budget)   { <span>Budget: {{ enq.budget }}</span><span class="dot">·</span> }
+                <span>
+                  @if (enq.agent !== 'Unassigned') { <strong>{{ enq.agent }}</strong> }
+                  @else { <span class="unassigned-tag">Agent being assigned…</span> }
+                </span>
               </div>
             </div>
-
-            <!-- Right side -->
             <div class="enq-right">
               <span class="enq-badge enq-badge--{{ enq.status }}">{{ statusLabel(enq.status) }}</span>
               <span class="enq-date">{{ enq.date }}</span>
@@ -59,20 +59,106 @@
             </div>
           </div>
 
+          <!-- Expanded body -->
           @if (expandedId() === enq.id) {
             <div class="enq-body">
-              <div class="enq-thread">
-                @if (enq.message) {
-                  <div class="thread-item thread-item--customer">
-                    <div class="thread-label">Your notes / message</div>
-                    <div class="thread-bubble thread-bubble--customer">{{ enq.message }}</div>
+
+              <!-- Won banner -->
+              @if (enq.status === 'won') {
+                <div class="won-banner">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  Congratulations! This deal has been won. Your agent will be in touch to complete next steps.
+                </div>
+              }
+
+              <!-- Lost banner -->
+              @if (enq.status === 'lost') {
+                <div class="lost-banner">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                  This enquiry was not progressed. Feel free to submit a new enquiry.
+                </div>
+              }
+
+              <!-- Status pipeline -->
+              @if (enq.status !== 'won' && enq.status !== 'lost' && enq.status !== 'closed') {
+                <div class="pipeline-wrap">
+                  <div class="pipeline">
+                    @for (step of statusSteps; track step; let i = $index) {
+                      <div class="pipeline-step" [class.done]="stepIndex(enq.status) > i" [class.current]="enq.status === step">
+                        <div class="pipeline-dot">
+                          @if (stepIndex(enq.status) > i) {
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                          }
+                        </div>
+                        <div class="pipeline-label">{{ statusLabel(step) }}</div>
+                      </div>
+                      @if (i < statusSteps.length - 1) {
+                        <div class="pipeline-line" [class.done]="stepIndex(enq.status) > i"></div>
+                      }
+                    }
                   </div>
-                }
-                <div class="enq-awaiting">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  Your agent will be in touch via phone or email.
+                </div>
+              }
+
+              <!-- Agent info -->
+              <div class="enq-agent-row">
+                <div class="enq-agent-avatar">{{ enq.agentInitials }}</div>
+                <div>
+                  <div class="enq-agent-name">
+                    @if (enq.agent !== 'Unassigned') { {{ enq.agent }} } @else { Agent being assigned… }
+                  </div>
+                  <div class="enq-agent-sub">Your assigned agent will contact you by phone or email</div>
                 </div>
               </div>
+
+              <!-- Message thread -->
+              <div class="thread-wrap">
+                @if (msgLoading()[enq.id]) {
+                  <div class="thread-loading">Loading messages…</div>
+                } @else if (!messages()[enq.id]?.length) {
+                  <div class="thread-empty">No messages yet. Send one below.</div>
+                } @else {
+                  <div class="thread-messages">
+                    @for (msg of messages()[enq.id]; track msg.id) {
+                      <div class="thread-msg" [class.thread-msg--mine]="msg.senderRole === 'customer'" [class.thread-msg--agent]="msg.senderRole === 'agent'">
+                        <div class="thread-msg-bubble">{{ msg.content }}</div>
+                        <div class="thread-msg-meta">{{ msg.senderName }} · {{ msg.createdAt }}</div>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Send message input -->
+                @if (enq.status !== 'lost' && enq.status !== 'closed') {
+                  <div class="thread-composer">
+                    <textarea class="thread-composer-input"
+                      rows="1"
+                      placeholder="Reply to your agent…"
+                      [value]="newMessage()[enq.id] || ''"
+                      (input)="setNewMessage(enq.id, $any($event.target).value)"
+                      (keydown)="onEnterKey($event, enq.id)">
+                    </textarea>
+                    <button class="thread-composer-btn"
+                      (click)="sendMessage(enq.id)"
+                      [disabled]="sending()[enq.id] || !(newMessage()[enq.id] || '').trim()"
+                      title="Send (Enter)">
+                      @if (sending()[enq.id]) {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                      } @else {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      }
+                    </button>
+                  </div>
+                }
+              </div>
+
+              @if (enq.budget) {
+                <div class="enq-detail-row"><span class="enq-detail-label">Budget</span><span class="enq-detail-val">{{ enq.budget }}</span></div>
+              }
+              @if (enq.location) {
+                <div class="enq-detail-row"><span class="enq-detail-label">Location</span><span class="enq-detail-val">{{ enq.location }}</span></div>
+              }
+
             </div>
           }
 

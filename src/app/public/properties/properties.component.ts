@@ -274,8 +274,14 @@ export class PropertiesComponent implements OnInit {
         p.type.toLowerCase().includes(q)
       );
     }
-    if (this.selectedType()) result = result.filter(p => p.type === this.selectedType());
-    if (this.selectedStatus()) result = result.filter(p => p.status === this.selectedStatus());
+    if (this.selectedType()) {
+      const t = this.selectedType().toLowerCase();
+      result = result.filter(p => p.type.toLowerCase() === t || p.type.toLowerCase().includes(t));
+    }
+    if (this.selectedStatus()) {
+      const s = this.selectedStatus().toLowerCase();
+      result = result.filter(p => p.status.toLowerCase() === s);
+    }
     if (this.selectedLocation()) result = result.filter(p => p.community === this.selectedLocation());
     if (this.minPrice() !== null) result = result.filter(p => p.price >= this.minPrice()!);
     if (this.maxPrice() !== null) result = result.filter(p => p.price <= this.maxPrice()!);
@@ -392,13 +398,15 @@ export class PropertiesComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.route.queryParams.subscribe(params => {
-      if (params['type']) this.selectedType.set(params['type']);
-      if (params['status']) this.selectedStatus.set(params['status']);
-      if (params['location']) this.selectedLocation.set(params['location']);
-      if (params['q']) this.searchQuery.set(params['q']);
-      if (params['beds']) this.selectedBeds.set(params['beds']);
-      if (params['minPrice']) this.minPrice.set(Number(params['minPrice']));
-      if (params['maxPrice']) this.maxPrice.set(Number(params['maxPrice']));
+      if (params['type'])      this.selectedType.set(params['type']);
+      if (params['status'])    this.selectedStatus.set(params['status']);
+      if (params['location'])  this.selectedLocation.set(params['location']);
+      if (params['q'])         this.searchQuery.set(params['q']);
+      if (params['beds'])      this.selectedBeds.set(params['beds']);
+      if (params['minPrice'])  this.minPrice.set(Number(params['minPrice']));
+      if (params['maxPrice'])  this.maxPrice.set(Number(params['maxPrice']));
+      if (params['furnished']) this.selectedFurnished.set(params['furnished']);
+      if (params['plotType'] && !params['type']) this.selectedType.set(params['plotType']);
     });
     await this.loadProperties();
   }
@@ -407,39 +415,46 @@ export class PropertiesComponent implements OnInit {
     this.isLoading.set(true);
     const { data, error } = await this.sb
       .from('properties')
-      .select('*, profiles(name)')
-      .eq('status', 'Published')
+      .select('id, title, location, community, price, listing_type, type, bedrooms, bathrooms, area_sqft, furnishing, images, amenities, views, created_at, agent_name, is_featured')
       .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('[Properties] DB error:', error.message, error.code);
+    }
 
     if (!error && data && data.length > 0) {
       this.allProperties.set(data.map((p: any) => ({
-        id:          p.id,
-        title:       p.title,
-        location:    p.location ?? '',
-        community:   p.community ?? '',
-        price:       p.price,
-        priceLabel:  this.formatPrice(p.price, p.listing_type),
-        pricePerSqft: p.area_sqft ? `AED ${Math.round(p.price / p.area_sqft).toLocaleString()}/sqft` : '',
-        beds:        p.bedrooms === 0 ? 'Studio' : p.bedrooms,
-        baths:       p.bathrooms ?? 1,
-        sqft:        p.area_sqft ?? 0,
-        sqftLabel:   p.area_sqft ? `${p.area_sqft.toLocaleString()} sqft` : '',
-        type:        p.type as any,
-        status:      p.listing_type === 'Rent' ? 'Rent' : 'Sale',
-        furnished:   p.furnishing ?? 'Unfurnished',
-        badge:       p.badge,
-        images:      p.images?.length ? p.images : ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80'],
-        amenities:   p.amenities ?? [],
-        views:       p.views ?? 0,
-        postedDate:  p.created_at?.slice(0, 10) ?? '',
-        lat:         p.lat ?? 25.2,
-        lng:         p.lng ?? 55.27,
-        agentName:   p.profiles?.name ?? 'Livwell Agent',
-        agentAvatar: '',
-        agentPhone:  '',
+        id:           p.id,
+        title:        p.title        ?? '',
+        location:     p.location     ?? '',
+        community:    p.community    ?? '',
+        price:        p.price        ?? 0,
+        priceLabel:   this.formatPrice(p.price ?? 0, p.listing_type),
+        pricePerSqft: p.area_sqft ? `AED ${Math.round((p.price ?? 0) / p.area_sqft).toLocaleString()}/sqft` : '',
+        beds:         p.bedrooms === 0 ? 'Studio' : (p.bedrooms ?? 1),
+        baths:        p.bathrooms    ?? 1,
+        sqft:         p.area_sqft    ?? 0,
+        sqftLabel:    p.area_sqft ? `${p.area_sqft.toLocaleString()} sqft` : '',
+        type:         p.type         as any ?? 'Apartment',
+        status:       p.listing_type === 'Rent' ? 'Rent' : p.listing_type === 'Off-Plan' ? 'Sale' : 'Sale',
+        isOffPlan:    p.listing_type === 'Off-Plan',
+        furnished:    p.furnishing   ?? 'Unfurnished',
+        badge:        p.is_featured  ? 'Featured' : undefined,
+        images:       p.images?.length ? p.images : ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80'],
+        amenities:    p.amenities    ?? [],
+        views:        p.views        ?? 0,
+        postedDate:   p.created_at?.slice(0, 10) ?? '',
+        lat:          25.2,
+        lng:          55.27,
+        agentName:    p.agent_name   ?? 'Livwell Agent',
+        agentAvatar:  '',
+        agentPhone:   '',
       })));
+    } else if (!error) {
+      // DB returned no rows — keep mock data so page isn't blank
+      this.allProperties.set(this._mockProperties);
     } else {
-      // Fall back to mock data if no real properties yet
+      // DB error — use mock data as fallback
       this.allProperties.set(this._mockProperties);
     }
     this.isLoading.set(false);
@@ -482,6 +497,7 @@ export class PropertiesComponent implements OnInit {
     this.selectedSpecialFeatures.set([]);
     this.referenceNumber.set('');
     this.currentPage.set(1);
+    this.router.navigate([], { queryParams: {}, replaceUrl: true });
   }
 
   toggleAmenity(amenity: string): void {

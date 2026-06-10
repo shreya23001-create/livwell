@@ -29,6 +29,9 @@
 
   <!-- Table -->
   <div class="table-wrap">
+    @if (loading()) {
+      <div class="empty-row-wrap">Loading your leads…</div>
+    } @else {
     <table class="data-table">
       <thead>
         <tr>
@@ -38,7 +41,7 @@
           <th>Budget</th>
           <th (click)="sort('location')" class="sortable">Location<svg *ngIf="sortCol()==='location'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir()==='asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
           <th>Source</th>
-          <th (click)="sort('lastContact')" class="sortable">Last Contact<svg *ngIf="sortCol()==='lastContact'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir()==='asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
+          <th (click)="sort('lastContact')" class="sortable">Date<svg *ngIf="sortCol()==='lastContact'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir()==='asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
           <th class="th-actions">Actions</th>
         </tr>
       </thead>
@@ -48,13 +51,35 @@
             <div class="lead-name">{{ l.name }}</div>
             <div class="lead-meta">{{ l.email }}</div>
             <div class="lead-meta">{{ l.phone }}</div>
+            <div class="lead-meta lead-property" *ngIf="l.propertyTitle">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              {{ l.propertyTitle }}
+            </div>
           </td>
-          <td><span class="badge badge--{{ l.status }}">{{ labelStatus(l.status) }}</span></td>
+          <td>
+            <!-- Clickable status badge → inline dropdown -->
+            <div class="status-cell">
+              <span class="badge badge--{{ l.status }}" (click)="quickStatusId.set(quickStatusId() === l.id ? null : l.id)" title="Click to change status">
+                {{ labelStatus(l.status) }}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+              @if (quickStatusId() === l.id) {
+                <div class="status-dropdown" (click)="$event.stopPropagation()">
+                  @for (s of statuses; track s) {
+                    <button class="status-option" [class.active]="l.status === s" (click)="quickUpdateStatus(l, s)">
+                      <span class="status-dot status-dot--{{ s }}"></span>
+                      {{ labelStatus(s) }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </td>
           <td><span class="cat-badge cat-badge--{{ l.category | lowercase }}">{{ l.category }}</span></td>
           <td class="td-muted">{{ l.budget }}</td>
           <td class="td-muted">{{ l.location }}</td>
           <td class="td-muted">{{ l.source }}</td>
-          <td class="td-muted">{{ l.lastContact }}</td>
+          <td class="td-muted">{{ l.createdDate }}</td>
           <td>
             <div class="action-btns">
               <button class="action-btn action-btn--edit" (click)="openEdit(l)" title="Edit">
@@ -66,9 +91,10 @@
             </div>
           </td>
         </tr>
-        <tr *ngIf="filtered().length===0"><td colspan="8" class="empty-row">No leads found.</td></tr>
+        <tr *ngIf="filtered().length===0 && !loading()"><td colspan="8" class="empty-row">No leads assigned to you yet.</td></tr>
       </tbody>
     </table>
+    }
   </div>
 </div>
 
@@ -100,22 +126,22 @@
         </div>
         <div class="form-field">
           <label>Category</label>
-          <select [value]="form()['category']" (change)="updateForm({category:$any($event.target).value})">
-            <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+          <select (change)="updateForm({category:$any($event.target).value})">
+            <option *ngFor="let c of categories" [value]="c" [selected]="form()['category'] === c">{{ c }}</option>
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
           <label>Status</label>
-          <select [value]="form()['status']" (change)="updateForm({status:$any($event.target).value})">
-            <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
+          <select (change)="updateForm({status:$any($event.target).value})">
+            <option *ngFor="let s of statuses" [value]="s" [selected]="form()['status'] === s">{{ labelStatus(s) }}</option>
           </select>
         </div>
         <div class="form-field">
           <label>Source</label>
-          <select [value]="form()['source']" (change)="updateForm({source:$any($event.target).value})">
-            <option *ngFor="let s of sources" [value]="s">{{ s }}</option>
+          <select (change)="updateForm({source:$any($event.target).value})">
+            <option *ngFor="let s of sources" [value]="s" [selected]="form()['source'] === s">{{ s }}</option>
           </select>
         </div>
       </div>
@@ -135,10 +161,51 @@
         <label>Notes</label>
         <textarea rows="3" [value]="form()['notes']" (input)="updateForm({notes:$any($event.target).value})" placeholder="Additional notes…"></textarea>
       </div>
+      <!-- Message thread (edit only) -->
+      @if (isEdit()) {
+        <div class="form-field form-field--full">
+          <label>Conversation with Customer</label>
+          <div class="agent-thread-wrap">
+            @if (msgLoading()) {
+              <div class="agent-thread-empty">Loading messages…</div>
+            } @else if (modalMessages().length === 0) {
+              <div class="agent-thread-empty">No messages yet. Reply below to start the conversation.</div>
+            } @else {
+              <div class="agent-thread-messages">
+                @for (msg of modalMessages(); track msg.id) {
+                  <div class="agent-thread-msg" [class.agent-thread-msg--mine]="msg.senderRole === 'agent'" [class.agent-thread-msg--customer]="msg.senderRole === 'customer'">
+                    <div class="agent-thread-bubble">{{ msg.content }}</div>
+                    <div class="agent-thread-meta">{{ msg.senderName }} · {{ msg.createdAt }}</div>
+                  </div>
+                }
+              </div>
+            }
+            <div class="agent-thread-input-row">
+              <textarea class="agent-thread-input" rows="2"
+                placeholder="Reply to customer… (Enter to send)"
+                [value]="newMessage()"
+                (input)="newMessage.set($any($event.target).value)"
+                (keydown)="onMsgEnter($event)">
+              </textarea>
+              <button class="agent-thread-send" (click)="sendMessage()" [disabled]="sendingMsg() || !newMessage().trim()">
+                @if (sendingMsg()) { <span>…</span> } @else {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                }
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+    <div *ngIf="saveError()" style="margin:0 1.5rem 0.75rem;padding:0.6rem 0.875rem;background:#fef2f2;border:1px solid #fecaca;border-radius:0.5rem;font-size:0.82rem;color:#dc2626">
+      {{ saveError() }}
     </div>
     <div class="modal-footer">
       <button class="btn-ghost" (click)="closeModal()">Cancel</button>
-      <button class="btn-primary" (click)="save()">{{ isEdit() ? 'Save Changes' : 'Add Lead' }}</button>
+      <button class="btn-primary" (click)="save()" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : (isEdit() ? 'Save Changes' : 'Add Lead') }}
+      </button>
     </div>
   </div>
 </div>

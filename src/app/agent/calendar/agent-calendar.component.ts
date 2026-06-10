@@ -1,6 +1,7 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../shared/services/auth.service';
 
 type EventType = 'viewing' | 'meeting' | 'followup' | 'call';
 
@@ -23,7 +24,8 @@ interface CalendarEvent {
   templateUrl: './agent-calendar.component.html',
   styleUrl: './agent-calendar.component.scss',
 })
-export class AgentCalendarComponent {
+export class AgentCalendarComponent implements OnInit {
+  private auth = inject(AuthService);
   today = new Date();
   currentYear  = signal(this.today.getFullYear());
   currentMonth = signal(this.today.getMonth()); // 0-based
@@ -40,15 +42,26 @@ export class AgentCalendarComponent {
   });
   formErrors = signal<Record<string, string>>({});
 
-  events = signal<CalendarEvent[]>([
-    { id: 1, title: 'Property Viewing', type: 'viewing', date: this.dateStr(0), time: '10:00', duration: 60, client: 'Mohammed Al-Rashidi', property: 'Luxury 2BR Downtown Dubai', notes: 'First viewing — client prefers high floor' },
-    { id: 2, title: 'Follow-up Call', type: 'followup', date: this.dateStr(0), time: '14:00', duration: 30, client: 'Priya Nair', notes: 'Discuss payment plan options' },
-    { id: 3, title: 'Client Meeting', type: 'meeting', date: this.dateStr(1), time: '11:00', duration: 90, client: 'Ahmed Hassan', property: 'Villa Arabian Ranches', notes: 'Bring brochures and floor plans' },
-    { id: 4, title: 'Property Viewing', type: 'viewing', date: this.dateStr(2), time: '09:30', duration: 45, client: 'Sarah Williams', property: 'Studio JVC' },
-    { id: 5, title: 'Discovery Call', type: 'call', date: this.dateStr(3), time: '15:00', duration: 30, client: 'Omar Khalid' },
-    { id: 6, title: 'Property Viewing', type: 'viewing', date: this.dateStr(5), time: '10:30', duration: 60, client: 'Fatima Al-Zahra', property: 'Penthouse Palm Jumeirah' },
-    { id: 7, title: 'Negotiation Meeting', type: 'meeting', date: this.dateStr(7), time: '13:00', duration: 120, client: 'David Chen', property: 'Townhouse Dubai Hills' },
-  ]);
+  events = signal<CalendarEvent[]>([]);
+
+  private storageKey = '';
+
+  ngOnInit(): void {
+    this.auth.waitForSession().then(() => {
+      const agentId = this.auth.currentUser()?.id ?? 'agent';
+      this.storageKey = `agent_calendar_${agentId}`;
+      const saved = localStorage.getItem(this.storageKey);
+      if (saved) {
+        try { this.events.set(JSON.parse(saved)); } catch { /* ignore */ }
+      }
+    });
+  }
+
+  private persist(): void {
+    if (this.storageKey) {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.events()));
+    }
+  }
 
   private dateStr(offsetDays: number): string {
     const d = new Date();
@@ -143,6 +156,7 @@ export class AgentCalendarComponent {
     } else {
       this.events.update(list => [...list, { id: Date.now(), ...f }]);
     }
+    this.persist();
     this.showModal.set(false);
     this.selectedDay.set(f.date);
   }
@@ -150,7 +164,10 @@ export class AgentCalendarComponent {
   confirmDelete(id: number): void { this.deleteId.set(id); }
   doDelete(): void {
     const id = this.deleteId();
-    if (id !== null) this.events.update(list => list.filter(e => e.id !== id));
+    if (id !== null) {
+      this.events.update(list => list.filter(e => e.id !== id));
+      this.persist();
+    }
     this.deleteId.set(null);
   }
 

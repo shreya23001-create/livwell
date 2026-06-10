@@ -1,6 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../shared/services/auth.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
+
+interface RecentLead { name: string; interest: string; status: string; date: string; }
+interface MyProperty { id: number; name: string; location: string; price: string; type: string; status: string; }
 
 @Component({
   selector: 'app-agent-dashboard',
@@ -9,40 +14,86 @@ import { RouterLink } from '@angular/router';
   templateUrl: './agent-dashboard.component.html',
   styleUrl: './agent-dashboard.component.scss',
 })
-export class AgentDashboardComponent {
+export class AgentDashboardComponent implements OnInit {
+  auth = inject(AuthService);
+  private sb = inject(SupabaseService).client;
+
   readonly today = new Date().toLocaleDateString('en-AE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
+  loading      = signal(true);
+  totalLeads   = signal(0);
+  newLeads     = signal(0);
+  activeDeals  = signal(0);
+  wonLeads     = signal(0);
+  myPropCount  = signal(0);
+  recentLeads  = signal<RecentLead[]>([]);
+  myProperties = signal<MyProperty[]>([]);
 
-  readonly kpis = [
-    { label: 'My Leads',        value: '38', sub: '4 new this week',    icon: 'leads',    trend: '+12%', up: true  },
-    { label: 'Active Deals',    value: '6',  sub: '2 in negotiation',   icon: 'deals',    trend: '+2',   up: true  },
-    { label: 'Won This Month',  value: '3',  sub: 'AED 1.4M revenue',   icon: 'won',      trend: '+1',   up: true  },
-    { label: 'Conversion Rate', value: '24%',sub: 'Leads to closed',    icon: 'rate',     trend: '+3%',  up: true  },
-  ];
+  greeting(): string {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+  firstName(): string { return this.auth.currentUser()?.name?.split(' ')[0] ?? 'there'; }
+  conversionRate(): string {
+    const t = this.totalLeads(), w = this.wonLeads();
+    return t ? Math.round((w / t) * 100) + '%' : '0%';
+  }
 
-  readonly recentLeads = [
-    { name: 'Mohammed Al-Rashidi', interest: 'Buy · Downtown Dubai · AED 2M–3M',   status: 'new',         time: '2h ago'  },
-    { name: 'James Carter',        interest: 'Invest · Palm Jumeirah · AED 5M+',   status: 'qualified',   time: '1d ago'  },
-    { name: 'Elena Petrova',       interest: 'Invest · Dubai Hills · AED 2M',      status: 'contacted',   time: '2d ago'  },
-    { name: 'David Kim',           interest: 'Buy · JVC · AED 1.5M',               status: 'qualified',   time: '3d ago'  },
-    { name: 'Robert Wilson',       interest: 'Invest · Palm Jumeirah · AED 10M+',  status: 'new',         time: '3d ago'  },
-  ];
+  async ngOnInit(): Promise<void> {
+    await this.auth.waitForSession();
+    const user = this.auth.currentUser();
+    if (!user) { this.loading.set(false); return; }
+    const agentName  = user.name;
+    const agentEmail = user.email;
 
-  readonly myProperties = [
-    { name: 'Marina Heights 2BHK',   location: 'Dubai Marina',   price: 'AED 2.8M', type: 'Apartment', status: 'available' },
-    { name: 'Palm Villa 4BR',         location: 'Palm Jumeirah',  price: 'AED 7.5M', type: 'Villa',     status: 'available' },
-    { name: 'DIFC Studio',            location: 'DIFC',           price: 'AED 90K/yr', type: 'Studio',  status: 'rented'    },
-    { name: 'Skyline Penthouse',      location: 'Downtown Dubai', price: 'AED 5.2M', type: 'Penthouse', status: 'reserved'  },
-  ];
+    const [byEmailRes, byNameRes, propsRes] = await Promise.all([
+      this.sb.from('admin_leads')
+        .select('id, name, status, location, property_type, budget, created_at')
+        .eq('agent_email', agentEmail)
+        .order('created_at', { ascending: false }),
+      this.sb.from('admin_leads')
+        .select('id, name, status, location, property_type, budget, created_at')
+        .eq('assigned_agent', agentName)
+        .is('agent_email', null)
+        .order('created_at', { ascending: false }),
+      this.sb.from('properties')
+        .select('id, title, location, type, listing_type, price, status')
+        .eq('agent_name', agentName)
+        .order('created_at', { ascending: false })
+        .limit(4),
+    ]);
 
-  readonly upcomingTasks = [
-    { task: 'Follow up with James Carter — Palm Jumeirah viewing',  due: 'Today, 3pm'       },
-    { task: 'Send proposal to Elena Petrova — Dubai Hills unit',    due: 'Tomorrow, 10am'   },
-    { task: 'Property viewing — David Kim, JVC Townhouse',          due: 'Thu, 2pm'         },
-    { task: 'Contract signing — Fatima Al-Zaabi, DIFC Apartment',   due: 'Fri, 11am'        },
-  ];
+    // Merge and deduplicate
+    const seen = new Set<number>();
+    const leadsAll = [...(byEmailRes.data ?? []), ...(byNameRes.data ?? [])].filter(r => { if (seen.has(r.id)) return false; seen.add(r.id); return true; });
+    const leadsRes = { data: leadsAll };
+
+    const leads = leadsRes.data;
+    this.totalLeads.set(leads.length);
+    this.newLeads.set(leads.filter((l: any) => l.status === 'new').length);
+    this.activeDeals.set(leads.filter((l: any) => ['contacted', 'qualified', 'negotiating'].includes(l.status)).length);
+    this.wonLeads.set(leads.filter((l: any) => l.status === 'won').length);
+    this.recentLeads.set(leads.slice(0, 5).map((l: any) => ({
+      name:     l.name || 'Unknown',
+      interest: [l.property_type, l.location, l.budget].filter(Boolean).join(' · ') || 'General Enquiry',
+      status:   l.status || 'new',
+      date:     new Date(l.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short' }),
+    })));
+
+    const props = propsRes.data ?? [];
+    this.myPropCount.set(props.length);
+    this.myProperties.set(props.map((p: any) => ({
+      id: p.id, name: p.title || '', location: p.location || '',
+      price: 'AED ' + Number(p.price).toLocaleString(),
+      type: p.type || '', status: p.listing_type === 'Rent' ? 'rent' : 'sale',
+    })));
+
+    this.loading.set(false);
+  }
 
   labelStatus(s: string): string {
-    return { new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' }[s] ?? s;
+    return ({ new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' } as Record<string, string>)[s] ?? s;
   }
 }

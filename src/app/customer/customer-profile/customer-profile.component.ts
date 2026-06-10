@@ -36,7 +36,8 @@ export class CustomerProfileComponent implements OnInit {
     smsAgentMessages:    false,
   };
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.auth.waitForSession();
     const user = this.auth.currentUser();
     if (user) {
       this.profileForm.name  = user.name  ?? '';

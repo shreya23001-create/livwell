@@ -818,7 +818,16 @@ $accent: #1a5c3a;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
-  &:hover { background: $accent; }
+  &:hover:not(:disabled) { background: $accent; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+.pd-inquiry-success {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem;
+  padding: 0.75rem 1rem; font-size: 0.85rem; color: #16a34a; font-weight: 600;
+}
+.pd-inquiry-error {
+  font-size: 0.8rem; color: #dc2626; margin: 0;
 }
 
 /* Meta card */

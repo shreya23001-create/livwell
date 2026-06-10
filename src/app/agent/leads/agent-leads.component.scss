@@ -53,7 +53,7 @@ $bg:      #f4f6fa;
   &:focus { border-color: #6366f1; }
 }
 
-.table-wrap { background: #fff; border: 1px solid $border; border-radius: 0.75rem; overflow: hidden; overflow-x: auto; }
+.table-wrap { background: #fff; border: 1px solid $border; border-radius: 0.75rem; overflow-x: auto; overflow-y: visible; }
 .data-table {
   width: 100%; border-collapse: collapse; font-size: 0.83rem; min-width: 800px;
   thead tr { background: $bg; border-bottom: 1px solid $border; }
@@ -70,18 +70,44 @@ $bg:      #f4f6fa;
 }
 .lead-name { font-weight: 600; }
 .lead-meta { font-size: 0.75rem; color: $muted; }
+.lead-property { display: flex; align-items: center; gap: 0.25rem; color: #6366f1; font-weight: 500; }
 .td-muted  { color: $sub; }
 
 .badge {
-  display: inline-flex; align-items: center; padding: 0.2rem 0.6rem;
+  display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.6rem;
   border-radius: 999px; font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+  cursor: pointer; user-select: none;
+  svg { width: 0.65rem; height: 0.65rem; opacity: 0.7; }
   &--new         { background: #fffbeb; color: #b45309; }
   &--contacted   { background: #eff6ff; color: #1d4ed8; }
   &--qualified   { background: #f0fdf4; color: #4f46e5; }
   &--negotiating { background: #faf5ff; color: #7c3aed; }
-  &--won         { background: rgba(#6366f1,0.12); color: #4f46e5; }
+  &--won         { background: #ecfdf5; color: #1a5c3a; }
   &--lost        { background: #fef2f2; color: #991b1b; }
 }
+
+.status-cell { position: relative; }
+.status-dropdown {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 100;
+  background: #fff; border: 1px solid $border; border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 160px; padding: 0.25rem 0; overflow: hidden;
+}
+.status-option {
+  display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.5rem 0.875rem;
+  background: none; border: none; font-size: 0.82rem; color: $text; cursor: pointer; text-align: left;
+  &:hover { background: #f9fafb; }
+  &.active { font-weight: 700; background: #f0f9ff; }
+}
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  &--new         { background: #f59e0b; }
+  &--contacted   { background: #3b82f6; }
+  &--qualified   { background: #4f46e5; }
+  &--negotiating { background: #7c3aed; }
+  &--won         { background: #1a5c3a; }
+  &--lost        { background: #ef4444; }
+}
+.empty-row-wrap { text-align: center; color: $muted; padding: 3rem; font-size: 0.875rem; }
 .cat-badge {
   display: inline-flex; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700;
   &--buy    { background: #eff6ff; color: #1d4ed8; }
@@ -116,4 +142,38 @@ $bg:      #f4f6fa;
 }
 .field-error { font-size: 0.75rem; color: $red; }
 .delete-msg { font-size: 0.9rem; color: $sub; line-height: 1.6; margin: 0; strong { color: $text; } }
+
+// Agent message thread in modal
+.agent-thread-wrap {
+  border: 1px solid $border; border-radius: 0.625rem; overflow: hidden;
+}
+.agent-thread-empty {
+  padding: 1rem; font-size: 0.82rem; color: $muted; text-align: center;
+}
+.agent-thread-messages {
+  display: flex; flex-direction: column; gap: 0.625rem;
+  padding: 0.875rem 1rem; max-height: 220px; overflow-y: auto; background: #fafafa;
+}
+.agent-thread-msg {
+  display: flex; flex-direction: column; gap: 0.15rem;
+  &--mine      { align-items: flex-end; .agent-thread-bubble { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 1rem 1rem 0.25rem 1rem; } }
+  &--customer  { align-items: flex-start; .agent-thread-bubble { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 1rem 1rem 1rem 0.25rem; } }
+}
+.agent-thread-bubble { padding: 0.5rem 0.75rem; font-size: 0.85rem; line-height: 1.5; max-width: 80%; word-break: break-word; white-space: pre-wrap; }
+.agent-thread-meta   { font-size: 0.68rem; color: $muted; padding: 0 0.2rem; }
+.agent-thread-input-row {
+  display: flex; border-top: 1px solid $border;
+}
+.agent-thread-input {
+  flex: 1; border: none; outline: none; resize: none;
+  padding: 0.75rem 0.875rem; font-size: 0.875rem; font-family: inherit; line-height: 1.5; background: #fff;
+  &::placeholder { color: $muted; }
+}
+.agent-thread-send {
+  display: flex; align-items: center; gap: 0.3rem;
+  padding: 0 1rem; background: $accent; color: #fff; border: none; cursor: pointer;
+  font-size: 0.82rem; font-weight: 600; flex-shrink: 0; transition: background 0.15s;
+  &:hover:not(:disabled) { background: $accent2; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
 

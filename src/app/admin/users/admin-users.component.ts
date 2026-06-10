@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx';
 import { UserRole, UserStatus } from '../../shared/models/user.model';
 import { AdminDataService, AdminUser } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 export type { AdminUser };
 
@@ -14,6 +15,8 @@ const EMPTY_FORM = (): Partial<AdminUser> => ({
   lastActive:  new Date().toISOString().slice(0, 10),
   propertiesCount: 0, leadsCount: 0,
 });
+
+interface UserForm extends Partial<AdminUser> { password?: string; }
 
 @Component({
   selector: 'app-admin-users',
@@ -26,6 +29,9 @@ export class AdminUsersComponent {
 
   dataSvc = inject(AdminDataService);
   private auth = inject(AuthService);
+  private sb   = inject(SupabaseService).client;
+
+  showPassword = signal(false);
 
   users   = this.dataSvc.users;
   loading = this.dataSvc.usersLoading;
@@ -41,8 +47,8 @@ export class AdminUsersComponent {
 
   // ── Modal ─────────────────────────────────────────────
   modalOpen    = signal(false);
-  editingId    = signal<number | null>(null);
-  form         = signal<Partial<AdminUser>>(EMPTY_FORM());
+  editingId    = signal<string | null>(null);
+  form         = signal<UserForm>(EMPTY_FORM());
   formErrors   = signal<Record<string, string>>({});
   saveError    = signal('');
   saving       = signal(false);
@@ -108,18 +114,20 @@ export class AdminUsersComponent {
 
   // ── Modal ─────────────────────────────────────────────
   openAdd(): void {
-    this.form.set(EMPTY_FORM());
+    this.form.set({ ...EMPTY_FORM(), password: '' });
     this.formErrors.set({});
     this.saveError.set('');
     this.editingId.set(null);
+    this.showPassword.set(false);
     this.modalOpen.set(true);
   }
 
   openEdit(u: AdminUser): void {
-    this.form.set({ ...u });
+    this.form.set({ ...u, password: u.password || '' });
     this.formErrors.set({});
     this.saveError.set('');
     this.editingId.set(u.id);
+    this.showPassword.set(false);
     this.modalOpen.set(true);
   }
 
@@ -133,18 +141,53 @@ export class AdminUsersComponent {
     this.saving.set(true);
     this.saveError.set('');
     const f = this.form();
+    const isNew = this.editingId() === null;
+
+    if (isNew) {
+      // Create Supabase auth account
+      const { data: signUpData, error: signUpErr } = await this.sb.auth.signUp({
+        email:    f.email!.trim(),
+        password: f.password!,
+        options:  { data: { name: f.name!.trim(), phone: f.phone?.trim() ?? '', role: f.role } },
+      });
+      if (signUpErr) {
+        this.saveError.set(signUpErr.message);
+        this.saving.set(false);
+        return;
+      }
+      const userId = signUpData.user?.id;
+      if (userId) {
+        await this.sb.from('profiles').upsert({
+          id:     userId,
+          name:   f.name!.trim(),
+          email:  f.email!.trim(),
+          phone:  f.phone?.trim() ?? null,
+          role:   f.role   ?? 'customer',
+          status: f.status ?? 'active',
+        });
+      }
+      await this.dataSvc.loadUsers();
+      this.saving.set(false);
+      this.closeModal();
+      const actor = this.auth.currentUser()?.email ?? 'admin';
+      const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
+      this.dataSvc.logUserAction(actor, role, 'Create User', `User "${f.name}" (${f.role}) created`);
+      return;
+    }
+
     const err = await this.dataSvc.saveUser(f, this.editingId());
     this.saving.set(false);
     if (err) { this.saveError.set(err); return; }
     this.closeModal();
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
-    this.dataSvc.logUserAction(actor, role, this.editingId() ? 'Update User' : 'Create User', `User "${f.name}" (${f.role}) ${this.editingId() ? 'updated' : 'created'}`);
+    this.dataSvc.logUserAction(actor, role, isNew ? 'Create User' : 'Update User', `User "${f.name}" (${f.role}) ${isNew ? 'created' : 'updated'}`);
   }
 
   private validateForm(): Record<string, string> {
     const errs: Record<string, string> = {};
     const f = this.form();
+    const isNew = this.editingId() === null;
     if (!f.name?.trim()) errs['name'] = 'Full name is required.';
     if (!f.email?.trim()) errs['email'] = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errs['email'] = 'Enter a valid email address.';
@@ -153,6 +196,10 @@ export class AdminUsersComponent {
       if (exists) errs['email'] = 'This email is already registered.';
     }
     if (!f.phone?.trim()) errs['phone'] = 'Phone number is required.';
+    if (isNew) {
+      if (!f.password?.trim()) errs['password'] = 'Password is required.';
+      else if (f.password.length < 8) errs['password'] = 'At least 8 characters.';
+    }
     return errs;
   }
 
@@ -162,7 +209,7 @@ export class AdminUsersComponent {
   }
 
   async toggleStatus(u: AdminUser): Promise<void> {
-    await this.dataSvc.toggleUserStatus(Number(u.id), u.status);
+    await this.dataSvc.toggleUserStatus(u.id, u.status);
   }
 
   confirmDelete(u: AdminUser): void { this.deleteTarget.set(u); }
@@ -170,7 +217,7 @@ export class AdminUsersComponent {
   async doDelete(): Promise<void> {
     const u = this.deleteTarget();
     if (!u) return;
-    await this.dataSvc.deleteUser(Number(u.id));
+    await this.dataSvc.deleteUser(u.id);
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
     this.dataSvc.logUserAction(actor, role, 'Delete User', `User "${u.name}" deleted`, 'warning');

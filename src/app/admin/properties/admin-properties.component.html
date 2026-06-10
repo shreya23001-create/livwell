@@ -262,14 +262,14 @@
     <div class="prop-form-row">
       <div class="prop-form-field">
         <label class="prop-form-label">Category *</label>
-        <select class="prop-form-input" [value]="form()['listing_type']" (change)="patchForm('listing_type', $any($event.target).value)">
-          <option *ngFor="let c of categoryList" [value]="c">{{ c }}</option>
+        <select class="prop-form-input" (change)="patchForm('listing_type', $any($event.target).value)">
+          <option *ngFor="let c of categoryList" [value]="c" [selected]="form()['listing_type'] === c">{{ c }}</option>
         </select>
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Type *</label>
-        <select class="prop-form-input" [value]="form()['type']" (change)="patchForm('type', $any($event.target).value)">
-          <option *ngFor="let t of typeList" [value]="t">{{ t }}</option>
+        <select class="prop-form-input" (change)="patchForm('type', $any($event.target).value)">
+          <option *ngFor="let t of typeList" [value]="t" [selected]="form()['type'] === t">{{ t }}</option>
         </select>
       </div>
     </div>
@@ -284,8 +284,8 @@
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Status</label>
-        <select class="prop-form-input" [value]="form()['status']" (change)="patchForm('status', $any($event.target).value)">
-          <option *ngFor="let s of statusList" [value]="s">{{ s }}</option>
+        <select class="prop-form-input" (change)="patchForm('status', $any($event.target).value)">
+          <option *ngFor="let s of statusList" [value]="s" [selected]="form()['status'] === s">{{ s }}</option>
         </select>
       </div>
     </div>
@@ -336,15 +336,15 @@
     <div class="prop-form-row">
       <div class="prop-form-field">
         <label class="prop-form-label">Furnishing</label>
-        <select class="prop-form-input" [value]="form()['furnishing']" (change)="patchForm('furnishing', $any($event.target).value)">
-          <option *ngFor="let f of furnishingList" [value]="f">{{ f }}</option>
+        <select class="prop-form-input" (change)="patchForm('furnishing', $any($event.target).value)">
+          <option *ngFor="let f of furnishingList" [value]="f" [selected]="form()['furnishing'] === f">{{ f }}</option>
         </select>
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Assign Agent</label>
-        <select class="prop-form-input" [value]="form()['agent_name'] || ''" (change)="patchForm('agent_name', $any($event.target).value || '')">
-          <option value="">— Unassigned —</option>
-          <option *ngFor="let a of agents()" [value]="a.name">{{ a.name }}</option>
+        <select class="prop-form-input" (change)="patchForm('agent_name', $any($event.target).value || '')">
+          <option value="" [selected]="!form()['agent_name']">— Unassigned —</option>
+          <option *ngFor="let a of agents()" [value]="a.name" [selected]="form()['agent_name'] === a.name">{{ a.name }}</option>
         </select>
       </div>
     </div>

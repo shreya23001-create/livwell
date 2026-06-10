@@ -56,6 +56,8 @@ import { FormsModule } from '@angular/forms';
   `]
 })
 export class CustomerFutureInterestComponent {
+  private readonly STORAGE_KEY = 'lw_future_interest';
+
   interests = [
     { key: 'buy',   label: 'Buy a property',      enabled: false },
     { key: 'sell',  label: 'Sell a property',      enabled: false },
@@ -65,7 +67,22 @@ export class CustomerFutureInterestComponent {
 
   saved = signal(false);
 
+  constructor() {
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY);
+      if (stored) {
+        const saved: Record<string, boolean> = JSON.parse(stored);
+        this.interests = this.interests.map(i => ({ ...i, enabled: saved[i.key] ?? false }));
+      }
+    } catch {}
+  }
+
   save(): void {
+    try {
+      const state: Record<string, boolean> = {};
+      this.interests.forEach(i => state[i.key] = i.enabled);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+    } catch {}
     this.saved.set(true);
     setTimeout(() => this.saved.set(false), 3000);
   }

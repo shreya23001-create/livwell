@@ -4,6 +4,7 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 interface Property {
   id: number;
@@ -38,15 +39,17 @@ interface Property {
 export class PropertyDetailComponent implements OnInit {
   private route      = inject(ActivatedRoute);
   private sb         = inject(SupabaseService).client;
+  private auth       = inject(AuthService);
   private platformId = inject(PLATFORM_ID);
 
-  property         = signal<Property | null>(null);
+  property          = signal<Property | null>(null);
   similarProperties = signal<Property[]>([]);
-  loading          = signal(true);
-  notFound         = signal(false);
-  activeImageIndex = signal(0);
-  descExpanded     = signal(false);
-  isFaved          = signal(false);
+  loading           = signal(true);
+  notFound          = signal(false);
+  activeImageIndex  = signal(0);
+  descExpanded      = signal(false);
+  isFaved           = signal(false);
+  favLoading        = signal(false);
 
   // Mortgage calculator
   mortgageDown   = signal(20);
@@ -85,6 +88,52 @@ export class PropertyDetailComponent implements OnInit {
   newsletterSubmitted = signal(false);
   subscribeNewsletter(): void { if (this.newsletterEmail()) this.newsletterSubmitted.set(true); }
 
+  // Inquiry form — pre-fill from logged-in user if available
+  inquiryForm_name    = '';
+  inquiryForm_phone   = '';
+  inquiryForm_email   = '';
+  inquiryForm_message = '';
+  inquirySent         = signal(false);
+  inquirySubmitting   = signal(false);
+  inquiryError        = signal('');
+
+  private prefillInquiryForm(): void {
+    const user = this.auth.currentUser();
+    if (!user) return;
+    if (!this.inquiryForm_name)  this.inquiryForm_name  = user.name  ?? '';
+    if (!this.inquiryForm_phone) this.inquiryForm_phone = user.phone ?? '';
+    if (!this.inquiryForm_email) this.inquiryForm_email = user.email ?? '';
+  }
+
+  async submitInquiry(p: Property): Promise<void> {
+    if (!this.inquiryForm_name.trim() || !this.inquiryForm_phone.trim() || !this.inquiryForm_email.trim()) {
+      this.inquiryError.set('Please fill in Name, Phone and Email.');
+      return;
+    }
+    this.inquirySubmitting.set(true);
+    this.inquiryError.set('');
+    const userId = this.auth.currentUser()?.id ?? null;
+    const { error } = await this.sb.from('admin_leads').insert({
+      name:           this.inquiryForm_name.trim(),
+      phone:          this.inquiryForm_phone.trim(),
+      email:          this.inquiryForm_email.trim(),
+      notes:          this.inquiryForm_message.trim() || `Enquiry about: ${p.title}`,
+      property_type:  p.type,
+      property_id:    p.id,
+      property_title: p.title,
+      customer_id:    userId,
+      location:       p.community || p.location,
+      assigned_agent: p.agent_name !== 'Unassigned' ? p.agent_name : null,
+      status:         'new',
+      source:         'website',
+    });
+    this.inquirySubmitting.set(false);
+    if (error) { this.inquiryError.set('Failed to send. Please try again.'); return; }
+    this.inquirySent.set(true);
+    this.inquiryForm_name = ''; this.inquiryForm_phone = '';
+    this.inquiryForm_email = ''; this.inquiryForm_message = '';
+  }
+
   // Mortgage price input
   mortgagePrice = signal(0);
 
@@ -114,6 +163,7 @@ export class PropertyDetailComponent implements OnInit {
       const id = Number(params['id']);
       this.loading.set(true);
       this.notFound.set(false);
+      this.isFaved.set(false);
       this.activeImageIndex.set(0);
 
       const { data, error } = await this.sb
@@ -135,12 +185,11 @@ export class PropertyDetailComponent implements OnInit {
       // Increment view count
       this.sb.from('properties').update({ views: (data.views || 0) + 1 }).eq('id', id).then(() => {});
 
-      // Load similar properties
+      // Load similar properties (no status filter — properties may not be Published)
       const { data: similar } = await this.sb
         .from('properties')
         .select('*')
         .eq('type', data.type)
-        .eq('status', 'Published')
         .neq('id', id)
         .limit(3);
       if (similar) this.similarProperties.set(similar.map(this.mapProperty));
@@ -148,7 +197,37 @@ export class PropertyDetailComponent implements OnInit {
       this.loading.set(false);
 
       if (isPlatformBrowser(this.platformId)) window.scrollTo({ top: 0 });
+
+      // Check fav status + pre-fill inquiry form after session loads
+      this.auth.waitForSession().then(async () => {
+        const userId = this.auth.currentUser()?.id;
+        this.prefillInquiryForm();
+        if (!userId) return;
+        const { data: saved } = await this.sb
+          .from('saved_properties')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('property_id', id)
+          .maybeSingle();
+        this.isFaved.set(!!saved);
+      });
     });
+  }
+
+  async toggleFav(): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    const propId = this.property()?.id;
+    if (!userId || !propId || this.favLoading()) return;
+
+    this.favLoading.set(true);
+    if (this.isFaved()) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', propId);
+      this.isFaved.set(false);
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: propId });
+      this.isFaved.set(true);
+    }
+    this.favLoading.set(false);
   }
 
   private mapProperty = (p: any): Property => ({

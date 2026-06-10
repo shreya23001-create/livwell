@@ -23,6 +23,7 @@ export class AuthService {
   private _currentUser  = signal<User | null>(null);
   private _sessionReady = false;
   private _sessionPromise: Promise<void> | null = null;
+  private _profileLoading = false;
 
   currentUser  = this._currentUser.asReadonly();
   isLoggedIn   = computed(() => !!this._currentUser());
@@ -42,36 +43,70 @@ export class AuthService {
   }
 
   private async loadSession(): Promise<void> {
-    const { data: { session } } = await this.supabase.auth.getSession();
-    if (session?.user) await this.loadProfile(session.user.id);
+    const timeout = new Promise<void>(r => setTimeout(r, 3000));
+    const load = (async () => {
+      const { data: { session } } = await this.supabase.auth.getSession();
+      if (session?.user) await this.loadProfileWithFallback(session.user);
+    })();
+    await Promise.race([load, timeout]);
     this._sessionReady = true;
 
-    this.supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) await this.loadProfile(session.user.id);
-      else this._currentUser.set(null);
+    this.supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        this._currentUser.set(null);
+        return;
+      }
+      // TOKEN_REFRESHED just refreshes the token — don't reload profile
+      if (event === 'TOKEN_REFRESHED') return;
+      // Only reload profile if user ID changed (new sign-in, not duplicate event)
+      if (session?.user && session.user.id !== this._currentUser()?.id) {
+        await this.loadProfileWithFallback(session.user);
+      }
     });
   }
 
-  private async loadProfile(userId: string, retries = 3): Promise<void> {
-    const { data, error } = await this.supabase
+  private async loadProfileWithFallback(authUser: { id: string; email?: string; user_metadata?: any }): Promise<void> {
+    if (this._profileLoading) return;
+    this._profileLoading = true;
+    try {
+      await this.loadProfile(authUser.id);
+      // If profile row not loaded, build user from JWT metadata so app never shows blank
+      if (!this._currentUser()) {
+        const meta = authUser.user_metadata as { role?: string; name?: string; phone?: string } | undefined;
+        this._currentUser.set({
+          id:     authUser.id,
+          name:   meta?.['name']  ?? authUser.email ?? '',
+          email:  authUser.email  ?? '',
+          phone:  meta?.['phone'] ?? '',
+          role:   (meta?.['role'] ?? 'customer') as UserRole,
+          status: 'active',
+          avatar: '',
+        });
+      }
+    } finally {
+      this._profileLoading = false;
+    }
+  }
+
+  private async loadProfile(userId: string, retries = 1): Promise<void> {
+    const { data } = await this.supabase
       .from('profiles')
-      .select('*')
+      .select('id, name, email, phone, role, status, avatar_url')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (data) {
       this._currentUser.set({
         id:     data.id,
-        name:   data.name,
-        email:  data.email,
-        phone:  data.phone,
-        role:   data.role as UserRole,
-        status: data.status,
-        avatar: data.avatar_url,
+        name:   data.name   || '',
+        email:  data.email  || '',
+        phone:  data.phone  || '',
+        role:   data.role   as UserRole,
+        status: data.status || 'active',
+        avatar: data.avatar_url || '',
       });
-    } else if (error?.code === 'PGRST116' && retries > 0) {
-      // Profile not created yet by trigger — wait and retry
-      await new Promise(r => setTimeout(r, 800));
+    } else if (retries > 0) {
+      await new Promise(r => setTimeout(r, 700));
       await this.loadProfile(userId, retries - 1);
     }
   }
@@ -84,7 +119,7 @@ export class AuthService {
       return { success: false, error: 'unknown' };
     }
     if (data.user) {
-      await this.loadProfile(data.user.id);
+      await this.loadProfileWithFallback(data.user);
       return { success: true };
     }
     return { success: false, error: 'unknown' };
@@ -104,14 +139,14 @@ export class AuthService {
     if (data.user) {
       // If session exists immediately — email confirmation is disabled
       if (data.session) {
-        await this.loadProfile(data.user.id);
+        await this.loadProfileWithFallback(data.user);
         this._newlyRegistered.set({ name, email });
         return { success: true };
       }
       // Fallback: try explicit login (works when email confirmation is off)
       const loginResult = await this.supabase.auth.signInWithPassword({ email, password });
       if (loginResult.data.user) {
-        await this.loadProfile(loginResult.data.user.id);
+        await this.loadProfileWithFallback(loginResult.data.user);
         this._newlyRegistered.set({ name, email });
         return { success: true };
       }

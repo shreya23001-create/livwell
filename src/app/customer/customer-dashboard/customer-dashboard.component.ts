@@ -28,8 +28,9 @@ export class CustomerDashboardComponent implements OnInit {
   showWelcome = signal(false);
   loading = signal(true);
 
-  savedProperties = signal<any[]>([]);
-  recentEnquiries = signal<Enquiry[]>([]);
+  savedCount       = signal(0);
+  totalEnquiries   = signal(0);
+  recentEnquiries  = signal<Enquiry[]>([]);
 
   constructor() {
     if (this.auth.newlyRegistered()) {
@@ -39,18 +40,25 @@ export class CustomerDashboardComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    await this.auth.waitForSession();
     const user = this.auth.currentUser();
     if (!user?.email) { this.loading.set(false); return; }
 
-    const { data } = await this.sb
-      .from('admin_leads')
-      .select('id, name, notes, status, assigned_agent, created_at, location, property_type')
-      .eq('email', user.email)
-      .order('created_at', { ascending: false })
-      .limit(5);
+    const [savedRes, countRes, leadsRes] = await Promise.all([
+      this.sb.from('saved_properties').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+      this.sb.from('admin_leads').select('id', { count: 'exact', head: true }).eq('email', user.email),
+      this.sb.from('admin_leads')
+        .select('id, notes, status, assigned_agent, created_at, location, property_type')
+        .eq('email', user.email)
+        .order('created_at', { ascending: false })
+        .limit(5),
+    ]);
 
-    if (data) {
-      this.recentEnquiries.set(data.map((r: any) => ({
+    this.savedCount.set(savedRes.count ?? 0);
+    this.totalEnquiries.set(countRes.count ?? 0);
+
+    if (leadsRes.data) {
+      this.recentEnquiries.set(leadsRes.data.map((r: any) => ({
         id:       r.id,
         property: r.property_type || r.location || 'Property Enquiry',
         agent:    r.assigned_agent || 'Unassigned',

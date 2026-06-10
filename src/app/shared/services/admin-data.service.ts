@@ -37,7 +37,7 @@ export type LeadSource   = 'website' | 'referral' | 'walk_in' | 'social_media' |
 export type LeadCategory = 'buy' | 'rent' | 'invest';
 
 export interface AdminUser {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -47,6 +47,7 @@ export interface AdminUser {
   lastActive: string;
   propertiesCount?: number;
   leadsCount?: number;
+  password?: string;
 }
 
 export interface Lead {
@@ -168,8 +169,8 @@ export class AdminDataService {
     this.usersLoading.set(true);
     this.usersError.set('');
     const { data, error } = await this.sb
-      .from('admin_users')
-      .select('*')
+      .from('profiles')
+      .select('id, name, email, phone, role, status, created_at')
       .order('created_at', { ascending: false });
 
     this.dbLog('loadUsers', error, data);
@@ -178,68 +179,53 @@ export class AdminDataService {
     } else if (data) {
       this.users.set(data.map((p: any) => ({
         id:              p.id,
-        name:            p.name             || '',
-        email:           p.email            || '',
-        phone:           p.phone            || '',
-        role:            p.role             || 'customer',
-        status:          p.status           || 'active',
-        joinedDate:      p.joined_date      || (p.created_at || '').slice(0, 10),
-        lastActive:      p.last_active      || (p.created_at || '').slice(0, 10),
-        propertiesCount: p.properties_count || 0,
-        leadsCount:      p.leads_count      || 0,
+        name:            p.name    || '',
+        email:           p.email   || '',
+        phone:           p.phone   || '',
+        role:            p.role    || 'customer',
+        status:          p.status  || 'active',
+        joinedDate:      (p.created_at || '').slice(0, 10),
+        lastActive:      (p.created_at || '').slice(0, 10),
+        propertiesCount: 0,
+        leadsCount:      0,
+        password:        '',
       })));
     }
     this.usersLoading.set(false);
   }
 
-  async saveUser(u: Partial<AdminUser>, editingId: number | null): Promise<string | null> {
+  async saveUser(u: Partial<AdminUser>, editingId: string | null): Promise<string | null> {
     const payload: any = {
-      name:        u.name?.trim(),
-      email:       u.email?.trim(),
-      phone:       u.phone?.trim()  || null,
-      role:        u.role           || 'customer',
-      status:      u.status         || 'active',
-      joined_date: u.joinedDate     || new Date().toISOString().slice(0, 10),
-      last_active: u.lastActive     || new Date().toISOString().slice(0, 10),
+      name:   u.name?.trim(),
+      phone:  u.phone?.trim() || null,
+      role:   u.role          || 'customer',
+      status: u.status        || 'active',
     };
-
     let error: any;
     if (editingId !== null) {
-      ({ error } = await this.sb.from('admin_users').update(payload).eq('id', editingId));
-    } else {
-      ({ error } = await this.sb.from('admin_users').insert(payload));
+      ({ error } = await this.sb.from('profiles').update(payload).eq('id', editingId));
     }
+    // For new users, profiles row is already created by auth.signUp in the component — nothing to insert here
 
     if (error) return error.message;
     await this.loadUsers();
     return null;
   }
 
-  async deleteUser(id: number): Promise<void> {
-    await this.sb.from('admin_users').delete().eq('id', id);
+  async deleteUser(id: string): Promise<void> {
+    await this.sb.from('profiles').delete().eq('id', id);
     await this.loadUsers();
   }
 
-  async toggleUserStatus(id: number, currentStatus: UserStatus): Promise<void> {
+  async toggleUserStatus(id: string, currentStatus: UserStatus): Promise<void> {
     const next: UserStatus = currentStatus === 'active' ? 'suspended' : 'active';
-    await this.sb.from('admin_users').update({ status: next }).eq('id', id);
+    await this.sb.from('profiles').update({ status: next }).eq('id', id);
     await this.loadUsers();
   }
 
   async importUsers(users: Omit<AdminUser, 'id'>[]): Promise<string | null> {
-    const rows = users.map(u => ({
-      name:        u.name,
-      email:       u.email,
-      phone:       u.phone      || null,
-      role:        u.role       || 'customer',
-      status:      u.status     || 'active',
-      joined_date: u.joinedDate || new Date().toISOString().slice(0, 10),
-      last_active: u.lastActive || new Date().toISOString().slice(0, 10),
-    }));
-    const { error } = await this.sb.from('admin_users').insert(rows);
-    if (error) return error.message;
-    await this.loadUsers();
-    return null;
+    // Import requires auth accounts — not supported via bulk insert into profiles alone
+    return 'Bulk import is not supported. Please add users one at a time via Add User.';
   }
 
   // ── Leads (admin_leads table) ─────────────────────────

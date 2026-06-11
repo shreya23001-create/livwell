@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed, inject, PLATFORM_ID } from '@angul
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
@@ -40,10 +41,19 @@ export class PropertyDetailComponent implements OnInit {
   private route      = inject(ActivatedRoute);
   private sb         = inject(SupabaseService).client;
   private auth       = inject(AuthService);
+  private sanitizer  = inject(DomSanitizer);
   private platformId = inject(PLATFORM_ID);
 
   property          = signal<Property | null>(null);
   similarProperties = signal<Property[]>([]);
+
+  mapUrl = computed((): SafeResourceUrl => {
+    const loc = this.property()?.location || 'Dubai';
+    const q   = encodeURIComponent(loc);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      `https://www.openstreetmap.org/export/embed.html?query=${q}&layer=mapnik`
+    );
+  });
   loading           = signal(true);
   notFound          = signal(false);
   activeImageIndex  = signal(0);

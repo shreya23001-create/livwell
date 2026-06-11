@@ -141,6 +141,7 @@ export class AdminLeadsComponent {
     if (!f.email?.trim())    errs['email']    = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errs['email'] = 'Enter a valid email.';
     if (!f.phone?.trim())    errs['phone']    = 'Phone is required.';
+    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(f.phone.trim())) errs['phone'] = 'Enter a valid phone number.';
     if (!f.budget?.trim())   errs['budget']   = 'Budget is required.';
     if (!f.location?.trim()) errs['location'] = 'Location is required.';
     this.formErrors.set(errs);

@@ -1,11 +1,12 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
-type EventType = 'viewing' | 'meeting' | 'followup' | 'call';
+export type EventType = 'viewing' | 'meeting' | 'followup' | 'call';
 
-interface CalendarEvent {
+export interface CalendarEvent {
   id: number;
   title: string;
   type: EventType;
@@ -24,16 +25,21 @@ interface CalendarEvent {
   templateUrl: './agent-calendar.component.html',
   styleUrl: './agent-calendar.component.scss',
 })
-export class AgentCalendarComponent implements OnInit {
+export class AgentCalendarComponent implements OnInit, OnDestroy {
   private auth = inject(AuthService);
+  private sb   = inject(SupabaseService).client;
+
   today = new Date();
   currentYear  = signal(this.today.getFullYear());
-  currentMonth = signal(this.today.getMonth()); // 0-based
+  currentMonth = signal(this.today.getMonth());
 
   showModal   = signal(false);
   editingId   = signal<number | null>(null);
   deleteId    = signal<number | null>(null);
   selectedDay = signal<string | null>(null);
+  loading     = signal(false);
+  saving      = signal(false);
+  saveError   = signal('');
 
   form = signal({
     title: '', type: 'viewing' as EventType,
@@ -41,32 +47,37 @@ export class AgentCalendarComponent implements OnInit {
     client: '', property: '', notes: '',
   });
   formErrors = signal<Record<string, string>>({});
+  events     = signal<CalendarEvent[]>([]);
 
-  events = signal<CalendarEvent[]>([]);
-
-  private storageKey = '';
-
-  ngOnInit(): void {
-    this.auth.waitForSession().then(() => {
-      const agentId = this.auth.currentUser()?.id ?? 'agent';
-      this.storageKey = `agent_calendar_${agentId}`;
-      const saved = localStorage.getItem(this.storageKey);
-      if (saved) {
-        try { this.events.set(JSON.parse(saved)); } catch { /* ignore */ }
-      }
-    });
+  async ngOnInit(): Promise<void> {
+    await this.auth.waitForSession();
+    await this.loadEvents();
   }
 
-  private persist(): void {
-    if (this.storageKey) {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.events()));
+  ngOnDestroy(): void {}
+
+  private async loadEvents(): Promise<void> {
+    this.loading.set(true);
+    const { data, error } = await this.sb
+      .from('calendar_events')
+      .select('id, title, type, date, time, duration, client, property, notes')
+      .order('date', { ascending: true })
+      .order('time', { ascending: true });
+
+    if (!error && data) {
+      this.events.set(data.map((r: any) => ({
+        id:       r.id,
+        title:    r.title,
+        type:     r.type as EventType,
+        date:     r.date,
+        time:     r.time,
+        duration: r.duration,
+        client:   r.client,
+        property: r.property ?? '',
+        notes:    r.notes    ?? '',
+      })));
     }
-  }
-
-  private dateStr(offsetDays: number): string {
-    const d = new Date();
-    d.setDate(d.getDate() + offsetDays);
-    return d.toISOString().split('T')[0];
+    this.loading.set(false);
   }
 
   // Calendar grid
@@ -75,21 +86,18 @@ export class AgentCalendarComponent implements OnInit {
 
   calendarDays = computed(() => {
     const year = this.currentYear(), month = this.currentMonth();
-    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const firstDay    = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const days: { date: string; day: number; inMonth: boolean }[] = [];
 
-    // Leading empty cells
     for (let i = 0; i < firstDay; i++) {
       const d = new Date(year, month, 1 - (firstDay - i));
       days.push({ date: d.toISOString().split('T')[0], day: d.getDate(), inMonth: false });
     }
-    // Current month
     for (let d = 1; d <= daysInMonth; d++) {
       const dt = new Date(year, month, d);
       days.push({ date: dt.toISOString().split('T')[0], day: d, inMonth: true });
     }
-    // Trailing cells to complete grid
     const remaining = 42 - days.length;
     for (let i = 1; i <= remaining; i++) {
       const d = new Date(year, month + 1, i);
@@ -129,44 +137,73 @@ export class AgentCalendarComponent implements OnInit {
 
   openAdd(date?: string): void {
     this.editingId.set(null);
-    this.form.set({ title: '', type: 'viewing', date: date ?? this.today.toISOString().split('T')[0], time: '10:00', duration: 60, client: '', property: '', notes: '' });
+    this.form.set({
+      title: '', type: 'viewing',
+      date: date ?? this.today.toISOString().split('T')[0],
+      time: '10:00', duration: 60,
+      client: '', property: '', notes: '',
+    });
     this.formErrors.set({});
+    this.saveError.set('');
     this.showModal.set(true);
   }
 
   openEdit(ev: CalendarEvent): void {
     this.editingId.set(ev.id);
-    this.form.set({ title: ev.title, type: ev.type, date: ev.date, time: ev.time, duration: ev.duration, client: ev.client, property: ev.property ?? '', notes: ev.notes ?? '' });
+    this.form.set({
+      title: ev.title, type: ev.type, date: ev.date, time: ev.time,
+      duration: ev.duration, client: ev.client,
+      property: ev.property ?? '', notes: ev.notes ?? '',
+    });
     this.formErrors.set({});
+    this.saveError.set('');
     this.showModal.set(true);
   }
 
-  saveEvent(): void {
+  async saveEvent(): Promise<void> {
     const f = this.form();
     const errs: Record<string, string> = {};
     if (!f.title.trim())  errs['title']  = 'Title is required.';
     if (!f.date)          errs['date']   = 'Date is required.';
     if (!f.client.trim()) errs['client'] = 'Client name is required.';
+    if (f.duration <= 0)  errs['duration'] = 'Duration must be greater than 0.';
     this.formErrors.set(errs);
     if (Object.keys(errs).length) return;
 
+    this.saving.set(true);
+    this.saveError.set('');
+
+    const user       = this.auth.currentUser();
+    const agent_id   = user?.id    ?? '';
+    const agent_email = user?.email ?? '';
+
     const id = this.editingId();
     if (id !== null) {
-      this.events.update(list => list.map(e => e.id === id ? { ...e, ...f } : e));
+      const { error } = await this.sb
+        .from('calendar_events')
+        .update({ title: f.title.trim(), type: f.type, date: f.date, time: f.time, duration: f.duration, client: f.client.trim(), property: f.property, notes: f.notes, notified: false })
+        .eq('id', id);
+      if (error) { this.saveError.set('Failed to save: ' + error.message); this.saving.set(false); return; }
     } else {
-      this.events.update(list => [...list, { id: Date.now(), ...f }]);
+      const { error } = await this.sb
+        .from('calendar_events')
+        .insert({ agent_id, agent_email, title: f.title.trim(), type: f.type, date: f.date, time: f.time, duration: f.duration, client: f.client.trim(), property: f.property, notes: f.notes });
+      if (error) { this.saveError.set('Failed to save: ' + error.message); this.saving.set(false); return; }
     }
-    this.persist();
+
+    await this.loadEvents();
+    this.saving.set(false);
     this.showModal.set(false);
     this.selectedDay.set(f.date);
   }
 
   confirmDelete(id: number): void { this.deleteId.set(id); }
-  doDelete(): void {
+
+  async doDelete(): Promise<void> {
     const id = this.deleteId();
     if (id !== null) {
+      await this.sb.from('calendar_events').delete().eq('id', id);
       this.events.update(list => list.filter(e => e.id !== id));
-      this.persist();
     }
     this.deleteId.set(null);
   }
@@ -189,6 +226,6 @@ export class AgentCalendarComponent implements OnInit {
       .slice(0, 5);
   });
 
-  readonly weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  readonly weekDays    = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   readonly typeOptions: EventType[] = ['viewing', 'meeting', 'followup', 'call'];
 }

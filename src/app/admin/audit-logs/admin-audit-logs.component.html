@@ -72,8 +72,8 @@
   </div>
 
   <!-- ── Results count ── -->
-  <p class="results-count" *ngIf="filteredLogs().length !== allLogs.length">
-    Showing {{ filteredLogs().length }} of {{ allLogs.length }} events
+  <p class="results-count" *ngIf="filteredLogs().length !== allLogs().length">
+    Showing {{ filteredLogs().length }} of {{ allLogs().length }} events
   </p>
 
   <!-- ── Log Table ── -->

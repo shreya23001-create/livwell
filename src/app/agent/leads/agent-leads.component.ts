@@ -299,7 +299,9 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     const e: Record<string, string> = {};
     if (!f.name?.trim())     e['name']     = 'Required.';
     if (!f.email?.trim())    e['email']    = 'Required.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e['email'] = 'Enter a valid email.';
     if (!f.phone?.trim())    e['phone']    = 'Required.';
+    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(f.phone.trim()))   e['phone'] = 'Enter a valid phone number.';
     if (!f.budget?.trim())   e['budget']   = 'Required.';
     if (!f.location?.trim()) e['location'] = 'Required.';
     this.formErrors.set(e);

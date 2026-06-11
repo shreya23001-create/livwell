@@ -1,0 +1,234 @@
+$accent:  #6366f1;
+$accent2: #8b5cf6;
+$dark:    #1a1a2e;
+$text:    #374151;
+$muted:   #6b7280;
+$border:  #e5e7eb;
+$bg:      #f8f9fc;
+$red:     #dc3545;
+$green:   #10b981;
+
+.adm-prof-page {
+  padding: 2rem;
+  max-width: 820px;
+}
+
+.adm-prof-header {
+  margin-bottom: 1.75rem;
+}
+.adm-prof-title   { font-size: 1.5rem; font-weight: 700; color: $dark; margin: 0 0 0.25rem; }
+.adm-prof-subtitle { font-size: 0.875rem; color: $muted; margin: 0; }
+
+.adm-prof-loading { color: $muted; padding: 2rem 0; }
+
+// Avatar card
+.adm-prof-avatar-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.adm-prof-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.adm-prof-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $accent, $accent2);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adm-prof-avatar-img {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.adm-prof-avatar-edit {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 24px; height: 24px;
+  background: $accent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  svg { width: 12px; height: 12px; stroke: #fff; }
+}
+
+.adm-prof-avatar-info { flex: 1; }
+.adm-prof-avatar-name  { font-size: 1.05rem; font-weight: 700; color: $dark; }
+.adm-prof-avatar-role  { font-size: 0.78rem; color: $accent; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 2px 0; }
+.adm-prof-avatar-email { font-size: 0.82rem; color: $muted; }
+
+.adm-prof-remove-photo {
+  background: none; border: 1px solid $border; border-radius: 0.5rem;
+  color: $red; font-size: 0.78rem; padding: 0.35rem 0.75rem; cursor: pointer;
+  &:hover { background: #fef2f2; }
+}
+
+// Tabs
+.adm-prof-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid $border;
+  padding-bottom: 0;
+}
+
+.adm-prof-tab {
+  background: none;
+  border: none;
+  padding: 0.6rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $muted;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+
+  &.active { color: $accent; border-bottom-color: $accent; }
+  &:hover:not(.active) { color: $text; }
+}
+
+// Card
+.adm-prof-card {
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 1rem;
+  padding: 1.75rem;
+}
+
+.adm-prof-success {
+  background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 0.5rem;
+  color: #065f46; font-size: 0.85rem; padding: 0.75rem 1rem; margin-bottom: 1.25rem;
+}
+.adm-prof-error {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.5rem;
+  color: #991b1b; font-size: 0.85rem; padding: 0.75rem 1rem; margin-bottom: 1.25rem;
+}
+
+.adm-prof-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.adm-prof-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 1.25rem;
+}
+
+.adm-prof-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $dark;
+}
+
+.adm-prof-input {
+  padding: 0.65rem 0.875rem;
+  border: 1.5px solid $border;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: $text;
+  background: #fff;
+  font-family: inherit;
+  transition: border-color 0.15s;
+
+  &:focus { outline: none; border-color: $accent; }
+  &:disabled { background: $bg; color: $muted; cursor: not-allowed; }
+  &.is-err { border-color: $red; }
+}
+
+.adm-prof-err  { font-size: 0.75rem; color: $red; }
+.adm-prof-hint { font-size: 0.75rem; color: $muted; }
+
+// Password
+.adm-prof-pw-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.adm-prof-pw-wrap .adm-prof-input { flex: 1; padding-right: 2.5rem; }
+
+.adm-prof-pw-eye {
+  position: absolute; right: 0.75rem;
+  background: none; border: none; cursor: pointer;
+  color: $muted; padding: 0;
+  svg { width: 1rem; height: 1rem; }
+  &:hover { color: $text; }
+}
+
+.adm-prof-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.adm-prof-strength-bar {
+  display: flex;
+  gap: 3px;
+}
+.adm-prof-strength-seg {
+  width: 40px; height: 4px;
+  border-radius: 2px;
+  background: #e5e7eb;
+  transition: background 0.2s;
+}
+.adm-prof-strength-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.adm-prof-pw-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.25rem;
+
+  span {
+    font-size: 0.75rem;
+    color: $muted;
+    &.met { color: $green; }
+  }
+}
+
+.adm-prof-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.75rem;
+  border-top: 1px solid $border;
+}
+
+.adm-prof-btn-save {
+  background: linear-gradient(135deg, $accent, $accent2);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.65rem 1.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.9; }
+}

@@ -1,0 +1,129 @@
+<div class="adm-prof-page">
+
+  <div class="adm-prof-header">
+    <div>
+      <h1 class="adm-prof-title">My Profile</h1>
+      <p class="adm-prof-subtitle">Manage your admin account details and password</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="adm-prof-loading">Loading...</div>
+
+  <div *ngIf="!loading()" class="adm-prof-body">
+
+    <!-- Avatar Card -->
+    <div class="adm-prof-avatar-card">
+      <div class="adm-prof-avatar-wrap">
+        <div class="adm-prof-avatar" *ngIf="!profile.photoUrl">{{ initials() }}</div>
+        <img class="adm-prof-avatar-img" *ngIf="profile.photoUrl" [src]="profile.photoUrl" alt="Profile photo" />
+        <label class="adm-prof-avatar-edit" title="Change photo">
+          <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onPhotoChange($event)" hidden />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/>
+          </svg>
+        </label>
+      </div>
+      <div class="adm-prof-avatar-info">
+        <div class="adm-prof-avatar-name">{{ profile.name || 'Admin' }}</div>
+        <div class="adm-prof-avatar-role">Administrator</div>
+        <div class="adm-prof-avatar-email">{{ profile.email }}</div>
+      </div>
+      <button class="adm-prof-remove-photo" *ngIf="profile.photoUrl" (click)="removePhoto()">Remove photo</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="adm-prof-tabs">
+      <button class="adm-prof-tab" [class.active]="activeTab() === 'profile'" (click)="setTab('profile')">Profile Details</button>
+      <button class="adm-prof-tab" [class.active]="activeTab() === 'password'" (click)="setTab('password')">Change Password</button>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="adm-prof-card" *ngIf="activeTab() === 'profile'">
+      <div class="adm-prof-success" *ngIf="profileSaved()">✓ Profile saved successfully.</div>
+      <div class="adm-prof-error"   *ngIf="profileError()">{{ profileError() }}</div>
+
+      <div class="adm-prof-form-row">
+        <div class="adm-prof-field">
+          <label class="adm-prof-label">Full Name *</label>
+          <input class="adm-prof-input" [class.is-err]="profileErrors()['name']" type="text"
+            [(ngModel)]="profile.name" (ngModelChange)="clearErr('name')" placeholder="Your full name" />
+          <span class="adm-prof-err" *ngIf="profileErrors()['name']">{{ profileErrors()['name'] }}</span>
+        </div>
+        <div class="adm-prof-field">
+          <label class="adm-prof-label">Email Address</label>
+          <input class="adm-prof-input" type="email" [(ngModel)]="profile.email" disabled />
+          <span class="adm-prof-hint">Email cannot be changed here.</span>
+        </div>
+      </div>
+
+      <div class="adm-prof-form-row">
+        <div class="adm-prof-field">
+          <label class="adm-prof-label">Phone Number *</label>
+          <input class="adm-prof-input" [class.is-err]="profileErrors()['phone']" type="tel"
+            [(ngModel)]="profile.phone" (ngModelChange)="clearErr('phone')" placeholder="+971 50 000 0000" />
+          <span class="adm-prof-err" *ngIf="profileErrors()['phone']">{{ profileErrors()['phone'] }}</span>
+        </div>
+      </div>
+
+      <div class="adm-prof-actions">
+        <button class="adm-prof-btn-save" (click)="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+
+    <!-- Password Tab -->
+    <div class="adm-prof-card" *ngIf="activeTab() === 'password'">
+      <div class="adm-prof-success" *ngIf="pwSaved()">✓ Password updated successfully.</div>
+      <div class="adm-prof-error"   *ngIf="pwError()">{{ pwError() }}</div>
+
+      <div class="adm-prof-field">
+        <label class="adm-prof-label">New Password *</label>
+        <div class="adm-prof-pw-wrap">
+          <input class="adm-prof-input" [class.is-err]="pwErrors()['newPw']"
+            [type]="showNewPw() ? 'text' : 'password'"
+            [(ngModel)]="pwForm.newPw" (ngModelChange)="clearPwErr('newPw')"
+            placeholder="Enter new password" />
+          <button class="adm-prof-pw-eye" type="button" (click)="showNewPw.update(v => !v)">
+            <svg *ngIf="!showNewPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+            <svg *ngIf="showNewPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+          </button>
+        </div>
+        <span class="adm-prof-err" *ngIf="pwErrors()['newPw']">{{ pwErrors()['newPw'] }}</span>
+        <div class="adm-prof-strength" *ngIf="pwForm.newPw">
+          <div class="adm-prof-strength-bar">
+            <span *ngFor="let i of [1,2,3,4]" class="adm-prof-strength-seg"
+              [style.background]="i <= passwordStrength() ? strengthColors[passwordStrength()] : '#e5e7eb'"></span>
+          </div>
+          <span class="adm-prof-strength-label" [style.color]="strengthColors[passwordStrength()]">
+            {{ strengthLabels[passwordStrength()] }}
+          </span>
+        </div>
+      </div>
+
+      <div class="adm-prof-field">
+        <label class="adm-prof-label">Confirm New Password *</label>
+        <div class="adm-prof-pw-wrap">
+          <input class="adm-prof-input" [class.is-err]="pwErrors()['confirm']"
+            [type]="showConfirmPw() ? 'text' : 'password'"
+            [(ngModel)]="pwForm.confirm" (ngModelChange)="clearPwErr('confirm')"
+            placeholder="Confirm new password" />
+          <button class="adm-prof-pw-eye" type="button" (click)="showConfirmPw.update(v => !v)">
+            <svg *ngIf="!showConfirmPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+            <svg *ngIf="showConfirmPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+          </button>
+        </div>
+        <span class="adm-prof-err" *ngIf="pwErrors()['confirm']">{{ pwErrors()['confirm'] }}</span>
+      </div>
+
+      <div class="adm-prof-pw-rules">
+        <span [class.met]="pwForm.newPw.length >= 8">✓ At least 8 characters</span>
+        <span [class.met]="/[A-Z]/.test(pwForm.newPw)">✓ One uppercase letter</span>
+        <span [class.met]="/[0-9]/.test(pwForm.newPw)">✓ One number</span>
+      </div>
+
+      <div class="adm-prof-actions">
+        <button class="adm-prof-btn-save" (click)="changePassword()">Update Password</button>
+      </div>
+    </div>
+
+  </div>
+</div>

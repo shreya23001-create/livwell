@@ -178,6 +178,9 @@ $bg-light: #f9fafb;
   &:focus { outline: none; border-color: $green; }
 }
 
+.ct-input-error { border-color: #dc3545 !important; }
+.ct-error { font-size: 0.75rem; color: #dc3545; margin-top: 0.125rem; }
+
 .ct-checkbox-row {
   flex-direction: row;
   align-items: flex-start;

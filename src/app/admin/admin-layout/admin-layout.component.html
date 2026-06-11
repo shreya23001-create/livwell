@@ -46,9 +46,9 @@
     <!-- User / logout -->
     <div class="adm-sidebar-footer">
       <div class="adm-user-card">
-        <div class="adm-user-avatar">{{ userInitial() }}</div>
+        <a routerLink="/admin/profile" class="adm-user-avatar" title="My Profile">{{ userInitial() }}</a>
         <div class="adm-user-info">
-          <div class="adm-user-name">{{ auth.currentUser()?.name || 'Admin' }}</div>
+          <a routerLink="/admin/profile" class="adm-user-name">{{ auth.currentUser()?.name || 'Admin' }}</a>
           <div class="adm-user-role">{{ roleLabel() }}</div>
         </div>
         <button class="adm-logout-btn" (click)="auth.logout()" title="Logout">

@@ -62,6 +62,7 @@ export class CustomerProfileComponent implements OnInit {
       }).eq('id', userId);
       if (error) { this.saveError.set('Failed to save. Please try again.'); this.saving.set(false); return; }
     }
+    await this.auth.refreshProfile();
     this.saving.set(false);
     this.saveSuccess.set('Profile updated successfully.');
     setTimeout(() => this.saveSuccess.set(''), 3000);

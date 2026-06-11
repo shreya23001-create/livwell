@@ -99,6 +99,7 @@ export class AdminDataService {
   // ── Audit Signals ─────────────────────────────────────
   readonly auditLogs     = signal<AuditLog[]>([]);
   readonly auditLoading  = signal(true);
+  private cachedIp: string | null = null;
 
   constructor() {
     this.loadMasterData();
@@ -197,6 +198,7 @@ export class AdminDataService {
   async saveUser(u: Partial<AdminUser>, editingId: string | null): Promise<string | null> {
     const payload: any = {
       name:   u.name?.trim(),
+      email:  u.email?.trim(),
       phone:  u.phone?.trim() || null,
       role:   u.role          || 'customer',
       status: u.status        || 'active',
@@ -204,10 +206,8 @@ export class AdminDataService {
     let error: any;
     if (editingId !== null) {
       ({ error } = await this.sb.from('profiles').update(payload).eq('id', editingId));
+      if (error) { console.error('[saveUser] update error:', error); return error.message; }
     }
-    // For new users, profiles row is already created by auth.signUp in the component — nothing to insert here
-
-    if (error) return error.message;
     await this.loadUsers();
     return null;
   }
@@ -432,9 +432,21 @@ export class AdminDataService {
     }
   }
 
-  async log(actor: string, actorRole: AuditActorRole, action: string, module: AuditModule, detail: string, status: AuditStatus = 'success'): Promise<void> { // public audit log method
-    await this.sb.from('audit_logs').insert({ actor, actor_role: actorRole, action, module, detail, status });
-    // Refresh only if audit logs are already loaded (non-blocking)
+  private async getClientIp(): Promise<string> {
+    if (this.cachedIp) return this.cachedIp;
+    try {
+      const res = await fetch('https://api.ipify.org?format=json');
+      const data = await res.json();
+      this.cachedIp = data.ip ?? '—';
+    } catch {
+      this.cachedIp = '—';
+    }
+    return this.cachedIp!;
+  }
+
+  async log(actor: string, actorRole: AuditActorRole, action: string, module: AuditModule, detail: string, status: AuditStatus = 'success'): Promise<void> {
+    const ip = await this.getClientIp();
+    await this.sb.from('audit_logs').insert({ actor, actor_role: actorRole, action, module, detail, status, ip });
     this.loadAuditLogs();
   }
 }

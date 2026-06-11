@@ -24,6 +24,7 @@ export interface Property {
   location:     string;
   community:    string;
   agent_name:   string;
+  created_by:   string;
   created_at:   string;
   views:        number;
   is_featured:  boolean;
@@ -143,6 +144,7 @@ export class AdminPropertiesComponent implements OnInit {
       this.properties.set(data.map((p: any) => ({
         ...p,
         agent_name: p.agent_name || '—',
+        created_by: p.created_by || p.agent_name || 'Admin',
       })));
     }
     this.loading.set(false);
@@ -201,6 +203,13 @@ export class AdminPropertiesComponent implements OnInit {
   }
 
   private async runUpload(files: File[]): Promise<void> {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const maxSize = 5 * 1024 * 1024; // 5 MB
+    for (const file of files) {
+      if (!allowed.includes(file.type)) { this.saveError.set(`"${file.name}" is not a supported image type. Use JPG, PNG, WebP, or GIF.`); return; }
+      if (file.size > maxSize)          { this.saveError.set(`"${file.name}" exceeds the 5 MB size limit.`); return; }
+    }
+
     this.uploadingImages.set(true);
     this.saveError.set('');
 
@@ -291,7 +300,8 @@ export class AdminPropertiesComponent implements OnInit {
       if (this.editingId() !== null) {
         ({ error } = await this.sb.from('properties').update(payload).eq('id', this.editingId()));
       } else {
-        ({ error } = await this.sb.from('properties').insert(payload));
+        const adminName = this.auth.currentUser()?.name || 'Admin';
+        ({ error } = await this.sb.from('properties').insert({ ...payload, created_by: adminName }));
       }
 
       if (error) {
@@ -326,6 +336,8 @@ export class AdminPropertiesComponent implements OnInit {
     if (!f.location?.trim()) errs['location'] = 'Location is required.';
     if (!f.price || f.price <= 0) errs['price'] = 'Price must be greater than 0.';
     if (!f.area_sqft || f.area_sqft <= 0) errs['area_sqft'] = 'Area must be greater than 0.';
+    if (f.bedrooms  !== undefined && (f.bedrooms  < 0 || f.bedrooms  > 50)) errs['bedrooms']  = 'Bedrooms must be between 0 and 50.';
+    if (f.bathrooms !== undefined && (f.bathrooms < 0 || f.bathrooms > 50)) errs['bathrooms'] = 'Bathrooms must be between 0 and 50.';
     return errs;
   }
 

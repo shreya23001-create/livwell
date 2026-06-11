@@ -119,6 +119,7 @@ export class HomeComponent implements OnInit {
       .from('properties')
       .select('id, title, location, community, price, bedrooms, bathrooms, area_sqft, type, images, is_featured, status')
       .eq('is_featured', true)
+      .eq('status', 'Published')
       .order('created_at', { ascending: false })
       .limit(6);
 
@@ -126,6 +127,7 @@ export class HomeComponent implements OnInit {
       ({ data } = await this.sb
         .from('properties')
         .select('id, title, location, community, price, bedrooms, bathrooms, area_sqft, type, images, is_featured, status')
+        .eq('status', 'Published')
         .order('created_at', { ascending: false })
         .limit(6));
     }

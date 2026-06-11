@@ -123,6 +123,7 @@
               <svg *ngIf="sortField() === 'views'" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>
             </th>
             <th class="prop-th">Agent</th>
+            <th class="prop-th">Created By</th>
             <th class="prop-th prop-th--sortable" (click)="sort('created_at')">
               Created
               <svg *ngIf="sortField() === 'created_at'" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir() === 'asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>
@@ -188,6 +189,11 @@
                 <span class="prop-agent-name">{{ p.agent_name }}</span>
               </div>
               <span *ngIf="!p.agent_name || p.agent_name === '—'" class="prop-no-agent">Unassigned</span>
+            </td>
+
+            <!-- Created By -->
+            <td class="prop-td">
+              <span class="prop-created-by">{{ p.created_by || p.agent_name || 'Admin' }}</span>
             </td>
 
             <!-- Created date -->
@@ -300,13 +306,15 @@
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Bedrooms</label>
-        <input class="prop-form-input" type="number" min="0" max="20"
+        <input class="prop-form-input" type="number" min="0" max="50"
                [value]="form()['bedrooms'] ?? 1" (input)="patchForm('bedrooms', +$any($event.target).value)">
+        <span class="prop-form-error" *ngIf="formErrors()['bedrooms']">{{ formErrors()['bedrooms'] }}</span>
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Bathrooms</label>
-        <input class="prop-form-input" type="number" min="1" max="20"
+        <input class="prop-form-input" type="number" min="0" max="50"
                [value]="form()['bathrooms'] ?? 1" (input)="patchForm('bathrooms', +$any($event.target).value)">
+        <span class="prop-form-error" *ngIf="formErrors()['bathrooms']">{{ formErrors()['bathrooms'] }}</span>
       </div>
     </div>
 

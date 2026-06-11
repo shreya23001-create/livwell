@@ -204,6 +204,11 @@ export class AuthService {
     this.redirectByRole(user.role);
   }
 
+  async refreshProfile(): Promise<void> {
+    const id = this._currentUser()?.id;
+    if (id) await this.loadProfile(id);
+  }
+
   hasRole(roles: UserRole[]): boolean {
     const role = this._currentUser()?.role;
     return role ? roles.includes(role) : false;

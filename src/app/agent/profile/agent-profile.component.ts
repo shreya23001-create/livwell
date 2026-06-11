@@ -83,14 +83,17 @@ export class AgentProfileComponent implements OnInit {
       // fetch extended fields from profiles table
       const { data } = await this.sb
         .from('profiles')
-        .select('name, email, phone, avatar_url')
+        .select('name, email, phone, avatar_url, bio, designation')
         .eq('id', user.id)
         .single();
       if (data) {
-        this.profile.name     = data.name     ?? this.profile.name;
-        this.profile.email    = data.email    ?? this.profile.email;
-        this.profile.phone    = data.phone    ?? this.profile.phone;
-        this.profile.photoUrl = data.avatar_url ?? '';
+        this.profile.name        = data.name        ?? this.profile.name;
+        this.profile.email       = data.email       ?? this.profile.email;
+        this.profile.phone       = data.phone       ?? this.profile.phone;
+        const av = data.avatar_url ?? '';
+        this.profile.photoUrl    = av.startsWith('data:') ? '' : av;
+        this.profile.bio         = data.bio         ?? '';
+        this.profile.designation = data.designation ?? '';
       }
     }
 
@@ -108,15 +111,29 @@ export class AgentProfileComponent implements OnInit {
     this.notifSaved.set(false);
   }
 
-  onPhotoChange(event: Event): void {
+  uploadingPhoto = signal(false);
+  photoError     = signal('');
+
+  async onPhotoChange(event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.profile.photoUrl = e.target?.result as string; };
-    reader.readAsDataURL(file);
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowed.includes(file.type)) { this.photoError.set('Only JPG, PNG, WebP or GIF allowed.'); return; }
+    if (file.size > 5 * 1024 * 1024)  { this.photoError.set('Image must be under 5 MB.'); return; }
+    this.photoError.set('');
+    this.uploadingPhoto.set(true);
+    const user = this.auth.currentUser();
+    if (!user?.id) { this.uploadingPhoto.set(false); return; }
+    const ext  = file.name.split('.').pop();
+    const path = `avatars/${user.id}.${ext}`;
+    const { error: upErr } = await this.sb.storage.from('imagesFolder').upload(path, file, { upsert: true });
+    if (upErr) { this.photoError.set('Upload failed: ' + upErr.message); this.uploadingPhoto.set(false); return; }
+    const { data } = this.sb.storage.from('imagesFolder').getPublicUrl(path);
+    this.profile.photoUrl = data.publicUrl + '?t=' + Date.now();
+    this.uploadingPhoto.set(false);
   }
 
-  removePhoto(): void { this.profile.photoUrl = ''; }
+  async removePhoto(): Promise<void> { this.profile.photoUrl = ''; }
 
   async saveProfile(): Promise<void> {
     const errs: Record<string, string> = {};
@@ -131,12 +148,15 @@ export class AgentProfileComponent implements OnInit {
     if (!user?.id) return;
 
     const { error } = await this.sb.from('profiles').update({
-      name:       this.profile.name.trim(),
-      phone:      this.profile.phone.trim(),
-      avatar_url: this.profile.photoUrl || null,
+      name:        this.profile.name.trim(),
+      phone:       this.profile.phone.trim(),
+      avatar_url:  this.profile.photoUrl || null,
+      bio:         this.profile.bio.trim() || null,
+      designation: this.profile.designation.trim() || null,
     }).eq('id', user.id);
 
-    if (error) { this.profileError.set('Failed to save. Please try again.'); return; }
+    if (error) { this.profileError.set('Failed to save: ' + error.message); return; }
+    await this.auth.refreshProfile();
     this.profileSaved.set(true);
     setTimeout(() => this.profileSaved.set(false), 3000);
   }

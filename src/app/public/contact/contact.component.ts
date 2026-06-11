@@ -15,6 +15,9 @@ interface ContactForm {
   consent: boolean;
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^\+?[0-9\s\-()\d]{7,15}$/;
+
 interface Office {
   name: string;
   address: string;
@@ -39,6 +42,7 @@ export class ContactComponent {
   enquiryTypes = ['Buy Property', 'Rent Property', 'Sell Property', 'Investment', 'General Enquiry'];
   activeType = signal('Buy Property');
   submitted = signal(false);
+  formErrors = signal<Record<string, string>>({});
 
   form = signal<ContactForm>({
     firstName: '', lastName: '', email: '', phone: '',
@@ -51,13 +55,23 @@ export class ContactComponent {
 
   submit(): void {
     const f = this.form();
-    if (f.firstName && f.email && f.subject && f.message && f.consent) {
-      this.submitted.set(true);
-    }
+    const e: Record<string, string> = {};
+    if (!f.firstName.trim())                        e['firstName'] = 'First name is required.';
+    if (!f.email.trim())                            e['email']     = 'Email is required.';
+    else if (!EMAIL_RE.test(f.email.trim()))        e['email']     = 'Enter a valid email address.';
+    if (f.phone.trim() && !PHONE_RE.test(f.phone.trim())) e['phone'] = 'Enter a valid phone number.';
+    if (!f.subject.trim())                          e['subject']   = 'Subject is required.';
+    if (!f.message.trim())                          e['message']   = 'Message is required.';
+    else if (f.message.trim().length < 10)          e['message']   = 'Message must be at least 10 characters.';
+    if (!f.consent)                                 e['consent']   = 'You must agree to the terms.';
+    this.formErrors.set(e);
+    if (Object.keys(e).length) return;
+    this.submitted.set(true);
   }
 
   reset(): void {
     this.submitted.set(false);
+    this.formErrors.set({});
     this.form.set({ firstName: '', lastName: '', email: '', phone: '', subject: '', message: '', consent: false });
   }
 

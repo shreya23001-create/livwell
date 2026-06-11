@@ -416,6 +416,7 @@ export class PropertiesComponent implements OnInit {
     const { data, error } = await this.sb
       .from('properties')
       .select('id, title, location, community, price, listing_type, type, bedrooms, bathrooms, area_sqft, furnishing, images, amenities, views, created_at, agent_name, is_featured')
+      .eq('status', 'Published')
       .order('created_at', { ascending: false });
 
     if (error) {

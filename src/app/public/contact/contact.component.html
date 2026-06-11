@@ -33,37 +33,41 @@
             <div class="ct-form-row">
               <div class="ct-field">
                 <label class="ct-label">First Name *</label>
-                <input type="text" class="ct-input" placeholder="Ahmed" [ngModel]="form().firstName"
-                  (ngModelChange)="patch('firstName', $event)" name="firstName" required />
+                <input type="text" class="ct-input" [class.ct-input-error]="formErrors()['firstName']" placeholder="Ahmed" [ngModel]="form().firstName"
+                  (ngModelChange)="patch('firstName', $event)" name="firstName" />
+                <span class="ct-error" *ngIf="formErrors()['firstName']">{{ formErrors()['firstName'] }}</span>
               </div>
               <div class="ct-field">
-                <label class="ct-label">Last Name *</label>
+                <label class="ct-label">Last Name</label>
                 <input type="text" class="ct-input" placeholder="Al-Rashidi" [ngModel]="form().lastName"
-                  (ngModelChange)="patch('lastName', $event)" name="lastName" required />
+                  (ngModelChange)="patch('lastName', $event)" name="lastName" />
               </div>
             </div>
             <div class="ct-form-row">
               <div class="ct-field">
                 <label class="ct-label">Email Address *</label>
-                <input type="email" class="ct-input" placeholder="ahmed@example.com" [ngModel]="form().email"
-                  (ngModelChange)="patch('email', $event)" name="email" required />
+                <input type="email" class="ct-input" [class.ct-input-error]="formErrors()['email']" placeholder="ahmed@example.com" [ngModel]="form().email"
+                  (ngModelChange)="patch('email', $event)" name="email" />
+                <span class="ct-error" *ngIf="formErrors()['email']">{{ formErrors()['email'] }}</span>
               </div>
               <div class="ct-field">
                 <label class="ct-label">Phone Number</label>
-                <input type="tel" class="ct-input" placeholder="+971 50 000 0000" [ngModel]="form().phone"
+                <input type="tel" class="ct-input" [class.ct-input-error]="formErrors()['phone']" placeholder="+971 50 000 0000" [ngModel]="form().phone"
                   (ngModelChange)="patch('phone', $event)" name="phone" />
+                <span class="ct-error" *ngIf="formErrors()['phone']">{{ formErrors()['phone'] }}</span>
               </div>
             </div>
             <div class="ct-field">
               <label class="ct-label">Subject *</label>
-              <input type="text" class="ct-input" placeholder="e.g. Looking for a 2BR in Dubai Marina"
-                [ngModel]="form().subject" (ngModelChange)="patch('subject', $event)" name="subject" required />
+              <input type="text" class="ct-input" [class.ct-input-error]="formErrors()['subject']" placeholder="e.g. Looking for a 2BR in Dubai Marina"
+                [ngModel]="form().subject" (ngModelChange)="patch('subject', $event)" name="subject" />
+              <span class="ct-error" *ngIf="formErrors()['subject']">{{ formErrors()['subject'] }}</span>
             </div>
             <div class="ct-field">
               <label class="ct-label">Message *</label>
-              <textarea class="ct-textarea" rows="5" placeholder="Tell us more about what you're looking for..."
-                [ngModel]="form().message" (ngModelChange)="patch('message', $event)" name="message"
-                required></textarea>
+              <textarea class="ct-textarea" [class.ct-input-error]="formErrors()['message']" rows="5" placeholder="Tell us more about what you're looking for..."
+                [ngModel]="form().message" (ngModelChange)="patch('message', $event)" name="message"></textarea>
+              <span class="ct-error" *ngIf="formErrors()['message']">{{ formErrors()['message'] }}</span>
             </div>
             <div class="ct-field ct-checkbox-row">
               <input type="checkbox" id="ctConsent" class="ct-checkbox" [ngModel]="form().consent"
@@ -73,6 +77,7 @@
                 being contacted.
               </label>
             </div>
+            <span class="ct-error" *ngIf="formErrors()['consent']">{{ formErrors()['consent'] }}</span>
             <button type="submit" class="ct-submit-btn">Send Message</button>
           </form>
         </div>

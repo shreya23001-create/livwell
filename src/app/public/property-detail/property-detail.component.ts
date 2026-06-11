@@ -47,13 +47,7 @@ export class PropertyDetailComponent implements OnInit {
   property          = signal<Property | null>(null);
   similarProperties = signal<Property[]>([]);
 
-  mapUrl = computed((): SafeResourceUrl => {
-    const loc = this.property()?.location || 'Dubai';
-    const q   = encodeURIComponent(loc);
-    return this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.openstreetmap.org/export/embed.html?query=${q}&layer=mapnik`
-    );
-  });
+  mapUrl = signal<SafeResourceUrl>(this.sanitizer.bypassSecurityTrustResourceUrl(''));
   loading           = signal(true);
   notFound          = signal(false);
   activeImageIndex  = signal(0);
@@ -191,15 +185,16 @@ export class PropertyDetailComponent implements OnInit {
       const prop = this.mapProperty(data);
       this.property.set(prop);
       this.mortgagePrice.set(prop.price);
+      this.geocodeAndSetMap(prop);
 
       // Increment view count
       this.sb.from('properties').update({ views: (data.views || 0) + 1 }).eq('id', id).then(() => {});
 
-      // Load similar properties (no status filter — properties may not be Published)
       const { data: similar } = await this.sb
         .from('properties')
         .select('*')
         .eq('type', data.type)
+        .eq('status', 'Published')
         .neq('id', id)
         .limit(3);
       if (similar) this.similarProperties.set(similar.map(this.mapProperty));
@@ -222,6 +217,29 @@ export class PropertyDetailComponent implements OnInit {
         this.isFaved.set(!!saved);
       });
     });
+  }
+
+  private async geocodeAndSetMap(prop: Property): Promise<void> {
+    const raw   = prop.address?.trim() || prop.community?.trim() || prop.location?.trim() || 'Dubai';
+    const query = raw.toLowerCase().includes('dubai') ? raw : raw + ', Dubai, UAE';
+    try {
+      const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+      const data = await res.json();
+      if (data?.length) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        // Use ll= with the address label — avoids "Place info couldn't load" popup
+        const q   = encodeURIComponent(query);
+        const url = `https://maps.google.com/maps?q=${q}&ll=${lat},${lon}&t=m&z=16&output=embed`;
+        this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+      } else {
+        const url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=16&output=embed`;
+        this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+      }
+    } catch {
+      const url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=16&output=embed`;
+      this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    }
   }
 
   async toggleFav(): Promise<void> {

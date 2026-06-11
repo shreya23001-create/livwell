@@ -178,6 +178,9 @@ $topbar-h:      60px;
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
+  text-decoration: none;
+  cursor: pointer;
+  &:hover { opacity: 0.85; }
 }
 .adm-user-info { overflow: hidden; }
 .adm-user-name {
@@ -185,6 +188,8 @@ $topbar-h:      60px;
   font-weight: 600;
   color: #fff;
   white-space: nowrap;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
 }
 .adm-user-role {
   font-size: 0.68rem;

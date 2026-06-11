@@ -16,7 +16,8 @@ type CmsTab = 'banners' | 'featured' | 'announcements' | 'pages';
 })
 export class AdminCmsComponent implements OnInit {
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.auth.waitForSession();
     this.loadFeaturedProperties();
   }
   private dataSvc = inject(AdminDataService);

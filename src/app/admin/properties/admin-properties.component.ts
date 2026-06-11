@@ -2,6 +2,7 @@ import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import * as XLSX from 'xlsx';
@@ -48,6 +49,7 @@ const EMPTY_FORM = (): Partial<Property> => ({
 })
 export class AdminPropertiesComponent implements OnInit {
   private sb      = inject(SupabaseService).client;
+  private auth    = inject(AuthService);
   private dataSvc = inject(AdminDataService);
 
   // ── Data ──────────────────────────────────────────────
@@ -126,6 +128,7 @@ export class AdminPropertiesComponent implements OnInit {
 
   // ── Lifecycle ─────────────────────────────────────────
   async ngOnInit(): Promise<void> {
+    await this.auth.waitForSession();
     await Promise.all([this.loadProperties(), this.loadAgents()]);
   }
 

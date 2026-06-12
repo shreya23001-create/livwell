@@ -4,6 +4,7 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface CommercialDetail {
   id: number;
@@ -180,23 +181,105 @@ EXTRA_OFFICES.forEach(o => { ALL_COMMERCIAL[o.id] = o; });
   styleUrl: './commercial-property-detail.component.scss',
 })
 export class CommercialPropertyDetailComponent implements OnInit {
-  property = signal<CommercialDetail | null>(null);
-  notFound = signal(false);
+  property  = signal<CommercialDetail | null>(null);
+  notFound  = signal(false);
+  loading   = signal(true);
   activeImage = signal(0);
   showEnquiry = signal(false);
 
-  private route = inject(ActivatedRoute);
+  private route     = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
+  private sb        = inject(SupabaseService).client;
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       const id = Number(params['id']);
-      const found = ALL_COMMERCIAL[id] ?? null;
-      this.property.set(found);
-      this.notFound.set(!found);
       this.activeImage.set(0);
       window.scrollTo({ top: 0 });
+      this.loadProperty(id);
     });
+  }
+
+  private async loadProperty(id: number): Promise<void> {
+    this.loading.set(true);
+    this.notFound.set(false);
+    this.property.set(null);
+
+    const { data, error } = await this.sb
+      .from('properties')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, images, furnishing, agent_name, description, is_featured, created_at')
+      .eq('id', id)
+      .in('type', ['Office', 'Shop', 'Warehouse', 'Plot'])
+      .single();
+
+    if (!error && data) {
+      const p = data as any;
+      const featuresMap: Record<string, string[]> = {
+        Office:    OFFICE_FEATURES,
+        Shop:      RETAIL_FEATURES,
+        Warehouse: WAREHOUSE_FEATURES,
+        Plot:      PLOT_FEATURES,
+      };
+      const imgs: string[] = Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []);
+      const priceNum = typeof p.price === 'number' ? p.price : parseFloat(String(p.price).replace(/[^0-9.]/g, ''));
+      const areaNum  = typeof p.area_sqft === 'number' ? p.area_sqft : parseFloat(String(p.area_sqft ?? '0'));
+      const ppsf     = areaNum > 0 ? Math.round(priceNum / areaNum) : 0;
+      const isRent   = (p.listing_type ?? '').toLowerCase() === 'rent';
+
+      // Fetch agent profile
+      const cleanAgent = (n: string) => (n ?? '').trim().replace(/^[-–—]+$/, '');
+      let agentObj = { name: cleanAgent(p.agent_name) || 'LivWell Agent', role: 'Property Consultant', phone: '', email: '', avatar: '' };
+      if (cleanAgent(p.agent_name)) {
+        const { data: prof } = await this.sb
+          .from('profiles')
+          .select('name, phone, email, avatar_url, designation')
+          .eq('name', p.agent_name)
+          .maybeSingle();
+        if (prof) {
+          const av = prof.avatar_url ?? '';
+          agentObj = {
+            name:   cleanAgent(prof.name) || cleanAgent(p.agent_name) || 'LivWell Agent',
+            role:   prof.designation ?? 'Property Consultant',
+            phone:  prof.phone  ?? '',
+            email:  prof.email  ?? '',
+            avatar: (av && !av.startsWith('data:')) ? av : '',
+          };
+        }
+      }
+
+      const detail: CommercialDetail = {
+        id:           p.id,
+        title:        p.title ?? '',
+        developer:    p.community ?? '',
+        location:     [p.location, p.community].filter(Boolean).join(', '),
+        type:         p.type ?? '',
+        status:       'Ready',
+        price:        priceNum > 0
+                        ? (isRent ? `AED ${priceNum.toLocaleString()} / year` : `AED ${priceNum.toLocaleString()}`)
+                        : (p.price ?? ''),
+        pricePerSqft: ppsf > 0
+                        ? (isRent ? `AED ${ppsf.toLocaleString()} / sqft / yr` : `AED ${ppsf.toLocaleString()} / sqft`)
+                        : '',
+        area:         areaNum > 0 ? `${areaNum.toLocaleString()} sqft` : '',
+        refNo:        `COM-${String(p.id).padStart(3, '0')}`,
+        furnished:    (p.furnishing ?? '').toLowerCase() === 'furnished',
+        forRent:      isRent,
+        images:       imgs.length ? imgs : ['https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=85'],
+        about:        p.description ?? '',
+        features:     featuresMap[p.type] ?? OFFICE_FEATURES,
+        agent:        agentObj,
+        mapUrl:       '',
+      };
+      this.property.set(detail);
+      this.loading.set(false);
+      return;
+    }
+
+    // Fall back to static data for legacy IDs 1–15
+    const found = ALL_COMMERCIAL[id] ?? null;
+    this.property.set(found);
+    this.notFound.set(!found);
+    this.loading.set(false);
   }
 
   safeMap(url: string): SafeResourceUrl {

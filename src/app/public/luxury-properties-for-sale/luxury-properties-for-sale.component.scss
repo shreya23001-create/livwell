@@ -326,7 +326,9 @@ $white: #fff;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 
-  & + & { border-left: 1.5px solid $border; }
+  &+& {
+    border-left: 1.5px solid $border;
+  }
 
   &.active {
     background: $gold;
@@ -855,7 +857,7 @@ $white: #fff;
   cursor: pointer;
   transition: opacity .15s, transform .12s;
   flex-shrink: 0;
-  background: #2d2d2d;
+  background: #fff;
 
   &:hover {
     opacity: .85;
@@ -923,6 +925,43 @@ $white: #fff;
     color: #e53e3e;
     box-shadow: 0 4px 12px rgba(0, 0, 0, .16);
   }
+}
+
+// ── Loading ───────────────────────────────────────────────
+.lpfs-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5rem 0;
+}
+
+.lpfs-spin {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $border;
+  border-top-color: $gold;
+  border-radius: 50%;
+  animation: lpfs-spin-anim 0.8s linear infinite;
+}
+
+@keyframes lpfs-spin-anim {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lpfs-agent-av--dummy {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d1d5db;
+  color: #6b7280;
+  flex-shrink: 0;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
 }
 
 // ── Empty state ───────────────────────────────────────────

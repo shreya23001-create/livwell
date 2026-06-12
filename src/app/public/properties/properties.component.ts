@@ -80,7 +80,7 @@ export class PropertiesComponent implements OnInit {
 
   // ── Data ─────────────────────────────────────────────────────
   readonly filterOptions = {
-    types: ['Apartment', 'Villa', 'Townhouse', 'Hotel Apartment', 'Duplex', 'Penthouse', 'Mansion', 'Office', 'Shop', 'Residential Plot', 'Commercial Plot'],
+    types: ['Apartment', 'Villa', 'Townhouse', 'Hotel Apartment', 'Duplex', 'Penthouse', 'Mansion'],
     statuses: ['Sale', 'Rent'],
     locations: ['Downtown Dubai', 'Palm Jumeirah', 'Dubai Marina', 'Business Bay', 'JBR', 'Arabian Ranches', 'Emirates Hills', 'Jumeirah Village Circle', 'Dubai Hills Estate', 'Meydan', 'Dubai Creek Harbour', 'Jumeirah', 'Al Barsha', 'DIFC', 'Dubai South'],
     beds: ['Studio', '1', '2', '3', '4', '5', '6', '7+'],
@@ -417,6 +417,7 @@ export class PropertiesComponent implements OnInit {
       .from('properties')
       .select('id, title, location, community, price, listing_type, type, bedrooms, bathrooms, area_sqft, furnishing, images, amenities, views, created_at, agent_name, is_featured')
       .eq('status', 'Published')
+      .not('type', 'in', '("Office","Shop","Warehouse","Plot")')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -424,33 +425,58 @@ export class PropertiesComponent implements OnInit {
     }
 
     if (!error && data && data.length > 0) {
-      this.allProperties.set(data.map((p: any) => ({
-        id:           p.id,
-        title:        p.title        ?? '',
-        location:     p.location     ?? '',
-        community:    p.community    ?? '',
-        price:        p.price        ?? 0,
-        priceLabel:   this.formatPrice(p.price ?? 0, p.listing_type),
-        pricePerSqft: p.area_sqft ? `AED ${Math.round((p.price ?? 0) / p.area_sqft).toLocaleString()}/sqft` : '',
-        beds:         p.bedrooms === 0 ? 'Studio' : (p.bedrooms ?? 1),
-        baths:        p.bathrooms    ?? 1,
-        sqft:         p.area_sqft    ?? 0,
-        sqftLabel:    p.area_sqft ? `${p.area_sqft.toLocaleString()} sqft` : '',
-        type:         p.type         as any ?? 'Apartment',
-        status:       p.listing_type === 'Rent' ? 'Rent' : p.listing_type === 'Off-Plan' ? 'Sale' : 'Sale',
-        isOffPlan:    p.listing_type === 'Off-Plan',
-        furnished:    p.furnishing   ?? 'Unfurnished',
-        badge:        p.is_featured  ? 'Featured' : undefined,
-        images:       p.images?.length ? p.images : ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80'],
-        amenities:    p.amenities    ?? [],
-        views:        p.views        ?? 0,
-        postedDate:   p.created_at?.slice(0, 10) ?? '',
-        lat:          25.2,
-        lng:          55.27,
-        agentName:    p.agent_name   ?? 'Livwell Agent',
-        agentAvatar:  '',
-        agentPhone:   '',
-      })));
+      // Build a name→{avatar, phone} map from profiles for all unique agent names
+      const uniqueNames = [...new Set(data.map((p: any) => p.agent_name).filter(Boolean))] as string[];
+      const agentMap: Record<string, { avatar: string; phone: string }> = {};
+      if (uniqueNames.length) {
+        const { data: profiles } = await this.sb
+          .from('profiles')
+          .select('name, avatar_url, phone')
+          .in('name', uniqueNames)
+          .eq('role', 'agent')
+          .eq('status', 'active');
+        if (profiles) {
+          for (const pr of profiles) {
+            const av = (pr.avatar_url ?? '').split('?')[0]; // strip cache-buster
+            const isProfilePhoto = av.length > 0 && !av.startsWith('data:') && /\/avatars\/[^/]+$/.test(av);
+            agentMap[pr.name] = {
+              avatar: isProfilePhoto ? (pr.avatar_url ?? '') : '',
+              phone:  pr.phone ?? '',
+            };
+          }
+        }
+      }
+
+      this.allProperties.set(data.map((p: any) => {
+        const ag = agentMap[p.agent_name] ?? { avatar: '', phone: '' };
+        return {
+          id:           p.id,
+          title:        p.title        ?? '',
+          location:     p.location     ?? '',
+          community:    p.community    ?? '',
+          price:        p.price        ?? 0,
+          priceLabel:   this.formatPrice(p.price ?? 0, p.listing_type),
+          pricePerSqft: p.area_sqft ? `AED ${Math.round((p.price ?? 0) / p.area_sqft).toLocaleString()}/sqft` : '',
+          beds:         p.bedrooms === 0 ? 'Studio' : (p.bedrooms ?? 1),
+          baths:        p.bathrooms    ?? 1,
+          sqft:         p.area_sqft    ?? 0,
+          sqftLabel:    p.area_sqft ? `${p.area_sqft.toLocaleString()} sqft` : '',
+          type:         p.type         as any ?? 'Apartment',
+          status:       p.listing_type === 'Rent' ? 'Rent' : p.listing_type === 'Off-Plan' ? 'Sale' : 'Sale',
+          isOffPlan:    p.listing_type === 'Off-Plan',
+          furnished:    p.furnishing   ?? 'Unfurnished',
+          badge:        p.is_featured  ? 'Featured' : undefined,
+          images:       p.images?.length ? p.images : ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80'],
+          amenities:    p.amenities    ?? [],
+          views:        p.views        ?? 0,
+          postedDate:   p.created_at?.slice(0, 10) ?? '',
+          lat:          25.2,
+          lng:          55.27,
+          agentName:    ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
+          agentAvatar:  ag.avatar,
+          agentPhone:   ag.phone,
+        };
+      }));
     } else if (!error) {
       // DB returned no rows — keep mock data so page isn't blank
       this.allProperties.set(this._mockProperties);

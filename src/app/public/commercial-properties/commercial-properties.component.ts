@@ -1,9 +1,10 @@
-import { Component, computed, signal, HostListener, ElementRef } from '@angular/core';
+import { Component, computed, signal, HostListener, ElementRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface CommercialProperty {
   id: number;
@@ -37,8 +38,11 @@ interface CommercialProperty {
   templateUrl: './commercial-properties.component.html',
   styleUrl: './commercial-properties.component.scss',
 })
-export class CommercialPropertiesComponent {
+export class CommercialPropertiesComponent implements OnInit {
 
+  private sb = inject(SupabaseService).client;
+
+  loading = signal(true);
   searchArea = signal('');
   activeType = signal('Any');
   activeBeds = signal('Any');
@@ -67,7 +71,9 @@ export class CommercialPropertiesComponent {
   readonly bedOptions = ['Any', 'Studio', '1', '2', '3', '4', '5', '6', '7+'];
   readonly bathOptions = ['Any', '1', '2', '3', '4', '5', '6', '7+'];
 
-  readonly allProperties: CommercialProperty[] = [
+  allProperties = signal<CommercialProperty[]>([]);
+
+  readonly staticProperties: CommercialProperty[] = [
     {
       id: 1, title: 'Grade A Office — DIFC Gate Village', developer: 'DIFC Authority', location: 'DIFC',
       type: 'Office', status: 'Ready', price: 8500000, priceDisplay: 'AED 8,500,000',
@@ -193,7 +199,7 @@ export class CommercialPropertiesComponent {
   ];
 
   filteredProperties = computed(() => {
-    let list = [...this.allProperties];
+    let list = [...this.allProperties()];
     const intent = this.interestedTo();
     list = list.filter(p => intent === 'Rent' ? !!p.forRent : !p.forRent);
 
@@ -273,6 +279,90 @@ export class CommercialPropertiesComponent {
     if (this.refNo()) n++;
     return n;
   });
+
+  async ngOnInit(): Promise<void> {
+    await this.loadProperties();
+  }
+
+  private async loadProperties(): Promise<void> {
+    this.loading.set(true);
+    const commercialTypes = ['Office', 'Shop', 'Warehouse', 'Plot'];
+    const { data, error } = await this.sb
+      .from('properties')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, images, is_featured, created_at, agent_name, furnishing, views')
+      .in('type', commercialTypes)
+      .eq('status', 'Published')
+      .order('created_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      const uniqueNames = [...new Set(data.map((p: any) => p.agent_name).filter(Boolean))] as string[];
+      const agentMap: Record<string, { avatar: string; phone: string; email: string }> = {};
+      if (uniqueNames.length) {
+        const { data: profiles } = await this.sb
+          .from('profiles')
+          .select('name, avatar_url, phone, email')
+          .in('name', uniqueNames)
+          .eq('role', 'agent');
+        if (profiles) {
+          for (const pr of profiles) {
+            const av = (pr.avatar_url ?? '').split('?')[0];
+            const isProfilePhoto = av.length > 0 && !av.startsWith('data:') && /\/avatars\/[^/]+$/.test(av);
+            agentMap[pr.name] = {
+              avatar: isProfilePhoto ? (pr.avatar_url ?? '') : '',
+              phone:  pr.phone ?? '+971 52 520 9703',
+              email:  pr.email ?? 'contact@livwelldubai.com',
+            };
+          }
+        }
+      }
+
+      this.allProperties.set(data.map((p: any) => {
+        const isRent = p.listing_type === 'Rent';
+        const price: number = p.price ?? 0;
+        const area: number = p.area_sqft ?? 0;
+        const pricePerSqft = area > 0 ? `AED ${Math.round(price / area).toLocaleString()}` : '';
+        const priceDisplay = isRent
+          ? `AED ${price.toLocaleString()} / yr`
+          : price >= 1_000_000
+            ? `AED ${(price / 1_000_000).toFixed(2)}M`
+            : `AED ${price.toLocaleString()}`;
+        const ag = agentMap[p.agent_name] ?? { avatar: '', phone: '+971 52 520 9703', email: 'contact@livwelldubai.com' };
+        const imgs: string[] = p.images?.length ? p.images : ['https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=85'];
+        return {
+          id:           p.id,
+          title:        p.title        ?? '',
+          developer:    p.community    ?? '',
+          location:     p.location     ?? '',
+          type:         p.type         as any,
+          status:       p.listing_type === 'Off-Plan' ? 'Off-Plan' : 'Ready' as any,
+          price,
+          priceDisplay,
+          pricePerSqft,
+          area,
+          areaDisplay:  area > 0 ? `${area.toLocaleString()} sqft` : '',
+          image:        imgs[0],
+          badge:        p.is_featured ? 'Featured' : undefined,
+          forRent:      isRent,
+          furnished:    p.furnishing === 'Furnished',
+          waterfront:   false,
+          beachfront:   false,
+          reducedPrice: false,
+          tour360:      false,
+          view:         undefined,
+          refNo:        `COM-${String(p.id).padStart(3, '0')}`,
+          agent: {
+            name:   ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
+            phone:  ag.phone,
+            email:  ag.email,
+            avatar: ag.avatar,
+          },
+        } as CommercialProperty;
+      }));
+    } else {
+      this.allProperties.set(this.staticProperties);
+    }
+    this.loading.set(false);
+  }
 
   constructor(private route: ActivatedRoute, private router: Router, private el: ElementRef) {
     this.route.queryParamMap.subscribe(params => {

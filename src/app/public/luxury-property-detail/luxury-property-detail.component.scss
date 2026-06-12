@@ -16,6 +16,13 @@ $radius: 10px;
 }
 
 // ── Not Found ─────────────────────────────────────────────
+.lpd-loading { display: flex; justify-content: center; align-items: center; min-height: 60vh; padding-top: 68px; }
+.lpd-spin { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: $gold; border-radius: 50%; animation: lpd-spin-anim 0.8s linear infinite; }
+@keyframes lpd-spin-anim { to { transform: rotate(360deg); } }
+.lpd-agent-av--dummy { display: flex; align-items: center; justify-content: center; background: #d1d5db; color: #6b7280; border-radius: 50%; flex-shrink: 0; }
+.lpd-ask-av.lpd-agent-av--dummy { width: 48px; height: 48px; border: 2px solid #e5e7eb; }
+.lpd-sc-av.lpd-agent-av--dummy { width: 44px; height: 44px; border: 2px solid #e5e7eb; }
+
 .lpd-not-found {
   max-width: 480px; margin: 6rem auto; text-align: center; padding: 2rem;
   .lpd-nf-icon { width: 80px; height: 80px; border-radius: 50%; background: $green-light; color: $green; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }

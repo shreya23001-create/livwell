@@ -130,14 +130,10 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Apartment',intent:'Buy'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Apartments</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Villa',intent:'Buy'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Villas</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Home',intent:'Buy'}" class="nav-dd-item"
-                (click)="closeMobileMenu()">Homes</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Penthouse',intent:'Buy'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Penthouses</a>
+              <a *ngFor="let t of luxeSaleTypes()"
+                routerLink="/luxury-properties-for-sale"
+                [queryParams]="{type: t, intent: 'Buy'}"
+                class="nav-dd-item" (click)="closeMobileMenu()">{{ t }}s</a>
             </div>
           </div>
           <!-- Luxury for Rent flyout -->
@@ -149,14 +145,10 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Apartment',intent:'Rent'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Apartments</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Villa',intent:'Rent'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Villas</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Home',intent:'Rent'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Homes</a>
-              <a routerLink="/luxury-properties-for-sale" [queryParams]="{type:'Penthouse',intent:'Rent'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">Penthouses</a>
+              <a *ngFor="let t of luxeRentTypes()"
+                routerLink="/luxury-properties-for-sale"
+                [queryParams]="{type: t, intent: 'Rent'}"
+                class="nav-dd-item" (click)="closeMobileMenu()">{{ t }}s</a>
             </div>
           </div>
         </div>
@@ -260,17 +252,17 @@
           <div class="nav-profile-divider"></div>
           <!-- Dashboard link — role-aware -->
           @if (auth.isAdmin()) {
-          <a routerLink="/admin/dashboard" class="nav-dd-item nav-dd-item--icon">
+          <a routerLink="/admin/dashboard" target="_blank" class="nav-dd-item nav-dd-item--icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Dashboard
           </a>
           } @else if (auth.isAgent()) {
-          <a routerLink="/agent/dashboard" class="nav-dd-item nav-dd-item--icon">
+          <a routerLink="/agent/dashboard" target="_blank" class="nav-dd-item nav-dd-item--icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Dashboard
           </a>
           } @else {
-          <a routerLink="/my/dashboard" class="nav-dd-item nav-dd-item--icon">
+          <a routerLink="/my/dashboard" target="_blank" class="nav-dd-item nav-dd-item--icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Dashboard
           </a>

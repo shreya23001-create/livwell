@@ -1,10 +1,11 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 export interface PropertyDetail {
   id: string;
@@ -572,22 +573,110 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   });
 
+  loading = signal(false);
+  private sb = inject(SupabaseService).client;
+
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id') ?? '';
-      const found = PROPERTIES[id];
-      if (found) {
-        this.property.set(found);
-        const priceNum = parseInt(found.price.replace(/[^0-9]/g, '')) || 0;
-        this.mortgageAmount.set(priceNum);
-        this.activeImage.set(0);
-        this.aboutExpanded.set(false);
+      this.activeImage.set(0);
+      this.aboutExpanded.set(false);
+      this.notFound.set(false);
+
+      // Numeric id → DB property; slug → static fallback
+      const numericId = Number(id);
+      if (!isNaN(numericId) && numericId > 0 && String(numericId) === id) {
+        this.loadFromDb(numericId);
       } else {
-        this.notFound.set(true);
+        const found = PROPERTIES[id];
+        if (found) {
+          this.property.set(found);
+          this.mortgageAmount.set(parseInt(found.price.replace(/[^0-9]/g, '')) || 0);
+        } else {
+          this.notFound.set(true);
+        }
       }
     });
+  }
+
+  private async loadFromDb(id: number): Promise<void> {
+    this.loading.set(true);
+    this.property.set(null);
+
+    const { data, error } = await this.sb
+      .from('properties')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, created_at, status')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      this.notFound.set(true);
+      this.loading.set(false);
+      return;
+    }
+
+    const p = data as any;
+    const priceNum  = typeof p.price === 'number' ? p.price : parseFloat(String(p.price ?? '0').replace(/[^0-9.]/g, ''));
+    const areaNum   = typeof p.area_sqft === 'number' ? p.area_sqft : parseFloat(String(p.area_sqft ?? '0'));
+    const ppsf      = areaNum > 0 ? Math.round(priceNum / areaNum) : 0;
+    const isRent    = (p.listing_type ?? '').toLowerCase() === 'rent';
+    const imgs: string[] = Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []);
+    const bedsNum   = Number(p.bedrooms) || 0;
+    const bathsNum  = Number(p.bathrooms) || 0;
+
+    // Fetch agent profile
+    const cleanAgentName = (n: string) => (n ?? '').trim().replace(/^[-–—]+$/, '');
+    let agentObj = { name: cleanAgentName(p.agent_name) || 'LivWell Agent', role: 'Property Consultant', phone: '', email: '', avatar: '' };
+    if (cleanAgentName(p.agent_name)) {
+      const { data: prof } = await this.sb
+        .from('profiles')
+        .select('name, phone, email, avatar_url, designation')
+        .eq('name', p.agent_name)
+        .maybeSingle();
+      if (prof) {
+        const av = prof.avatar_url ?? '';
+        agentObj = {
+          name:   cleanAgentName(prof.name) || cleanAgentName(p.agent_name) || 'LivWell Agent',
+          role:   prof.designation ?? 'Property Consultant',
+          phone:  prof.phone ?? '',
+          email:  prof.email ?? '',
+          avatar: (av && !av.startsWith('data:')) ? av : '',
+        };
+      }
+    }
+
+    const detail: PropertyDetail = {
+      id:           String(p.id),
+      title:        p.title ?? '',
+      developer:    p.community ?? '',
+      location:     p.location ?? '',
+      community:    p.community ?? '',
+      type:         p.type ?? '',
+      status:       (['Ready', 'Off-Plan', 'Under Construction'].includes(p.status ?? '') ? p.status : 'Ready') as any,
+      price:        priceNum > 0
+                      ? (isRent ? `AED ${priceNum.toLocaleString()} / yr` : `AED ${priceNum.toLocaleString()}`)
+                      : 'Price on Request',
+      pricePerSqft: ppsf > 0 ? `AED ${ppsf.toLocaleString()}` : '',
+      beds:         bedsNum === 0 ? 'Studio' : `${bedsNum} BR`,
+      baths:        String(bathsNum),
+      area:         areaNum > 0 ? `${areaNum.toLocaleString()} sqft` : '',
+      parking:      '1',
+      furnished:    (p.furnishing ?? '').toLowerCase() === 'furnished',
+      listedDate:   'Recently listed',
+      images:       imgs.length ? imgs : ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=85'],
+      about:        p.description ?? '',
+      amenities:    p.type === 'Villa' || p.type === 'Home' ? VILLA_AMENITIES : STANDARD_AMENITIES,
+      agent:        agentObj,
+      mortgageRate: 4.5,
+      mapUrl:       '',
+      nearbySchools: [],
+    };
+
+    this.property.set(detail);
+    this.mortgageAmount.set(priceNum);
+    this.loading.set(false);
   }
 
   nextImage() {

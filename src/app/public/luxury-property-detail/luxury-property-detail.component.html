@@ -1,7 +1,12 @@
 <div class="lpd-page">
 
+  <!-- ── Loading ───────────────────────────────────────────── -->
+  <div *ngIf="loading()" class="lpd-loading">
+    <div class="lpd-spin"></div>
+  </div>
+
   <!-- ── Not Found ──────────────────────────────────────── -->
-  <ng-container *ngIf="notFound()">
+  <ng-container *ngIf="!loading() && notFound()">
     <div class="lpd-not-found">
       <div class="lpd-nf-icon">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -176,7 +181,16 @@
             <h2 class="lpd-sec-title">Ask {{ property()!.agent.name }} a question</h2>
             <div class="lpd-ask">
               <div class="lpd-ask-agent">
-                <img [src]="property()!.agent.avatar" [alt]="property()!.agent.name" class="lpd-ask-av">
+                <ng-container *ngIf="property()!.agent.avatar; else askAgentDummy">
+                  <img [src]="property()!.agent.avatar" [alt]="property()!.agent.name" class="lpd-ask-av" (error)="property()!.agent.avatar = ''" />
+                </ng-container>
+                <ng-template #askAgentDummy>
+                  <div class="lpd-ask-av lpd-agent-av--dummy">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                      <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </ng-template>
                 <div>
                   <div class="lpd-ask-name">{{ property()!.agent.name }}</div>
                   <div class="lpd-ask-role">{{ property()!.agent.role }}</div>
@@ -296,7 +310,16 @@
 
             <!-- Agent -->
             <div class="lpd-sc-agent">
-              <img [src]="property()!.agent.avatar" [alt]="property()!.agent.name" class="lpd-sc-av">
+              <ng-container *ngIf="property()!.agent.avatar; else scAgentDummy">
+                <img [src]="property()!.agent.avatar" [alt]="property()!.agent.name" class="lpd-sc-av" (error)="property()!.agent.avatar = ''" />
+              </ng-container>
+              <ng-template #scAgentDummy>
+                <div class="lpd-sc-av lpd-agent-av--dummy">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </ng-template>
               <div>
                 <div class="lpd-sc-agent-name">{{ property()!.agent.name }}</div>
                 <div class="lpd-sc-agent-role">{{ property()!.agent.role }}</div>

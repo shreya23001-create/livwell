@@ -1,4 +1,8 @@
-<div class="cpd-page" *ngIf="property() as p; else notFoundTpl">
+<div *ngIf="loading()" class="cpd-loading">
+  <div class="cpd-spin"></div>
+</div>
+
+<div class="cpd-page" *ngIf="!loading() && property() as p; else notFoundTpl">
 
   <!-- ── Breadcrumb ─────────────────────────────────────── -->
   <div class="cpd-breadcrumb">
@@ -93,7 +97,7 @@
         </div>
 
         <!-- Map -->
-        <div class="cpd-section">
+        <div class="cpd-section" *ngIf="p.mapUrl">
           <h2 class="cpd-section-title">Location</h2>
           <div class="cpd-map-wrap">
             <iframe [src]="safeMap(p.mapUrl)" class="cpd-map" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -127,7 +131,17 @@
 
         <!-- Agent Card -->
         <div class="cpd-agent-card">
-          <img [src]="p.agent.avatar" [alt]="p.agent.name" class="cpd-agent-av" />
+          <ng-container *ngIf="p.agent.avatar; else agentDummy">
+            <img [src]="p.agent.avatar" [alt]="p.agent.name" class="cpd-agent-av"
+                 (error)="p.agent.avatar = ''" />
+          </ng-container>
+          <ng-template #agentDummy>
+            <div class="cpd-agent-av cpd-agent-av--dummy">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </ng-template>
           <div>
             <p class="cpd-agent-name">{{ p.agent.name }}</p>
             <p class="cpd-agent-role">{{ p.agent.role }}</p>
@@ -155,7 +169,7 @@
 </div>
 
 <ng-template #notFoundTpl>
-  <div class="cpd-not-found">
+  <div class="cpd-not-found" *ngIf="!loading()">
     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <h2>Property not found</h2>
     <p>This listing may have been removed or the link is invalid.</p>

@@ -1,11 +1,15 @@
-import { Component, HostListener, signal, OnInit, computed } from '@angular/core';
+import { Component, HostListener, signal, OnInit, computed, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { SupabaseService } from '../../services/supabase.service';
 import { filter } from 'rxjs/operators';
 
 // Pages where the navbar should always be white (no hero behind it)
 const ALWAYS_WHITE_ROUTES = ['/properties', '/off-plan', '/about', '/contact', '/agents', '/privacy-policy', '/terms-of-use', '/luxury-projects', '/ultra-luxury-projects', '/luxury-properties-for-sale', '/luxury-properties-for-rent', '/luxury-project/', '/luxury-property/', '/blog', '/guides', '/faq', '/news', '/careers', '/why-invest', '/branded-residences', '/branded-residence/', '/services', '/commercial', '/commercial/', '/areas', '/areas/', '/developers', '/developers/'];
+
+// Types that appear in the Luxe section (ordered for display)
+const LUXE_TYPES_ORDER = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Home'];
 
 @Component({
   selector: 'app-navbar',
@@ -15,9 +19,13 @@ const ALWAYS_WHITE_ROUTES = ['/properties', '/off-plan', '/about', '/contact', '
   styleUrl: './navbar.component.scss',
 })
 export class NavbarComponent implements OnInit {
-  isScrolled = signal(false);
+  isScrolled    = signal(false);
   isAlwaysWhite = signal(false);
   mobileMenuOpen = signal(false);
+
+  // Luxe flyout types loaded from DB
+  luxeSaleTypes = signal<string[]>(['Apartment', 'Villa', 'Penthouse', 'Home']);
+  luxeRentTypes = signal<string[]>(['Apartment', 'Villa', 'Penthouse', 'Home']);
 
   navbarWhite = computed(() => this.isScrolled() || this.isAlwaysWhite());
 
@@ -33,15 +41,35 @@ export class NavbarComponent implements OnInit {
 
   currentYear = new Date().getFullYear();
 
+  private sb = inject(SupabaseService).client;
+
   constructor(public auth: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    // Check initial route
     this.checkRoute(this.router.url);
-    // Check on every navigation
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe((e: any) => this.checkRoute(e.urlAfterRedirects));
+
+    this.loadLuxeTypes();
+  }
+
+  private async loadLuxeTypes(): Promise<void> {
+    const { data } = await this.sb
+      .from('properties')
+      .select('type')
+      .eq('status', 'Published')
+      .in('type', LUXE_TYPES_ORDER);
+
+    if (data && data.length > 0) {
+      const found = [...new Set((data as any[]).map(r => r.type).filter(Boolean))];
+      const ordered = LUXE_TYPES_ORDER.filter(t => found.includes(t));
+      if (ordered.length > 0) {
+        // Same types shown for both Sale and Rent flyouts
+        this.luxeSaleTypes.set(ordered);
+        this.luxeRentTypes.set(ordered);
+      }
+    }
   }
 
   private checkRoute(url: string): void {

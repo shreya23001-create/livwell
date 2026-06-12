@@ -46,6 +46,8 @@ export class PropertyDetailComponent implements OnInit {
 
   property          = signal<Property | null>(null);
   similarProperties = signal<Property[]>([]);
+  agentAvatar       = signal('');
+  agentPhone        = signal('');
 
   mapUrl = signal<SafeResourceUrl>(this.sanitizer.bypassSecurityTrustResourceUrl(''));
   loading           = signal(true);
@@ -187,6 +189,25 @@ export class PropertyDetailComponent implements OnInit {
       this.mortgagePrice.set(prop.price);
       this.geocodeAndSetMap(prop);
 
+      // Load agent avatar + phone
+      this.agentAvatar.set('');
+      this.agentPhone.set('');
+      if (prop.agent_name && prop.agent_name !== 'LivWell Agent') {
+        const { data: profile } = await this.sb
+          .from('profiles')
+          .select('avatar_url, phone, designation')
+          .eq('name', prop.agent_name)
+          .eq('role', 'agent')
+          .maybeSingle();
+        if (profile) {
+          const av = profile.avatar_url ?? '';
+          if (av && !av.startsWith('data:') && /\/avatars\/[^/]+/.test(av)) {
+            this.agentAvatar.set(av);
+          }
+          this.agentPhone.set(profile.phone ?? '');
+        }
+      }
+
       // Increment view count
       this.sb.from('properties').update({ views: (data.views || 0) + 1 }).eq('id', id).then(() => {});
 
@@ -275,7 +296,7 @@ export class PropertyDetailComponent implements OnInit {
     furnishing:   p.furnishing   || '',
     images:       p.images       || [],
     is_featured:  p.is_featured  || false,
-    agent_name:   p.agent_name   || 'Unassigned',
+    agent_name:   ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
     created_at:   p.created_at   || '',
     views:        p.views        || 0,
     amenities:    p.amenities    || [],

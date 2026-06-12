@@ -1,9 +1,10 @@
-import { Component, computed, signal, HostListener, ElementRef } from '@angular/core';
+import { Component, computed, signal, HostListener, ElementRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface LuxuryProperty {
   id: number;
@@ -29,6 +30,8 @@ interface LuxuryProperty {
   agent: { name: string; phone: string; email: string; avatar: string };
 }
 
+const LUXE_TYPES = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Home', 'Mansion', 'Duplex'];
+
 @Component({
   selector: 'app-luxury-properties-for-sale',
   standalone: true,
@@ -36,241 +39,47 @@ interface LuxuryProperty {
   templateUrl: './luxury-properties-for-sale.component.html',
   styleUrl: './luxury-properties-for-sale.component.scss',
 })
-export class LuxuryPropertiesForSaleComponent {
+export class LuxuryPropertiesForSaleComponent implements OnInit {
+  private sb    = inject(SupabaseService).client;
 
   // ── Search & filter state ──────────────────────────────
-  searchArea = signal('');
-  activeType = signal('Any');
-  activeBeds = signal('Any');
-  activeBaths = signal('Any');
-  priceMin = signal('');
-  priceMax = signal('');
-  areaMin = signal('');
-  areaMax = signal('');
-  filterFurnished = signal(false);
+  searchArea   = signal('');
+  activeType   = signal('Any');
+  activeBeds   = signal('Any');
+  activeBaths  = signal('Any');
+  priceMin     = signal('');
+  priceMax     = signal('');
+  areaMin      = signal('');
+  areaMax      = signal('');
+  filterFurnished  = signal(false);
   filterWaterfront = signal(false);
   filterBeachfront = signal(false);
   activeStatus = signal('All');
   interestedTo = signal<'Buy' | 'Rent'>('Buy');
-  sortBy = signal('default');
+  sortBy       = signal('default');
+  loading      = signal(true);
+
+  allProperties = signal<LuxuryProperty[]>([]);
 
   // ── Dropdown open state ────────────────────────────────
   openDropdown = signal<string | null>(null);
 
   readonly propertyTypes = ['Any', 'Apartment', 'Villa', 'Townhouse', 'Home', 'Penthouse'];
-  readonly bedOptions = ['Any', 'Studio', '1', '2', '3', '4', '5', '6', '7+'];
-  readonly bathOptions = ['Any', '1', '2', '3', '4', '5', '6', '7+'];
+  readonly bedOptions    = ['Any', 'Studio', '1', '2', '3', '4', '5', '6', '7+'];
+  readonly bathOptions   = ['Any', '1', '2', '3', '4', '5', '6', '7+'];
   readonly statusOptions = ['All', 'Ready', 'Off-Plan', 'Under Construction'];
 
-  readonly allProperties: LuxuryProperty[] = [
-    {
-      id: 1, title: 'Address Residences Dubai Opera', developer: 'Emaar', location: 'Downtown Dubai',
-      type: 'Apartment', status: 'Ready', price: 4200000, priceDisplay: 'AED 4,200,000',
-      pricePerSqft: 'AED 3,800', beds: 2, baths: 3, area: 1105, areaDisplay: '1,105 sqft',
-      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900&q=85',
-      badge: 'Furnished', furnished: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 2, title: 'Dorchester Collection Dubai', developer: 'OMNIYAT', location: 'Business Bay',
-      type: 'Apartment', status: 'Ready', price: 9800000, priceDisplay: 'AED 9,800,000',
-      pricePerSqft: 'AED 4,200', beds: 3, baths: 4, area: 2333, areaDisplay: '2,333 sqft',
-      image: 'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=900&q=85',
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    {
-      id: 3, title: 'Six Senses Residences', developer: 'Select Group', location: 'Palm Jumeirah',
-      type: 'Apartment', status: 'Off-Plan', price: 5500000, priceDisplay: 'AED 5,500,000',
-      pricePerSqft: 'AED 3,200', beds: 2, baths: 3, area: 1718, areaDisplay: '1,718 sqft',
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=85',
-      badge: 'New Launch', beachfront: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 4, title: 'Emaar Beachfront Grand Bleu', developer: 'Emaar', location: 'Dubai Harbour',
-      type: 'Apartment', status: 'Under Construction', price: 4500000, priceDisplay: 'AED 4,500,000',
-      pricePerSqft: 'AED 3,100', beds: 1, baths: 2, area: 1451, areaDisplay: '1,451 sqft',
-      image: 'https://images.unsplash.com/photo-1470219556762-1771e7f9427d?w=900&q=85',
-      badge: 'High ROI', waterfront: true, beachfront: true,
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    {
-      id: 5, title: 'Bulgari Ocean Mansions', developer: 'Meraas', location: 'Jumeira Bay Island',
-      type: 'Villa', status: 'Off-Plan', price: 65000000, priceDisplay: 'AED 65,000,000',
-      pricePerSqft: 'AED 12,500', beds: 6, baths: 8, area: 12000, areaDisplay: '12,000 sqft',
-      image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=900&q=85',
-      badge: 'Ultra Luxury', waterfront: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 6, title: 'District One Villas Phase 3', developer: 'Meydan', location: 'MBR City',
-      type: 'Villa', status: 'Off-Plan', price: 8900000, priceDisplay: 'AED 8,900,000',
-      pricePerSqft: 'AED 2,200', beds: 5, baths: 6, area: 7200, areaDisplay: '7,200 sqft',
-      image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=900&q=85',
-      badge: 'Limited',
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    {
-      id: 7, title: 'Jumeirah Islands Villa', developer: 'Nakheel', location: 'Jumeirah Islands',
-      type: 'Villa', status: 'Ready', price: 12500000, priceDisplay: 'AED 12,500,000',
-      pricePerSqft: 'AED 2,800', beds: 5, baths: 6, area: 8928, areaDisplay: '8,928 sqft',
-      image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=900&q=85',
-      waterfront: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 8, title: 'Lanai Islands by Majid Al Futtaim', developer: 'Majid Al Futtaim', location: 'Tilal Al Ghaf',
-      type: 'Home', status: 'Off-Plan', price: 7200000, priceDisplay: 'AED 7,200,000',
-      pricePerSqft: 'AED 1,950', beds: 4, baths: 5, area: 5500, areaDisplay: '5,500 sqft',
-      image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=85',
-      badge: 'Golf View',
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    {
-      id: 9, title: 'Sobha Hartland Forest Villas', developer: 'Sobha Realty', location: 'MBR City',
-      type: 'Home', status: 'Ready', price: 6800000, priceDisplay: 'AED 6,800,000',
-      pricePerSqft: 'AED 2,100', beds: 4, baths: 5, area: 4800, areaDisplay: '4,800 sqft',
-      image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=900&q=85',
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 10, title: "One Za'abeel Sky Penthouse", developer: 'Ithra Dubai', location: "Za'abeel",
-      type: 'Penthouse', status: 'Ready', price: 28000000, priceDisplay: 'AED 28,000,000',
-      pricePerSqft: 'AED 7,200', beds: 4, baths: 5, area: 6500, areaDisplay: '6,500 sqft',
-      image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=85',
-      badge: 'Iconic',
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    {
-      id: 11, title: 'Nakheel Como Residences Penthouse', developer: 'Nakheel', location: 'Palm Jumeirah',
-      type: 'Penthouse', status: 'Off-Plan', price: 37000000, priceDisplay: 'AED 37,000,000',
-      pricePerSqft: 'AED 9,400', beds: 5, baths: 6, area: 9800, areaDisplay: '9,800 sqft',
-      image: 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=900&q=85',
-      badge: 'Rare', waterfront: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 12, title: 'Jumeirah Living Business Bay', developer: 'Jumeirah Group', location: 'Business Bay',
-      type: 'Penthouse', status: 'Ready', price: 11000000, priceDisplay: 'AED 11,000,000',
-      pricePerSqft: 'AED 4,800', beds: 3, baths: 4, area: 4600, areaDisplay: '4,600 sqft',
-      image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=900&q=85',
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    // ── Townhouse for Sale ────────────────────────────────
-    {
-      id: 19, title: 'Cherrywoods Townhouses', developer: 'Meraas', location: 'Dubai Science Park',
-      type: 'Townhouse', status: 'Ready', price: 3200000, priceDisplay: 'AED 3,200,000',
-      pricePerSqft: 'AED 1,400', beds: 3, baths: 4, area: 2285, areaDisplay: '2,285 sqft',
-      image: 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=900&q=85',
-      badge: 'Ready to Move',
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 20, title: 'Mudon Al Ranim Townhouses', developer: 'Dubai Properties', location: 'Mudon',
-      type: 'Townhouse', status: 'Off-Plan', price: 4100000, priceDisplay: 'AED 4,100,000',
-      pricePerSqft: 'AED 1,650', beds: 4, baths: 5, area: 2486, areaDisplay: '2,486 sqft',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=85',
-      badge: 'Golf Community',
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    // ── For Rent — Apartments ─────────────────────────────
-    {
-      id: 13, title: 'Burj Vista Luxury Apartment', developer: 'Emaar', location: 'Downtown Dubai',
-      type: 'Apartment', status: 'Ready', price: 280000, priceDisplay: 'AED 280,000 / yr',
-      pricePerSqft: 'AED 253', beds: 2, baths: 3, area: 1105, areaDisplay: '1,105 sqft',
-      image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=900&q=85',
-      badge: 'Furnished', furnished: true, forRent: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 14, title: 'Dorchester Collection Dubai', developer: 'OMNIYAT', location: 'Business Bay',
-      type: 'Apartment', status: 'Ready', price: 420000, priceDisplay: 'AED 420,000 / yr',
-      pricePerSqft: 'AED 180', beds: 3, baths: 4, area: 2333, areaDisplay: '2,333 sqft',
-      image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=900&q=85',
-      forRent: true,
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    {
-      id: 16, title: 'Six Senses Palm Residences', detailSlug: 'six-senses-residences', developer: 'Select Group', location: 'Palm Jumeirah',
-      type: 'Apartment', status: 'Ready', price: 350000, priceDisplay: 'AED 350,000 / yr',
-      pricePerSqft: 'AED 204', beds: 2, baths: 3, area: 1718, areaDisplay: '1,718 sqft',
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=900&q=85',
-      badge: 'Beachfront', beachfront: true, forRent: true,
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    // ── For Rent — Villas ─────────────────────────────────
-    {
-      id: 15, title: 'Bulgari Ocean Mansion Villa', detailSlug: 'bulgari-ocean-mansions', developer: 'Meraas', location: 'Jumeira Bay Island',
-      type: 'Villa', status: 'Ready', price: 2800000, priceDisplay: 'AED 2,800,000 / yr',
-      pricePerSqft: 'AED 233', beds: 6, baths: 8, area: 12000, areaDisplay: '12,000 sqft',
-      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=85',
-      badge: 'Ultra Luxury', waterfront: true, forRent: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 17, title: 'Palm Signature Villa', developer: 'Nakheel', location: 'Palm Jumeirah',
-      type: 'Villa', status: 'Ready', price: 950000, priceDisplay: 'AED 950,000 / yr',
-      pricePerSqft: 'AED 106', beds: 5, baths: 6, area: 8928, areaDisplay: '8,928 sqft',
-      image: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=900&q=85',
-      waterfront: true, forRent: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    // ── For Rent — Homes ──────────────────────────────────
-    {
-      id: 21, title: 'Sobha Hartland Forest Home', detailSlug: 'sobha-hartland-forest-villas', developer: 'Sobha Realty', location: 'MBR City',
-      type: 'Home', status: 'Ready', price: 480000, priceDisplay: 'AED 480,000 / yr',
-      pricePerSqft: 'AED 100', beds: 4, baths: 5, area: 4800, areaDisplay: '4,800 sqft',
-      image: 'https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=900&q=85',
-      forRent: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    {
-      id: 22, title: 'Tilal Al Ghaf Luxury Home', detailSlug: 'lanai-islands-by-majid-al-futtaim', developer: 'Majid Al Futtaim', location: 'Tilal Al Ghaf',
-      type: 'Home', status: 'Ready', price: 380000, priceDisplay: 'AED 380,000 / yr',
-      pricePerSqft: 'AED 80', beds: 4, baths: 4, area: 4750, areaDisplay: '4,750 sqft',
-      image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=900&q=85',
-      badge: 'Lagoon View', forRent: true,
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    // ── For Rent — Penthouses ─────────────────────────────
-    {
-      id: 18, title: "One Za'abeel Sky Penthouse", developer: 'Ithra Dubai', location: "Za'abeel",
-      type: 'Penthouse', status: 'Ready', price: 1200000, priceDisplay: 'AED 1,200,000 / yr',
-      pricePerSqft: 'AED 185', beds: 4, baths: 5, area: 6500, areaDisplay: '6,500 sqft',
-      image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=900&q=85',
-      badge: 'Iconic', forRent: true,
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-    {
-      id: 23, title: 'Como Residences Sky Penthouse', detailSlug: 'nakheel-como-residences-penthouse', developer: 'Nakheel', location: 'Palm Jumeirah',
-      type: 'Penthouse', status: 'Ready', price: 2400000, priceDisplay: 'AED 2,400,000 / yr',
-      pricePerSqft: 'AED 245', beds: 5, baths: 6, area: 9800, areaDisplay: '9,800 sqft',
-      image: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=900&q=85',
-      badge: 'Sea View', waterfront: true, forRent: true,
-      agent: { name: 'Anuj Sharma', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    },
-    // ── For Rent — Townhouses ─────────────────────────────
-    {
-      id: 24, title: 'Cherrywoods Townhouse Rental', detailSlug: 'cherrywoods-townhouses', developer: 'Meraas', location: 'Dubai Science Park',
-      type: 'Townhouse', status: 'Ready', price: 185000, priceDisplay: 'AED 185,000 / yr',
-      pricePerSqft: 'AED 81', beds: 3, baths: 4, area: 2285, areaDisplay: '2,285 sqft',
-      image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=900&q=85',
-      forRent: true,
-      agent: { name: 'Niket Mehta', phone: '+971585798027', email: 'niket@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/44.jpg' },
-    },
-  ];
-
   filteredProperties = computed(() => {
-    let list = [...this.allProperties];
+    let list = [...this.allProperties()];
     const intent = this.interestedTo();
     list = list.filter(p => intent === 'Rent' ? !!p.forRent : !p.forRent);
-    const type = this.activeType();
-    const beds = this.activeBeds();
-    const baths = this.activeBaths();
-    const pMin = this.priceMin() ? parseInt(this.priceMin().replace(/,/g, '')) : 0;
-    const pMax = this.priceMax() ? parseInt(this.priceMax().replace(/,/g, '')) : Infinity;
-    const aMin = this.areaMin() ? parseInt(this.areaMin().replace(/,/g, '')) : 0;
-    const aMax = this.areaMax() ? parseInt(this.areaMax().replace(/,/g, '')) : Infinity;
+    const type   = this.activeType();
+    const beds   = this.activeBeds();
+    const baths  = this.activeBaths();
+    const pMin   = this.priceMin() ? parseInt(this.priceMin().replace(/,/g, '')) : 0;
+    const pMax   = this.priceMax() ? parseInt(this.priceMax().replace(/,/g, '')) : Infinity;
+    const aMin   = this.areaMin() ? parseInt(this.areaMin().replace(/,/g, '')) : 0;
+    const aMax   = this.areaMax() ? parseInt(this.areaMax().replace(/,/g, '')) : Infinity;
     const status = this.activeStatus();
     const search = this.searchArea().toLowerCase().trim();
 
@@ -303,9 +112,9 @@ export class LuxuryPropertiesForSaleComponent {
     );
 
     const sort = this.sortBy();
-    if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
+    if (sort === 'price-asc')  list.sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
-    if (sort === 'area-desc') list.sort((a, b) => b.area - a.area);
+    if (sort === 'area-desc')  list.sort((a, b) => b.area - a.area);
 
     return list;
   });
@@ -359,6 +168,91 @@ export class LuxuryPropertiesForSaleComponent {
     });
   }
 
+  async ngOnInit(): Promise<void> {
+    await this.loadProperties();
+  }
+
+  private async loadProperties(): Promise<void> {
+    this.loading.set(true);
+
+    const { data, error } = await this.sb
+      .from('properties')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, is_featured, created_at, status')
+      .in('type', LUXE_TYPES)
+      .eq('status', 'Published')
+      .order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      this.loading.set(false);
+      return;
+    }
+
+    // Batch-fetch agent avatars
+    const agentNames = [...new Set((data as any[]).map(p => p.agent_name).filter(Boolean))];
+    const agentMap: Record<string, { phone: string; email: string; avatar: string }> = {};
+    if (agentNames.length) {
+      const { data: profiles } = await this.sb
+        .from('profiles')
+        .select('name, phone, email, avatar_url')
+        .in('name', agentNames);
+      for (const prof of profiles ?? []) {
+        const av = prof.avatar_url ?? '';
+        agentMap[prof.name] = {
+          phone:  prof.phone ?? '',
+          email:  prof.email ?? '',
+          avatar: (av && !av.startsWith('data:')) ? av : '',
+        };
+      }
+    }
+
+    const mapped: LuxuryProperty[] = (data as any[]).map(p => {
+      const priceNum  = typeof p.price === 'number' ? p.price : parseFloat(String(p.price ?? '0').replace(/[^0-9.]/g, ''));
+      const areaNum   = typeof p.area_sqft === 'number' ? p.area_sqft : parseFloat(String(p.area_sqft ?? '0'));
+      const ppsf      = areaNum > 0 ? Math.round(priceNum / areaNum) : 0;
+      const isRent    = (p.listing_type ?? '').toLowerCase() === 'rent';
+      const imgs: string[] = Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []);
+      const bedsRaw   = p.bedrooms;
+      const bedsVal: number | 'Studio' = bedsRaw === 0 || String(bedsRaw).toLowerCase() === 'studio' ? 'Studio' : (Number(bedsRaw) || 0);
+      const agentInfo = agentMap[p.agent_name] ?? { phone: '', email: '', avatar: '' };
+      const dbStatus  = (p.status ?? '');
+
+      // Map furnishing
+      const furnishingLower = (p.furnishing ?? '').toLowerCase();
+
+      const rawAgent = (p.agent_name ?? '').trim().replace(/^[-–—]+$/, '');
+      const agentName = rawAgent || 'LivWell Agent';
+      return {
+        id:           p.id,
+        title:        p.title ?? '',
+        developer:    p.community ?? '',
+        location:     p.location ?? '',
+        type:         (LUXE_TYPES.includes(p.type) ? p.type : 'Apartment') as any,
+        status:       (['Ready', 'Off-Plan', 'Under Construction'].includes(dbStatus) ? dbStatus : 'Ready') as any,
+        price:        priceNum,
+        priceDisplay: priceNum > 0
+                        ? (isRent ? `AED ${priceNum.toLocaleString()} / yr` : `AED ${priceNum.toLocaleString()}`)
+                        : '',
+        pricePerSqft: ppsf > 0 ? `AED ${ppsf.toLocaleString()}` : '',
+        beds:         bedsVal,
+        baths:        Number(p.bathrooms) || 0,
+        area:         areaNum,
+        areaDisplay:  areaNum > 0 ? `${areaNum.toLocaleString()} sqft` : '',
+        image:        imgs[0] ?? 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900&q=85',
+        furnished:    furnishingLower === 'furnished',
+        forRent:      isRent,
+        agent: {
+          name:   agentName,
+          phone:  agentInfo.phone,
+          email:  agentInfo.email,
+          avatar: agentInfo.avatar,
+        },
+      };
+    });
+
+    this.allProperties.set(mapped);
+    this.loading.set(false);
+  }
+
   setIntent(value: 'Buy' | 'Rent') {
     this.interestedTo.set(value);
     this.router.navigate([], {
@@ -404,7 +298,8 @@ export class LuxuryPropertiesForSaleComponent {
   }
 
   detailLink(p: LuxuryProperty): string {
-    return p.detailSlug ?? this.slugify(p.title);
+    // DB properties use numeric id; static legacy ones use slug
+    return p.detailSlug ?? String(p.id);
   }
 
   statusClass(status: string): string {

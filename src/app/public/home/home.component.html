@@ -22,7 +22,8 @@
 
   <!-- Slide nav arrows — right edge -->
   <div class="hero-nav">
-    <button class="hero-nav-btn" (click)="activeSlide.set((activeSlide() - 1 + heroSlides().length) % heroSlides().length)">
+    <button class="hero-nav-btn"
+      (click)="activeSlide.set((activeSlide() - 1 + heroSlides().length) % heroSlides().length)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
       </svg>
@@ -298,10 +299,10 @@
     <!-- Scrollable cards track -->
     <div class="lp-track-wrap">
       <div class="lp-track" #lpTrack>
-        <div *ngFor="let p of latestProjects" class="lp-card">
+        <div *ngFor="let p of latestProjects()" class="lp-card">
           <!-- Image -->
           <div class="lp-img-wrap">
-            <img [src]="p.image" [alt]="p.name" class="lp-img">
+            <img [src]="p.image" [alt]="p.name" class="lp-img" (error)="$any($event.target).src='images/dummy-image.png'">
             <div class="lp-payment-badge">{{ p.paymentPlan }} Payment Plan</div>
             <div *ngIf="p.badge" class="lp-hot-dot"></div>
           </div>
@@ -328,7 +329,8 @@
             </div>
             <div class="lp-divider"></div>
             <p class="lp-handover">Handover in {{ p.handover }}</p>
-            <a [routerLink]="['/properties']" class="lp-price-btn">from {{ p.startingPrice }}</a>
+            <a [routerLink]="p.id ? ['/projects', p.id] : ['/off-plan']" class="lp-price-btn">from {{ p.startingPrice
+              }}</a>
           </div>
         </div>
       </div>
@@ -413,15 +415,19 @@
         <div class="teams-carousel-viewport">
           <div class="teams-carousel-track">
             <!-- Original set -->
-            <ng-container *ngFor="let agent of teamAreas[activeTeam()].agents">
+            <ng-container *ngFor="let agent of teamAreas[activeTeam()]?.agents">
               <div class="team-agent-card">
                 <div class="team-agent-img-wrap">
-                  <img [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
+                  <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
+                  <div *ngIf="!agent.avatar" class="team-agent-img team-agent-initials">
+                    {{ initials(agent.name) }}
+                  </div>
                   <div class="team-agent-info">
                     <p class="team-agent-name">{{ agent.name }}</p>
                     <p class="team-agent-role">{{ agent.role }}</p>
                   </div>
-                  <a [href]="'https://wa.me/' + agent.phone" class="team-wa-btn" target="_blank" rel="noopener">
+                  <a [href]="'https://wa.me/' + agent.phone.replace(/[^0-9]/g, '')" class="team-wa-btn" target="_blank"
+                    rel="noopener">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
                       <path
                         d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
@@ -431,15 +437,19 @@
               </div>
             </ng-container>
             <!-- Duplicate set for seamless loop -->
-            <ng-container *ngFor="let agent of teamAreas[activeTeam()].agents">
+            <ng-container *ngFor="let agent of teamAreas[activeTeam()]?.agents">
               <div class="team-agent-card" aria-hidden="true">
                 <div class="team-agent-img-wrap">
-                  <img [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
+                  <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
+                  <div *ngIf="!agent.avatar" class="team-agent-img team-agent-initials">
+                    {{ initials(agent.name) }}
+                  </div>
                   <div class="team-agent-info">
                     <p class="team-agent-name">{{ agent.name }}</p>
                     <p class="team-agent-role">{{ agent.role }}</p>
                   </div>
-                  <a [href]="'https://wa.me/' + agent.phone" class="team-wa-btn" target="_blank" rel="noopener">
+                  <a [href]="'https://wa.me/' + agent.phone.replace(/[^0-9]/g, '')" class="team-wa-btn" target="_blank"
+                    rel="noopener">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
                       <path
                         d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
@@ -488,10 +498,11 @@
 
     <!-- Cards track -->
     <div class="trending-track" #trendingTrack>
-      <div *ngFor="let p of filteredTrendingProjects()" class="trending-card">
+      <a *ngFor="let p of filteredTrendingProjects()" [routerLink]="p.id ? ['/projects', p.id] : ['/off-plan']"
+        class="trending-card">
         <!-- Image -->
         <div class="trending-img-wrap">
-          <img [src]="p.image" [alt]="p.name" class="trending-img">
+          <img [src]="p.image" [alt]="p.name" class="trending-img" (error)="$any($event.target).src='images/dummy-image.png'">
           <span class="trending-badge" [class.badge-red]="p.badge === 'Ready'" [class.badge-dark]="p.badge !== 'Ready'">
             {{ p.badge }}
           </span>
@@ -518,7 +529,7 @@
             </span>
           </div>
         </div>
-      </div>
+      </a>
     </div>
 
     <!-- Bottom: ALL LUXURY button -->
@@ -552,7 +563,7 @@
         class="property-card">
 
         <!-- Full image fills the card -->
-        <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy">
+        <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
 
         <!-- Gradient overlay darkens bottom -->
         <div class="property-overlay"></div>
@@ -622,10 +633,9 @@
     </div>
 
     <div class="offplan-grid">
-      <div *ngFor="let project of offPlanProjects; let i = index" class="offplan-card animate-on-scroll"
-        [class]="'delay-' + (i * 150 + 100)">
+      <div *ngFor="let project of offPlanProjects(); let i = index" class="offplan-card">
         <div class="offplan-img-wrap">
-          <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy">
+          <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
           <div class="offplan-overlay"></div>
           <div class="offplan-top-badges">
             <span class="offplan-badge">{{ project.badge }}</span>
@@ -672,14 +682,14 @@
             </div>
           </div>
           <div class="offplan-actions">
-            <a [routerLink]="['/off-plan', project.id]" class="offplan-cta">
+            <a [routerLink]="project.id ? ['/projects', project.id] : ['/off-plan']" class="offplan-cta">
               View Project
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                 stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>
             </a>
-            <a routerLink="/contact" class="offplan-enquire">Enquire Now</a>
+            <!-- <a routerLink="/contact" class="offplan-enquire">Enquire Now</a> -->
           </div>
         </div>
       </div>
@@ -715,21 +725,44 @@
     </div>
 
     <div class="types-grid">
-      <a *ngFor="let type of propertyTypes; let i = index" routerLink="/properties" class="type-card animate-on-scroll"
-        [ngClass]="'delay-' + ((i % 3) * 100 + 100)">
+      <a *ngFor="let type of propertyTypes(); let i = index" routerLink="/properties" class="type-card">
         <div class="type-icon">
           <!-- Apartments: building -->
-          <svg *ngIf="type.label === 'Apartments'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg>
+          <svg *ngIf="type.label === 'Apartments'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.6" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+          </svg>
           <!-- Villas: house -->
-          <svg *ngIf="type.label === 'Villas'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+          <svg *ngIf="type.label === 'Villas'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.6" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
           <!-- Townhouses: houses -->
-          <svg *ngIf="type.label === 'Townhouses'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" /></svg>
+          <svg *ngIf="type.label === 'Townhouses'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.6" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
+          </svg>
           <!-- Offices: briefcase -->
-          <svg *ngIf="type.label === 'Offices'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+          <svg *ngIf="type.label === 'Offices'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.6" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+          </svg>
           <!-- Retail: shopping bag -->
-          <svg *ngIf="type.label === 'Retail'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z" /></svg>
+          <svg *ngIf="type.label === 'Retail'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.6" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z" />
+          </svg>
           <!-- Plots: map -->
-          <svg *ngIf="type.label === 'Plots'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" /></svg>
+          <svg *ngIf="type.label === 'Plots'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.6" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
+          </svg>
         </div>
         <div class="type-label">{{ type.label }}</div>
         <div class="type-count">{{ type.count }}</div>
@@ -757,8 +790,11 @@
 
           <div class="feature-item">
             <div class="feature-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
               </svg>
             </div>
             <div>
@@ -769,8 +805,10 @@
 
           <div class="feature-item">
             <div class="feature-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
             </div>
             <div>
@@ -781,8 +819,12 @@
 
           <div class="feature-item">
             <div class="feature-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
             </div>
             <div>
@@ -793,8 +835,10 @@
 
           <div class="feature-item">
             <div class="feature-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
               </svg>
             </div>
             <div>
@@ -841,10 +885,11 @@
       <div *ngFor="let agent of topAgents; let i = index" class="agent-card animate-on-scroll"
         [class]="'delay-' + (i * 100 + 100)">
         <div class="agent-avatar-wrap">
-          <img [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
-          <div class="agent-rating">
-            ★ {{ agent.rating }}
+          <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
+          <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">
+            {{ initials(agent.name) }}
           </div>
+          <div class="agent-rating">★ 5.0</div>
         </div>
         <h3 class="agent-name">{{ agent.name }}</h3>
         <p class="agent-role">{{ agent.role }}</p>

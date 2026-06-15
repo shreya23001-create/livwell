@@ -20,18 +20,45 @@ interface Property {
   image: string;
 }
 
-interface Stat {
-  value: string;
-  label: string;
-  suffix?: string;
+interface HomeProject {
+  id: number;
+  name: string;
+  location: string;
+  developer: string;
+  handover: string;
+  startingPrice: string;
+  paymentPlan: string;
+  badge: boolean;
+  image: string;
 }
 
-interface Agent {
+interface OffPlanCard {
+  id: number;
+  name: string;
+  developer: string;
+  location: string;
+  startingPrice: string;
+  completion: string;
+  type: string;
+  roi: string;
+  image: string;
+  badge: string;
+}
+
+interface TrendingProject {
+  id: number;
+  name: string;
+  developer: string;
+  price: string;
+  badge: string;
+  type: string;
+  image: string;
+}
+
+interface HomeAgent {
   name: string;
   role: string;
-  deals: number;
-  rating: number;
-  avatar: string;
+  avatar: string | null;
   phone: string;
   email: string;
 }
@@ -104,17 +131,34 @@ export class HomeComponent implements OnInit {
     ];
   });
 
-  stats: Stat[] = [
+  stats = [
     { value: '2,500', label: 'Properties Listed', suffix: '+' },
     { value: '1,800', label: 'Happy Families', suffix: '+' },
     { value: '98', label: 'Client Satisfaction', suffix: '%' },
     { value: '15', label: 'Years Experience', suffix: '+' },
   ];
 
-  // Empty until DB loads — avoids showing fake IDs that break property detail navigation
   featuredPropertiesLive = signal<Property[]>([]);
+  latestProjectsLive     = signal<HomeProject[]>([]);
+  offPlanProjectsLive    = signal<OffPlanCard[]>([]);
+  trendingProjectsDb     = signal<TrendingProject[]>([]);
+  topAgentsLive          = signal<HomeAgent[]>([]);
+  propertyCounts         = signal<Record<string, number>>({});
 
-  private async loadFeaturedFromSupabase(): Promise<void> {
+  private async loadHomeData(): Promise<void> {
+    await Promise.all([
+      this.loadFeaturedProperties(),
+      this.loadLatestProjects(),
+      this.loadOffPlanFeatured(),
+      this.loadTrendingProjects(),
+      this.loadPropertyCounts(),
+    ]);
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => this.setupScrollAnimations(), 50);
+    }
+  }
+
+  private async loadFeaturedProperties(): Promise<void> {
     let { data } = await this.sb
       .from('properties')
       .select('id, title, location, community, price, bedrooms, bathrooms, area_sqft, type, images, is_featured, status')
@@ -143,17 +187,134 @@ export class HomeComponent implements OnInit {
         sqft:     Number(p.area_sqft || 0).toLocaleString(),
         type:     p.type,
         badge:    p.is_featured ? 'Featured' : '',
-        image:    (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
+        image:    (p.images && p.images[0]) || 'images/dummy-image.png',
       })));
     }
-    // If no DB data, section stays hidden (ngIf on section handles this)
   }
 
-  topAgents: Agent[] = [
-    { name: 'Anuj Sharma',      role: 'Business Associate', deals: 0, rating: 5.0, avatar: 'images/Anuj.jpeg',   phone: '+971542481813',  email: 'anuj@livwelldubai.ae'  },
-    { name: 'Niket Mehta',      role: 'Business Associate', deals: 0, rating: 5.0, avatar: 'images/Niket .jpeg', phone: '+971585798027',  email: 'niket@livwelldubai.ae' },
-    { name: 'Yash Uday Chari',  role: 'Business Associate', deals: 0, rating: 5.0, avatar: 'images/Yash.jpeg',   phone: '+971585833629',  email: 'yash@livwelldubai.ae'  },
-  ];
+  private async loadLatestProjects(): Promise<void> {
+    const { data } = await this.sb
+      .from('projects')
+      .select('id, title, location, community, developer, completion_date, price_from, price_label, payment_plan, images, badge, is_featured, status')
+      .eq('status', 'Published')
+      .order('created_at', { ascending: false })
+      .limit(8);
+
+    if (data && data.length) {
+      this.latestProjectsLive.set(data.map((p: any) => ({
+        id:           p.id,
+        name:         p.title ?? '',
+        location:     [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
+        developer:    p.developer ?? '',
+        handover:     p.completion_date ?? '',
+        startingPrice: p.price_label || (p.price_from ? `AED ${Number(p.price_from).toLocaleString()}` : ''),
+        paymentPlan:  p.payment_plan ?? '',
+        badge:        !!p.is_featured,
+        image:        (p.images && p.images[0]) || 'images/dummy-image.png',
+      })));
+    }
+  }
+
+  private async loadOffPlanFeatured(): Promise<void> {
+    let { data } = await this.sb
+      .from('projects')
+      .select('id, title, developer, location, community, price_from, price_label, completion_date, type, badge, images, status')
+      .eq('is_featured', true)
+      .eq('status', 'Published')
+      .order('created_at', { ascending: false })
+      .limit(3);
+
+    if (!data || !data.length) {
+      ({ data } = await this.sb
+        .from('projects')
+        .select('id, title, developer, location, community, price_from, price_label, completion_date, type, badge, images, status')
+        .eq('status', 'Published')
+        .order('created_at', { ascending: false })
+        .limit(3));
+    }
+
+    if (data && data.length) {
+      this.offPlanProjectsLive.set(data.map((p: any) => ({
+        id:           p.id,
+        name:         p.title ?? '',
+        developer:    p.developer ?? '',
+        location:     [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
+        startingPrice: p.price_label || (p.price_from ? `AED ${Number(p.price_from).toLocaleString()}` : 'Price on Request'),
+        completion:   p.completion_date ?? '',
+        type:         p.type ?? 'Apartments',
+        roi:          '',
+        image:        (p.images && p.images[0]) || 'images/dummy-image.png',
+        badge:        p.badge || 'New Launch',
+      })));
+    }
+  }
+
+  private async loadTrendingProjects(): Promise<void> {
+    const { data } = await this.sb
+      .from('projects')
+      .select('id, title, developer, price_from, price_label, badge, type, is_luxury, is_ultra_luxury, images, status')
+      .eq('status', 'Published')
+      .order('created_at', { ascending: false })
+      .limit(15);
+
+    if (data && data.length) {
+      this.trendingProjectsDb.set(data.map((p: any) => {
+        const rawType = (p.type ?? '').toLowerCase();
+        let tabType = 'flats';
+        if (rawType.includes('villa') || rawType.includes('townhouse')) tabType = 'villas';
+        else if (p.is_luxury || p.is_ultra_luxury || rawType.includes('penthouse') || rawType.includes('mansion')) tabType = 'luxury';
+
+        const priceNum = Number(p.price_from || 0);
+        const priceStr = p.price_label
+          ? p.price_label.replace(/^AED\s*/i, '').trim()
+          : priceNum > 0 ? (priceNum >= 1_000_000 ? `${(priceNum / 1_000_000).toFixed(1)}M` : `${(priceNum / 1_000).toFixed(0)}K`) : '';
+
+        return {
+          id:        p.id,
+          name:      p.title ?? '',
+          developer: p.developer ?? '',
+          price:     priceStr,
+          badge:     p.badge || 'New Launch',
+          type:      tabType,
+          image:     (p.images && p.images[0]) || 'images/dummy-image.png',
+        };
+      }));
+    }
+  }
+
+  private async loadTopAgents(): Promise<void> {
+    const { data } = await this.sb
+      .from('profiles')
+      .select('name, email, phone, avatar_url, designation')
+      .eq('role', 'agent')
+      .eq('status', 'active')
+      .order('name', { ascending: true })
+      .limit(6);
+
+    if (data && data.length) {
+      this.topAgentsLive.set(data.map((a: any) => ({
+        name:   a.name        ?? 'Agent',
+        role:   a.designation ?? 'Business Associate',
+        avatar: (a.avatar_url && !a.avatar_url.startsWith('data:')) ? a.avatar_url : null,
+        phone:  a.phone ?? '',
+        email:  a.email ?? '',
+      })));
+    }
+  }
+
+  private async loadPropertyCounts(): Promise<void> {
+    const types = ['Apartment', 'Villa', 'Townhouse', 'Office', 'Shop', 'Plot'];
+    const counts: Record<string, number> = {};
+    await Promise.all(types.map(async t => {
+      const { count } = await this.sb
+        .from('properties')
+        .select('id', { count: 'exact', head: true })
+        .eq('type', t)
+        .eq('status', 'Published');
+      counts[t] = count ?? 0;
+    }));
+    this.propertyCounts.set(counts);
+  }
 
   testimonials: Testimonial[] = [
     {
@@ -223,127 +384,51 @@ export class HomeComponent implements OnInit {
     },
   ];
 
-  propertyTypes = [
-    { label: 'Apartments', icon: 'fa-solid fa-building', count: '1,240+' },
-    { label: 'Villas', icon: 'fa-solid fa-house', count: '380+' },
-    { label: 'Townhouses', icon: 'fa-solid fa-house-chimney', count: '290+' },
-    { label: 'Offices', icon: 'fa-solid fa-landmark', count: '180+' },
-    { label: 'Retail', icon: 'fa-solid fa-store', count: '95+' },
-    { label: 'Plots', icon: 'fa-solid fa-map', count: '210+' },
-  ];
+  propertyTypes = computed(() => {
+    const c = this.propertyCounts();
+    return [
+      { label: 'Apartments', count: c['Apartment'] ? `${c['Apartment']}` : '' },
+      { label: 'Villas',     count: c['Villa']     ? `${c['Villa']}`     : '' },
+      { label: 'Townhouses', count: c['Townhouse'] ? `${c['Townhouse']}` : '' },
+      { label: 'Offices',    count: c['Office']    ? `${c['Office']}`    : '' },
+      { label: 'Retail',     count: c['Shop']      ? `${c['Shop']}`      : '' },
+      { label: 'Plots',      count: c['Plot']      ? `${c['Plot']}`      : '' },
+    ];
+  });
 
-  offPlanProjects = [
-    {
-      id: 1,
-      name: 'Creek Horizon Residences',
-      developer: 'Emaar Properties',
-      location: 'Dubai Creek Harbour',
-      startingPrice: 'AED 1,250,000',
-      completion: 'Q4 2027',
-      type: 'Apartments',
-      roi: '8.5% est. ROI',
-      image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
-      badge: 'New Launch',
-    },
-    {
-      id: 2,
-      name: 'Palm Vista Villas',
-      developer: 'Nakheel',
-      location: 'Palm Jebel Ali, Dubai',
-      startingPrice: 'AED 6,800,000',
-      completion: 'Q2 2026',
-      type: 'Villas',
-      roi: '7.2% est. ROI',
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
-      badge: 'Selling Fast',
-    },
-    {
-      id: 3,
-      name: 'Skyline Towers',
-      developer: 'DAMAC Properties',
-      location: 'Business Bay, Dubai',
-      startingPrice: 'AED 890,000',
-      completion: 'Q1 2028',
-      type: 'Apartments',
-      roi: '9.1% est. ROI',
-      image: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=800&q=80',
-      badge: 'Early Bird',
-    },
-  ];
+  offPlanProjects = computed<OffPlanCard[]>(() => {
+    const live = this.offPlanProjectsLive();
+    if (live.length) return live;
+    return [
+      { id: 1, name: 'Creek Horizon Residences', developer: 'Emaar Properties', location: 'Dubai Creek Harbour', startingPrice: 'AED 1,250,000', completion: 'Q4 2027', type: 'Apartments', roi: '8.5% est. ROI', image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80', badge: 'New Launch' },
+      { id: 2, name: 'Palm Vista Villas', developer: 'Nakheel', location: 'Palm Jebel Ali, Dubai', startingPrice: 'AED 6,800,000', completion: 'Q2 2026', type: 'Villas', roi: '7.2% est. ROI', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80', badge: 'Selling Fast' },
+      { id: 3, name: 'Skyline Towers', developer: 'DAMAC Properties', location: 'Business Bay, Dubai', startingPrice: 'AED 890,000', completion: 'Q1 2028', type: 'Apartments', roi: '9.1% est. ROI', image: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=800&q=80', badge: 'Early Bird' },
+    ];
+  });
 
   @ViewChildren('animateEl') animateEls!: QueryList<ElementRef>;
   @ViewChild('lpTrack') lpTrack!: ElementRef<HTMLElement>;
   @ViewChild('trendingTrack') trendingTrack!: ElementRef<HTMLElement>;
 
-  latestProjects = [
-    {
-      name: 'Avena by Emaar',
-      location: 'Arabian Ranches 3',
-      developer: 'Emaar',
-      handover: 'Q1 2029',
-      startingPrice: 'AED 3.5M',
-      paymentPlan: '10 / 80',
-      badge: true,
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80',
-    },
-    {
-      name: 'Avarra By Palace',
-      location: 'Business Bay',
-      developer: 'Emaar',
-      handover: 'Q2 2031',
-      startingPrice: 'AED 13.6M',
-      paymentPlan: '10 / 80 / 10',
-      badge: false,
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80',
-    },
-    {
-      name: 'Binghatti Skyflame',
-      location: 'Majan',
-      developer: 'Binghatti',
-      handover: 'Q4 2027',
-      startingPrice: 'AED 585K',
-      paymentPlan: '10 / 60 / 30',
-      badge: false,
-      image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80',
-    },
-    {
-      name: 'The Edit at d3',
-      location: 'Dubai Design District',
-      developer: 'Meraas',
-      handover: 'Q4 2027',
-      startingPrice: 'AED 1.9M',
-      paymentPlan: '20 / 55 / 25',
-      badge: false,
-      image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80',
-    },
-    {
-      name: 'Creek Horizon',
-      location: 'Dubai Creek Harbour',
-      developer: 'Emaar',
-      handover: 'Q4 2027',
-      startingPrice: 'AED 1.25M',
-      paymentPlan: '20 / 60 / 20',
-      badge: true,
-      image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80',
-    },
-    {
-      name: 'Palm Vista Residences',
-      location: 'Palm Jebel Ali',
-      developer: 'Nakheel',
-      handover: 'Q2 2026',
-      startingPrice: 'AED 6.8M',
-      paymentPlan: '15 / 55 / 30',
-      badge: false,
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80',
-    },
-  ];
+  latestProjects = computed<HomeProject[]>(() => {
+    const live = this.latestProjectsLive();
+    if (live.length) return live;
+    return [
+      { id: 0, name: 'Avena by Emaar',       location: 'Arabian Ranches 3',     developer: 'Emaar',    handover: 'Q1 2029', startingPrice: 'AED 3.5M',  paymentPlan: '10 / 80',       badge: true,  image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80' },
+      { id: 0, name: 'Avarra By Palace',      location: 'Business Bay',          developer: 'Emaar',    handover: 'Q2 2031', startingPrice: 'AED 13.6M', paymentPlan: '10 / 80 / 10',  badge: false, image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80' },
+      { id: 0, name: 'Binghatti Skyflame',    location: 'Majan',                 developer: 'Binghatti',handover: 'Q4 2027', startingPrice: 'AED 585K',  paymentPlan: '10 / 60 / 30',  badge: false, image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80' },
+      { id: 0, name: 'The Edit at d3',        location: 'Dubai Design District', developer: 'Meraas',   handover: 'Q4 2027', startingPrice: 'AED 1.9M',  paymentPlan: '20 / 55 / 25',  badge: false, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80' },
+      { id: 0, name: 'Creek Horizon',         location: 'Dubai Creek Harbour',   developer: 'Emaar',    handover: 'Q4 2027', startingPrice: 'AED 1.25M', paymentPlan: '20 / 60 / 20',  badge: true,  image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80' },
+      { id: 0, name: 'Palm Vista Residences', location: 'Palm Jebel Ali',        developer: 'Nakheel',  handover: 'Q2 2026', startingPrice: 'AED 6.8M',  paymentPlan: '15 / 55 / 30',  badge: false, image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80' },
+    ];
+  });
 
   constructor(@Inject(PLATFORM_ID) private platformId: object) {}
 
   private slideInterval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
-    this.loadFeaturedFromSupabase();
+    this.loadHomeData();
     if (isPlatformBrowser(this.platformId)) {
       this.startSlideshow();
       this.startTestimonialRotation();
@@ -402,6 +487,10 @@ export class HomeComponent implements OnInit {
     return Array(Math.floor(rating)).fill(0);
   }
 
+  initials(name: string): string {
+    return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'AG';
+  }
+
   activeTeam = signal(0);
   activeTrendingTab = signal('luxury');
 
@@ -411,23 +500,20 @@ export class HomeComponent implements OnInit {
     { value: 'flats', label: 'Flats' },
   ];
 
-  trendingProjects = [
-    { name: 'One at Palm Jumeirah', developer: 'Omniyat', price: '14M', badge: 'Ready', type: 'luxury', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80' },
-    { name: 'The Royal Atlantis Residences', developer: 'Kerzner International', price: '17M', badge: 'Ready', type: 'luxury', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80' },
-    { name: 'Six Senses', developer: 'Select Group', price: '12.5M', badge: '40 / 60 Payment Plan', type: 'luxury', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80' },
-    { name: 'Burj Binghatti', developer: 'Binghatti', price: '8M', badge: '60 / 40 Payment Plan', type: 'luxury', image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80' },
-    { name: 'Bugatti Residences', developer: 'Binghatti', price: '19.1M', badge: '70 / 30 Payment Plan', type: 'luxury', image: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=600&q=80' },
-    { name: 'Palm Vista Villas', developer: 'Nakheel', price: '6.8M', badge: 'Ready', type: 'villas', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80' },
-    { name: 'Emirates Hills Villa', developer: 'Emaar', price: '22M', badge: '20 / 80 Payment Plan', type: 'villas', image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80' },
-    { name: 'Tilal Al Ghaf Villa', developer: 'Majid Al Futtaim', price: '4.2M', badge: '10 / 80 / 10 Payment Plan', type: 'villas', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80' },
-    { name: 'Skyline Tower', developer: 'DAMAC', price: '890K', badge: '60 / 40 Payment Plan', type: 'flats', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80' },
-    { name: 'Creek Horizon', developer: 'Emaar', price: '1.25M', badge: '20 / 60 / 20 Payment Plan', type: 'flats', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80' },
-    { name: 'Binghatti Nova', developer: 'Binghatti', price: '680K', badge: 'Ready', type: 'flats', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80' },
-  ];
-
-  filteredTrendingProjects = computed(() =>
-    this.trendingProjects.filter(p => p.type === this.activeTrendingTab())
-  );
+  filteredTrendingProjects = computed(() => {
+    const tab = this.activeTrendingTab();
+    const live = this.trendingProjectsDb();
+    if (live.length) return live.filter(p => p.type === tab);
+    const fallback: TrendingProject[] = [
+      { id: 0, name: 'One at Palm Jumeirah', developer: 'Omniyat', price: '14M', badge: 'Ready', type: 'luxury', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80' },
+      { id: 0, name: 'Six Senses', developer: 'Select Group', price: '12.5M', badge: '40 / 60 Payment Plan', type: 'luxury', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80' },
+      { id: 0, name: 'Palm Vista Villas', developer: 'Nakheel', price: '6.8M', badge: 'Ready', type: 'villas', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80' },
+      { id: 0, name: 'Emirates Hills Villa', developer: 'Emaar', price: '22M', badge: '20 / 80 Payment Plan', type: 'villas', image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80' },
+      { id: 0, name: 'Skyline Tower', developer: 'DAMAC', price: '890K', badge: '60 / 40 Payment Plan', type: 'flats', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80' },
+      { id: 0, name: 'Creek Horizon', developer: 'Emaar', price: '1.25M', badge: '20 / 60 / 20 Payment Plan', type: 'flats', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80' },
+    ];
+    return fallback.filter(p => p.type === tab);
+  });
 
   guides = [
     { title: 'Buying Guide', subtitle: 'How to Buy Property in Dubai', avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
@@ -436,15 +522,16 @@ export class HomeComponent implements OnInit {
     { title: 'Selling Guide', subtitle: 'How to Sell Property in Dubai', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
   ];
 
-  teamAreas = [
-    {
-      area: 'Our Associates', agents: [
-        { name: 'Anuj Sharma',     role: 'Business Associate', avatar: 'images/Anuj.jpeg',   phone: '+971542481813',  email: 'anuj@livwelldubai.ae'  },
-        { name: 'Niket Mehta',     role: 'Business Associate', avatar: 'images/Niket .jpeg', phone: '+971585798027',  email: 'niket@livwelldubai.ae' },
-        { name: 'Yash Uday Chari', role: 'Business Associate', avatar: 'images/Yash.jpeg',   phone: '+971585833629',  email: 'yash@livwelldubai.ae'  },
-      ]
-    },
+  topAgents: HomeAgent[] = [
+    { name: 'Anuj Sharma',     role: 'Business Associate', avatar: 'images/Anuj.jpeg',    phone: '+971542481813', email: 'anuj@livwelldubai.ae'  },
+    { name: 'Niket Mehta',     role: 'Business Associate', avatar: 'images/Niket .jpeg',  phone: '+971585798027', email: 'niket@livwelldubai.ae' },
+    { name: 'Yash Uday Chari', role: 'Business Associate', avatar: 'images/Yash.jpeg',    phone: '+971585833629', email: 'yash@livwelldubai.ae'  },
   ];
+
+  teamAreas = [{
+    area: 'Our Associates',
+    agents: this.topAgents,
+  }];
 
   scrollTrending(dir: 1 | -1): void {
     const track = this.trendingTrack?.nativeElement;

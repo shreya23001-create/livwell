@@ -26,18 +26,7 @@ $accent: #1a5c3a;
 }
 @keyframes pd-spin { to { transform: rotate(360deg); } }
 
-.pd-agent-avatar-placeholder {
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  background: $accent;
-  color: #fff;
-  font-size: 1.25rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+.pd-agent-avatar-wrap { flex-shrink: 0; width: 56px; height: 56px; }
 
 .pd-not-found {
   min-height: 60vh;
@@ -696,8 +685,18 @@ $accent: #1a5c3a;
   height: 56px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: top center;
   border: 3px solid #e5e7eb;
-  flex-shrink: 0;
+  display: block;
+}
+
+.pd-agent-dummy {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #e5e7eb;
+  svg { width: 55%; height: 55%; color: #9ca3af; }
 }
 
 .pd-agent-name {

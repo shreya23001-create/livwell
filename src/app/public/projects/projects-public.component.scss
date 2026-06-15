@@ -1,0 +1,91 @@
+$gold:   #c8a84b;
+$green:  #1a5c3a;
+$text:   #111827;
+$muted:  #6b7280;
+$border: #e5e7eb;
+$bg:     #f9fafb;
+$white:  #fff;
+
+/* ── Hero ────────────────────────────────────────── */
+.prj-hero {
+  position: relative; min-height: 420px; display: flex; align-items: center;
+  background: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1600&q=80') center/cover no-repeat;
+  padding: 8rem 0 4rem;
+}
+.prj-hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(10,14,26,.85) 0%, rgba(10,14,26,.6) 100%); }
+.prj-hero-content { position: relative; z-index: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: 0 1.5rem; text-align: center; }
+.prj-hero-eyebrow { color: $gold; font-size: .8rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; margin-bottom: .75rem; }
+.prj-hero-title { color: #fff; font-size: clamp(1.75rem, 4vw, 3rem); font-weight: 700; margin-bottom: .75rem; line-height: 1.2; }
+.prj-hero-sub { color: rgba(255,255,255,.75); font-size: clamp(.95rem, 2vw, 1.1rem); max-width: 640px; margin: 0 auto 2.5rem; }
+
+.prj-search-bar {
+  display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; max-width: 900px; margin: 0 auto;
+  background: rgba(255,255,255,.1); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.2);
+  border-radius: 1rem; padding: 1rem 1.25rem;
+}
+.prj-search-input-wrap { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 220px; svg { color: rgba(255,255,255,.6); } }
+.prj-search-input { border: none; background: none; outline: none; color: #fff; font-size: .9rem; width: 100%; &::placeholder { color: rgba(255,255,255,.55); } }
+.prj-search-select { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: .5rem; color: #fff; padding: .45rem .875rem; font-size: .85rem; cursor: pointer; outline: none; option { color: $text; background: $white; } }
+
+/* ── Stats ───────────────────────────────────────── */
+.prj-stats-strip { background: $white; border-bottom: 1px solid $border; padding: 1.5rem 0; }
+.prj-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; max-width: 1320px; margin: 0 auto; padding: 0 1.5rem; @media(max-width:640px){ grid-template-columns: repeat(2,1fr); } }
+.prj-stat { text-align: center; }
+.prj-stat-value { display: block; font-size: 1.5rem; font-weight: 700; color: $green; }
+.prj-stat-label { font-size: .75rem; color: $muted; text-transform: uppercase; letter-spacing: .06em; }
+
+/* ── Section ─────────────────────────────────────── */
+.prj-section { padding: 3.5rem 0; background: $bg; }
+.container-custom { max-width: 1320px; margin: 0 auto; padding: 0 1.5rem; }
+.prj-section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.prj-section-title { font-size: 1.5rem; font-weight: 700; color: $text; margin: 0 0 .25rem; }
+.prj-section-sub { font-size: .83rem; color: $muted; margin: 0; }
+.prj-sort-select { border: 1px solid $border; border-radius: .5rem; padding: .45rem .75rem; font-size: .83rem; color: $text; background: $white; cursor: pointer; outline: none; }
+
+/* ── Loading ─────────────────────────────────────── */
+.prj-loading { display: flex; justify-content: center; padding: 4rem; }
+.prj-spin { width: 40px; height: 40px; border: 3px solid $border; border-top-color: $gold; border-radius: 50%; animation: prj-spin .8s linear infinite; }
+@keyframes prj-spin { to { transform: rotate(360deg); } }
+
+/* ── Grid ────────────────────────────────────────── */
+.prj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; @media(max-width:1024px){ grid-template-columns: repeat(2,1fr); } @media(max-width:640px){ grid-template-columns: 1fr; } }
+.prj-empty { grid-column: 1/-1; text-align: center; color: $muted; padding: 4rem; svg { display: block; margin: 0 auto 1rem; opacity: .35; } }
+
+/* ── Card ────────────────────────────────────────── */
+.prj-card {
+  background: $white; border: 1px solid $border; border-radius: .875rem; overflow: hidden; text-decoration: none; display: block; color: inherit;
+  transition: box-shadow .15s, transform .15s;
+  &:hover { box-shadow: 0 6px 28px rgba(0,0,0,.1); transform: translateY(-2px); }
+}
+.prj-card-img-wrap { position: relative; height: 200px; overflow: hidden; background: $bg; }
+.prj-card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; .prj-card:hover & { transform: scale(1.04); } }
+.prj-card-img-empty { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; svg { color: #d1d5db; } }
+
+.prj-badge {
+  display: inline-block; font-size: .68rem; font-weight: 700; padding: .22rem .7rem; border-radius: 2rem; letter-spacing: .03em;
+  &--overlay { position: absolute; bottom: .65rem; left: .65rem; background: rgba(0,0,0,.65); color: #fff; }
+  &--tl { position: absolute; top: .65rem; left: .65rem; }
+  &--ultra  { background: rgba(124,58,237,.85); color: #fff; }
+  &--luxury { background: rgba(200,168,75,.9); color: #5a3c00; }
+  &--featured { background: rgba(26,92,58,.85); color: #fff; }
+}
+
+.prj-card-body { padding: 1.1rem; display: flex; flex-direction: column; gap: .35rem; }
+.prj-card-top { display: flex; justify-content: space-between; align-items: center; }
+.prj-type-tag { font-size: .72rem; font-weight: 600; padding: .22rem .65rem; border-radius: 2rem; background: rgba($green,.08); color: $green; }
+.prj-card-title { font-size: 1rem; font-weight: 700; color: $text; margin: .1rem 0 0; }
+.prj-card-dev { font-size: .8rem; color: $muted; margin: 0; }
+.prj-card-loc { display: flex; align-items: center; gap: .35rem; font-size: .78rem; color: $muted; margin: 0; svg { flex-shrink: 0; } }
+.prj-card-price-row { display: flex; justify-content: space-between; margin-top: .2rem; }
+.prj-card-price { font-size: .95rem; font-weight: 700; color: $green; }
+.prj-card-handover { font-size: .75rem; color: $muted; }
+.prj-card-plan { display: flex; align-items: center; gap: .35rem; font-size: .75rem; color: $muted; svg { flex-shrink: 0; } }
+
+/* ── FAQ ─────────────────────────────────────────── */
+.prj-faq-section { padding: 3.5rem 0; background: $white; }
+.prj-faq-title { font-size: 1.4rem; font-weight: 700; color: $text; margin-bottom: 1.5rem; }
+.prj-faq-list { display: flex; flex-direction: column; gap: .75rem; max-width: 860px; }
+.prj-faq-item { border: 1px solid $border; border-radius: .75rem; overflow: hidden; cursor: pointer; }
+.prj-faq-q { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; font-weight: 600; color: $text; font-size: .9rem; svg { flex-shrink: 0; transition: transform .2s; } }
+.prj-faq-item.open .prj-faq-q svg { transform: rotate(180deg); }
+.prj-faq-a { padding: 0 1.25rem 1rem; font-size: .85rem; color: $muted; line-height: 1.6; }

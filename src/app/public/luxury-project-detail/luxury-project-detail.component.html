@@ -61,7 +61,7 @@
       <div class="lpd-container">
         <div class="lpd-gallery">
           <div class="lpd-gallery-main">
-            <img [src]="p.images[activeImage()]" [alt]="p.title" class="lpd-gallery-main-img">
+            <img [src]="p.images[activeImage()]" [alt]="p.title" class="lpd-gallery-main-img" (error)="$any($event.target).src='images/dummy-image.png'">
             <span *ngIf="p.badge" class="lpd-gallery-badge">{{ p.badge }}</span>
             <span class="lpd-gallery-status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
           </div>
@@ -223,6 +223,17 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- ── Location Map ──────────────────────────────────── -->
+    <div class="lpd-section" *ngIf="mapUrl()">
+      <div class="lpd-container">
+        <h2 class="lpd-section-title">Location</h2>
+        <div class="lpd-map-wrap">
+          <iframe [src]="mapUrl()" class="lpd-map" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <p class="lpd-map-address">{{ p.community || p.location }}</p>
       </div>
     </div>
 

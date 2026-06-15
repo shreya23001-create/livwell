@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 export type EventType = 'viewing' | 'meeting' | 'followup' | 'call';
 
@@ -26,8 +27,9 @@ export interface CalendarEvent {
   styleUrl: './agent-calendar.component.scss',
 })
 export class AgentCalendarComponent implements OnInit, OnDestroy {
-  private auth = inject(AuthService);
-  private sb   = inject(SupabaseService).client;
+  private auth  = inject(AuthService);
+  private sb    = inject(SupabaseService).client;
+  private toast = inject(ToastService);
 
   today = new Date();
   currentYear  = signal(this.today.getFullYear());
@@ -49,9 +51,52 @@ export class AgentCalendarComponent implements OnInit, OnDestroy {
   formErrors = signal<Record<string, string>>({});
   events     = signal<CalendarEvent[]>([]);
 
+  // Dropdown data
+  activeCustomers = signal<{ name: string; phone: string }[]>([]);
+  propertyTitles  = signal<string[]>([]);
+
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
-    await this.loadEvents();
+    await Promise.all([this.loadEvents(), this.loadDropdownData()]);
+  }
+
+  private async loadDropdownData(): Promise<void> {
+    const user      = this.auth.currentUser();
+    const agentName  = user?.name  ?? '';
+    const agentEmail = user?.email ?? '';
+
+    // Active customers: leads not won/lost, assigned to this agent
+    const { data: byEmail } = await this.sb
+      .from('admin_leads')
+      .select('name, phone')
+      .eq('agent_email', agentEmail)
+      .not('status', 'in', '("won","lost")');
+
+    const { data: byName } = agentName ? await this.sb
+      .from('admin_leads')
+      .select('name, phone')
+      .eq('assigned_agent', agentName)
+      .not('status', 'in', '("won","lost")') : { data: [] };
+
+    const seen = new Set<string>();
+    const customers: { name: string; phone: string }[] = [];
+    for (const r of [...(byEmail ?? []), ...(byName ?? [])]) {
+      if (r.name && !seen.has(r.name)) {
+        seen.add(r.name);
+        customers.push({ name: r.name, phone: r.phone ?? '' });
+      }
+    }
+    this.activeCustomers.set(customers.sort((a, b) => a.name.localeCompare(b.name)));
+
+    // Properties assigned to this agent
+    const { data: props } = await this.sb
+      .from('properties')
+      .select('title')
+      .eq('agent_name', agentName)
+      .eq('status', 'Published')
+      .order('title', { ascending: true });
+
+    this.propertyTitles.set((props ?? []).map((p: any) => p.title).filter(Boolean));
   }
 
   ngOnDestroy(): void {}
@@ -183,18 +228,19 @@ export class AgentCalendarComponent implements OnInit, OnDestroy {
         .from('calendar_events')
         .update({ title: f.title.trim(), type: f.type, date: f.date, time: f.time, duration: f.duration, client: f.client.trim(), property: f.property, notes: f.notes, notified: false })
         .eq('id', id);
-      if (error) { this.saveError.set('Failed to save: ' + error.message); this.saving.set(false); return; }
+      if (error) { this.toast.error('Failed to save: ' + error.message); this.saving.set(false); return; }
     } else {
       const { error } = await this.sb
         .from('calendar_events')
         .insert({ agent_id, agent_email, title: f.title.trim(), type: f.type, date: f.date, time: f.time, duration: f.duration, client: f.client.trim(), property: f.property, notes: f.notes });
-      if (error) { this.saveError.set('Failed to save: ' + error.message); this.saving.set(false); return; }
+      if (error) { this.toast.error('Failed to save: ' + error.message); this.saving.set(false); return; }
     }
 
     await this.loadEvents();
     this.saving.set(false);
     this.showModal.set(false);
     this.selectedDay.set(f.date);
+    this.toast.success(id !== null ? 'Event updated.' : 'Event added.');
   }
 
   confirmDelete(id: number): void { this.deleteId.set(id); }

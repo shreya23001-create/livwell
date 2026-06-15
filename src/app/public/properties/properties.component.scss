@@ -245,6 +245,7 @@
 /* Status toggle */
 .status-toggle {
   display: flex;
+  flex-wrap: wrap;
   background: #f1f5f9;
   border-radius: 0.5rem;
   padding: 0.25rem;
@@ -979,13 +980,34 @@
   flex: 1;
 }
 
+.prop-agent-avatar-wrap {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+
 .prop-agent-avatar {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
+  object-position: top center;
   border: 2px solid #e5e7eb;
+  display: block;
+}
+
+.prop-agent-dummy {
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-color: #d1d5db;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: #9ca3af;
+  }
 }
 
 .prop-agent-name {

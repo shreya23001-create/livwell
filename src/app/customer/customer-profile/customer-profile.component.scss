@@ -219,3 +219,7 @@ $bg:      #f4f6fa;
   .profile-tabs { width: 100%; }
   .tab-btn { flex: 1; text-align: center; }
 }
+
+.select-wrapper { position: relative; display: inline-block; width: 100%; }
+.select-wrapper select { appearance: none; -webkit-appearance: none; padding-right: 2.25rem; width: 100%; cursor: pointer; }
+.dropdown-icon { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; pointer-events: none; color: #6b7280; }

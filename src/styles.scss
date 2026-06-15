@@ -484,6 +484,30 @@ router-outlet+* {
   animation: shimmer 1.5s linear infinite;
 }
 
+.select-wrapper {
+  position: relative;
+}
+
+.custom-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  padding-right: 40px;
+  /* space for icon */
+}
+
+.dropdown-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+
+  color: #666;
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;

@@ -26,8 +26,19 @@
     </div>
   </div>
 
+  <!-- ── Loading ────────────────────────────────────────── -->
+  <div *ngIf="loading()" class="br-loading">
+    <div class="br-spin"></div>
+  </div>
+
+  <!-- ── DB Error ───────────────────────────────────────── -->
+  <div *ngIf="dbError()" class="br-db-error">
+    <strong>Database error:</strong> {{ dbError() }}
+    <br><small>Run the SQL migration in Supabase to add the <code>is_branded</code> column.</small>
+  </div>
+
   <!-- ── Split Layout ────────────────────────────────────── -->
-  <div class="br-split">
+  <div class="br-split" *ngIf="!loading() && !dbError()">
 
     <!-- LEFT: Card list -->
     <div class="br-list-col">
@@ -36,21 +47,22 @@
       <div class="br-list">
         <a *ngFor="let r of filteredResidences()"
              class="br-card"
-             [routerLink]="['/branded-residence', getSlug(r.id)]"
+             [routerLink]="['/branded-residence', r.id]"
              [class.hovered]="hoveredId() === r.id"
              (mouseenter)="hoveredId.set(r.id)"
              (mouseleave)="hoveredId.set(null)">
 
           <!-- Image -->
           <div class="br-card-img-wrap">
-            <img [src]="r.image" [alt]="r.title" class="br-card-img" loading="lazy">
+            <img [src]="r.images?.[0] || 'images/dummy-image.png'" [alt]="r.title" class="br-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
             <span *ngIf="r.badge" class="br-badge">{{ r.badge }}</span>
-            <span class="br-status" [ngClass]="statusClass(r.status)">{{ r.status }}</span>
+            <span *ngIf="r.is_ultra_luxury" class="br-status status--ultra">Ultra Luxury</span>
+            <span *ngIf="!r.is_ultra_luxury && r.is_luxury" class="br-status status--luxury">Luxury</span>
           </div>
 
           <!-- Body -->
           <div class="br-card-body">
-            <div class="br-card-brand">{{ r.brand }}</div>
+            <div class="br-card-brand">{{ r.brand || '—' }}</div>
             <div class="br-card-developer">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               {{ r.developer }}
@@ -62,12 +74,12 @@
             </div>
             <div class="br-card-meta">
               <span>{{ r.beds }}</span>
-              <span class="br-sep">·</span>
-              <span>{{ r.completionDate }}</span>
+              <span *ngIf="r.beds && r.completion_date" class="br-sep">·</span>
+              <span>{{ r.completion_date }}</span>
             </div>
             <div class="br-card-price">
               <span class="br-price-lbl">from</span>
-              <span class="br-price-val">{{ r.startingPrice }}</span>
+              <span class="br-price-val">{{ r.price_label || formatPrice(r.price_from) }}</span>
             </div>
           </div>
 
@@ -75,44 +87,39 @@
 
         <div *ngIf="filteredResidences().length === 0" class="br-empty">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <p>No properties match your search.</p>
+          <p>No branded residences found.</p>
           <button class="br-reset-btn" (click)="activeFilter.set('All'); searchQuery.set('')">Reset Filters</button>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Map -->
+    <!-- RIGHT: Map placeholder (no lat/lng in list query for perf) -->
     <div class="br-map-col">
       <div class="br-map-wrap">
-
-        <!-- Map style pills -->
         <div class="br-map-tabs">
           <button class="br-map-tab active">Streets</button>
         </div>
-
-        <!-- Map iframe -->
         <iframe
           class="br-map-iframe"
-          [src]="mapSrc()"
+          src="https://maps.google.com/maps?q=Dubai,UAE&z=11&output=embed"
           frameborder="0"
           allowfullscreen
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade">
         </iframe>
 
-        <!-- Hovered property popup -->
-        <div class="br-map-popup" *ngIf="hoveredResidence()">
-          <img [src]="hoveredResidence()!.image" [alt]="hoveredResidence()!.title" class="br-popup-img">
+        <!-- Hovered card popup -->
+        <div class="br-map-popup" *ngIf="hoveredResidence() as h">
+          <img *ngIf="h.images?.[0]" [src]="h.images[0]" [alt]="h.title" class="br-popup-img">
           <div class="br-popup-body">
-            <div class="br-popup-price">{{ hoveredResidence()!.startingPrice }}</div>
-            <div class="br-popup-title">{{ hoveredResidence()!.title }}</div>
+            <div class="br-popup-price">{{ h.price_label || formatPrice(h.price_from) }}</div>
+            <div class="br-popup-title">{{ h.title }}</div>
             <div class="br-popup-loc">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
-              {{ hoveredResidence()!.location }}
+              {{ h.location }}
             </div>
           </div>
         </div>
-
       </div>
     </div>
 

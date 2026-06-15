@@ -14,21 +14,27 @@
     <!-- Avatar Card -->
     <div class="adm-prof-avatar-card">
       <div class="adm-prof-avatar-wrap">
-        <div class="adm-prof-avatar" *ngIf="!profile.photoUrl">{{ initials() }}</div>
-        <img class="adm-prof-avatar-img" *ngIf="profile.photoUrl" [src]="profile.photoUrl" alt="Profile photo" />
-        <label class="adm-prof-avatar-edit" title="Change photo">
-          <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onPhotoChange($event)" hidden />
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/>
-          </svg>
+        <div class="adm-prof-avatar" *ngIf="!profile().photoUrl">{{ initials() }}</div>
+        <img class="adm-prof-avatar-img" *ngIf="profile().photoUrl" [src]="profile().photoUrl" alt="Profile photo" />
+        <label class="adm-prof-avatar-edit" [class.uploading]="uploadingPhoto()" title="Change photo">
+          <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onPhotoChange($event)" hidden [disabled]="uploadingPhoto()" />
+          @if (uploadingPhoto()) {
+            <svg class="adm-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="30 70" />
+            </svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/>
+            </svg>
+          }
         </label>
       </div>
       <div class="adm-prof-avatar-info">
-        <div class="adm-prof-avatar-name">{{ profile.name || 'Admin' }}</div>
+        <div class="adm-prof-avatar-name">{{ profile().name || 'Admin' }}</div>
         <div class="adm-prof-avatar-role">Administrator</div>
-        <div class="adm-prof-avatar-email">{{ profile.email }}</div>
+        <div class="adm-prof-avatar-email">{{ profile().email }}</div>
       </div>
-      <button class="adm-prof-remove-photo" *ngIf="profile.photoUrl" (click)="removePhoto()">Remove photo</button>
+      <button class="adm-prof-remove-photo" *ngIf="profile().photoUrl" (click)="removePhoto()">Remove photo</button>
     </div>
 
     <!-- Tabs -->
@@ -46,12 +52,12 @@
         <div class="adm-prof-field">
           <label class="adm-prof-label">Full Name *</label>
           <input class="adm-prof-input" [class.is-err]="profileErrors()['name']" type="text"
-            [(ngModel)]="profile.name" (ngModelChange)="clearErr('name')" placeholder="Your full name" />
+            [value]="profile().name" (input)="profile.update(p => ({ ...p, name: $any($event.target).value })); clearErr('name')" placeholder="Your full name" />
           <span class="adm-prof-err" *ngIf="profileErrors()['name']">{{ profileErrors()['name'] }}</span>
         </div>
         <div class="adm-prof-field">
           <label class="adm-prof-label">Email Address</label>
-          <input class="adm-prof-input" type="email" [(ngModel)]="profile.email" disabled />
+          <input class="adm-prof-input" type="email" [value]="profile().email" disabled />
           <span class="adm-prof-hint">Email cannot be changed here.</span>
         </div>
       </div>
@@ -60,7 +66,7 @@
         <div class="adm-prof-field">
           <label class="adm-prof-label">Phone Number *</label>
           <input class="adm-prof-input" [class.is-err]="profileErrors()['phone']" type="tel"
-            [(ngModel)]="profile.phone" (ngModelChange)="clearErr('phone')" placeholder="+971 50 000 0000" />
+            [value]="profile().phone" (input)="profile.update(p => ({ ...p, phone: $any($event.target).value })); clearErr('phone')" placeholder="+971 50 000 0000" />
           <span class="adm-prof-err" *ngIf="profileErrors()['phone']">{{ profileErrors()['phone'] }}</span>
         </div>
       </div>

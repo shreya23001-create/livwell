@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 export type AgentPropStatus = 'Draft' | 'Pending Review' | 'Published' | 'Archived' | 'Sold' | 'Rented';
 
@@ -43,8 +44,9 @@ const EMPTY_FORM = (): Partial<AgentProperty> => ({
   styleUrl: './agent-properties.component.scss',
 })
 export class AgentPropertiesComponent implements OnInit {
-  private auth = inject(AuthService);
-  private sb   = inject(SupabaseService).client;
+  private auth  = inject(AuthService);
+  private sb    = inject(SupabaseService).client;
+  private toast = inject(ToastService);
 
   properties   = signal<AgentProperty[]>([]);
   search       = signal('');
@@ -179,8 +181,8 @@ export class AgentPropertiesComponent implements OnInit {
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     const maxSize = 5 * 1024 * 1024; // 5 MB
     for (const file of files) {
-      if (!allowed.includes(file.type)) { this.saveError.set(`"${file.name}" is not a supported image type. Use JPG, PNG, WebP, or GIF.`); return; }
-      if (file.size > maxSize)          { this.saveError.set(`"${file.name}" exceeds the 5 MB size limit.`); return; }
+      if (!allowed.includes(file.type)) { this.toast.error(`"${file.name}" is not a supported image type. Use JPG, PNG, WebP, or GIF.`); return; }
+      if (file.size > maxSize)          { this.toast.error(`"${file.name}" exceeds the 5 MB size limit.`); return; }
     }
 
     this.uploadingImages.set(true);
@@ -197,7 +199,7 @@ export class AgentPropertiesComponent implements OnInit {
           .from('imagesFolder')
           .upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
         if (error) {
-          this.saveError.set(`Image ${i + 1} failed: ${error.message}`);
+          this.toast.error(`Image ${i + 1} failed: ${error.message}`);
           URL.revokeObjectURL(blobs[i]);
           this.previewImages.update(p => p.filter(u => u !== blobs[i]));
           break;
@@ -210,7 +212,7 @@ export class AgentPropertiesComponent implements OnInit {
         }
       }
     } catch (e: any) {
-      this.saveError.set('Upload error: ' + (e?.message ?? 'Unknown error'));
+      this.toast.error('Upload error: ' + (e?.message ?? 'Unknown error'));
     } finally {
       this.uploadedImages.update(p => [...p, ...publicUrls]);
       this.uploadingImages.set(false);
@@ -260,17 +262,18 @@ export class AgentPropertiesComponent implements OnInit {
     try {
       if (this.isEdit() && this.editId() !== null) {
         const { error } = await this.sb.from('properties').update(payload).eq('id', this.editId()!);
-        if (error) { this.saveError.set('Failed to save: ' + error.message); this.saving.set(false); return; }
+        if (error) { this.toast.error('Failed to save: ' + error.message); this.saving.set(false); return; }
         this.properties.update(list => list.map(p => p.id === this.editId() ? { ...p, ...this.mapRow({ ...payload, id: p.id, views: p.views, created_at: p.created_at }) } : p));
       } else {
         const { data, error } = await this.sb.from('properties').insert({ ...payload, views: 0, created_by: agentName }).select().single();
-        if (error) { this.saveError.set('Failed to add: ' + error.message); this.saving.set(false); return; }
+        if (error) { this.toast.error('Failed to add: ' + error.message); this.saving.set(false); return; }
         if (data) this.properties.update(list => [this.mapRow(data), ...list]);
       }
       this.saving.set(false);
       this.showModal.set(false);
+      this.toast.success(this.editId() !== null ? 'Property updated.' : 'Property added.');
     } catch (ex: any) {
-      this.saveError.set('Unexpected error: ' + (ex?.message || 'Please try again.'));
+      this.toast.error('Unexpected error: ' + (ex?.message || 'Please try again.'));
       this.saving.set(false);
     }
   }

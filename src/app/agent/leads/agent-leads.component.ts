@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 interface LeadMessage {
   id: number;
@@ -49,8 +50,9 @@ const EMPTY_FORM = (): Partial<AgentLead> => ({
   styleUrl: './agent-leads.component.scss',
 })
 export class AgentLeadsComponent implements OnInit, OnDestroy {
-  private auth = inject(AuthService);
-  private sb   = inject(SupabaseService).client;
+  private auth  = inject(AuthService);
+  private sb    = inject(SupabaseService).client;
+  private toast = inject(ToastService);
 
   private realtimeSub: any = null;
   private msgRealtimeSub: any = null;
@@ -328,7 +330,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
 
     if (this.isEdit() && this.editId() !== null) {
       const { error } = await this.sb.from('admin_leads').update(payload).eq('id', this.editId()!);
-      if (error) { this.saveError.set('Failed to save. Please try again.'); this.saving.set(false); return; }
+      if (error) { this.toast.error('Failed to save. Please try again.'); this.saving.set(false); return; }
       this.leads.update(list =>
         list.map(l => l.id === this.editId()
           ? { ...l, ...f, propertyType: f.propertyType || l.propertyType } as AgentLead
@@ -336,12 +338,13 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       );
     } else {
       const { data, error } = await this.sb.from('admin_leads').insert(payload).select().single();
-      if (error) { this.saveError.set('Failed to add lead. Please try again.'); this.saving.set(false); return; }
+      if (error) { this.toast.error('Failed to add lead. Please try again.'); this.saving.set(false); return; }
       if (data) this.leads.update(list => [this.mapRow(data), ...list]);
     }
 
     this.saving.set(false);
     this.showModal.set(false);
+    this.toast.success(this.editId() !== null ? 'Lead updated.' : 'Lead added.');
   }
 
   async quickUpdateStatus(lead: AgentLead, newStatus: LeadStatus): Promise<void> {

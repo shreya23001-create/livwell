@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 type Tab = 'profile' | 'password';
 
@@ -14,13 +15,14 @@ type Tab = 'profile' | 'password';
   styleUrl: './admin-profile.component.scss',
 })
 export class AdminProfileComponent implements OnInit {
-  private auth = inject(AuthService);
-  private sb   = inject(SupabaseService).client;
+  private auth  = inject(AuthService);
+  private sb    = inject(SupabaseService).client;
+  private toast = inject(ToastService);
 
   activeTab = signal<Tab>('profile');
   loading   = signal(true);
 
-  profile = { name: '', email: '', phone: '', photoUrl: '' };
+  profile = signal({ name: '', email: '', phone: '', photoUrl: '' });
 
   profileSaved  = signal(false);
   profileError  = signal('');
@@ -48,7 +50,13 @@ export class AdminProfileComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
-    const user = this.auth.currentUser();
+    let user = this.auth.currentUser();
+    if (!user) {
+      for (let i = 0; i < 6 && !user; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        user = this.auth.currentUser();
+      }
+    }
     if (user) {
       const { data } = await this.sb
         .from('profiles')
@@ -56,14 +64,15 @@ export class AdminProfileComponent implements OnInit {
         .eq('id', user.id)
         .single();
       if (data) {
-        this.profile.name     = data.name      ?? user.name  ?? '';
-        this.profile.email    = data.email     ?? user.email ?? '';
-        this.profile.phone    = data.phone     ?? user.phone ?? '';
-        this.profile.photoUrl = data.avatar_url ?? '';
+        const av = data.avatar_url ?? '';
+        this.profile.set({
+          name:     data.name  ?? user.name  ?? '',
+          email:    data.email ?? user.email ?? '',
+          phone:    data.phone ?? user.phone ?? '',
+          photoUrl: (av && !av.startsWith('data:') && /\/avatars\/[^/]+/.test(av)) ? av : '',
+        });
       } else {
-        this.profile.name  = user.name  ?? '';
-        this.profile.email = user.email ?? '';
-        this.profile.phone = user.phone ?? '';
+        this.profile.set({ name: user.name ?? '', email: user.email ?? '', phone: user.phone ?? '', photoUrl: '' });
       }
     }
     this.loading.set(false);
@@ -75,7 +84,9 @@ export class AdminProfileComponent implements OnInit {
     this.pwSaved.set(false);      this.pwError.set('');
   }
 
-  onPhotoChange(event: Event): void {
+  uploadingPhoto = signal(false);
+
+  async onPhotoChange(event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
@@ -83,22 +94,36 @@ export class AdminProfileComponent implements OnInit {
       return;
     }
     if (file.size > 2 * 1024 * 1024) { this.profileError.set('Image must be under 2 MB.'); return; }
-    const reader = new FileReader();
-    reader.onload = e => { this.profile.photoUrl = e.target?.result as string; };
-    reader.readAsDataURL(file);
+    const user = this.auth.currentUser();
+    if (!user?.id) return;
+    this.uploadingPhoto.set(true);
+    this.profileError.set('');
+    const ext  = file.name.split('.').pop() || 'jpg';
+    const path = `avatars/${user.id}.${ext}`;
+    const { error: upErr } = await this.sb.storage.from('imagesFolder').upload(path, file, { upsert: true });
+    if (upErr) {
+      this.profileError.set('Upload failed: ' + upErr.message);
+      this.uploadingPhoto.set(false);
+      return;
+    }
+    const { data } = this.sb.storage.from('imagesFolder').getPublicUrl(path);
+    this.profile.update(p => ({ ...p, photoUrl: data.publicUrl + '?t=' + Date.now() }));
+    this.uploadingPhoto.set(false);
+    this.toast.success('Photo uploaded. Save changes to apply.');
   }
 
-  removePhoto(): void { this.profile.photoUrl = ''; }
+  removePhoto(): void { this.profile.update(p => ({ ...p, photoUrl: '' })); }
 
   initials(): string {
-    return this.profile.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'A';
+    return this.profile().name.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) || 'A';
   }
 
   async saveProfile(): Promise<void> {
+    const p = this.profile();
     const errs: Record<string, string> = {};
-    if (!this.profile.name.trim())  errs['name']  = 'Name is required.';
-    if (!this.profile.phone.trim()) errs['phone'] = 'Phone is required.';
-    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(this.profile.phone)) errs['phone'] = 'Enter a valid phone number.';
+    if (!p.name.trim())  errs['name']  = 'Name is required.';
+    if (!p.phone.trim()) errs['phone'] = 'Phone is required.';
+    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(p.phone)) errs['phone'] = 'Enter a valid phone number.';
     this.profileErrors.set(errs);
     if (Object.keys(errs).length) return;
 
@@ -107,15 +132,14 @@ export class AdminProfileComponent implements OnInit {
     if (!user?.id) return;
 
     const { error } = await this.sb.from('profiles').update({
-      name:       this.profile.name.trim(),
-      phone:      this.profile.phone.trim(),
-      avatar_url: this.profile.photoUrl || null,
+      name:       p.name.trim(),
+      phone:      p.phone.trim(),
+      avatar_url: p.photoUrl || null,
     }).eq('id', user.id);
 
-    if (error) { this.profileError.set('Failed to save: ' + error.message); return; }
+    if (error) { this.toast.error('Failed to save: ' + error.message); return; }
     await this.auth.refreshProfile();
-    this.profileSaved.set(true);
-    setTimeout(() => this.profileSaved.set(false), 3000);
+    this.toast.success('Profile updated successfully.');
   }
 
   async changePassword(): Promise<void> {
@@ -131,10 +155,9 @@ export class AdminProfileComponent implements OnInit {
 
     this.pwError.set('');
     const { error } = await this.sb.auth.updateUser({ password: this.pwForm.newPw });
-    if (error) { this.pwError.set('Failed to update: ' + error.message); return; }
+    if (error) { this.toast.error('Failed to update: ' + error.message); return; }
     this.pwForm = { newPw: '', confirm: '' };
-    this.pwSaved.set(true);
-    setTimeout(() => this.pwSaved.set(false), 3000);
+    this.toast.success('Password changed successfully.');
   }
 
   clearErr(f: string): void { this.profileErrors.update(e => { const n = {...e}; delete n[f]; return n; }); }

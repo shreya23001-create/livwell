@@ -568,15 +568,33 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
   totalPayment = computed(() => this.monthlyPayment() * this.mortgageYears() * 12);
 
-  safeMapUrl = computed((): SafeResourceUrl => {
-    const url = this.property()?.mapUrl ?? '';
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  });
+  safeMapUrl = signal<SafeResourceUrl>('');
 
   loading = signal(false);
   private sb = inject(SupabaseService).client;
 
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer) {}
+
+  private async geocodeAndSetMap(community: string, location: string): Promise<void> {
+    const raw   = community?.trim() || location?.trim() || 'Dubai';
+    const query = raw.toLowerCase().includes('dubai') ? raw : raw + ', Dubai, UAE';
+    try {
+      const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+      const data = await res.json();
+      let url: string;
+      if (data?.length) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&ll=${lat},${lon}&t=m&z=15&output=embed`;
+      } else {
+        url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=15&output=embed`;
+      }
+      this.safeMapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    } catch {
+      const url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=15&output=embed`;
+      this.safeMapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    }
+  }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -594,6 +612,11 @@ export class LuxuryPropertyDetailComponent implements OnInit {
         if (found) {
           this.property.set(found);
           this.mortgageAmount.set(parseInt(found.price.replace(/[^0-9]/g, '')) || 0);
+          if (found.mapUrl) {
+            this.safeMapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(found.mapUrl));
+          } else {
+            this.geocodeAndSetMap(found.community, found.location);
+          }
         } else {
           this.notFound.set(true);
         }
@@ -676,6 +699,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
     this.property.set(detail);
     this.mortgageAmount.set(priceNum);
+    this.geocodeAndSetMap(p.community ?? '', p.location ?? '');
     this.loading.set(false);
   }
 

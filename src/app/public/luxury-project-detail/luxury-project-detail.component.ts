@@ -1,6 +1,7 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 
@@ -175,10 +176,13 @@ STUB_IDS.forEach(id => {
   styleUrl: './luxury-project-detail.component.scss',
 })
 export class LuxuryProjectDetailComponent implements OnInit {
-  project = signal<ProjectDetail | null>(null);
-  notFound = signal(false);
-  openFaq = signal<number | null>(null);
+  project    = signal<ProjectDetail | null>(null);
+  notFound   = signal(false);
+  openFaq    = signal<number | null>(null);
   activeImage = signal(0);
+  mapUrl     = signal<SafeResourceUrl>('');
+
+  private sanitizer = inject(DomSanitizer);
 
   hasData = computed(() => {
     const p = this.project();
@@ -193,10 +197,32 @@ export class LuxuryProjectDetailComponent implements OnInit {
       const found = PROJECTS[id];
       if (found) {
         this.project.set(found);
+        this.geocodeAndSetMap(found.community, found.location);
       } else {
         this.notFound.set(true);
       }
     });
+  }
+
+  private async geocodeAndSetMap(community: string, location: string): Promise<void> {
+    const raw   = community?.trim() || location?.trim() || 'Dubai';
+    const query = raw.toLowerCase().includes('dubai') ? raw : raw + ', Dubai, UAE';
+    try {
+      const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+      const data = await res.json();
+      let url: string;
+      if (data?.length) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&ll=${lat},${lon}&t=m&z=15&output=embed`;
+      } else {
+        url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=15&output=embed`;
+      }
+      this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    } catch {
+      const url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=15&output=embed`;
+      this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    }
   }
 
   toggleFaq(i: number) {

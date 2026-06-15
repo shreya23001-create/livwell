@@ -68,11 +68,14 @@
       <div class="form-grid">
         <div class="form-field">
           <label>I am looking to</label>
-          <select [(ngModel)]="profileForm.lookingFor">
-            <option value="buy">Buy</option>
-            <option value="rent">Rent</option>
-            <option value="invest">Invest</option>
-          </select>
+          <div class="select-wrapper">
+            <select [(ngModel)]="profileForm.lookingFor">
+              <option value="buy">Buy</option>
+              <option value="rent">Rent</option>
+              <option value="invest">Invest</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
         </div>
         <div class="form-field">
           <label>Budget</label>

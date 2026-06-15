@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 type Tab = 'profile' | 'password' | 'notifications';
 
@@ -14,21 +15,22 @@ type Tab = 'profile' | 'password' | 'notifications';
   styleUrl: './agent-profile.component.scss',
 })
 export class AgentProfileComponent implements OnInit {
-  private auth = inject(AuthService);
-  private sb   = inject(SupabaseService).client;
+  private auth  = inject(AuthService);
+  private sb    = inject(SupabaseService).client;
+  private toast = inject(ToastService);
 
   activeTab = signal<Tab>('profile');
   loading   = signal(true);
 
   // ── Profile fields ───────────────────────────────────
-  profile = {
+  profile = signal({
     name:        '',
     email:       '',
     phone:       '',
     designation: '',
     bio:         '',
     photoUrl:    '',
-  };
+  });
 
   profileSaved  = signal(false);
   profileError  = signal('');
@@ -71,29 +73,35 @@ export class AgentProfileComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
-    const user = this.auth.currentUser();
-    if (user) {
-      this.profile.name        = user.name  ?? '';
-      this.profile.email       = user.email ?? '';
-      this.profile.phone       = user.phone ?? '';
-      this.profile.designation = '';
-      this.profile.bio         = '';
-      this.profile.photoUrl    = '';
 
-      // fetch extended fields from profiles table
+    // waitForSession can resolve while the profile row is still being fetched
+    // (race between auth.getSession() and profiles SELECT). Retry up to 3s.
+    let user = this.auth.currentUser();
+    if (!user) {
+      for (let i = 0; i < 6 && !user; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        user = this.auth.currentUser();
+      }
+    }
+
+    if (user) {
+      this.profile.set({ name: user.name ?? '', email: user.email ?? '', phone: user.phone ?? '', designation: '', bio: '', photoUrl: '' });
+
       const { data } = await this.sb
         .from('profiles')
         .select('name, email, phone, avatar_url, bio, designation')
         .eq('id', user.id)
         .single();
       if (data) {
-        this.profile.name        = data.name        ?? this.profile.name;
-        this.profile.email       = data.email       ?? this.profile.email;
-        this.profile.phone       = data.phone       ?? this.profile.phone;
         const av = data.avatar_url ?? '';
-        this.profile.photoUrl    = av.startsWith('data:') ? '' : av;
-        this.profile.bio         = data.bio         ?? '';
-        this.profile.designation = data.designation ?? '';
+        this.profile.set({
+          name:        data.name        ?? user.name  ?? '',
+          email:       data.email       ?? user.email ?? '',
+          phone:       data.phone       ?? user.phone ?? '',
+          photoUrl:    (av && !av.startsWith('data:') && /\/avatars\/[^/]+/.test(av)) ? av : '',
+          bio:         data.bio         ?? '',
+          designation: data.designation ?? '',
+        });
       }
     }
 
@@ -127,19 +135,21 @@ export class AgentProfileComponent implements OnInit {
     const ext  = file.name.split('.').pop();
     const path = `avatars/${user.id}.${ext}`;
     const { error: upErr } = await this.sb.storage.from('imagesFolder').upload(path, file, { upsert: true });
-    if (upErr) { this.photoError.set('Upload failed: ' + upErr.message); this.uploadingPhoto.set(false); return; }
+    if (upErr) { this.photoError.set('Upload failed: ' + upErr.message); this.toast.error('Photo upload failed.'); this.uploadingPhoto.set(false); return; }
     const { data } = this.sb.storage.from('imagesFolder').getPublicUrl(path);
-    this.profile.photoUrl = data.publicUrl + '?t=' + Date.now();
+    this.profile.update(p => ({ ...p, photoUrl: data.publicUrl + '?t=' + Date.now() }));
     this.uploadingPhoto.set(false);
+    this.toast.success('Photo uploaded. Save changes to apply.');
   }
 
-  async removePhoto(): Promise<void> { this.profile.photoUrl = ''; }
+  async removePhoto(): Promise<void> { this.profile.update(p => ({ ...p, photoUrl: '' })); }
 
   async saveProfile(): Promise<void> {
+    const p = this.profile();
     const errs: Record<string, string> = {};
-    if (!this.profile.name.trim())  errs['name']  = 'Name is required.';
-    if (!this.profile.phone.trim()) errs['phone'] = 'Phone is required.';
-    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(this.profile.phone)) errs['phone'] = 'Enter a valid phone number.';
+    if (!p.name.trim())  errs['name']  = 'Name is required.';
+    if (!p.phone.trim()) errs['phone'] = 'Phone is required.';
+    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(p.phone)) errs['phone'] = 'Enter a valid phone number.';
     this.profileErrors.set(errs);
     if (Object.keys(errs).length) return;
 
@@ -148,17 +158,16 @@ export class AgentProfileComponent implements OnInit {
     if (!user?.id) return;
 
     const { error } = await this.sb.from('profiles').update({
-      name:        this.profile.name.trim(),
-      phone:       this.profile.phone.trim(),
-      avatar_url:  this.profile.photoUrl || null,
-      bio:         this.profile.bio.trim() || null,
-      designation: this.profile.designation.trim() || null,
+      name:        p.name.trim(),
+      phone:       p.phone.trim(),
+      avatar_url:  p.photoUrl || null,
+      bio:         p.bio.trim() || null,
+      designation: p.designation.trim() || null,
     }).eq('id', user.id);
 
-    if (error) { this.profileError.set('Failed to save: ' + error.message); return; }
+    if (error) { this.toast.error('Failed to save: ' + error.message); return; }
     await this.auth.refreshProfile();
-    this.profileSaved.set(true);
-    setTimeout(() => this.profileSaved.set(false), 3000);
+    this.toast.success('Profile updated successfully.');
   }
 
   async changePassword(): Promise<void> {
@@ -174,10 +183,9 @@ export class AgentProfileComponent implements OnInit {
 
     this.pwError.set('');
     const { error } = await this.sb.auth.updateUser({ password: this.pwForm.newPw });
-    if (error) { this.pwError.set('Failed to update password. Please try again.'); return; }
+    if (error) { this.toast.error('Failed to update password. Please try again.'); return; }
     this.pwForm = { newPw: '', confirm: '' };
-    this.pwSaved.set(true);
-    setTimeout(() => this.pwSaved.set(false), 3000);
+    this.toast.success('Password changed successfully.');
   }
 
   saveNotifications(): void {

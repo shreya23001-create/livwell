@@ -2,6 +2,7 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-customer-change-password',
@@ -68,7 +69,8 @@ import { SupabaseService } from '../../shared/services/supabase.service';
   `]
 })
 export class CustomerChangePasswordComponent {
-  private sb = inject(SupabaseService).client;
+  private sb    = inject(SupabaseService).client;
+  private toast = inject(ToastService);
   newPassword     = '';
   confirmPassword = '';
   showNew     = signal(false);
@@ -87,8 +89,8 @@ export class CustomerChangePasswordComponent {
     this.loading.set(true);
     const { error } = await this.sb.auth.updateUser({ password: this.newPassword });
     this.loading.set(false);
-    if (error) { this.error.set('Failed to update password. Please try again.'); return; }
-    this.success.set(true);
+    if (error) { this.toast.error('Failed to update password. Please try again.'); return; }
+    this.toast.success('Password changed successfully.');
     this.newPassword = '';
     this.confirmPassword = '';
   }

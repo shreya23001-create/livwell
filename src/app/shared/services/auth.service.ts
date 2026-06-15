@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   private async loadSession(): Promise<void> {
-    const timeout = new Promise<void>(r => setTimeout(r, 3000));
+    const timeout = new Promise<void>(r => setTimeout(r, 5000));
     const load = (async () => {
       const { data: { session } } = await this.supabase.auth.getSession();
       if (session?.user) await this.loadProfileWithFallback(session.user);
@@ -96,6 +96,7 @@ export class AuthService {
       .maybeSingle();
 
     if (data) {
+      const av = data.avatar_url ?? '';
       this._currentUser.set({
         id:     data.id,
         name:   data.name   || '',
@@ -103,7 +104,7 @@ export class AuthService {
         phone:  data.phone  || '',
         role:   data.role   as UserRole,
         status: data.status || 'active',
-        avatar: data.avatar_url || '',
+        avatar: (av && !av.startsWith('data:') && /\/avatars\/[^/]+/.test(av)) ? av : '',
       });
     } else if (retries > 0) {
       await new Promise(r => setTimeout(r, 700));

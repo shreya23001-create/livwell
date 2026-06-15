@@ -5,40 +5,44 @@ import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
+import { ToastService } from '../../shared/services/toast.service';
 import * as XLSX from 'xlsx';
 
 export type PropStatus   = 'Draft' | 'Pending Review' | 'Published' | 'Archived' | 'Sold' | 'Rented';
-export type PropType     = 'Apartment' | 'Villa' | 'Townhouse' | 'Penthouse' | 'Studio' | 'Office';
+export type PropType     = 'Apartment' | 'Villa' | 'Townhouse' | 'Penthouse' | 'Studio' | 'Office' | 'Shop' | 'Warehouse' | 'Plot';
 export type PropCategory = 'Sale' | 'Rent' | 'Off-Plan';
 
 export interface Property {
-  id:           number;
-  title:        string;
-  type:         PropType;
-  listing_type: PropCategory;
-  status:       PropStatus;
-  price:        number;
-  area_sqft:    number;
-  bedrooms:     number;
-  bathrooms:    number;
-  location:     string;
-  community:    string;
-  agent_name:   string;
-  created_by:   string;
-  created_at:   string;
-  views:        number;
-  is_featured:  boolean;
-  description:  string;
-  address:      string;
-  furnishing:   string;
-  images:       string[];
+  id:              number;
+  title:           string;
+  type:            PropType;
+  listing_type:    PropCategory;
+  status:          PropStatus;
+  price:           number;
+  area_sqft:       number;
+  bedrooms:        number;
+  bathrooms:       number;
+  location:        string;
+  community:       string;
+  agent_name:      string;
+  agent_avatar:    string;
+  created_by:      string;
+  created_at:      string;
+  views:           number;
+  is_featured:     boolean;
+  description:     string;
+  address:         string;
+  furnishing:      string;
+  images:          string[];
+  amenities:       string[];
 }
 
 const EMPTY_FORM = (): Partial<Property> => ({
   title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
   price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', address: '', description: '',
-  furnishing: 'Unfurnished', agent_name: '', is_featured: false, images: [],
+  furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, images: [],
+  amenities: [],
 });
 
 @Component({
@@ -52,6 +56,7 @@ export class AdminPropertiesComponent implements OnInit {
   private sb      = inject(SupabaseService).client;
   private auth    = inject(AuthService);
   private dataSvc = inject(AdminDataService);
+  private toast   = inject(ToastService);
 
   // ── Data ──────────────────────────────────────────────
   properties  = signal<Property[]>([]);
@@ -81,6 +86,7 @@ export class AdminPropertiesComponent implements OnInit {
   uploadingImages = signal(false);
   uploadedImages  = signal<string[]>([]);   // final public URLs (saved to DB)
   previewImages   = signal<string[]>([]);   // local blob URLs for instant preview
+  amenityInput    = signal('');
 
   // ── Computed ──────────────────────────────────────────
   filtered = computed(() => {
@@ -141,10 +147,26 @@ export class AdminPropertiesComponent implements OnInit {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
+      const uniqueNames = [...new Set(data.map((p: any) => p.agent_name).filter(Boolean))] as string[];
+      const avatarMap: Record<string, string> = {};
+      if (uniqueNames.length) {
+        const { data: profiles } = await this.sb
+          .from('profiles')
+          .select('name, avatar_url')
+          .in('name', uniqueNames)
+          .eq('role', 'agent');
+        if (profiles) {
+          for (const pr of profiles) {
+            const av = (pr.avatar_url ?? '').split('?')[0];
+            avatarMap[pr.name] = /\/avatars\/[^/]+$/.test(av) ? (pr.avatar_url ?? '') : '';
+          }
+        }
+      }
       this.properties.set(data.map((p: any) => ({
         ...p,
-        agent_name: p.agent_name || '—',
-        created_by: p.created_by || p.agent_name || 'Admin',
+        agent_name:   p.agent_name || '—',
+        agent_avatar: avatarMap[p.agent_name] ?? '',
+        created_by:   p.created_by || p.agent_name || 'Admin',
       })));
     }
     this.loading.set(false);
@@ -180,6 +202,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.saveError.set('');
     this.uploadedImages.set([]);
     this.previewImages.set([]);
+    this.amenityInput.set('');
     this.editingId.set(null);
     this.modalOpen.set(true);
   }
@@ -189,7 +212,8 @@ export class AdminPropertiesComponent implements OnInit {
     this.formErrors.set({});
     this.saveError.set('');
     this.uploadedImages.set(p.images ?? []);
-    this.previewImages.set(p.images ?? []);   // existing URLs are already public
+    this.previewImages.set(p.images ?? []);
+    this.amenityInput.set('');
     this.editingId.set(p.id);
     this.modalOpen.set(true);
   }
@@ -206,8 +230,8 @@ export class AdminPropertiesComponent implements OnInit {
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     const maxSize = 5 * 1024 * 1024; // 5 MB
     for (const file of files) {
-      if (!allowed.includes(file.type)) { this.saveError.set(`"${file.name}" is not a supported image type. Use JPG, PNG, WebP, or GIF.`); return; }
-      if (file.size > maxSize)          { this.saveError.set(`"${file.name}" exceeds the 5 MB size limit.`); return; }
+      if (!allowed.includes(file.type)) { this.toast.error(`"${file.name}" is not a supported image type. Use JPG, PNG, WebP, or GIF.`); return; }
+      if (file.size > maxSize)          { this.toast.error(`"${file.name}" exceeds the 5 MB size limit.`); return; }
     }
 
     this.uploadingImages.set(true);
@@ -230,7 +254,7 @@ export class AdminPropertiesComponent implements OnInit {
           .upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
 
         if (error) {
-          this.saveError.set(`Image ${i + 1} failed: ${error.message}`);
+          this.toast.error(`Image ${i + 1} failed: ${error.message}`);
           // Revoke the blob that failed
           URL.revokeObjectURL(blobs[i]);
           this.previewImages.update(p => p.filter(u => u !== blobs[i]));
@@ -246,7 +270,7 @@ export class AdminPropertiesComponent implements OnInit {
         }
       }
     } catch (e: any) {
-      this.saveError.set('Upload error: ' + (e?.message ?? 'Unknown error'));
+      this.toast.error('Upload error: ' + (e?.message ?? 'Unknown error'));
     } finally {
       this.uploadedImages.update(p => [...p, ...publicUrls]);
       this.uploadingImages.set(false);
@@ -259,10 +283,22 @@ export class AdminPropertiesComponent implements OnInit {
   }
 
 
+  addAmenity(): void {
+    const v = this.amenityInput().trim();
+    if (!v) return;
+    this.form.update(f => ({ ...f, amenities: [...(f.amenities ?? []), v] }));
+    this.amenityInput.set('');
+  }
+
+  removeAmenity(i: number): void {
+    this.form.update(f => ({ ...f, amenities: (f.amenities ?? []).filter((_, idx) => idx !== i) }));
+  }
+
   closeModal(): void {
     this.modalOpen.set(false);
     this.previewImages.set([]);
     this.uploadedImages.set([]);
+    this.amenityInput.set('');
   }
 
   async saveProperty(): Promise<void> {
@@ -275,23 +311,24 @@ export class AdminPropertiesComponent implements OnInit {
     const f = this.form();
 
     const payload: any = {
-      title:        f.title?.trim(),
-      type:         f.type         || 'Apartment',
-      listing_type: f.listing_type || 'Sale',
-      status:       f.status       || 'Draft',
-      price:        Number(f.price)    || 0,
-      area_sqft:    Number(f.area_sqft) || 0,
-      bedrooms:     Number(f.bedrooms)  || 0,
-      bathrooms:    Number(f.bathrooms) || 1,
-      location:     f.location?.trim()  || '',
-      community:    f.community?.trim() || '',
-      address:      f.address?.trim()   || '',
-      description:  f.description?.trim() || '',
-      furnishing:   f.furnishing    || 'Unfurnished',
-      agent_name:   f.agent_name    || null,
-      agent_id:     null,
-      is_featured:  f.is_featured   ?? false,
-      images:       this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
+      title:           f.title?.trim(),
+      type:            f.type            || 'Apartment',
+      listing_type:    f.listing_type    || 'Sale',
+      status:          f.status          || 'Draft',
+      price:           Number(f.price)    || 0,
+      area_sqft:       Number(f.area_sqft) || 0,
+      bedrooms:        Number(f.bedrooms)  || 0,
+      bathrooms:       Number(f.bathrooms) || 1,
+      location:        f.location?.trim()  || '',
+      community:       f.community?.trim() || '',
+      address:         f.address?.trim()   || '',
+      description:     f.description?.trim() || '',
+      furnishing:      f.furnishing    || 'Unfurnished',
+      agent_name:      f.agent_name    || null,
+      agent_id:        null,
+      is_featured:     f.is_featured   ?? false,
+      images:          this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
+      amenities:       f.amenities ?? [],
     };
 
     try {
@@ -306,7 +343,7 @@ export class AdminPropertiesComponent implements OnInit {
 
       if (error) {
         console.error('Supabase save error:', error);
-        this.saveError.set(`Error: ${error.message || error.code || 'Unknown error'}`);
+        this.toast.error(`Error: ${error.message || error.code || 'Unknown error'}`);
         this.saving.set(false);
         return;
       }
@@ -314,7 +351,7 @@ export class AdminPropertiesComponent implements OnInit {
       this.saving.set(false);
       const editingId = this.editingId();
       this.closeModal();
-      // Update local signal immediately so table reflects change without waiting
+      this.toast.success(editingId !== null ? 'Property updated successfully.' : 'Property added successfully.');
       if (editingId !== null) {
         this.properties.update(list => list.map(p =>
           p.id === editingId ? { ...p, ...payload } : p
@@ -324,7 +361,7 @@ export class AdminPropertiesComponent implements OnInit {
 
     } catch (e: any) {
       console.error('Save exception:', e);
-      this.saveError.set('Unexpected error: ' + (e?.message || 'Please try again.'));
+      this.toast.error('Unexpected error: ' + (e?.message || 'Please try again.'));
       this.saving.set(false);
     }
   }
@@ -369,7 +406,7 @@ export class AdminPropertiesComponent implements OnInit {
     if (error) {
       // Revert on failure
       this.properties.update(list => list.map(x => x.id === p.id ? { ...x, status: previous } : x));
-      this.saveError.set('Status update failed: ' + error.message);
+      this.toast.error('Status update failed: ' + error.message);
     }
   }
 
@@ -438,7 +475,7 @@ export class AdminPropertiesComponent implements OnInit {
     const rows   = XLSX.utils.sheet_to_json(ws) as any[];
 
     if (!rows.length) {
-      this.importError.set('No data found in the file.');
+      this.toast.error('No data found in the file.');
       this.importing.set(false);
       return;
     }
@@ -464,9 +501,9 @@ export class AdminPropertiesComponent implements OnInit {
     const { error } = await this.sb.from('properties').insert(records);
 
     if (error) {
-      this.importError.set('Import failed: ' + error.message);
+      this.toast.error('Import failed: ' + error.message);
     } else {
-      this.importSuccess.set(`✓ ${records.length} properties imported successfully.`);
+      this.toast.success(`${records.length} properties imported successfully.`);
       await this.loadProperties();
     }
 

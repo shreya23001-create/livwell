@@ -181,15 +181,37 @@ EXTRA_OFFICES.forEach(o => { ALL_COMMERCIAL[o.id] = o; });
   styleUrl: './commercial-property-detail.component.scss',
 })
 export class CommercialPropertyDetailComponent implements OnInit {
-  property  = signal<CommercialDetail | null>(null);
-  notFound  = signal(false);
-  loading   = signal(true);
+  property    = signal<CommercialDetail | null>(null);
+  notFound    = signal(false);
+  loading     = signal(true);
   activeImage = signal(0);
   showEnquiry = signal(false);
+  mapUrl      = signal<SafeResourceUrl>('');
 
   private route     = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
   private sb        = inject(SupabaseService).client;
+
+  private async geocodeAndSetMap(community: string, location: string): Promise<void> {
+    const raw   = community?.trim() || location?.trim() || 'Dubai';
+    const query = raw.toLowerCase().includes('dubai') ? raw : raw + ', Dubai, UAE';
+    try {
+      const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+      const data = await res.json();
+      let url: string;
+      if (data?.length) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&ll=${lat},${lon}&t=m&z=15&output=embed`;
+      } else {
+        url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=15&output=embed`;
+      }
+      this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    } catch {
+      const url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=15&output=embed`;
+      this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    }
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -272,6 +294,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
       };
       this.property.set(detail);
       this.loading.set(false);
+      this.geocodeAndSetMap(p.community ?? '', p.location ?? '');
       return;
     }
 
@@ -280,6 +303,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
     this.property.set(found);
     this.notFound.set(!found);
     this.loading.set(false);
+    if (found) { this.geocodeAndSetMap(found.developer ?? '', found.location ?? ''); }
   }
 
   safeMap(url: string): SafeResourceUrl {

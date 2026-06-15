@@ -1098,6 +1098,55 @@ $amber: #d97706;
   margin-top: 0.4rem;
 }
 
+// ── Amenities tag input ────────────────────────────────────
+.apr-tag-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  .prop-form-input {
+    flex: 1;
+  }
+}
+
+.prop-btn--sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.78rem;
+}
+
+.apr-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.apr-tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #eff6ff;
+  color: $blue;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $blue;
+    font-size: 0.85rem;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.6;
+
+    &:hover { opacity: 1; }
+  }
+}
+
 .select-wrapper {
   position: relative;
   display: inline-block;

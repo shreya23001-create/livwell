@@ -207,8 +207,14 @@
     </div>
   </div>
 
+  <!-- ── Loading ──────────────────────────────────────────────── -->
+  <div *ngIf="loading()" class="lpfs-loading">
+    <svg class="lpfs-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#6366f1" stroke-width="3" stroke-dasharray="30 70"/></svg>
+    <p>Loading properties…</p>
+  </div>
+
   <!-- ── Results Bar ───────────────────────────────────────── -->
-  <div class="lpfs-results-bar">
+  <div class="lpfs-results-bar" *ngIf="!loading()">
     <div class="lpfs-container">
       <span class="lpfs-count"><strong>{{ filteredProperties().length }}</strong> properties found</span>
       <div class="lpfs-sort-wrap">
@@ -224,12 +230,12 @@
   </div>
 
   <!-- ── Property Cards ─────────────────────────────────────── -->
-  <div class="lpfs-container">
+  <div class="lpfs-container" *ngIf="!loading()">
     <div class="lpfs-list">
       <div *ngFor="let p of filteredProperties()" class="lpfs-card">
 
         <a [routerLink]="['/commercial', p.id]" class="lpfs-card-img-wrap">
-          <img [src]="p.image" [alt]="p.title" class="lpfs-card-img" loading="lazy">
+          <img [src]="p.image || 'images/dummy-image.png'" [alt]="p.title" class="lpfs-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
           <span *ngIf="p.badge" class="lpfs-badge">{{ p.badge }}</span>
           <span class="lpfs-status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
           <span *ngIf="p.tour360" class="lpfs-badge-360">360°</span>
@@ -314,7 +320,15 @@
         <!-- Agent bar -->
         <div class="lpfs-agent-bar">
           <div class="lpfs-agent-name-strip">
-            <img [src]="p.agent.avatar" [alt]="p.agent.name" class="lpfs-agent-av">
+            @if (p.agent.avatar) {
+              <img [src]="p.agent.avatar" [alt]="p.agent.name" class="lpfs-agent-av" (error)="p.agent.avatar = ''">
+            } @else {
+              <div class="lpfs-agent-av lpfs-agent-av-dummy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                </svg>
+              </div>
+            }
             <span class="lpfs-agent-name">{{ p.agent.name }}</span>
           </div>
           <div class="lpfs-agent-btns-strip">

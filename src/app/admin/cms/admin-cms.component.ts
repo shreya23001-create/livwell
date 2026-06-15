@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminDataService, CmsBanner, CmsAnnouncement, CmsPage, BannerStatus, AnnouncementType } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 type CmsTab = 'banners' | 'featured' | 'announcements' | 'pages';
 
@@ -23,6 +24,7 @@ export class AdminCmsComponent implements OnInit {
   private dataSvc = inject(AdminDataService);
   private auth    = inject(AuthService);
   private sb      = inject(SupabaseService).client;
+  private toast   = inject(ToastService);
 
   activeTab   = signal<CmsTab>('banners');
   saveSuccess = signal('');
@@ -65,7 +67,7 @@ export class AdminCmsComponent implements OnInit {
     if (!prop) return;
     await this.sb.from('properties').update({ is_featured: !prop.featured }).eq('id', id);
     await this.loadFeaturedProperties();
-    this.flash('Featured properties updated.');
+    this.toast.success('Featured properties updated.');
   }
 
   // ── Banner modal ──────────────────────────────────────
@@ -101,9 +103,9 @@ export class AdminCmsComponent implements OnInit {
     this.saving.set(true);
     const err = await this.dataSvc.saveBanner(f, this.editingBannerId());
     this.saving.set(false);
-    if (err) { this.saveError.set(err); return; }
+    if (err) { this.toast.error(err); return; }
     this.showBannerModal.set(false);
-    this.flash('Banner saved.');
+    this.toast.success('Banner saved.');
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
     this.dataSvc.log(actor, role, this.editingBannerId() ? 'Edit CMS Banner' : 'Add CMS Banner', 'cms', `Banner "${f.title}" ${this.editingBannerId() ? 'updated' : 'created'}`);
@@ -120,7 +122,7 @@ export class AdminCmsComponent implements OnInit {
     if (id === null) return;
     await this.dataSvc.deleteBanner(id);
     this.deleteBannerId.set(null);
-    this.flash('Banner deleted.');
+    this.toast.success('Banner deleted.');
   }
 
   // ── Announcement modal ────────────────────────────────
@@ -155,9 +157,9 @@ export class AdminCmsComponent implements OnInit {
     this.saving.set(true);
     const err = await this.dataSvc.saveAnnouncement(f, this.editingAnnId());
     this.saving.set(false);
-    if (err) { this.saveError.set(err); return; }
+    if (err) { this.toast.error(err); return; }
     this.showAnnModal.set(false);
-    this.flash('Announcement saved.');
+    this.toast.success('Announcement saved.');
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
     this.dataSvc.log(actor, role, 'Update CMS Announcement', 'cms', `Announcement "${f.title}" saved`);
@@ -174,7 +176,7 @@ export class AdminCmsComponent implements OnInit {
     if (id === null) return;
     await this.dataSvc.deleteAnnouncement(id);
     this.deleteAnnId.set(null);
-    this.flash('Announcement deleted.');
+    this.toast.success('Announcement deleted.');
   }
 
   // ── Page content ──────────────────────────────────────
@@ -192,9 +194,9 @@ export class AdminCmsComponent implements OnInit {
     this.saving.set(true);
     const err = await this.dataSvc.savePage(id, this.pageForm());
     this.saving.set(false);
-    if (err) { this.saveError.set(err); return; }
+    if (err) { this.toast.error(err); return; }
     this.editingPageId.set(null);
-    this.flash('Page content saved.');
+    this.toast.success('Page content saved.');
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
     this.dataSvc.log(actor, role, 'Update CMS Page', 'cms', `Page "${id}" content updated`);
@@ -207,9 +209,4 @@ export class AdminCmsComponent implements OnInit {
     return { info: 'Info', success: 'Success', warning: 'Warning' }[t];
   }
 
-  private flash(msg: string): void {
-    this.saveSuccess.set(msg);
-    this.saveError.set('');
-    setTimeout(() => this.saveSuccess.set(''), 3000);
-  }
 }

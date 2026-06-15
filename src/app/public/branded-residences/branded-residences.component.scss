@@ -9,6 +9,17 @@ $bg: #f9fafb;
 $white: #fff;
 $radius: 10px;
 
+.br-loading { display: flex; justify-content: center; padding: 5rem; }
+.br-db-error {
+  max-width: 1400px; margin: 1.5rem auto; padding: 1rem 1.5rem;
+  background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px;
+  color: #991b1b; font-size: 0.88rem; line-height: 1.6;
+  code { background: #fee2e2; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.82rem; }
+}
+.br-spin { width: 40px; height: 40px; border: 3px solid $border; border-top-color: $gold; border-radius: 50%; animation: br-spin .8s linear infinite; }
+@keyframes br-spin { to { transform: rotate(360deg); } }
+.br-card-img--empty { display: flex; align-items: center; justify-content: center; background: $bg; }
+
 .br-page {
   min-height: 100vh;
   background: $bg;
@@ -139,6 +150,8 @@ $radius: 10px;
   &.status--ready { background: #d1fae5; color: #065f46; }
   &.status--offplan { background: #fef3c7; color: #92400e; }
   &.status--construction { background: #dbeafe; color: #1e40af; }
+  &.status--ultra { background: #0a1628; color: #c8a84b; }
+  &.status--luxury { background: #1a1a2e; color: #c8a84b; }
 }
 
 .br-card-body {

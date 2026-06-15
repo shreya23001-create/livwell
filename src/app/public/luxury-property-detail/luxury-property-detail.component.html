@@ -88,7 +88,7 @@
       <!-- Gallery grid (main + 4 thumbs) -->
       <div class="lpd-gallery-grid">
         <div class="lpd-gallery-main" (click)="openLightbox()">
-          <img [src]="property()!.images[activeImage()]" [alt]="property()!.title" class="lpd-main-img">
+          <img [src]="property()!.images[activeImage()]" [alt]="property()!.title" class="lpd-main-img" (error)="$any($event.target).src='images/dummy-image.png'">
           <span *ngIf="property()?.badge" class="lpd-badge">{{ property()?.badge }}</span>
           <button class="lpd-nav lpd-nav-prev"
             (click)="$event.stopPropagation(); prevImage()"

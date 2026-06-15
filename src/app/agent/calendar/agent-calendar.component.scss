@@ -180,3 +180,8 @@ $bg:      #f4f6fa;
 
 @media (max-width: 1024px) { .cal-layout { grid-template-columns: 1fr; } }
 @media (max-width: 640px)  { .form-row { grid-template-columns: 1fr; } }
+
+.select-wrapper { position: relative; display: inline-block; width: 100%; }
+.select-wrapper select { appearance: none; -webkit-appearance: none; padding-right: 2.25rem; width: 100%; cursor: pointer; }
+.dropdown-icon { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; pointer-events: none; color: #6b7280; }
+.cal-hint { font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem; display: block; }

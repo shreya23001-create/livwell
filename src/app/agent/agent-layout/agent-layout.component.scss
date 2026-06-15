@@ -99,7 +99,10 @@ $topbar-h:      60px;
 .agt-user-avatar {
   width: 2rem; height: 2rem; border-radius: 50%;
   background: linear-gradient(135deg, $accent, $accent2); display: flex; align-items: center; justify-content: center;
-  font-size: 0.78rem; font-weight: 700; color: #fff; flex-shrink: 0;
+  font-size: 0.78rem; font-weight: 700; color: #fff; flex-shrink: 0; overflow: hidden;
+}
+.agt-user-avatar-img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top center; border-radius: 50%; display: block;
 }
 .agt-user-info { overflow: hidden; }
 .agt-user-name { font-size: 0.83rem; font-weight: 600; color: #fff; white-space: nowrap; }
@@ -157,7 +160,7 @@ $topbar-h:      60px;
 .agt-topbar-avatar {
   width: 2rem; height: 2rem; border-radius: 50%; background: linear-gradient(135deg, $accent, $accent2);
   color: #fff; font-size: 0.78rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;
 }
 .agt-content { flex: 1; overflow-y: auto; }
 

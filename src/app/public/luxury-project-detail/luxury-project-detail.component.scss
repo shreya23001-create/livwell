@@ -770,3 +770,6 @@ $white: #fff;
     border-color: $gold;
   }
 }
+.lpd-map-wrap { border-radius: 0.75rem; overflow: hidden; height: 380px; background: #e5e7eb; }
+.lpd-map { width: 100%; height: 100%; border: none; display: block; }
+.lpd-map-address { margin: 0.75rem 0 0; font-size: 0.85rem; color: #6b7280; }

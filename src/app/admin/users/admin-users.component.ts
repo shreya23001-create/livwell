@@ -6,6 +6,7 @@ import { UserRole, UserStatus } from '../../shared/models/user.model';
 import { AdminDataService, AdminUser } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 export type { AdminUser };
 
@@ -28,8 +29,9 @@ interface UserForm extends Partial<AdminUser> { password?: string; }
 export class AdminUsersComponent {
 
   dataSvc = inject(AdminDataService);
-  private auth = inject(AuthService);
-  private sb   = inject(SupabaseService).client;
+  private auth  = inject(AuthService);
+  private sb    = inject(SupabaseService).client;
+  private toast = inject(ToastService);
 
   showPassword = signal(false);
 
@@ -151,7 +153,7 @@ export class AdminUsersComponent {
         options:  { data: { name: f.name!.trim(), phone: f.phone?.trim() ?? '', role: f.role } },
       });
       if (signUpErr) {
-        this.saveError.set(signUpErr.message);
+        this.toast.error(signUpErr.message);
         this.saving.set(false);
         return;
       }
@@ -169,6 +171,7 @@ export class AdminUsersComponent {
       await this.dataSvc.loadUsers();
       this.saving.set(false);
       this.closeModal();
+      this.toast.success(`User "${f.name}" created successfully.`);
       const actor = this.auth.currentUser()?.email ?? 'admin';
       const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
       this.dataSvc.logUserAction(actor, role, 'Create User', `User "${f.name}" (${f.role}) created`);
@@ -177,8 +180,9 @@ export class AdminUsersComponent {
 
     const err = await this.dataSvc.saveUser(f, this.editingId());
     this.saving.set(false);
-    if (err) { this.saveError.set(err); return; }
+    if (err) { this.toast.error(err); return; }
     this.closeModal();
+    this.toast.success(`User "${f.name}" ${isNew ? 'created' : 'updated'} successfully.`);
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
     this.dataSvc.logUserAction(actor, role, isNew ? 'Create User' : 'Update User', `User "${f.name}" (${f.role}) ${isNew ? 'created' : 'updated'}`);
@@ -257,7 +261,7 @@ export class AdminUsersComponent {
     const rows   = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) as any[];
 
     if (!rows.length) {
-      this.importError.set('No data found in the file.');
+      this.toast.error('No data found in the file.');
       this.importing.set(false);
       input.value = '';
       return;
@@ -286,8 +290,8 @@ export class AdminUsersComponent {
       }));
 
     const err = await this.dataSvc.importUsers(toImport);
-    if (err) this.importError.set('Import failed: ' + err);
-    else     this.importSuccess.set(`✓ ${toImport.length} user(s) imported.`);
+    if (err) this.toast.error('Import failed: ' + err);
+    else     this.toast.success(`${toImport.length} user(s) imported successfully.`);
 
     this.importing.set(false);
     input.value = '';

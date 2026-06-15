@@ -21,10 +21,13 @@
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
       <input type="text" placeholder="Search name, email, location…" [value]="search()" (input)="search.set($any($event.target).value)">
     </div>
-    <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
-      <option value="">All Statuses</option>
-      <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
-    </select>
+    <div class="select-wrapper">
+      <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
+        <option value="">All Statuses</option>
+        <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
   </div>
 
   <!-- Table -->
@@ -126,23 +129,32 @@
         </div>
         <div class="form-field">
           <label>Category</label>
-          <select (change)="updateForm({category:$any($event.target).value})">
-            <option *ngFor="let c of categories" [value]="c" [selected]="form()['category'] === c">{{ c }}</option>
-          </select>
+          <div class="select-wrapper">
+            <select (change)="updateForm({category:$any($event.target).value})">
+              <option *ngFor="let c of categories" [value]="c" [selected]="form()['category'] === c">{{ c }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
           <label>Status</label>
-          <select (change)="updateForm({status:$any($event.target).value})">
-            <option *ngFor="let s of statuses" [value]="s" [selected]="form()['status'] === s">{{ labelStatus(s) }}</option>
-          </select>
+          <div class="select-wrapper">
+            <select (change)="updateForm({status:$any($event.target).value})">
+              <option *ngFor="let s of statuses" [value]="s" [selected]="form()['status'] === s">{{ labelStatus(s) }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
         </div>
         <div class="form-field">
           <label>Source</label>
-          <select (change)="updateForm({source:$any($event.target).value})">
-            <option *ngFor="let s of sources" [value]="s" [selected]="form()['source'] === s">{{ s }}</option>
-          </select>
+          <div class="select-wrapper">
+            <select (change)="updateForm({source:$any($event.target).value})">
+              <option *ngFor="let s of sources" [value]="s" [selected]="form()['source'] === s">{{ s }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
         </div>
       </div>
       <div class="form-row">

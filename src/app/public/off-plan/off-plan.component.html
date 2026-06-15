@@ -72,7 +72,7 @@
     <div class="op-grid">
       <article *ngFor="let p of filteredProjects()" class="op-card" [routerLink]="['/off-plan', p.slug]">
         <div class="op-card-img-wrap">
-          <img [src]="p.image" [alt]="p.title" class="op-card-img" loading="lazy">
+          <img [src]="p.image || 'images/dummy-image.png'" [alt]="p.title" class="op-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
           <div class="op-card-badges">
             <span *ngIf="p.badge" class="op-badge" [class.op-badge--gold]="p.badge === 'Featured' || p.badge === 'Exclusive' || p.badge === 'Ultra Luxury'" [class.op-badge--red]="p.badge === 'Hot' || p.badge === 'Trending'" [class.op-badge--blue]="p.badge === 'New Launch'">{{ p.badge }}</span>
           </div>

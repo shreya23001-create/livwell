@@ -9,22 +9,31 @@
     <div class="leads-header-actions">
       <!-- Import -->
       <label class="btn-ghost" [class.btn-loading]="importing()" title="Import from Excel">
-        <input type="file" accept=".xlsx,.xls,.csv" (change)="importFromExcel($event)" style="display:none" [disabled]="importing()">
+        <input type="file" accept=".xlsx,.xls,.csv" (change)="importFromExcel($event)" style="display:none"
+          [disabled]="importing()">
         @if (importing()) {
-          <span class="btn-spinner"></span> Importing…
+        <span class="btn-spinner"></span> Importing…
         } @else {
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
-          Import Excel
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+        </svg>
+        Import Excel
         }
       </label>
       <!-- Export -->
       <button class="btn-ghost" (click)="exportToExcel()" [disabled]="leads().length === 0" title="Export to Excel">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
         Export Excel
       </button>
       <!-- Add -->
       <button class="btn-primary" (click)="openAdd()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
         Add Lead
       </button>
     </div>
@@ -32,17 +41,21 @@
 
   <!-- Import feedback -->
   @if (importError()) {
-    <div class="leads-msg leads-msg--error">{{ importError() }}</div>
+  <div class="leads-msg leads-msg--error">{{ importError() }}</div>
   }
   @if (importSuccess()) {
-    <div class="leads-msg leads-msg--success">{{ importSuccess() }}</div>
+  <div class="leads-msg leads-msg--success">{{ importSuccess() }}</div>
   }
 
   <!-- ── Stat Cards ── -->
   <div class="leads-stats">
     <div class="stat-card">
       <div class="stat-icon stat-icon--total">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+        </svg>
       </div>
       <div>
         <div class="stat-value">{{ stats().total }}</div>
@@ -51,7 +64,11 @@
     </div>
     <div class="stat-card">
       <div class="stat-icon stat-icon--new">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+        </svg>
       </div>
       <div>
         <div class="stat-value">{{ stats().new }}</div>
@@ -60,7 +77,11 @@
     </div>
     <div class="stat-card">
       <div class="stat-icon stat-icon--qualified">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
       </div>
       <div>
         <div class="stat-value">{{ stats().qualified }}</div>
@@ -69,7 +90,11 @@
     </div>
     <div class="stat-card">
       <div class="stat-icon stat-icon--negotiating">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+        </svg>
       </div>
       <div>
         <div class="stat-value">{{ stats().negotiating }}</div>
@@ -78,7 +103,11 @@
     </div>
     <div class="stat-card">
       <div class="stat-icon stat-icon--won">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0" />
+        </svg>
       </div>
       <div>
         <div class="stat-value">{{ stats().won }}</div>
@@ -90,22 +119,40 @@
   <!-- ── Filters ── -->
   <div class="leads-filters">
     <div class="search-box">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
-      <input type="text" placeholder="Search name, email, phone, location…"
-             [value]="search()" (input)="search.set($any($event.target).value); onSearch()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+      </svg>
+      <input type="text" placeholder="Search name, email, phone, location…" [value]="search()"
+        (input)="search.set($any($event.target).value); onSearch()">
     </div>
-    <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value); onFilter()">
-      <option value="">All Statuses</option>
-      <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
-    </select>
-    <select [value]="filterSource()" (change)="filterSource.set($any($event.target).value); onFilter()">
-      <option value="">All Sources</option>
-      <option *ngFor="let s of sources" [value]="s">{{ labelSource(s) }}</option>
-    </select>
-    <select [value]="filterAgent()" (change)="filterAgent.set($any($event.target).value); onFilter()">
-      <option value="">All Agents</option>
-      <option *ngFor="let a of agents()" [value]="a">{{ a }}</option>
-    </select>
+    <div class="select-wrapper">
+      <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value); onFilter()">
+        <option value="">All Statuses</option>
+        <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </div>
+    <div class="select-wrapper">
+      <select [value]="filterSource()" (change)="filterSource.set($any($event.target).value); onFilter()">
+        <option value="">All Sources</option>
+        <option *ngFor="let s of sources" [value]="s">{{ labelSource(s) }}</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </div>
+    <div class="select-wrapper">
+      <select [value]="filterAgent()" (change)="filterAgent.set($any($event.target).value); onFilter()">
+        <option value="">All Agents</option>
+        <option *ngFor="let a of agents()" [value]="a">{{ a }}</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </div>
   </div>
 
   <!-- ── Loading / Error ── -->
@@ -121,14 +168,34 @@
     <table class="leads-table">
       <thead>
         <tr>
-          <th (click)="sort('name')" class="sortable">Lead<svg *ngIf="sortCol()==='name'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir()==='asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
-          <th (click)="sort('status')" class="sortable">Status<svg *ngIf="sortCol()==='status'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir()==='asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
+          <th (click)="sort('name')" class="sortable">Lead<svg *ngIf="sortCol()==='name'"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+              [class.flipped]="sortDir()==='asc'">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+            </svg></th>
+          <th (click)="sort('status')" class="sortable">Status<svg *ngIf="sortCol()==='status'"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+              [class.flipped]="sortDir()==='asc'">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+            </svg></th>
           <th>Category</th>
-          <th (click)="sort('source')" class="sortable">Source<svg *ngIf="sortCol()==='source'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir()==='asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
+          <th (click)="sort('source')" class="sortable">Source<svg *ngIf="sortCol()==='source'"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+              [class.flipped]="sortDir()==='asc'">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+            </svg></th>
           <th>Budget</th>
           <th>Location</th>
-          <th (click)="sort('assignedAgent')" class="sortable">Agent<svg *ngIf="sortCol()==='assignedAgent'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir()==='asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
-          <th (click)="sort('createdDate')" class="sortable">Created<svg *ngIf="sortCol()==='createdDate'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" [class.flipped]="sortDir()==='asc'"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"/></svg></th>
+          <th (click)="sort('assignedAgent')" class="sortable">Agent<svg *ngIf="sortCol()==='assignedAgent'"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+              [class.flipped]="sortDir()==='asc'">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+            </svg></th>
+          <th (click)="sort('createdDate')" class="sortable">Created<svg *ngIf="sortCol()==='createdDate'"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+              [class.flipped]="sortDir()==='asc'">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+            </svg></th>
           <th class="col-actions">Actions</th>
         </tr>
       </thead>
@@ -154,10 +221,18 @@
           <td>
             <div class="action-btns">
               <button class="action-btn action-btn--edit" (click)="openEdit(lead)" title="Edit">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                </svg>
               </button>
               <button class="action-btn action-btn--delete" (click)="confirmDelete(lead)" title="Delete">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                </svg>
               </button>
             </div>
           </td>
@@ -172,15 +247,20 @@
   <!-- ── Pagination ── -->
   <div class="leads-pagination" *ngIf="totalPages() > 1">
     <span class="pagination-info">
-      Showing {{ (page()-1)*pageSize + 1 }}–{{ page()*pageSize > filtered().length ? filtered().length : page()*pageSize }} of {{ filtered().length }} leads
+      Showing {{ (page()-1)*pageSize + 1 }}–{{ page()*pageSize > filtered().length ? filtered().length : page()*pageSize
+      }} of {{ filtered().length }} leads
     </span>
     <div class="pagination-btns">
       <button (click)="page.update(p => p-1)" [disabled]="page()===1">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
       </button>
       <button *ngFor="let n of pageNumbers()" (click)="page.set(n)" [class.active]="page()===n">{{ n }}</button>
       <button (click)="page.update(p => p+1)" [disabled]="page()===totalPages()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
       </button>
     </div>
   </div>
@@ -193,76 +273,112 @@
     <div class="modal-header">
       <h2>{{ isEdit() ? 'Edit Lead' : 'Add Lead' }}</h2>
       <button class="modal-close" (click)="closeModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
     <div class="modal-body">
       <div class="form-row">
         <div class="form-field" [class.has-error]="formErrors()['name']">
           <label>Full Name *</label>
-          <input type="text" [value]="form()['name']" (input)="updateForm({name: $any($event.target).value})" placeholder="e.g. James Carter">
+          <input type="text" [value]="form()['name']" (input)="updateForm({name: $any($event.target).value})"
+            placeholder="e.g. James Carter">
           <span class="field-error" *ngIf="formErrors()['name']">{{ formErrors()['name'] }}</span>
         </div>
         <div class="form-field" [class.has-error]="formErrors()['email']">
           <label>Email *</label>
-          <input type="email" [value]="form()['email']" (input)="updateForm({email: $any($event.target).value})" placeholder="james@example.com">
+          <input type="email" [value]="form()['email']" (input)="updateForm({email: $any($event.target).value})"
+            placeholder="james@example.com">
           <span class="field-error" *ngIf="formErrors()['email']">{{ formErrors()['email'] }}</span>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field" [class.has-error]="formErrors()['phone']">
           <label>Phone *</label>
-          <input type="text" [value]="form()['phone']" (input)="updateForm({phone: $any($event.target).value})" placeholder="+971 50 000 0000">
+          <input type="text" [value]="form()['phone']" (input)="updateForm({phone: $any($event.target).value})"
+            placeholder="+971 50 000 0000">
           <span class="field-error" *ngIf="formErrors()['phone']">{{ formErrors()['phone'] }}</span>
         </div>
         <div class="form-field">
           <label>Category</label>
-          <select (change)="updateForm({category: $any($event.target).value})">
-            <option *ngFor="let c of categories" [value]="c" [selected]="form()['category'] === c">{{ c | titlecase }}</option>
-          </select>
+          <div class="select-wrapper">
+            <select (change)="updateForm({category: $any($event.target).value})">
+              <option *ngFor="let c of categories" [value]="c" [selected]="form()['category'] === c">{{ c | titlecase }}
+              </option>
+            </select>
+            <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
+            </svg>
+          </div>
+
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
           <label>Status</label>
-          <select (change)="updateForm({status: $any($event.target).value})">
-            <option *ngFor="let s of statuses" [value]="s" [selected]="form()['status'] === s">{{ labelStatus(s) }}</option>
-          </select>
+          <div class="select-wrapper">
+            <select (change)="updateForm({status: $any($event.target).value})">
+              <option *ngFor="let s of statuses" [value]="s" [selected]="form()['status'] === s">{{ labelStatus(s) }}
+              </option>
+            </select>
+            <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
+            </svg>
+          </div>
+
         </div>
         <div class="form-field">
           <label>Source</label>
-          <select (change)="updateForm({source: $any($event.target).value})">
-            <option *ngFor="let s of sources" [value]="s" [selected]="form()['source'] === s">{{ labelSource(s) }}</option>
-          </select>
+          <div class="select-wrapper">
+            <select (change)="updateForm({source: $any($event.target).value})">
+              <option *ngFor="let s of sources" [value]="s" [selected]="form()['source'] === s">{{ labelSource(s) }}
+              </option>
+            </select>
+            <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
+            </svg>
+          </div>
+
         </div>
       </div>
       <div class="form-row">
         <div class="form-field" [class.has-error]="formErrors()['budget']">
           <label>Budget *</label>
-          <input type="text" [value]="form()['budget']" (input)="updateForm({budget: $any($event.target).value})" placeholder="AED 2M–3M">
+          <input type="text" [value]="form()['budget']" (input)="updateForm({budget: $any($event.target).value})"
+            placeholder="AED 2M–3M">
           <span class="field-error" *ngIf="formErrors()['budget']">{{ formErrors()['budget'] }}</span>
         </div>
         <div class="form-field" [class.has-error]="formErrors()['location']">
           <label>Preferred Location *</label>
-          <input type="text" [value]="form()['location']" (input)="updateForm({location: $any($event.target).value})" placeholder="Dubai Marina">
+          <input type="text" [value]="form()['location']" (input)="updateForm({location: $any($event.target).value})"
+            placeholder="Dubai Marina">
           <span class="field-error" *ngIf="formErrors()['location']">{{ formErrors()['location'] }}</span>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
           <label>Property Type</label>
-          <input type="text" [value]="form()['propertyType']" (input)="updateForm({propertyType: $any($event.target).value})" placeholder="Apartment, Villa…">
+          <input type="text" [value]="form()['propertyType']"
+            (input)="updateForm({propertyType: $any($event.target).value})" placeholder="Apartment, Villa…">
         </div>
         <div class="form-field">
           <label>Assigned Agent</label>
-          <select (change)="updateForm({assignedAgent: $any($event.target).value})">
-            <option *ngFor="let a of agents()" [value]="a" [selected]="form()['assignedAgent'] === a">{{ a }}</option>
-          </select>
+          <div class="select-wrapper">
+            <select (change)="updateForm({assignedAgent: $any($event.target).value})">
+              <option *ngFor="let a of agents()" [value]="a" [selected]="form()['assignedAgent'] === a">{{ a }}</option>
+            </select>
+            <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
+            </svg>
+          </div>
+
         </div>
       </div>
       <div class="form-field form-field--full">
         <label>Notes</label>
-        <textarea rows="3" [value]="form()['notes']" (input)="updateForm({notes: $any($event.target).value})" placeholder="Any additional notes…"></textarea>
+        <textarea rows="3" [value]="form()['notes']" (input)="updateForm({notes: $any($event.target).value})"
+          placeholder="Any additional notes…"></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -282,11 +398,14 @@
     <div class="modal-header modal-header--danger">
       <h2>Delete Lead</h2>
       <button class="modal-close" (click)="cancelDelete()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
     <div class="modal-body">
-      <p class="delete-msg">Are you sure you want to delete <strong>{{ deleteTarget()?.name }}</strong>? This action cannot be undone.</p>
+      <p class="delete-msg">Are you sure you want to delete <strong>{{ deleteTarget()?.name }}</strong>? This action
+        cannot be undone.</p>
     </div>
     <div class="modal-footer">
       <button class="btn-ghost" (click)="cancelDelete()">Cancel</button>

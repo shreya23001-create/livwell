@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 type Tab = 'profile' | 'security' | 'preferences';
 
@@ -14,8 +15,9 @@ type Tab = 'profile' | 'security' | 'preferences';
   styleUrl: './customer-profile.component.scss',
 })
 export class CustomerProfileComponent implements OnInit {
-  auth = inject(AuthService);
-  private sb = inject(SupabaseService).client;
+  auth          = inject(AuthService);
+  private sb    = inject(SupabaseService).client;
+  private toast = inject(ToastService);
 
   activeTab = signal<Tab>('profile');
   saving    = signal(false);
@@ -60,12 +62,11 @@ export class CustomerProfileComponent implements OnInit {
         name:  this.profileForm.name.trim(),
         phone: this.profileForm.phone.trim() || null,
       }).eq('id', userId);
-      if (error) { this.saveError.set('Failed to save. Please try again.'); this.saving.set(false); return; }
+      if (error) { this.toast.error('Failed to save. Please try again.'); this.saving.set(false); return; }
     }
     await this.auth.refreshProfile();
     this.saving.set(false);
-    this.saveSuccess.set('Profile updated successfully.');
-    setTimeout(() => this.saveSuccess.set(''), 3000);
+    this.toast.success('Profile updated successfully.');
   }
 
   async savePassword(): Promise<void> {
@@ -77,14 +78,12 @@ export class CustomerProfileComponent implements OnInit {
     this.saving.set(true);
     const { error } = await this.sb.auth.updateUser({ password: this.passwordForm.newPw });
     this.saving.set(false);
-    if (error) { this.saveError.set('Failed to update password. Please try again.'); return; }
-    this.saveSuccess.set('Password changed successfully.');
+    if (error) { this.toast.error('Failed to update password. Please try again.'); return; }
+    this.toast.success('Password changed successfully.');
     this.passwordForm = { newPw: '', confirmPw: '' };
-    setTimeout(() => this.saveSuccess.set(''), 3000);
   }
 
   savePreferences(): void {
-    this.saveSuccess.set('Notification preferences saved.');
-    setTimeout(() => this.saveSuccess.set(''), 3000);
+    this.toast.success('Notification preferences saved.');
   }
 }

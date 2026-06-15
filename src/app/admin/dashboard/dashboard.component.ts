@@ -22,19 +22,27 @@ export class DashboardComponent {
   leads = this.dataSvc.leads;
   users = this.dataSvc.users;
 
-  // Properties count from Supabase directly
-  propertiesCount = signal(0);
+  propertiesCount     = signal(0);
   propertiesPublished = signal(0);
+  projectsCount       = signal(0);
+  projectsPublished   = signal(0);
 
   constructor() {
-    this.loadPropertyStats();
+    this.loadStats();
   }
 
-  private async loadPropertyStats(): Promise<void> {
-    const { data } = await this.sb.from('properties').select('status');
-    if (data) {
-      this.propertiesCount.set(data.length);
-      this.propertiesPublished.set(data.filter((p: any) => p.status === 'Published').length);
+  private async loadStats(): Promise<void> {
+    const [propRes, projRes] = await Promise.all([
+      this.sb.from('properties').select('status'),
+      this.sb.from('projects').select('status'),
+    ]);
+    if (propRes.data) {
+      this.propertiesCount.set(propRes.data.length);
+      this.propertiesPublished.set(propRes.data.filter((p: any) => p.status === 'Published').length);
+    }
+    if (projRes.data) {
+      this.projectsCount.set(projRes.data.length);
+      this.projectsPublished.set(projRes.data.filter((p: any) => p.status === 'Published').length);
     }
   }
 
@@ -48,10 +56,11 @@ export class DashboardComponent {
     const conv    = leads.length > 0 ? ((won / leads.length) * 100).toFixed(1) : '0.0';
 
     return [
-      { label: 'Total Properties', value: String(this.propertiesCount()), sub: `${this.propertiesPublished()} published`, icon: 'home',    color: 'blue'   },
-      { label: 'Active Leads',     value: String(active),                  sub: `${leads.filter(l=>l.status==='new').length} new today`,  icon: 'leads',   color: 'gold'   },
-      { label: 'Active Agents',    value: String(agents),                  sub: `${users.filter(u=>u.role==='agent').length} total`,       icon: 'agents',  color: 'green'  },
-      { label: 'Conversion Rate',  value: `${conv}%`,                      sub: `${won} deals won`,                                        icon: 'revenue', color: 'purple' },
+      { label: 'Total Properties', value: String(this.propertiesCount()), sub: `${this.propertiesPublished()} published`, icon: 'home',     color: 'blue'   },
+      { label: 'Total Projects',   value: String(this.projectsCount()),   sub: `${this.projectsPublished()} published`,  icon: 'projects', color: 'teal'   },
+      { label: 'Active Leads',     value: String(active),                  sub: `${leads.filter(l=>l.status==='new').length} new today`,   icon: 'leads',   color: 'gold'   },
+      { label: 'Active Agents',    value: String(agents),                  sub: `${users.filter(u=>u.role==='agent').length} total`,        icon: 'agents',  color: 'green'  },
+      { label: 'Conversion Rate',  value: `${conv}%`,                      sub: `${won} deals won`,                                         icon: 'revenue', color: 'purple' },
     ];
   });
 

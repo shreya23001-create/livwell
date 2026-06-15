@@ -1,5 +1,5 @@
 <!-- ============================================================
-     LUXURY PROJECTS PAGE
+     LUXURY PROJECTS PAGE — dynamic from projects table
      ============================================================ -->
 <div class="lxp-page">
 
@@ -19,16 +19,24 @@
     </div>
   </div>
 
+  <!-- Loading -->
+  <div *ngIf="loading()" class="lxp-loading"><div class="lxp-spin"></div></div>
+
   <!-- ── Project Cards ───────────────────────────────────── -->
-  <div class="lxp-list">
-    <div *ngFor="let p of projects" class="lxp-card">
+  <div class="lxp-list" *ngIf="!loading()">
+
+    <div *ngIf="projects().length === 0" class="lxp-empty">
+      No {{ filter() === 'ultra' ? 'ultra luxury' : 'luxury' }} projects are currently published.
+    </div>
+
+    <div *ngFor="let p of projects()" class="lxp-card">
 
       <!-- Image -->
       <div class="lxp-card-img-wrap">
-        <img [src]="p.image" [alt]="p.title" class="lxp-card-img" loading="lazy">
+        <img [src]="p.images?.[0] || 'images/dummy-image.png'" [alt]="p.title" class="lxp-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
         <div class="lxp-card-img-overlay"></div>
         <span *ngIf="p.badge" class="lxp-badge">{{ p.badge }}</span>
-        <span class="lxp-status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+        <span *ngIf="p.is_ultra_luxury" class="lxp-badge lxp-badge--ultra">Ultra Luxury</span>
       </div>
 
       <!-- Details -->
@@ -36,8 +44,8 @@
         <div class="lxp-card-top">
           <div class="lxp-card-meta">
             <span class="lxp-card-type">{{ p.type }}</span>
-            <span class="lxp-card-sep">·</span>
-            <span class="lxp-card-beds">{{ p.beds }}</span>
+            <span *ngIf="p.beds" class="lxp-card-sep">·</span>
+            <span *ngIf="p.beds" class="lxp-card-beds">{{ p.beds }}</span>
           </div>
           <h2 class="lxp-card-title">{{ p.title }}</h2>
           <div class="lxp-card-developer">
@@ -46,7 +54,7 @@
             </svg>
             {{ p.developer }}
           </div>
-          <div class="lxp-card-location">
+          <div class="lxp-card-location" *ngIf="p.location">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
@@ -59,28 +67,28 @@
         <div class="lxp-card-pricing">
           <div class="lxp-price-main">
             <span class="lxp-price-label">Starting From</span>
-            <span class="lxp-price-value">{{ p.startingPrice }}</span>
+            <span class="lxp-price-value">{{ formatPrice(p.price_from) }}</span>
           </div>
           <div class="lxp-price-sub">
-            <div class="lxp-pill">
+            <div class="lxp-pill" *ngIf="p.completion_date">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
               </svg>
-              {{ p.completionDate }}
+              {{ p.completion_date }}
             </div>
-            <div class="lxp-pill">
+            <div class="lxp-pill" *ngIf="p.payment_plan">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2v20M2 12h20"/>
               </svg>
-              {{ p.paymentPlan }}
+              {{ p.payment_plan }}
             </div>
-            <div class="lxp-pill lxp-pill--sqft">{{ p.pricePerSqft }} / sqft</div>
+            <div class="lxp-pill lxp-pill--sqft" *ngIf="p.price_per_sqft">{{ p.price_per_sqft }} / sqft</div>
           </div>
         </div>
 
         <!-- Actions -->
         <div class="lxp-card-actions">
-          <a [routerLink]="['/luxury-project', slugify(p.title)]" class="lxp-btn-primary">
+          <a [routerLink]="['/projects', p.id]" class="lxp-btn-primary">
             View Project
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M7 17L17 7M17 7H7M17 7v10"/>
@@ -104,10 +112,7 @@
     </div>
   </div>
 
-  <!-- ── Newsletter ──────────────────────────────────────── -->
   <app-newsletter-section></app-newsletter-section>
-
-  <!-- ── SEO Links + Offices ────────────────────────────── -->
   <app-seo-links-section></app-seo-links-section>
 
 </div>

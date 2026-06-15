@@ -16,10 +16,11 @@
       <!-- Avatar card -->
       <div class="avatar-card">
         <div class="avatar-wrap">
-          <img *ngIf="profile.photoUrl" [src]="profile.photoUrl" alt="Profile photo" class="avatar-img" />
-          <div *ngIf="!profile.photoUrl" class="avatar-placeholder">
-            {{ profile.name.charAt(0) }}
-          </div>
+          @if (profile().photoUrl) {
+            <img [src]="profile().photoUrl" alt="Profile photo" class="avatar-img" />
+          } @else {
+            <div class="avatar-placeholder">{{ profile().name.charAt(0) }}</div>
+          }
           <label class="avatar-edit-btn" title="Change photo" [class.uploading]="uploadingPhoto()">
             <input type="file" accept="image/*" (change)="onPhotoChange($event)" hidden [disabled]="uploadingPhoto()" />
             <svg *ngIf="!uploadingPhoto()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>
@@ -27,10 +28,10 @@
           </label>
         </div>
         <div *ngIf="photoError()" class="avatar-photo-err">{{ photoError() }}</div>
-        <div class="avatar-name">{{ profile.name }}</div>
-        <div class="avatar-role">{{ profile.designation || 'Sales Agent' }}</div>
-        <div class="avatar-email">{{ profile.email }}</div>
-        <button *ngIf="profile.photoUrl" class="remove-photo-btn" (click)="removePhoto()">Remove photo</button>
+        <div class="avatar-name">{{ profile().name }}</div>
+        <div class="avatar-role">{{ profile().designation || 'Sales Agent' }}</div>
+        <div class="avatar-email">{{ profile().email }}</div>
+        <button *ngIf="profile().photoUrl" class="remove-photo-btn" (click)="removePhoto()">Remove photo</button>
       </div>
 
       <!-- Nav tabs -->
@@ -60,7 +61,6 @@
           <p class="card-sub">Update your name, contact details, bio and areas of expertise</p>
         </div>
 
-        <!-- Success / Error banners -->
         <div class="alert alert--success" *ngIf="profileSaved()">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
           Profile updated successfully.
@@ -75,29 +75,32 @@
 
             <div class="form-field" [class.has-error]="profileErrors()['name']">
               <label class="form-label">Full Name <span class="req">*</span></label>
-              <input type="text" class="form-input" [(ngModel)]="profile.name" name="name"
-                (input)="clearProfileError('name')" placeholder="Your full name" />
+              <input type="text" class="form-input" [value]="profile().name"
+                (input)="profile.update(p => ({ ...p, name: $any($event.target).value })); clearProfileError('name')"
+                name="name" placeholder="Your full name" />
               <span class="field-error" *ngIf="profileErrors()['name']">{{ profileErrors()['name'] }}</span>
             </div>
 
             <div class="form-field">
               <label class="form-label">Email Address</label>
-              <input type="email" class="form-input form-input--disabled" [value]="profile.email" disabled />
+              <input type="email" class="form-input form-input--disabled" [value]="profile().email" disabled />
               <span class="field-hint">Email cannot be changed — contact admin.</span>
             </div>
 
             <div class="form-field" [class.has-error]="profileErrors()['phone']">
               <label class="form-label">Phone Number <span class="req">*</span></label>
-              <input type="tel" class="form-input" [(ngModel)]="profile.phone" name="phone"
-                (input)="clearProfileError('phone')" placeholder="+971 50 123 4567" />
+              <input type="tel" class="form-input" [value]="profile().phone"
+                (input)="profile.update(p => ({ ...p, phone: $any($event.target).value })); clearProfileError('phone')"
+                name="phone" placeholder="+971 50 123 4567" />
               <span class="field-error" *ngIf="profileErrors()['phone']">{{ profileErrors()['phone'] }}</span>
             </div>
 
             <div class="form-field form-field--full">
               <label class="form-label">Bio</label>
-              <textarea class="form-textarea" [(ngModel)]="profile.bio" name="bio" rows="4"
-                placeholder="Write a short professional bio…"></textarea>
-              <span class="field-hint">{{ profile.bio.length }} / 500 characters</span>
+              <textarea class="form-textarea" [value]="profile().bio"
+                (input)="profile.update(p => ({ ...p, bio: $any($event.target).value }))"
+                name="bio" rows="4" placeholder="Write a short professional bio…"></textarea>
+              <span class="field-hint">{{ profile().bio.length }} / 500 characters</span>
             </div>
 
           </div>
@@ -140,7 +143,6 @@
                   <svg *ngIf="showNewPw()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
                 </button>
               </div>
-              <!-- Strength meter -->
               <div class="pw-strength" *ngIf="pwForm.newPw">
                 <div class="pw-bars">
                   <div *ngFor="let i of [1,2,3,4]" class="pw-bar"

@@ -298,7 +298,8 @@
           <div class="prop-img-wrap">
             <img [src]="property.images[getCardImageIndex(property.id)]"
                  [alt]="property.title"
-                 class="prop-img" loading="lazy">
+                 class="prop-img" loading="lazy"
+                 (error)="$any($event.target).src='images/dummy-image.png'">
 
             <!-- Image navigation (stops propagation so click doesn't navigate) -->
             <ng-container *ngIf="property.images.length > 1">
@@ -405,7 +406,18 @@
         <!-- Agent footer — outside the link, stops propagation -->
         <div class="prop-footer" (click)="$event.preventDefault(); $event.stopPropagation()">
           <div class="prop-agent">
-            <img [src]="property.agentAvatar" [alt]="property.agentName" class="prop-agent-avatar">
+            <div class="prop-agent-avatar-wrap">
+              @if (property.agentAvatar) {
+                <img [src]="property.agentAvatar" [alt]="property.agentName" class="prop-agent-avatar"
+                  (error)="property.agentAvatar = ''">
+              } @else {
+                <div class="prop-agent-avatar prop-agent-dummy">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              }
+            </div>
             <span class="prop-agent-name">{{ property.agentName }}</span>
           </div>
           <div class="prop-contact-btns">
@@ -438,7 +450,7 @@
         <!-- Clickable area → detail page -->
         <a [routerLink]="['/properties', property.id]" class="plc-link">
           <div class="plc-img-wrap">
-            <img [src]="property.images[0]" [alt]="property.title" class="plc-img" loading="lazy">
+            <img [src]="property.images[0]" [alt]="property.title" class="plc-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
             <div class="plc-img-overlay"></div>
             <span class="prop-status-badge" [class.sale]="property.status === 'Sale'" [class.rent]="property.status === 'Rent'">
               {{ property.status === 'Sale' ? 'For Sale' : 'For Rent' }}
@@ -520,7 +532,18 @@
         <!-- Footer: agent + Call/WhatsApp/Email — outside link -->
         <div class="plc-footer" (click)="$event.preventDefault(); $event.stopPropagation()">
           <div class="prop-agent">
-            <img [src]="property.agentAvatar" [alt]="property.agentName" class="prop-agent-avatar">
+            <div class="prop-agent-avatar-wrap">
+              @if (property.agentAvatar) {
+                <img [src]="property.agentAvatar" [alt]="property.agentName" class="prop-agent-avatar"
+                  (error)="property.agentAvatar = ''">
+              } @else {
+                <div class="prop-agent-avatar prop-agent-dummy">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              }
+            </div>
             <div>
               <div class="prop-agent-name">{{ property.agentName }}</div>
               <div class="plc-agent-phone">{{ property.agentPhone }}</div>
@@ -574,7 +597,7 @@
              class="map-prop-card"
              [class.active]="activeMapProperty()?.id === property.id"
              (click)="selectMapProperty(property)">
-          <img [src]="property.images[0]" [alt]="property.title" class="map-card-img" loading="lazy">
+          <img [src]="property.images[0]" [alt]="property.title" class="map-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
           <div class="map-card-body">
             <div class="map-card-price">{{ property.priceLabel }}</div>
             <div class="map-card-title">{{ property.title }}</div>

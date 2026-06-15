@@ -352,23 +352,169 @@ $radius: 10px;
   padding-bottom: 0.85rem;
 }
 
-// ── Sticky card ──────────────────────────────────────────
+// ── Sticky sidebar ────────────────────────────────────────
 .brd-right {
   position: sticky; top: 84px;
 }
 
 .brd-sticky-card {
-  background: $white; border: 1.5px solid $border; border-radius: $radius;
-  overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  display: flex; flex-direction: column; gap: 0;
 }
 
-.brd-sc-price-header {
-  background: $green; color: $white; padding: 1rem 1.25rem;
+// ── Agent card (mirrors project-detail pd-* styles) ───────
+.pd-agent-card {
+  background: $white; border: 1px solid $border; border-radius: 1rem;
+  padding: 1.375rem; box-shadow: 0 2px 12px rgba(0,0,0,.06);
 }
-.brd-sc-price-lbl { font-size: 0.72rem; opacity: 0.85; margin-bottom: 0.2rem; }
-.brd-sc-price-val { font-size: 1.3rem; font-weight: 800; }
+.pd-agent-avatar-wrap { flex-shrink: 0; width: 56px; height: 56px; }
+.pd-agent-header {
+  display: flex; align-items: center; gap: .875rem;
+  margin-bottom: 1.125rem; padding-bottom: 1.125rem; border-bottom: 1px solid #f1f5f9;
+}
+.pd-agent-avatar {
+  width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: top center;
+  border: 3px solid $border; display: block;
+}
+.pd-agent-dummy {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  display: flex; align-items: center; justify-content: center;
+  border: 3px solid $border; border-radius: 50%; width: 56px; height: 56px;
+  svg { width: 55%; height: 55%; color: #9ca3af; }
+}
+.pd-agent-name    { font-size: 1rem; font-weight: 700; color: $text; }
+.pd-agent-role    { font-size: .8rem; color: $muted; }
+.pd-agent-company { font-size: .775rem; color: $gold; font-weight: 600; }
 
-.brd-sc-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.pd-agent-price-summary { margin-bottom: 1rem; }
+.pd-aps-price { font-size: 1.4rem; font-weight: 800; color: $text; }
+.pd-aps-ref   { font-size: .775rem; color: #9ca3af; margin-top: .125rem; }
+
+.pd-agent-contact-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; margin-bottom: 1.25rem; }
+.pd-contact-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .3rem; padding: .625rem .375rem; border-radius: .625rem; font-size: .75rem; font-weight: 600;
+  text-decoration: none; cursor: pointer; border: 1.5px solid transparent; transition: all .2s;
+  svg { width: 18px; height: 18px; flex-shrink: 0; }
+  &.call     { background: #f0f4ff; border-color: #c7d2fe; color: $green;   &:hover { background: $green;   color: $white; border-color: $green;   } }
+  &.whatsapp { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; &:hover { background: #16a34a; color: $white; border-color: #16a34a; } }
+  &.email    { background: #fef3f2; border-color: #fecaca; color: #dc2626; &:hover { background: #dc2626; color: $white; border-color: #dc2626; } }
+}
+
+.pd-inquiry-form  { display: flex; flex-direction: column; gap: .625rem; }
+.pd-inquiry-title { font-size: .875rem; font-weight: 700; color: $text; margin-bottom: .25rem; }
+.pd-input, .pd-textarea {
+  width: 100%; padding: .625rem .875rem; border: 1.5px solid $border; border-radius: .5rem;
+  font-size: .85rem; color: $text; background: $white; outline: none; transition: border-color .2s;
+  box-sizing: border-box; font-family: inherit;
+  &::placeholder { color: #9ca3af; }
+  &:focus { border-color: $green; }
+}
+.pd-textarea { resize: vertical; }
+.pd-submit-btn {
+  width: 100%; padding: .75rem; background: $text; color: $white; border: none;
+  border-radius: .625rem; font-size: .9rem; font-weight: 700; cursor: pointer; transition: background .2s;
+  &:hover:not(:disabled) { background: $green; }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+.pd-inquiry-success {
+  display: flex; align-items: center; gap: .5rem; background: #f0fdf4; border: 1px solid #bbf7d0;
+  border-radius: .5rem; padding: .75rem 1rem; font-size: .85rem; color: #16a34a; font-weight: 600;
+}
+.pd-inquiry-error { font-size: .8rem; color: #dc2626; margin: 0; }
+
+.pd-project-meta {
+  background: $white; border: 1px solid $border; border-radius: 1rem; padding: 1.125rem 1.375rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+.pd-meta-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .5rem 0; border-bottom: 1px solid #f1f5f9;
+  &:last-child { border-bottom: none; }
+}
+.pd-meta-label { font-size: .8rem; color: #9ca3af; }
+.pd-meta-value { font-size: .8rem; font-weight: 600; color: $text; }
+
+// ── Loading ──────────────────────────────────────────────
+.brd-loading { display: flex; justify-content: center; padding: 5rem; }
+.brd-spin {
+  width: 40px; height: 40px;
+  border: 3px solid $border; border-top-color: $gold;
+  border-radius: 50%; animation: brd-spin .8s linear infinite;
+}
+@keyframes brd-spin { to { transform: rotate(360deg); } }
+
+// ── Gallery empty ────────────────────────────────────────
+.brd-gallery-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 220px; background: $bg; border: 1.5px dashed $border;
+  border-radius: $radius; color: $muted; gap: 0.75rem;
+  font-size: 0.85rem; margin-bottom: 1rem;
+}
+
+// ── Agent dummy SVG ──────────────────────────────────────
+.brd-agent-dummy { display: block; }
+.brd-agent-company { font-size: 0.7rem; color: $gold; font-weight: 600; }
+
+// ── Payment plan text ────────────────────────────────────
+.brd-payment-plan-text {
+  font-size: 0.88rem; color: $muted; line-height: 1.7; margin: 0;
+}
+
+// ── Sticky card: agent header ────────────────────────────
+.brd-sc-agent-hdr {
+  display: flex; align-items: center; gap: 0.85rem;
+  padding: 1rem 1.25rem; border-bottom: 1.5px solid $border;
+}
+.brd-sc-agent-avatar-wrap { flex-shrink: 0; }
+.brd-sc-agent-img {
+  width: 52px; height: 52px; border-radius: 50%; object-fit: cover;
+  border: 2px solid $green; display: block;
+}
+.brd-sc-agent-dummy { background: transparent; }
+.brd-sc-agent-info { display: flex; flex-direction: column; gap: 0.1rem; }
+.brd-sc-agent-name { font-size: 0.85rem; font-weight: 700; color: $text; }
+.brd-sc-agent-title { font-size: 0.72rem; color: $muted; }
+.brd-sc-agent-company { font-size: 0.7rem; color: $gold; font-weight: 600; }
+
+// ── Sticky card: price ref ───────────────────────────────
+.brd-sc-price-ref { font-size: 0.7rem; opacity: 0.7; margin-top: 0.15rem; }
+
+// ── Sticky card: inquiry form ────────────────────────────
+.brd-sc-body { padding: 0.9rem 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.brd-sc-input, .brd-sc-textarea {
+  width: 100%; padding: 0.55rem 0.8rem;
+  border: 1.5px solid $border; border-radius: 7px;
+  font-size: 0.82rem; color: $text; background: $bg;
+  outline: none; box-sizing: border-box;
+  &:focus { border-color: $green; background: $white; }
+  &::placeholder { color: $muted; }
+}
+.brd-sc-textarea { resize: vertical; font-family: inherit; }
+
+.brd-sc-submit-btn {
+  width: 100%; padding: 0.65rem; background: #111827; color: $white;
+  border: none; border-radius: 7px; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; transition: background 0.15s;
+  &:hover:not(:disabled) { background: #1f2937; }
+  &:disabled { opacity: 0.6; cursor: default; }
+}
+
+.brd-sc-success {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 7px;
+  padding: 0.75rem 1rem; font-size: 0.82rem; color: #166534; font-weight: 600;
+}
+
+.brd-sc-error {
+  font-size: 0.78rem; color: #dc2626; padding: 0.25rem 0;
+}
+
+// ── Sticky card: key facts ───────────────────────────────
+.brd-sc-facts {
+  padding: 0 1.25rem 1rem; display: flex; flex-direction: column; gap: 0;
+  border-top: 1.5px solid $border; padding-top: 0.75rem;
+}
 
 .brd-sc-fact-row {
   display: flex; justify-content: space-between; align-items: center;
@@ -377,37 +523,6 @@ $radius: 10px;
 }
 .brd-sc-fact-lbl { color: $muted; font-weight: 500; }
 .brd-sc-fact-val { color: $text; font-weight: 600; text-align: right; }
-
-.brd-sc-agent {
-  display: flex; align-items: center; gap: 0.75rem;
-  padding: 0.75rem 0; border-top: 1.5px solid $border; margin-top: 0.25rem;
-}
-
-.brd-sc-agent-img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
-.brd-sc-agent-name { font-size: 0.82rem; font-weight: 700; color: $text; }
-.brd-sc-agent-title { font-size: 0.72rem; color: $muted; }
-
-.brd-sc-actions {
-  display: flex; gap: 0.5rem; flex-wrap: wrap;
-}
-
-.brd-sc-btn {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.4rem;
-  padding: 0.55rem 0.75rem; border-radius: 7px; font-size: 0.78rem; font-weight: 600;
-  text-decoration: none; cursor: pointer; border: none; transition: all 0.15s;
-  min-width: 0;
-
-  &--call { background: $green; color: $white; &:hover { background: $green2; } }
-  &--whatsapp { background: #25d366; color: $white; &:hover { background: #1fb558; } }
-  &--email { background: $bg; color: $text; border: 1.5px solid $border; &:hover { border-color: $green; color: $green; } }
-}
-
-.brd-sc-follow-btn {
-  width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-  padding: 0.6rem; background: $bg; border: 1.5px solid $border; border-radius: 7px;
-  font-size: 0.82rem; font-weight: 600; color: $muted; cursor: pointer; margin-top: 0.25rem;
-  &:hover { border-color: $green; color: $green; }
-}
 
 // ── Not found ────────────────────────────────────────────
 .brd-not-found {

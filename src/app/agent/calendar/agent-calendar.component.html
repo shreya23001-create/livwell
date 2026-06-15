@@ -156,13 +156,27 @@
         <div class="form-row">
           <div class="form-field">
             <label>Type</label>
-            <select [ngModel]="form().type" (ngModelChange)="form.update(f => ({...f, type: $event}))">
-              @for (t of typeOptions; track t) { <option [value]="t">{{ typeLabel(t) }}</option> }
-            </select>
+            <div class="select-wrapper">
+              <select [ngModel]="form().type" (ngModelChange)="form.update(f => ({...f, type: $event}))">
+                @for (t of typeOptions; track t) { <option [value]="t">{{ typeLabel(t) }}</option> }
+              </select>
+              <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
           </div>
           <div class="form-field" [class.has-error]="formErrors()['client']">
-            <label>Client Name</label>
-            <input type="text" [ngModel]="form().client" (ngModelChange)="form.update(f => ({...f, client: $event}))" placeholder="Client full name" />
+            <label>Customer Name *</label>
+            <div class="select-wrapper">
+              <select [ngModel]="form().client" (ngModelChange)="form.update(f => ({...f, client: $event}))">
+                <option value="">— Select customer —</option>
+                @for (c of activeCustomers(); track c.name) {
+                  <option [value]="c.name">{{ c.name }}</option>
+                }
+              </select>
+              <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            @if (activeCustomers().length === 0) {
+              <span class="cal-hint">No active customers — all leads are won/lost or none assigned yet.</span>
+            }
             @if (formErrors()['client']) { <span class="field-error">{{ formErrors()['client'] }}</span> }
           </div>
         </div>
@@ -180,18 +194,32 @@
         <div class="form-row">
           <div class="form-field">
             <label>Duration (minutes)</label>
-            <select [ngModel]="form().duration" (ngModelChange)="form.update(f => ({...f, duration: +$event}))">
-              <option [value]="15">15 min</option>
-              <option [value]="30">30 min</option>
-              <option [value]="45">45 min</option>
-              <option [value]="60">1 hour</option>
-              <option [value]="90">1.5 hours</option>
-              <option [value]="120">2 hours</option>
-            </select>
+            <div class="select-wrapper">
+              <select [ngModel]="form().duration" (ngModelChange)="form.update(f => ({...f, duration: +$event}))">
+                <option [value]="15">15 min</option>
+                <option [value]="30">30 min</option>
+                <option [value]="45">45 min</option>
+                <option [value]="60">1 hour</option>
+                <option [value]="90">1.5 hours</option>
+                <option [value]="120">2 hours</option>
+              </select>
+              <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
           </div>
           <div class="form-field">
             <label>Property (optional)</label>
-            <input type="text" [ngModel]="form().property" (ngModelChange)="form.update(f => ({...f, property: $event}))" placeholder="Property name" />
+            <div class="select-wrapper">
+              <select [ngModel]="form().property" (ngModelChange)="form.update(f => ({...f, property: $event}))">
+                <option value="">— Select property —</option>
+                @for (p of propertyTitles(); track p) {
+                  <option [value]="p">{{ p }}</option>
+                }
+              </select>
+              <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            @if (propertyTitles().length === 0) {
+              <span class="cal-hint">No published properties assigned to you yet.</span>
+            }
           </div>
         </div>
         <div class="form-row">

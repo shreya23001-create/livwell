@@ -75,7 +75,7 @@ export class AdminDataService {
 
   // ── Master Data Signals ───────────────────────────────
   readonly categories   = signal<string[]>(['Sale', 'Rent', 'Off-Plan']);
-  readonly propTypes    = signal<string[]>(['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office']);
+  readonly propTypes    = signal<string[]>(['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office', 'Shop', 'Warehouse', 'Plot']);
   readonly propStatuses = signal<MasterStatus[]>([
     { name: 'Draft', color: '#6b7280' }, { name: 'Pending Review', color: '#f59e0b' },
     { name: 'Published', color: '#10b981' }, { name: 'Archived', color: '#8b5cf6' },

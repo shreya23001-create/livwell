@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed, inject, PLATFORM_ID } from '@angul
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { OffPlanProject } from '../off-plan/off-plan.component';
 
 const ALL_PROJECTS: OffPlanProject[] = [
@@ -202,10 +203,12 @@ export interface FaqItem { question: string; answer: string; open: boolean; }
   styleUrl: './off-plan-detail.component.scss',
 })
 export class OffPlanDetailComponent implements OnInit {
-  private route = inject(ActivatedRoute);
+  private route      = inject(ActivatedRoute);
   private platformId = inject(PLATFORM_ID);
+  private sanitizer  = inject(DomSanitizer);
 
   project = signal<OffPlanProject | null>(null);
+  mapUrl  = signal<SafeResourceUrl>('');
   activeImageIndex = signal(0);
   isFaved = signal(false);
   inquiryName = signal('');
@@ -284,10 +287,33 @@ export class OffPlanDetailComponent implements OnInit {
       const id = params['id'];
       const found = ALL_PROJECTS.find(p => p.slug === id || p.id === Number(id)) ?? null;
       this.project.set(found);
+      if (found) this.geocodeAndSetMap(found);
       if (isPlatformBrowser(this.platformId)) {
         window.scrollTo({ top: 0 });
       }
     });
+  }
+
+  private async geocodeAndSetMap(p: OffPlanProject): Promise<void> {
+    const raw   = p.community?.trim() || p.location?.trim() || p.title?.trim() || 'Dubai';
+    const query = raw.toLowerCase().includes('dubai') ? raw : raw + ', Dubai, UAE';
+    try {
+      const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+      const data = await res.json();
+      if (data?.length) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        const q   = encodeURIComponent(query);
+        const url = `https://maps.google.com/maps?q=${q}&ll=${lat},${lon}&t=m&z=15&output=embed`;
+        this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+      } else {
+        const url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=15&output=embed`;
+        this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+      }
+    } catch {
+      const url = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=m&z=15&output=embed`;
+      this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+    }
   }
 
   toggleFaq(i: number): void {

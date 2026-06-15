@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import { AdminDataService, LeadStatus, LeadSource, LeadCategory, Lead } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 export type { LeadStatus, LeadSource, LeadCategory, Lead };
 
@@ -24,8 +25,9 @@ const EMPTY_FORM = (): Partial<Lead> => ({
 })
 export class AdminLeadsComponent {
 
-  dataSvc = inject(AdminDataService);
-  private auth = inject(AuthService);
+  dataSvc       = inject(AdminDataService);
+  private auth  = inject(AuthService);
+  private toast = inject(ToastService);
   leads   = this.dataSvc.leads;
   loading = this.dataSvc.leadsLoading;
 
@@ -149,13 +151,15 @@ export class AdminLeadsComponent {
 
     this.saving.set(true);
     this.saveError.set('');
+    const isEdit = this.editId() !== null;
     const err = await this.dataSvc.saveLead(f, this.editId());
     this.saving.set(false);
-    if (err) { this.saveError.set(err); return; }
+    if (err) { this.toast.error(err); return; }
     this.showModal.set(false);
+    this.toast.success(`Lead "${f.name}" ${isEdit ? 'updated' : 'created'} successfully.`);
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
-    this.dataSvc.logLeadAction(actor, role, this.editId() ? 'Update Lead' : 'Add Lead', `Lead "${f.name}" ${this.editId() ? 'updated' : 'created'}`);
+    this.dataSvc.logLeadAction(actor, role, isEdit ? 'Update Lead' : 'Add Lead', `Lead "${f.name}" ${isEdit ? 'updated' : 'created'}`);
   }
 
   confirmDelete(lead: Lead): void { this.deleteTarget.set(lead); this.showDeleteModal.set(true); }
@@ -211,7 +215,7 @@ export class AdminLeadsComponent {
     const rows   = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) as any[];
 
     if (!rows.length) {
-      this.importError.set('No data found in the file.');
+      this.toast.error('No data found in the file.');
       this.importing.set(false);
       input.value = '';
       return;
@@ -245,8 +249,8 @@ export class AdminLeadsComponent {
       }));
 
     const err = await this.dataSvc.importLeads(toImport);
-    if (err) this.importError.set('Import failed: ' + err);
-    else     this.importSuccess.set(`✓ ${toImport.length} lead(s) imported.`);
+    if (err) this.toast.error('Import failed: ' + err);
+    else     this.toast.success(`${toImport.length} lead(s) imported successfully.`);
 
     this.importing.set(false);
     input.value = '';

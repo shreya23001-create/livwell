@@ -175,10 +175,14 @@
         <h2 class="opd-section-title">Location</h2>
         <div class="opd-map-wrap">
           <iframe
-            src="https://www.openstreetmap.org/export/embed.html?bbox=55.0,25.0,55.5,25.3&layer=mapnik"
+            *ngIf="mapUrl()"
+            [src]="mapUrl()"
             class="opd-map"
-            allowfullscreen loading="lazy" title="Project location">
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Project location">
           </iframe>
+          <div *ngIf="!mapUrl()" class="opd-map-loading">
+            <div class="opd-map-spin"></div>
+          </div>
         </div>
         <div class="opd-map-chips">
           <span class="opd-map-chip">
@@ -297,7 +301,7 @@
         <div class="opd-similar-grid">
           <a *ngFor="let sp of similarProjects()" [routerLink]="['/off-plan', sp.id]" class="opd-similar-card">
             <div class="opd-sim-img-wrap">
-              <img [src]="sp.image" [alt]="sp.title" class="opd-sim-img" loading="lazy">
+              <img [src]="sp.image || 'images/dummy-image.png'" [alt]="sp.title" class="opd-sim-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
               <span *ngIf="sp.badge" class="opd-sim-badge">{{ sp.badge }}</span>
             </div>
             <div class="opd-sim-body">
@@ -327,7 +331,7 @@
         </div>
 
         <div class="opd-inquiry-project">
-          <img [src]="p.image" [alt]="p.title" class="opd-iq-proj-img">
+          <img [src]="p.image || 'images/dummy-image.png'" [alt]="p.title" class="opd-iq-proj-img" (error)="$any($event.target).src='images/dummy-image.png'">
           <div class="opd-iq-proj-info">
             <div class="opd-iq-proj-title">{{ p.title }}</div>
             <div class="opd-iq-proj-sub">{{ p.developer }} · {{ p.community }}</div>

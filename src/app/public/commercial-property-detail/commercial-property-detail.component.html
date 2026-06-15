@@ -18,7 +18,7 @@
   <!-- ── Hero Gallery ───────────────────────────────────── -->
   <div class="cpd-gallery">
     <div class="cpd-gallery-main">
-      <img [src]="p.images[activeImage()]" [alt]="p.title" class="cpd-gallery-img" />
+      <img [src]="p.images[activeImage()]" [alt]="p.title" class="cpd-gallery-img" (error)="$any($event.target).src='images/dummy-image.png'" />
       <button class="cpd-gallery-nav cpd-gallery-nav--prev" (click)="prevImage()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
@@ -97,10 +97,10 @@
         </div>
 
         <!-- Map -->
-        <div class="cpd-section" *ngIf="p.mapUrl">
+        <div class="cpd-section" *ngIf="mapUrl()">
           <h2 class="cpd-section-title">Location</h2>
           <div class="cpd-map-wrap">
-            <iframe [src]="safeMap(p.mapUrl)" class="cpd-map" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <iframe [src]="mapUrl()" class="cpd-map" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
         </div>
 

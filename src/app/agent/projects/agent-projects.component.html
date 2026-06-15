@@ -1,0 +1,74 @@
+<div class="agtp-page">
+
+  <div class="agtp-header">
+    <div>
+      <h1 class="agtp-title">My Projects</h1>
+      <p class="agtp-sub">Off-plan and luxury projects assigned to you</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="agtp-stats">
+    <div class="agtp-stat"><span class="agtp-stat-val">{{ stats().total }}</span><span class="agtp-stat-lbl">Total</span></div>
+    <div class="agtp-stat agtp-stat--green"><span class="agtp-stat-val">{{ stats().published }}</span><span class="agtp-stat-lbl">Published</span></div>
+    <div class="agtp-stat agtp-stat--gold"><span class="agtp-stat-val">{{ stats().luxury }}</span><span class="agtp-stat-lbl">Luxury</span></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search title, developer…" [value]="search()" (input)="search.set($any($event.target).value)">
+    </div>
+    <div class="select-wrapper">
+      <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
+        <option value="">All Statuses</option>
+        <option value="Published">Published</option>
+        <option value="Draft">Draft</option>
+        <option value="Archived">Archived</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="agtp-loading"><div class="agtp-spin"></div></div>
+
+  <!-- Grid -->
+  <div class="agtp-grid" *ngIf="!loading()">
+    <div class="agtp-card" *ngFor="let p of filtered()">
+      <div class="agtp-card-img">
+        <img *ngIf="p.images?.[0]" [src]="p.images[0]" [alt]="p.title">
+        <div *ngIf="!p.images?.[0]" class="agtp-card-img--empty">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 9 4-4 4 4 4-6 4 8"/></svg>
+        </div>
+        <span *ngIf="p.badge" class="agtp-badge agtp-badge--overlay">{{ p.badge }}</span>
+        <span *ngIf="p.is_ultra_luxury" class="agtp-badge agtp-badge--purple agtp-badge--tl">Ultra Luxury</span>
+        <span *ngIf="p.is_luxury && !p.is_ultra_luxury" class="agtp-badge agtp-badge--gold agtp-badge--tl">Luxury</span>
+      </div>
+      <div class="agtp-card-body">
+        <div class="agtp-card-top">
+          <span class="agtp-type-tag">{{ p.type }}</span>
+          <span class="agtp-status-badge" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+        </div>
+        <h3 class="agtp-card-title">{{ p.title }}</h3>
+        <p class="agtp-card-dev">{{ p.developer }}</p>
+        <p class="agtp-card-loc">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          {{ p.location }}
+        </p>
+        <div class="agtp-card-meta">
+          <span>{{ formatPrice(p.price_from) }}</span>
+          <span *ngIf="p.completion_date">{{ p.completion_date }}</span>
+        </div>
+        <div class="agtp-card-plan" *ngIf="p.payment_plan">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+          {{ p.payment_plan }}
+        </div>
+        <a [routerLink]="['/projects', p.id]" target="_blank" class="agtp-view-btn">View on Site →</a>
+      </div>
+    </div>
+    <div *ngIf="filtered().length === 0" class="agtp-empty">No projects assigned to you yet.</div>
+  </div>
+
+</div>

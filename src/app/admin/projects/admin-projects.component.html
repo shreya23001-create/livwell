@@ -1,0 +1,372 @@
+<div class="apr-page">
+
+  <!-- ── Header ── -->
+  <div class="apr-header">
+    <div>
+      <h1 class="apr-title">Projects</h1>
+      <p class="apr-sub">Manage all off-plan, luxury and ultra-luxury projects</p>
+    </div>
+    <div class="apr-header-actions">
+      <!-- Import -->
+      <label class="apr-btn apr-btn--ghost" [class.apr-btn--loading]="importing()" title="Import from Excel">
+        <input type="file" accept=".xlsx,.xls,.csv" (change)="importFromExcel($event)" style="display:none" [disabled]="importing()">
+        <ng-container *ngIf="importing()">
+          <span class="apr-btn-spinner"></span> Importing…
+        </ng-container>
+        <ng-container *ngIf="!importing()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import Excel
+        </ng-container>
+      </label>
+
+      <!-- Export -->
+      <button class="apr-btn apr-btn--ghost" (click)="exportToExcel()" [disabled]="projects().length === 0" title="Export to Excel">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export Excel
+      </button>
+
+      <!-- Add -->
+      <button class="apr-btn apr-btn--primary" (click)="openAdd()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Add Project
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Stats ── -->
+  <div class="apr-stats">
+    <div class="apr-stat"><span class="apr-stat-val">{{ stats().total }}</span><span class="apr-stat-lbl">Total</span></div>
+    <div class="apr-stat apr-stat--green"><span class="apr-stat-val">{{ stats().published }}</span><span class="apr-stat-lbl">Published</span></div>
+    <div class="apr-stat apr-stat--gold"><span class="apr-stat-val">{{ stats().luxury }}</span><span class="apr-stat-lbl">Luxury</span></div>
+    <div class="apr-stat apr-stat--purple"><span class="apr-stat-val">{{ stats().ultra }}</span><span class="apr-stat-lbl">Ultra Luxury</span></div>
+  </div>
+
+  <!-- ── Filters ── -->
+  <div class="apr-filters">
+    <div class="apr-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search title, developer, location…" [value]="search()" (input)="setFilter('search', $any($event.target).value)">
+    </div>
+    <div class="select-wrapper">
+      <select [value]="filterStatus()" (change)="setFilter('filterStatus', $any($event.target).value)">
+        <option value="">All Statuses</option>
+        <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="select-wrapper">
+      <select [value]="filterType()" (change)="setFilter('filterType', $any($event.target).value)">
+        <option value="">All Types</option>
+        <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="select-wrapper">
+      <select [value]="filterLuxe()" (change)="setFilter('filterLuxe', $any($event.target).value)">
+        <option value="">All Categories</option>
+        <option value="luxury">Luxury</option>
+        <option value="ultra_luxury">Ultra Luxury</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+  </div>
+
+  <!-- ── Loading ── -->
+  <div *ngIf="loading()" class="apr-loading">
+    <div class="apr-spin"></div>
+  </div>
+
+  <!-- ── Table ── -->
+  <div class="apr-table-wrap" *ngIf="!loading()">
+    <table class="apr-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Type</th>
+          <th>Developer</th>
+          <th>Price From</th>
+          <th>Completion</th>
+          <th>Payment Plan</th>
+          <th>Category</th>
+          <th>Agent</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of paginated()">
+          <td>
+            <div class="apr-proj-cell">
+              <img *ngIf="p.images?.[0]" [src]="p.images[0]" class="apr-proj-thumb" [alt]="p.title" (error)="$any($event.target).style.display='none'">
+              <div class="apr-proj-thumb apr-proj-thumb--empty" *ngIf="!p.images?.[0]">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 9 4-4 4 4 4-6 4 8"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
+              </div>
+              <div>
+                <div class="apr-proj-title">{{ p.title }}</div>
+                <div class="apr-proj-loc">{{ p.location }}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="apr-tag">{{ p.type }}</span></td>
+          <td class="apr-muted">{{ p.developer || '—' }}</td>
+          <td class="apr-price">{{ formatPrice(p.price_from) }}</td>
+          <td class="apr-muted">{{ p.completion_date || '—' }}</td>
+          <td class="apr-muted">{{ p.payment_plan || '—' }}</td>
+          <td>
+            <span *ngIf="p.is_ultra_luxury" class="apr-badge apr-badge--purple">Ultra Luxury</span>
+            <span *ngIf="p.is_luxury && !p.is_ultra_luxury" class="apr-badge apr-badge--gold">Luxury</span>
+            <span *ngIf="!p.is_luxury && !p.is_ultra_luxury" class="apr-badge apr-badge--grey">Standard</span>
+          </td>
+          <td class="apr-muted">{{ p.agent_name || '—' }}</td>
+          <td>
+            <span class="apr-badge" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+          </td>
+          <td>
+            <div class="apr-actions">
+              <button class="apr-icon-btn" title="Toggle Published" (click)="toggleStatus(p)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <button class="apr-icon-btn" title="Edit" (click)="openEdit(p)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="apr-icon-btn apr-icon-btn--danger" title="Delete" (click)="deleteProject(p)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filtered().length === 0">
+          <td colspan="10" class="apr-empty">No projects found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Pagination ── -->
+  <div class="apr-pagination" *ngIf="totalPages() > 1">
+    <button class="apr-page-btn" [disabled]="page() === 1" (click)="page.update(p => p - 1)">‹</button>
+    <ng-container *ngFor="let pg of pages()">
+      <span *ngIf="pg === -1" class="apr-page-ellipsis">…</span>
+      <button *ngIf="pg !== -1" class="apr-page-btn" [class.active]="pg === page()" (click)="page.set(pg)">{{ pg }}</button>
+    </ng-container>
+    <button class="apr-page-btn" [disabled]="page() === totalPages()" (click)="page.update(p => p + 1)">›</button>
+    <span class="apr-page-info">Page {{ page() }} of {{ totalPages() }} · {{ filtered().length }} total</span>
+  </div>
+
+</div>
+
+<!-- ── Add/Edit Modal ── -->
+<div class="apr-modal-overlay" *ngIf="showModal()" (click)="closeModal()">
+  <div class="apr-modal" (click)="$event.stopPropagation()">
+
+    <div class="apr-modal-header">
+      <h2>{{ editMode() ? 'Edit Project' : 'Add Project' }}</h2>
+      <button class="apr-modal-close" (click)="closeModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="apr-modal-body">
+
+      <!-- Row 1: Title + Developer -->
+      <div class="apr-form-row">
+        <div class="apr-form-group apr-form-group--grow">
+          <label>Title *</label>
+          <input type="text" [value]="form().title" (input)="form.update(f=>({...f,title:$any($event.target).value}))" placeholder="e.g. Emaar Skyrise">
+        </div>
+        <div class="apr-form-group">
+          <label>Developer</label>
+          <input type="text" [value]="form().developer" (input)="form.update(f=>({...f,developer:$any($event.target).value}))" placeholder="e.g. Emaar Properties">
+        </div>
+      </div>
+
+      <!-- Row 2: Location + Community -->
+      <div class="apr-form-row">
+        <div class="apr-form-group apr-form-group--grow">
+          <label>Location</label>
+          <input type="text" [value]="form().location" (input)="form.update(f=>({...f,location:$any($event.target).value}))" placeholder="e.g. Business Bay, Dubai">
+        </div>
+        <div class="apr-form-group">
+          <label>Community</label>
+          <input type="text" [value]="form().community" (input)="form.update(f=>({...f,community:$any($event.target).value}))" placeholder="e.g. Business Bay">
+        </div>
+      </div>
+
+      <!-- Row 3: Type + Status + Badge -->
+      <div class="apr-form-row">
+        <div class="apr-form-group">
+          <label>Type</label>
+          <div class="select-wrapper">
+            <select [ngModel]="form().type" (ngModelChange)="form.update(f=>({...f,type:$event}))">
+              <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="apr-form-group">
+          <label>Status</label>
+          <div class="select-wrapper">
+            <select [ngModel]="form().status" (ngModelChange)="form.update(f=>({...f,status:$event}))">
+              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="apr-form-group">
+          <label>Badge</label>
+          <div class="select-wrapper">
+            <select [ngModel]="form().badge" (ngModelChange)="form.update(f=>({...f,badge:$event}))">
+              <option *ngFor="let b of badges" [value]="b">{{ b || 'None' }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Price + Beds + Completion -->
+      <div class="apr-form-row">
+        <div class="apr-form-group">
+          <label>Price From (AED)</label>
+          <input type="number" [value]="form().price_from" (input)="form.update(f=>({...f,price_from:+$any($event.target).value}))" placeholder="e.g. 1200000">
+        </div>
+        <div class="apr-form-group">
+          <label>Price Label</label>
+          <input type="text" [value]="form().price_label" (input)="form.update(f=>({...f,price_label:$any($event.target).value}))" placeholder="e.g. AED 1.2M">
+        </div>
+        <div class="apr-form-group">
+          <label>Beds</label>
+          <input type="text" [value]="form().beds" (input)="form.update(f=>({...f,beds:$any($event.target).value}))" placeholder="e.g. 1 – 4 Beds">
+        </div>
+      </div>
+
+      <!-- Row 5: Completion + Payment Plan + Area -->
+      <div class="apr-form-row">
+        <div class="apr-form-group">
+          <label>Completion Date</label>
+          <input type="text" [value]="form().completion_date" (input)="form.update(f=>({...f,completion_date:$any($event.target).value}))" placeholder="e.g. Q4 2027">
+        </div>
+        <div class="apr-form-group apr-form-group--grow">
+          <label>Payment Plan</label>
+          <input type="text" [value]="form().payment_plan" (input)="form.update(f=>({...f,payment_plan:$any($event.target).value}))" placeholder="e.g. 40/60, 1% monthly, post-handover">
+        </div>
+        <div class="apr-form-group">
+          <label>Area (sqft)</label>
+          <input type="number" [value]="form().area_sqft" (input)="form.update(f=>({...f,area_sqft:+$any($event.target).value}))" placeholder="e.g. 1200">
+        </div>
+      </div>
+
+      <!-- Agent name -->
+      <div class="apr-form-row">
+        <div class="apr-form-group apr-form-group--grow">
+          <label>Assign Agent</label>
+          <div class="select-wrapper">
+            <select [ngModel]="form().agent_name" (ngModelChange)="form.update(f=>({...f,agent_name:$event}))">
+              <option value="">— Unassigned —</option>
+              <option *ngFor="let a of agents()" [value]="a.name">{{ a.name }}</option>
+            </select>
+            <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5"/></svg>
+          </div>
+        </div>
+        <div class="apr-form-group">
+          <label>Floor Plan URL</label>
+          <input type="text" [value]="form().floor_plan_url" (input)="form.update(f=>({...f,floor_plan_url:$any($event.target).value}))" placeholder="https://...">
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="apr-form-group">
+        <label>Description</label>
+        <textarea rows="3" [value]="form().description" (input)="form.update(f=>({...f,description:$any($event.target).value}))" placeholder="Project overview…"></textarea>
+      </div>
+
+      <!-- Flags -->
+      <div class="apr-form-row apr-form-row--flags">
+        <label class="apr-checkbox">
+          <input type="checkbox" [checked]="form().is_featured" (change)="form.update(f=>({...f,is_featured:$any($event.target).checked}))">
+          Featured
+        </label>
+        <label class="apr-checkbox">
+          <input type="checkbox" [checked]="form().is_luxury" (change)="form.update(f=>({...f,is_luxury:$any($event.target).checked}))">
+          Luxury
+        </label>
+        <label class="apr-checkbox">
+          <input type="checkbox" [checked]="form().is_ultra_luxury" (change)="form.update(f=>({...f,is_ultra_luxury:$any($event.target).checked}))">
+          Ultra Luxury
+        </label>
+        <label class="apr-checkbox">
+          <input type="checkbox" [checked]="form().is_branded" (change)="form.update(f=>({...f,is_branded:$any($event.target).checked}))">
+          Branded Residence
+        </label>
+      </div>
+
+      <!-- Brand name (shown when is_branded) -->
+      <div class="apr-form-group" *ngIf="form().is_branded">
+        <label>Brand Name</label>
+        <input type="text" [value]="form().brand" (input)="form.update(f=>({...f,brand:$any($event.target).value}))" placeholder="e.g. Bulgari, Four Seasons, Armani">
+      </div>
+
+      <!-- Images -->
+      <div class="apr-form-group">
+        <label>Images</label>
+
+        <!-- Hidden file input -->
+        <input #fileInput type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" (change)="onFileChange($event)">
+
+        <!-- Upload trigger -->
+        <ng-container *ngIf="!uploadingImages()">
+          <div class="apr-upload-area" (click)="fileInput.click()">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span class="apr-upload-label">Click to upload images</span>
+            <span class="apr-upload-hint">JPG, PNG, WebP · max 5 MB each</span>
+          </div>
+        </ng-container>
+
+        <!-- Uploading spinner -->
+        <ng-container *ngIf="uploadingImages()">
+          <div class="apr-upload-area apr-upload-area--uploading">
+            <div class="apr-upload-spinner"></div>
+            <span class="apr-upload-label">Uploading…</span>
+          </div>
+        </ng-container>
+
+        <!-- Previews -->
+        <ng-container *ngIf="previewImages().length > 0">
+          <div class="apr-img-previews">
+            <div *ngFor="let url of previewImages(); let i = index" class="apr-img-preview">
+              <img [src]="url" [alt]="'Image ' + (i + 1)">
+              <button type="button" class="apr-img-remove" (click)="removeImage(i)">✕</button>
+            </div>
+          </div>
+          <p class="apr-img-count">{{ previewImages().length }} image(s) ready</p>
+        </ng-container>
+      </div>
+
+      <!-- Amenities -->
+      <div class="apr-form-group">
+        <label>Amenities</label>
+        <div class="apr-tag-input">
+          <input type="text" [value]="amenityInput()" (input)="amenityInput.set($any($event.target).value)" placeholder="e.g. Pool" (keydown.enter)="addAmenity()">
+          <button type="button" class="apr-btn apr-btn--sm" (click)="addAmenity()">Add</button>
+        </div>
+        <div class="apr-tags" *ngIf="form().amenities?.length">
+          <span *ngFor="let a of form().amenities; let i = index" class="apr-tag-item">
+            {{ a }} <button (click)="removeAmenity(i)">×</button>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="apr-modal-footer">
+      <button class="apr-btn apr-btn--ghost" (click)="closeModal()">Cancel</button>
+      <button class="apr-btn apr-btn--primary" (click)="save()" [disabled]="saving() || uploadingImages()">
+        {{ saving() ? 'Saving…' : uploadingImages() ? 'Uploading images…' : (editMode() ? 'Save Changes' : 'Add Project') }}
+      </button>
+    </div>
+
+  </div>
+</div>

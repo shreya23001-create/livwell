@@ -110,13 +110,13 @@ export class PropertiesComponent implements OnInit {
       beds: 4, baths: 3, sqft: 3200, sqftLabel: '3,200 sqft',
       type: 'Penthouse', status: 'Sale', furnished: 'Furnished', badge: 'Featured',
       images: [
-        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
-        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80',
-        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Concierge', 'Balcony', 'Parking'],
       views: 1842, postedDate: '2026-05-10', lat: 25.1972, lng: 55.2744,
-      agentName: 'Sarah Al-Mansouri', agentAvatar: 'https://randomuser.me/api/portraits/women/32.jpg', agentPhone: '+971 50 123 4567',
+      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567',
     },
     {
       id: 2, title: 'Modern Villa with Private Pool', location: 'Palm Jumeirah, Dubai', community: 'Palm Jumeirah',
@@ -124,12 +124,12 @@ export class PropertiesComponent implements OnInit {
       beds: 5, baths: 5, sqft: 5800, sqftLabel: '5,800 sqft',
       type: 'Villa', status: 'Sale', furnished: 'Unfurnished', badge: 'Hot',
       images: [
-        'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
-        'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Beach Access', 'Parking', 'Security', 'BBQ Area'],
       views: 3210, postedDate: '2026-05-08', lat: 25.1124, lng: 55.1390,
-      agentName: 'Ahmed Hassan', agentAvatar: 'https://randomuser.me/api/portraits/men/45.jpg', agentPhone: '+971 50 234 5678',
+      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678',
     },
     {
       id: 3, title: 'Beachfront Apartment Sea Views', location: 'JBR Walk, Dubai Marina', community: 'JBR',
@@ -137,12 +137,12 @@ export class PropertiesComponent implements OnInit {
       beds: 2, baths: 2, sqft: 1450, sqftLabel: '1,450 sqft',
       type: 'Apartment', status: 'Sale', furnished: 'Furnished', badge: 'New',
       images: [
-        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Beach Access', 'Balcony', 'Parking'],
       views: 987, postedDate: '2026-05-12', lat: 25.0777, lng: 55.1328,
-      agentName: 'Priya Sharma', agentAvatar: 'https://randomuser.me/api/portraits/women/68.jpg', agentPhone: '+971 50 345 6789',
+      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789',
     },
     {
       id: 4, title: 'Contemporary Townhouse Family Living', location: 'Arabian Ranches, Dubai', community: 'Arabian Ranches',
@@ -150,12 +150,12 @@ export class PropertiesComponent implements OnInit {
       beds: 4, baths: 3, sqft: 2900, sqftLabel: '2,900 sqft',
       type: 'Townhouse', status: 'Sale', furnished: 'Unfurnished',
       images: [
-        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Kids Play Area', 'Security', 'Parking', 'BBQ Area'],
       views: 654, postedDate: '2026-05-06', lat: 25.0501, lng: 55.2607,
-      agentName: 'Michael Chen', agentAvatar: 'https://randomuser.me/api/portraits/men/22.jpg', agentPhone: '+971 50 456 7890',
+      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890',
     },
     {
       id: 5, title: 'Sky View Studio Business Bay', location: 'Business Bay, Dubai', community: 'Business Bay',
@@ -163,12 +163,12 @@ export class PropertiesComponent implements OnInit {
       beds: 'Studio', baths: 1, sqft: 650, sqftLabel: '650 sqft',
       type: 'Apartment', status: 'Sale', furnished: 'Furnished', badge: 'Reduced',
       images: [
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
-        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Gym', 'Concierge', 'Parking', 'Balcony'],
       views: 1543, postedDate: '2026-05-14', lat: 25.1867, lng: 55.2640,
-      agentName: 'Sarah Al-Mansouri', agentAvatar: 'https://randomuser.me/api/portraits/women/32.jpg', agentPhone: '+971 50 123 4567',
+      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567',
     },
     {
       id: 6, title: 'Heritage Mansion Emirates Hills', location: 'Emirates Hills, Dubai', community: 'Emirates Hills',
@@ -176,12 +176,12 @@ export class PropertiesComponent implements OnInit {
       beds: 7, baths: 8, sqft: 12400, sqftLabel: '12,400 sqft',
       type: 'Villa', status: 'Sale', furnished: 'Furnished', badge: 'Exclusive',
       images: [
-        'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',
-        'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Golf Course', 'Gym', 'Security', 'Concierge', 'Maid Room', 'Parking', 'BBQ Area'],
       views: 4120, postedDate: '2026-04-28', lat: 25.0798, lng: 55.1699,
-      agentName: 'Ahmed Hassan', agentAvatar: 'https://randomuser.me/api/portraits/men/45.jpg', agentPhone: '+971 50 234 5678',
+      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678',
     },
     {
       id: 7, title: 'Marina View 1BR Apartment', location: 'Dubai Marina', community: 'Dubai Marina',
@@ -189,12 +189,12 @@ export class PropertiesComponent implements OnInit {
       beds: 1, baths: 1, sqft: 1200, sqftLabel: '1,200 sqft',
       type: 'Apartment', status: 'Rent', furnished: 'Furnished',
       images: [
-        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80',
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Marina View', 'Balcony', 'Parking'],
       views: 2890, postedDate: '2026-05-15', lat: 25.0782, lng: 55.1401,
-      agentName: 'Priya Sharma', agentAvatar: 'https://randomuser.me/api/portraits/women/68.jpg', agentPhone: '+971 50 345 6789',
+      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789',
     },
     {
       id: 8, title: '3BR Townhouse Dubai Hills', location: 'Dubai Hills Estate, Dubai', community: 'Dubai Hills Estate',
@@ -202,12 +202,12 @@ export class PropertiesComponent implements OnInit {
       beds: 3, baths: 3, sqft: 2500, sqftLabel: '2,500 sqft',
       type: 'Townhouse', status: 'Rent', furnished: 'Semi-Furnished',
       images: [
-        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',
-        'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Kids Play Area', 'Security', 'Parking'],
       views: 432, postedDate: '2026-05-13', lat: 25.1124, lng: 55.2233,
-      agentName: 'Michael Chen', agentAvatar: 'https://randomuser.me/api/portraits/men/22.jpg', agentPhone: '+971 50 456 7890',
+      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890',
     },
     {
       id: 9, title: 'Premium Office Space Business Bay', location: 'Business Bay, Dubai', community: 'Business Bay',
@@ -215,12 +215,12 @@ export class PropertiesComponent implements OnInit {
       beds: 0 as any, baths: 2, sqft: 2800, sqftLabel: '2,800 sqft',
       type: 'Office', status: 'Rent', furnished: 'Furnished',
       images: [
-        'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
-        'https://images.unsplash.com/photo-1560472355-536de3962603?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Parking', 'Concierge', 'Security', 'Gym'],
       views: 765, postedDate: '2026-05-11', lat: 25.1881, lng: 55.2644,
-      agentName: 'Ahmed Hassan', agentAvatar: 'https://randomuser.me/api/portraits/men/45.jpg', agentPhone: '+971 50 234 5678',
+      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678',
     },
     {
       id: 10, title: '2BR Apartment JVC with Pool', location: 'Jumeirah Village Circle, Dubai', community: 'Jumeirah Village Circle',
@@ -228,12 +228,12 @@ export class PropertiesComponent implements OnInit {
       beds: 2, baths: 2, sqft: 1400, sqftLabel: '1,400 sqft',
       type: 'Apartment', status: 'Sale', furnished: 'Unfurnished',
       images: [
-        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Kids Play Area', 'Parking'],
       views: 312, postedDate: '2026-05-09', lat: 25.0609, lng: 55.2097,
-      agentName: 'Priya Sharma', agentAvatar: 'https://randomuser.me/api/portraits/women/68.jpg', agentPhone: '+971 50 345 6789',
+      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789',
     },
     {
       id: 11, title: 'Stunning 4BR Meydan Villa', location: 'Meydan, Dubai', community: 'Meydan',
@@ -241,12 +241,12 @@ export class PropertiesComponent implements OnInit {
       beds: 4, baths: 4, sqft: 4625, sqftLabel: '4,625 sqft',
       type: 'Villa', status: 'Sale', furnished: 'Unfurnished', badge: 'New',
       images: [
-        'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+        'images/dummy-image.png',
+        'images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Golf Course', 'Security', 'Parking', 'Maid Room'],
       views: 891, postedDate: '2026-05-07', lat: 25.1605, lng: 55.3119,
-      agentName: 'Sarah Al-Mansouri', agentAvatar: 'https://randomuser.me/api/portraits/women/32.jpg', agentPhone: '+971 50 123 4567',
+      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567',
     },
     {
       id: 12, title: 'Retail Space Ground Floor JBR', location: 'JBR, Dubai Marina', community: 'JBR',
@@ -254,11 +254,11 @@ export class PropertiesComponent implements OnInit {
       beds: 0 as any, baths: 1, sqft: 1800, sqftLabel: '1,800 sqft',
       type: 'Retail', status: 'Rent', furnished: 'Unfurnished',
       images: [
-        'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
+        'images/dummy-image.png',
       ],
       amenities: ['Parking', 'Security'],
       views: 244, postedDate: '2026-05-05', lat: 25.0790, lng: 55.1320,
-      agentName: 'Michael Chen', agentAvatar: 'https://randomuser.me/api/portraits/men/22.jpg', agentPhone: '+971 50 456 7890',
+      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890',
     },
   ];
 
@@ -306,7 +306,7 @@ export class PropertiesComponent implements OnInit {
       result = result.filter(p => amenities.every(a => p.amenities.includes(a)));
     }
     if (this.selectedReadiness() === 'off-plan') result = result.filter(p => p.isOffPlan === true);
-    if (this.selectedReadiness() === 'ready') result = result.filter(p => !p.isOffPlan);
+    if (this.selectedReadiness() === 'ready')    result = result.filter(p => !p.isOffPlan);
     const specialFeatures = this.selectedSpecialFeatures();
     if (specialFeatures.length) {
       result = result.filter(p => {
@@ -466,7 +466,7 @@ export class PropertiesComponent implements OnInit {
           isOffPlan:    p.listing_type === 'Off-Plan',
           furnished:    p.furnishing   ?? 'Unfurnished',
           badge:        p.is_featured  ? 'Featured' : undefined,
-          images:       p.images?.length ? p.images : ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80'],
+          images:       p.images?.length ? p.images : ['images/dummy-image.png'],
           amenities:    p.amenities    ?? [],
           views:        p.views        ?? 0,
           postedDate:   p.created_at?.slice(0, 10) ?? '',

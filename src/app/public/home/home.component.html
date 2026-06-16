@@ -403,8 +403,8 @@
 
     <div class="teams-body">
       <!-- Left: scrollable team name list — hidden when only one area -->
-      <div class="teams-list" [class.teams-list--hidden]="teamAreas.length === 1">
-        <button *ngFor="let team of teamAreas; let i = index" class="team-name-btn" [class.active]="activeTeam() === i"
+      <div class="teams-list" [class.teams-list--hidden]="teamAreas().length === 1">
+        <button *ngFor="let team of teamAreas(); let i = index" class="team-name-btn" [class.active]="activeTeam() === i"
           (click)="activeTeam.set(i)">
           {{ team.area }}
         </button>
@@ -415,7 +415,7 @@
         <div class="teams-carousel-viewport">
           <div class="teams-carousel-track">
             <!-- Original set -->
-            <ng-container *ngFor="let agent of teamAreas[activeTeam()]?.agents">
+            <ng-container *ngFor="let agent of teamAreas()[activeTeam()]?.agents">
               <div class="team-agent-card">
                 <div class="team-agent-img-wrap">
                   <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
@@ -437,7 +437,7 @@
               </div>
             </ng-container>
             <!-- Duplicate set for seamless loop -->
-            <ng-container *ngFor="let agent of teamAreas[activeTeam()]?.agents">
+            <ng-container *ngFor="let agent of teamAreas()[activeTeam()]?.agents">
               <div class="team-agent-card" aria-hidden="true">
                 <div class="team-agent-img-wrap">
                   <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
@@ -882,7 +882,7 @@
     </div>
 
     <div class="agents-grid">
-      <div *ngFor="let agent of topAgents; let i = index" class="agent-card animate-on-scroll"
+      <div *ngFor="let agent of displayedAgents(); let i = index" class="agent-card animate-on-scroll"
         [class]="'delay-' + (i * 100 + 100)">
         <div class="agent-avatar-wrap">
           <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">

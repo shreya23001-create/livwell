@@ -15,6 +15,7 @@ const EMPTY_FORM = (): Partial<AdminUser> => ({
   joinedDate: new Date().toISOString().slice(0, 10),
   lastActive:  new Date().toISOString().slice(0, 10),
   propertiesCount: 0, leadsCount: 0,
+  designation: '', avatar_url: '',
 });
 
 interface UserForm extends Partial<AdminUser> { password?: string; }
@@ -33,7 +34,10 @@ export class AdminUsersComponent {
   private sb    = inject(SupabaseService).client;
   private toast = inject(ToastService);
 
-  showPassword = signal(false);
+  showPassword    = signal(false);
+  uploadingAvatar = signal(false);
+  avatarPreview   = signal<string | null>(null);
+  avatarDragOver  = signal(false);
 
   users   = this.dataSvc.users;
   loading = this.dataSvc.usersLoading;
@@ -119,6 +123,7 @@ export class AdminUsersComponent {
     this.form.set({ ...EMPTY_FORM(), password: '' });
     this.formErrors.set({});
     this.saveError.set('');
+    this.avatarPreview.set(null);
     this.editingId.set(null);
     this.showPassword.set(false);
     this.modalOpen.set(true);
@@ -128,12 +133,55 @@ export class AdminUsersComponent {
     this.form.set({ ...u, password: u.password || '' });
     this.formErrors.set({});
     this.saveError.set('');
+    this.avatarPreview.set(u.avatar_url || null);
     this.editingId.set(u.id);
     this.showPassword.set(false);
     this.modalOpen.set(true);
   }
 
-  closeModal(): void { this.modalOpen.set(false); }
+  closeModal(): void { this.modalOpen.set(false); this.avatarPreview.set(null); }
+
+  onAvatarFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    this.uploadAvatar(input.files[0]);
+    input.value = '';
+  }
+
+  onAvatarDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.avatarDragOver.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (file) this.uploadAvatar(file);
+  }
+
+  private async uploadAvatar(file: File): Promise<void> {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.type)) { this.toast.error('Only JPG, PNG, or WebP images are allowed.'); return; }
+    if (file.size > 5 * 1024 * 1024)  { this.toast.error('Image must be under 5 MB.'); return; }
+    this.uploadingAvatar.set(true);
+    const preview = URL.createObjectURL(file);
+    this.avatarPreview.set(preview);
+    try {
+      const ext  = file.name.split('.').pop() ?? 'jpg';
+      const path = `avatars/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { data, error } = await this.sb.storage
+        .from('imagesFolder')
+        .upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
+      if (error) { this.toast.error('Upload failed: ' + error.message); this.avatarPreview.set(null); return; }
+      const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
+      URL.revokeObjectURL(preview);
+      this.avatarPreview.set(pub.publicUrl);
+      this.patchForm('avatar_url', pub.publicUrl);
+    } finally {
+      this.uploadingAvatar.set(false);
+    }
+  }
+
+  removeAvatar(): void {
+    this.avatarPreview.set(null);
+    this.patchForm('avatar_url', '');
+  }
 
   async saveUser(): Promise<void> {
     const errs = this.validateForm();
@@ -160,12 +208,14 @@ export class AdminUsersComponent {
       const userId = signUpData.user?.id;
       if (userId) {
         await this.sb.from('profiles').upsert({
-          id:     userId,
-          name:   f.name!.trim(),
-          email:  f.email!.trim(),
-          phone:  f.phone?.trim() ?? null,
-          role:   f.role   ?? 'customer',
-          status: f.status ?? 'active',
+          id:          userId,
+          name:        f.name!.trim(),
+          email:       f.email!.trim(),
+          phone:       f.phone?.trim()       ?? null,
+          role:        f.role                ?? 'customer',
+          status:      f.status              ?? 'active',
+          designation: f.designation?.trim() ?? null,
+          avatar_url:  f.avatar_url?.trim()  ?? null,
         });
       }
       await this.dataSvc.loadUsers();

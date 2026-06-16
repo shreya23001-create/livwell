@@ -155,8 +155,12 @@
           <!-- User info -->
           <td class="usr-td">
             <div class="usr-cell-user">
+              <img *ngIf="u.avatar_url" [src]="u.avatar_url" [alt]="u.name"
+                class="usr-avatar" style="object-fit:cover"
+                (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'">
               <div class="usr-avatar" [style.background]="avatarColor(u.role) + '22'"
-                [style.color]="avatarColor(u.role)">
+                [style.color]="avatarColor(u.role)"
+                [style.display]="u.avatar_url ? 'none' : 'flex'">
                 {{ initials(u.name) }}
               </div>
               <div>
@@ -355,6 +359,45 @@
         <label class="usr-form-label">Joined Date</label>
         <input class="usr-form-input" type="date" [value]="form()['joinedDate'] || ''"
           (input)="patchForm('joinedDate', $any($event.target).value)">
+      </div>
+    </div>
+
+    <!-- Agent-only fields -->
+    <div *ngIf="form()['role'] === 'agent'" class="usr-form-row">
+      <div class="usr-form-field">
+        <label class="usr-form-label">Designation / Title</label>
+        <input class="usr-form-input" type="text" placeholder="e.g. Business Associate"
+          [value]="form()['designation'] || ''"
+          (input)="patchForm('designation', $any($event.target).value)">
+      </div>
+      <div class="usr-form-field">
+        <label class="usr-form-label">Photo</label>
+        <input #avatarFileInput type="file" accept="image/jpeg,image/png,image/webp" style="display:none"
+          (change)="onAvatarFileChange($event)">
+
+        <!-- Preview state -->
+        <div *ngIf="avatarPreview()" class="usr-avatar-preview-wrap">
+          <img [src]="avatarPreview()!" alt="Agent photo" class="usr-avatar-preview">
+          <div *ngIf="uploadingAvatar()" class="usr-avatar-uploading">
+            <span class="usr-btn-spinner"></span>
+          </div>
+          <button type="button" class="usr-avatar-remove" (click)="removeAvatar()" title="Remove photo">✕</button>
+        </div>
+
+        <!-- Drop zone -->
+        <div *ngIf="!avatarPreview()"
+          class="usr-avatar-drop" [class.usr-avatar-drop--over]="avatarDragOver()"
+          (click)="avatarFileInput.click()"
+          (dragover)="$event.preventDefault(); avatarDragOver.set(true)"
+          (dragleave)="avatarDragOver.set(false)"
+          (drop)="onAvatarDrop($event)">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span class="usr-avatar-drop-label">Click or drag photo here</span>
+          <span class="usr-avatar-drop-hint">JPG, PNG, WebP · max 5 MB</span>
+        </div>
       </div>
     </div>
 

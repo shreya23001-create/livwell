@@ -1,0 +1,235 @@
+$accent:  #6366f1;
+$accent2: #4f46e5;
+$green:   #1a5c3a;
+$red:     #ef4444;
+$border:  #e5e7eb;
+$muted:   #9ca3af;
+$sub:     #6b7280;
+$text:    #111827;
+$bg:      #f4f6fa;
+$white:   #fff;
+
+.lp-page { padding: 1.75rem 2rem; max-width: 1400px; background: $bg; min-height: 100vh; }
+
+// ── Loader ────────────────────────────────────────────────────
+.lp-loader {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.75rem; padding: 6rem; color: $muted; font-size: 0.875rem;
+}
+.lp-spin {
+  width: 32px; height: 32px; border: 3px solid $border; border-top-color: $accent;
+  border-radius: 50%; animation: lp-spin 0.7s linear infinite;
+}
+@keyframes lp-spin { to { transform: rotate(360deg); } }
+
+// ── Header ────────────────────────────────────────────────────
+.lp-back-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: none; color: $sub; font-size: 0.82rem; cursor: pointer;
+  padding: 0; margin-bottom: 1rem;
+  &:hover { color: $text; }
+}
+.lp-header { margin-bottom: 1.5rem; }
+.lp-header-main {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+.lp-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, $accent, $accent2);
+  color: $white; font-size: 1.4rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.lp-name { font-size: 1.4rem; font-weight: 800; color: $text; margin: 0 0 0.2rem; }
+.lp-meta { font-size: 0.8rem; color: $muted; }
+.lp-status-badge { margin-left: auto; }
+
+// ── Grid ──────────────────────────────────────────────────────
+.lp-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+.lp-col-left, .lp-col-right { display: flex; flex-direction: column; gap: 1.25rem; }
+
+// ── Card ──────────────────────────────────────────────────────
+.lp-card {
+  background: $white; border: 1px solid $border; border-radius: 0.875rem;
+  padding: 1.125rem 1.25rem;
+}
+.lp-card-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: $muted; margin-bottom: 1rem;
+  svg { flex-shrink: 0; }
+}
+
+// ── Info Grid ─────────────────────────────────────────────────
+.lp-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1rem; margin-bottom: 1rem;
+}
+.lp-info-item { display: flex; flex-direction: column; gap: 0.15rem;
+  &--full { grid-column: 1 / -1; }
+}
+.lp-lbl { font-size: 0.68rem; color: $muted; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+.lp-val {
+  font-size: 0.85rem; color: $text;
+  &--bold { font-weight: 700; }
+  &--link { color: $accent; text-decoration: none; &:hover { text-decoration: underline; } }
+}
+
+// ── Quick contact ─────────────────────────────────────────────
+.lp-contact-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.lp-cta {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem;
+  border-radius: 0.4rem; font-size: 0.8rem; font-weight: 600; text-decoration: none;
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.82; }
+  &--call  { background: #eff6ff; color: #1d4ed8; }
+  &--wa    { background: #f0fdf4; color: #15803d; }
+  &--email { background: #faf5ff; color: #7c3aed; }
+}
+
+// ── Status Pipeline ───────────────────────────────────────────
+.lp-pipeline {
+  display: flex; flex-direction: column; gap: 0; position: relative; margin-bottom: 1rem;
+  &::before { content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px; width: 2px; background: $border; }
+}
+.lp-pipe-step {
+  display: flex; align-items: center; gap: 0.65rem; padding: 0.45rem 0.5rem;
+  border-radius: 0.4rem; cursor: pointer; position: relative; transition: background 0.12s;
+  &:hover { background: $bg; }
+  &.done .lp-pipe-dot { background: $accent; border-color: $accent; }
+  &.done .lp-pipe-label { color: $accent; }
+  &.active .lp-pipe-dot { background: $accent; border-color: $accent; box-shadow: 0 0 0 4px rgba(99,102,241,0.15); }
+  &.active .lp-pipe-label { color: $text; font-weight: 700; }
+}
+.lp-pipe-dot {
+  width: 18px; height: 18px; border-radius: 50%; background: $white; border: 2px solid $border;
+  flex-shrink: 0; position: relative; z-index: 1;
+}
+.lp-pipe-label { font-size: 0.85rem; color: $muted; }
+
+.lp-outcome-row { display: flex; gap: 0.75rem; }
+.lp-outcome-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.55rem; border-radius: 0.5rem; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; border: 1.5px solid $border; background: $white; transition: all 0.12s;
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &--won  { color: #059669;
+    &:hover:not(:disabled), &.active { background: #ecfdf5; border-color: #059669; } }
+  &--lost { color: $red;
+    &:hover:not(:disabled), &.active { background: #fef2f2; border-color: $red; } }
+}
+
+// ── Activity Log ──────────────────────────────────────────────
+.lp-activity { display: flex; flex-direction: column; }
+.lp-act-empty { font-size: 0.82rem; color: $muted; text-align: center; padding: 1rem 0; }
+.lp-act-item {
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  padding: 0.6rem 0; border-bottom: 1px solid $border;
+  &:last-child { border-bottom: none; }
+}
+.lp-act-icon {
+  width: 28px; height: 28px; border-radius: 0.4rem; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+  &--create  { background: rgba(99,102,241,0.1);  color: $accent; }
+  &--message { background: rgba(59,130,246,0.1);   color: #3b82f6; }
+  &--status  { background: rgba(245,158,11,0.1);   color: #b45309; }
+  &--save    { background: rgba(239,68,68,0.1);    color: $red; }
+  &--view    { background: rgba(16,185,129,0.1);   color: #059669; }
+}
+.lp-act-body  { flex: 1; min-width: 0; }
+.lp-act-action { font-size: 0.82rem; font-weight: 600; color: $text; }
+.lp-act-detail { font-size: 0.75rem; color: $muted; margin-top: 0.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp-act-time   { font-size: 0.72rem; color: $muted; white-space: nowrap; padding-top: 0.15rem; flex-shrink: 0; }
+
+// ── Property Card ─────────────────────────────────────────────
+.lp-prop-skeleton {
+  height: 110px; border-radius: 0.5rem;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%; animation: lp-shimmer 1.2s infinite;
+}
+@keyframes lp-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+.lp-prop-card { display: flex; gap: 1rem; }
+.lp-prop-img  { width: 120px; height: 90px; object-fit: cover; border-radius: 0.5rem; flex-shrink: 0; background: $bg; }
+.lp-prop-body { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+.lp-prop-type  { font-size: 0.7rem; color: $muted; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+.lp-prop-title { font-size: 0.95rem; font-weight: 700; color: $text; }
+.lp-prop-loc   { display: flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: $muted; svg { flex-shrink: 0; } }
+.lp-prop-specs { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.lp-prop-price { font-size: 0.95rem; font-weight: 800; color: $accent; }
+.lp-prop-spec  { font-size: 0.73rem; color: $muted; background: $bg; padding: 0.1rem 0.45rem; border-radius: 3px; }
+.lp-prop-link  { font-size: 0.78rem; color: $accent; font-weight: 600; text-decoration: none; margin-top: 0.2rem; &:hover { text-decoration: underline; } }
+
+.lp-no-prop {
+  display: flex; align-items: center; gap: 0.75rem; padding: 1rem;
+  background: $bg; border-radius: 0.5rem; border: 1px dashed $border;
+  font-size: 0.83rem; color: $muted;
+}
+
+// ── Saved Properties ──────────────────────────────────────────
+.lp-saved-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.lp-saved-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.6rem 0.75rem; border-radius: 0.5rem;
+  background: $bg; border: 1px solid $border;
+}
+.lp-saved-thumb { width: 48px; height: 38px; object-fit: cover; border-radius: 0.375rem; flex-shrink: 0; background: $border; }
+.lp-saved-body  { flex: 1; min-width: 0; }
+.lp-saved-name  { font-size: 0.83rem; font-weight: 600; color: $text; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-saved-meta  { font-size: 0.73rem; color: $muted; }
+.lp-saved-link  {
+  display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+  border-radius: 0.375rem; background: rgba(99,102,241,0.08); color: $accent; flex-shrink: 0;
+  &:hover { background: rgba(99,102,241,0.16); }
+}
+
+// ── Chat ──────────────────────────────────────────────────────
+.lp-chat-card { padding-bottom: 0; overflow: hidden; }
+.lp-chat-msgs {
+  display: flex; flex-direction: column; gap: 0.75rem;
+  padding: 0.25rem 0 0.875rem; min-height: 80px; max-height: 400px; overflow-y: auto;
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: $border; border-radius: 4px; }
+}
+.lp-chat-empty { font-size: 0.82rem; color: $muted; text-align: center; padding: 1.5rem 0; }
+.lp-chat-msg {
+  display: flex; flex-direction: column; gap: 0.2rem;
+  &--mine   { align-items: flex-end;
+    .lp-chat-bubble { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 1rem 1rem 0.25rem 1rem; } }
+  &--theirs { align-items: flex-start;
+    .lp-chat-bubble { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 1rem 1rem 1rem 0.25rem; } }
+}
+.lp-chat-bubble { padding: 0.55rem 0.875rem; font-size: 0.875rem; line-height: 1.5; max-width: 82%; word-break: break-word; white-space: pre-wrap; }
+.lp-chat-meta   { font-size: 0.7rem; color: $muted; padding: 0 0.25rem; }
+.lp-chat-input-row { display: flex; border-top: 1px solid $border; margin: 0 -1.25rem; }
+.lp-chat-input {
+  flex: 1; border: none; outline: none; resize: none;
+  padding: 0.75rem 1.25rem; font-size: 0.875rem; font-family: inherit; line-height: 1.5; background: $white;
+  &::placeholder { color: $muted; }
+}
+.lp-chat-send {
+  display: flex; align-items: center; gap: 0.4rem; padding: 0 1.25rem;
+  background: $accent; color: $white; border: none; cursor: pointer;
+  font-size: 0.84rem; font-weight: 600; flex-shrink: 0; transition: background 0.15s;
+  &:hover:not(:disabled) { background: $accent2; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// ── Status badge (reuse from leads page) ─────────────────────
+.badge {
+  display: inline-flex; align-items: center; padding: 0.25rem 0.75rem;
+  border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap;
+  &--new         { background: #fffbeb; color: #b45309; }
+  &--contacted   { background: #eff6ff; color: #1d4ed8; }
+  &--qualified   { background: #f0fdf4; color: #4f46e5; }
+  &--negotiating { background: #faf5ff; color: #7c3aed; }
+  &--won         { background: #ecfdf5; color: #1a5c3a; }
+  &--lost        { background: #fef2f2; color: #991b1b; }
+}

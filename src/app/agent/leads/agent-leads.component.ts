@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -12,6 +13,7 @@ interface LeadMessage {
   content: string;
   createdAt: string;
 }
+
 
 export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'negotiating' | 'won' | 'lost';
 
@@ -32,6 +34,7 @@ export interface AgentLead {
   agentReply: string;
   lastContact: string;
   createdDate: string;
+  customerId?: string | null;
 }
 
 const EMPTY_FORM = (): Partial<AgentLead> => ({
@@ -45,16 +48,17 @@ const EMPTY_FORM = (): Partial<AgentLead> => ({
 @Component({
   selector: 'app-agent-leads',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './agent-leads.component.html',
   styleUrl: './agent-leads.component.scss',
 })
 export class AgentLeadsComponent implements OnInit, OnDestroy {
-  private auth  = inject(AuthService);
-  private sb    = inject(SupabaseService).client;
-  private toast = inject(ToastService);
+  private auth   = inject(AuthService);
+  private sb     = inject(SupabaseService).client;
+  private toast  = inject(ToastService);
+  private router = inject(Router);
 
-  private realtimeSub: any = null;
+  private realtimeSub: any    = null;
   private msgRealtimeSub: any = null;
 
   leads        = signal<AgentLead[]>([]);
@@ -76,14 +80,24 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   quickStatusId   = signal<number | null>(null);
 
   // Messages
-  modalMessages  = signal<LeadMessage[]>([]);
-  msgLoading     = signal(false);
-  newMessage     = signal('');
-  sendingMsg     = signal(false);
+  modalMessages = signal<LeadMessage[]>([]);
+  msgLoading    = signal(false);
+  newMessage    = signal('');
+  sendingMsg    = signal(false);
+
 
   readonly statuses: LeadStatus[] = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
   readonly categories = ['Buy', 'Rent', 'Invest'];
   readonly sources    = ['Website', 'Referral', 'Walk-in', 'Social Media', 'Portal', 'Cold Call'];
+
+  readonly statusTimeline: { status: LeadStatus; label: string; color: string }[] = [
+    { status: 'new',         label: 'New Lead',     color: '#f59e0b' },
+    { status: 'contacted',   label: 'Contacted',    color: '#3b82f6' },
+    { status: 'qualified',   label: 'Qualified',    color: '#6366f1' },
+    { status: 'negotiating', label: 'Negotiating',  color: '#7c3aed' },
+    { status: 'won',         label: 'Won',          color: '#10b981' },
+    { status: 'lost',        label: 'Lost',         color: '#ef4444' },
+  ];
 
   stats = computed(() => {
     const a = this.leads();
@@ -115,7 +129,6 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     await this.auth.waitForSession();
     const user = this.auth.currentUser();
     if (!user) { this.loading.set(false); return; }
-    // Match by email (unique) OR name — email is stored in agent_email column if present, else fall back to name
     const agentEmail = user.email;
     const agentName  = user.name;
     await this.fetchLeads(agentEmail, agentName);
@@ -128,22 +141,20 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   }
 
   private async fetchLeads(agentEmail: string, agentName: string): Promise<void> {
-    // Try matching by email first, then by name — handles both old and new leads
     const { data: byEmail } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, budget')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, budget, customer_id')
       .eq('agent_email', agentEmail)
       .order('created_at', { ascending: false });
 
     const { data: byName } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, budget')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, budget, customer_id')
       .eq('assigned_agent', agentName)
       .is('agent_email', null)
       .order('created_at', { ascending: false });
 
     const combined = [...(byEmail ?? []), ...(byName ?? [])];
-    // Deduplicate by id
     const seen = new Set<number>();
     const unique = combined.filter(r => { if (seen.has(r.id)) return false; seen.add(r.id); return true; });
     this.leads.set(unique.map((r: any) => this.mapRow(r)));
@@ -153,21 +164,17 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   private subscribeRealtime(agentEmail: string, agentName: string): void {
     this.realtimeSub = this.sb
       .channel('agent-leads-live')
-      .on(
-        'postgres_changes',
+      .on('postgres_changes',
         { event: '*', schema: 'public', table: 'admin_leads', filter: `agent_email=eq.${agentEmail}` },
         (payload: any) => {
           if (payload.eventType === 'INSERT') {
             this.leads.update(list => [this.mapRow(payload.new), ...list]);
           } else if (payload.eventType === 'UPDATE') {
-            this.leads.update(list =>
-              list.map(l => l.id === payload.new.id ? this.mapRow(payload.new) : l)
-            );
+            this.leads.update(list => list.map(l => l.id === payload.new.id ? this.mapRow(payload.new) : l));
           } else if (payload.eventType === 'DELETE') {
             this.leads.update(list => list.filter(l => l.id !== payload.old.id));
           }
-        }
-      )
+        })
       .subscribe();
   }
 
@@ -189,6 +196,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       agentReply:    r.agent_reply    || '',
       lastContact:   r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '',
       createdDate:   r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '',
+      customerId:    r.customer_id    ?? null,
     };
   }
 
@@ -197,6 +205,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     else { this.sortCol.set(col); this.sortDir.set('asc'); }
   }
 
+  // ── Edit / Add Modal ─────────────────────────────────────
   openAdd(): void {
     this.form.set(EMPTY_FORM()); this.formErrors.set({}); this.isEdit.set(false);
     this.editId.set(null); this.modalMessages.set([]); this.newMessage.set('');
@@ -217,34 +226,23 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
 
   private async loadModalMessages(leadId: number): Promise<void> {
     this.msgLoading.set(true);
-
-    // Fetch lead for legacy notes/agent_reply + new messages in parallel
     const [leadRes, msgsRes] = await Promise.all([
       this.sb.from('admin_leads').select('notes, agent_reply, assigned_agent, created_at').eq('id', leadId).single(),
       this.sb.from('lead_messages').select('id, sender_role, sender_name, content, created_at').eq('lead_id', leadId).order('created_at', { ascending: true }),
     ]);
-
     const legacy: LeadMessage[] = [];
     if (leadRes.data?.notes) legacy.push({
       id: -(leadId * 10 + 1), senderRole: 'customer', senderName: 'Customer',
-      content: leadRes.data.notes,
-      createdAt: this.fmtDate(leadRes.data.created_at),
+      content: leadRes.data.notes, createdAt: this.fmtDate(leadRes.data.created_at),
     });
     if (leadRes.data?.agent_reply) legacy.push({
       id: -(leadId * 10 + 2), senderRole: 'agent', senderName: leadRes.data.assigned_agent || 'Agent',
-      content: leadRes.data.agent_reply,
-      createdAt: this.fmtDate(leadRes.data.created_at),
+      content: leadRes.data.agent_reply, createdAt: this.fmtDate(leadRes.data.created_at),
     });
-
     const fresh = (msgsRes.data ?? []).map(this.mapMsg);
     this.modalMessages.set([...legacy, ...fresh]);
     this.msgLoading.set(false);
     this.subscribeModalMsgs(leadId);
-  }
-
-  private fmtDate(ts: string): string {
-    return new Date(ts).toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: true }) +
-           ' · ' + new Date(ts).toLocaleDateString('en-AE', { day: 'numeric', month: 'short' });
   }
 
   private subscribeModalMsgs(leadId: number): void {
@@ -267,19 +265,11 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     if (!text || !leadId) return;
     const user = this.auth.currentUser();
     if (!user) return;
-
     this.sendingMsg.set(true);
     const { error } = await this.sb.from('lead_messages').insert({
-      lead_id:     leadId,
-      sender_role: 'agent',
-      sender_name: user.name || user.email,
-      content:     text,
+      lead_id: leadId, sender_role: 'agent', sender_name: user.name || user.email, content: text,
     });
-
-    if (!error) {
-      this.newMessage.set('');
-      await this.loadModalMessages(leadId);
-    }
+    if (!error) { this.newMessage.set(''); await this.loadModalMessages(leadId); }
     this.sendingMsg.set(false);
   }
 
@@ -287,13 +277,6 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); this.sendMessage(); }
   }
 
-  private mapMsg = (r: any): LeadMessage => ({
-    id:         r.id,
-    senderRole: r.sender_role,
-    senderName: r.sender_name,
-    content:    r.content,
-    createdAt:  this.fmtDate(r.created_at),
-  });
   updateForm(p: Partial<AgentLead>): void { this.form.update(f => ({ ...f, ...p })); }
 
   async save(): Promise<void> {
@@ -314,34 +297,22 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     const agentName  = this.auth.currentUser()?.name  ?? '';
     const agentEmail = this.auth.currentUser()?.email ?? '';
     const payload = {
-      name:           f.name!.trim(),
-      email:          f.email!.trim(),
-      phone:          f.phone!.trim(),
-      status:         f.status || 'new',
-      budget:         f.budget!.trim(),
-      location:       f.location!.trim(),
-      property_type:  f.propertyType || '',
-      source:         f.source || 'Website',
-      notes:          f.notes || '',
-      agent_reply:    f.agentReply || null,
-      assigned_agent: agentName,
-      agent_email:    agentEmail,
+      name: f.name!.trim(), email: f.email!.trim(), phone: f.phone!.trim(),
+      status: f.status || 'new', budget: f.budget!.trim(), location: f.location!.trim(),
+      property_type: f.propertyType || '', source: f.source || 'Website',
+      notes: f.notes || '', agent_reply: f.agentReply || null,
+      assigned_agent: agentName, agent_email: agentEmail,
     };
 
     if (this.isEdit() && this.editId() !== null) {
       const { error } = await this.sb.from('admin_leads').update(payload).eq('id', this.editId()!);
       if (error) { this.toast.error('Failed to save. Please try again.'); this.saving.set(false); return; }
-      this.leads.update(list =>
-        list.map(l => l.id === this.editId()
-          ? { ...l, ...f, propertyType: f.propertyType || l.propertyType } as AgentLead
-          : l)
-      );
+      this.leads.update(list => list.map(l => l.id === this.editId() ? { ...l, ...f, propertyType: f.propertyType || l.propertyType } as AgentLead : l));
     } else {
       const { data, error } = await this.sb.from('admin_leads').insert(payload).select().single();
       if (error) { this.toast.error('Failed to add lead. Please try again.'); this.saving.set(false); return; }
       if (data) this.leads.update(list => [this.mapRow(data), ...list]);
     }
-
     this.saving.set(false);
     this.showModal.set(false);
     this.toast.success(this.editId() !== null ? 'Lead updated.' : 'Lead added.');
@@ -351,8 +322,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     this.quickStatusId.set(null);
     const agentEmail = this.auth.currentUser()?.email ?? '';
     const { error } = await this.sb.from('admin_leads')
-      .update({ status: newStatus, agent_email: agentEmail })
-      .eq('id', lead.id);
+      .update({ status: newStatus, agent_email: agentEmail }).eq('id', lead.id);
     if (!error) {
       this.leads.update(list => list.map(l => l.id === lead.id ? { ...l, status: newStatus } : l));
     }
@@ -372,4 +342,26 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   labelStatus(s: string): string {
     return ({ new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' } as Record<string, string>)[s] ?? s;
   }
+
+  formatPrice(n: number): string {
+    if (!n) return 'AED —';
+    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(2)}M`;
+    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
+    return `AED ${n.toLocaleString()}`;
+  }
+
+  // ── Customer Profile Page ───────────────────────────────
+  openProfile(l: AgentLead): void {
+    this.router.navigate(['/agent/leads', l.id]);
+  }
+
+  private fmtDate(ts: string): string {
+    return new Date(ts).toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: true }) +
+           ' · ' + new Date(ts).toLocaleDateString('en-AE', { day: 'numeric', month: 'short' });
+  }
+
+  private mapMsg = (r: any): LeadMessage => ({
+    id: r.id, senderRole: r.sender_role, senderName: r.sender_name,
+    content: r.content, createdAt: this.fmtDate(r.created_at),
+  });
 }

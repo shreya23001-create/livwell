@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 
@@ -33,6 +34,8 @@ export interface BRProperty {
   is_ultra_luxury: boolean;
   agent_name: string;
   created_at: string;
+  video_url: string | null;
+  views?: number;
 }
 
 @Component({
@@ -46,6 +49,17 @@ export class BrandedResidenceDetailComponent implements OnInit {
   private sb        = inject(SupabaseService).client;
   private route     = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
+  private auth      = inject(AuthService);
+
+  isLoggedIn = this.auth.isLoggedIn;
+
+  videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const url = this.property()?.video_url;
+    if (!url) return null;
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  });
 
   property         = signal<BRProperty | null>(null);
   agent            = signal<{ name: string; email: string; phone: string; avatar_url: string } | null>(null);
@@ -56,6 +70,9 @@ export class BrandedResidenceDetailComponent implements OnInit {
   avatarError      = signal(false);
   overviewExpanded = signal(false);
   activeMapTab     = signal<'location' | 'community'>('location');
+  isFaved          = signal(false);
+  favLoading       = signal(false);
+  shareToast       = signal(false);
 
   agentAvatar = computed(() => this.avatarError() ? '' : (this.agent()?.avatar_url ?? ''));
   agentPhone  = computed(() => this.agent()?.phone ?? '');
@@ -84,6 +101,7 @@ export class BrandedResidenceDetailComponent implements OnInit {
     if (data) {
       this.property.set(data as BRProperty);
       this.geocodeAndSetMap(data as BRProperty);
+      this.sb.from('projects').update({ views: ((data as BRProperty).views || 0) + 1 }).eq('id', id).then(() => {});
       const agentName = (data as BRProperty).agent_name;
       if (agentName) {
         const { data: ag } = await this.sb
@@ -97,6 +115,42 @@ export class BrandedResidenceDetailComponent implements OnInit {
       this.notFound.set(true);
     }
     this.loading.set(false);
+    if (data) { this.auth.waitForSession().then(() => this.checkFavStatus(Number(id))); }
+  }
+
+  private async checkFavStatus(propId: number): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('id').eq('user_id', userId).eq('property_id', propId).maybeSingle();
+    this.isFaved.set(!!data);
+  }
+
+  async toggleFav(): Promise<void> {
+    const p = this.property();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId || !p?.id || this.favLoading()) return;
+    this.favLoading.set(true);
+    if (this.isFaved()) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', p.id);
+      this.isFaved.set(false);
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: p.id });
+      this.isFaved.set(true);
+    }
+    this.favLoading.set(false);
+  }
+
+  async shareProperty(): Promise<void> {
+    const p = this.property();
+    if (!p) return;
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: p.title, text: p.title, url }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(url);
+    }
+    this.shareToast.set(true);
+    setTimeout(() => this.shareToast.set(false), 2500);
   }
 
   formatPrice(n: number): string {

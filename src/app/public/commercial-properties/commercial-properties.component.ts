@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 interface CommercialProperty {
   id: number;
@@ -40,7 +41,14 @@ interface CommercialProperty {
 })
 export class CommercialPropertiesComponent implements OnInit {
 
-  private sb = inject(SupabaseService).client;
+  private sb   = inject(SupabaseService).client;
+  private auth = inject(AuthService);
+
+  savedIds     = signal<Set<number>>(new Set());
+  savingId     = signal<number | null>(null);
+  shareToastId = signal<number | null>(null);
+
+  isSaved(id: number): boolean { return this.savedIds().has(id); }
 
   loading = signal(true);
   searchArea = signal('');
@@ -53,7 +61,6 @@ export class CommercialPropertiesComponent implements OnInit {
   areaMax = signal('');
   sizeMin = signal('');
   sizeMax = signal('');
-  activeStatus = signal('Any');
   activeView = signal('Any');
   refNo = signal('');
   filterFurnished = signal(false);
@@ -66,7 +73,6 @@ export class CommercialPropertiesComponent implements OnInit {
   openDropdown = signal<string | null>(null);
 
   readonly propertyTypes = ['Any', 'Office', 'Shop', 'Warehouse', 'Plot'];
-  readonly statusOptions = ['Any', 'Ready', 'Off-Plan', 'Under Construction'];
   readonly viewOptions = ['Any', 'Sea View', 'City View', 'Park View', 'Canal View', 'Street View'];
   readonly bedOptions = ['Any', 'Studio', '1', '2', '3', '4', '5', '6', '7+'];
   readonly bathOptions = ['Any', '1', '2', '3', '4', '5', '6', '7+'];
@@ -204,7 +210,6 @@ export class CommercialPropertiesComponent implements OnInit {
     list = list.filter(p => intent === 'Rent' ? !!p.forRent : !p.forRent);
 
     const type = this.activeType();
-    const status = this.activeStatus();
     const view = this.activeView();
     const ref = this.refNo().trim().toLowerCase();
     const search = this.searchArea().toLowerCase().trim();
@@ -214,7 +219,6 @@ export class CommercialPropertiesComponent implements OnInit {
     const sMax = this.sizeMax() ? parseInt(this.sizeMax().replace(/,/g, '')) : Infinity;
 
     if (type !== 'Any') list = list.filter(p => p.type === type);
-    if (status !== 'Any') list = list.filter(p => p.status === status);
     if (view !== 'Any') list = list.filter(p => p.view === view);
     if (ref) list = list.filter(p => p.refNo.toLowerCase().includes(ref));
     if (pMin > 0) list = list.filter(p => p.price >= pMin);
@@ -281,6 +285,7 @@ export class CommercialPropertiesComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
+    this.auth.waitForSession().then(() => this.loadSavedIds());
     await this.loadProperties();
   }
 
@@ -393,7 +398,7 @@ export class CommercialPropertiesComponent implements OnInit {
   }
 
   resetAll() {
-    this.activeType.set('Any'); this.activeStatus.set('Any'); this.activeView.set('Any');
+    this.activeType.set('Any'); this.activeView.set('Any');
     this.priceMin.set(''); this.priceMax.set('');
     this.sizeMin.set(''); this.sizeMax.set('');
     this.refNo.set('');
@@ -409,7 +414,6 @@ export class CommercialPropertiesComponent implements OnInit {
   }
 
   slugify(title: string): string { return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
-  statusClass(s: string): string { return ({ 'Ready': 'status--ready', 'Off-Plan': 'status--offplan', 'Under Construction': 'status--construction' }[s] ?? ''); }
   typeLabel(): string { return this.activeType() === 'Any' ? 'Property Type' : this.activeType() + 's'; }
   priceLabel(): string {
     const mn = this.priceMin(), mx = this.priceMax();
@@ -417,5 +421,45 @@ export class CommercialPropertiesComponent implements OnInit {
     if (mn && !mx) return `AED ${mn}+`;
     if (!mn && mx) return `Up to AED ${mx}`;
     return `AED ${mn} – ${mx}`;
+  }
+
+  private async loadSavedIds(): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('property_id').eq('user_id', userId);
+    if (data) this.savedIds.set(new Set(data.map((r: any) => r.property_id)));
+  }
+
+  async toggleSave(id: number, e: Event): Promise<void> {
+    e.preventDefault(); e.stopPropagation();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId || this.savingId() === id) return;
+    this.savingId.set(id);
+    const saved = this.savedIds();
+    if (saved.has(id)) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', id);
+      const next = new Set(saved); next.delete(id);
+      this.savedIds.set(next);
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: id });
+      const next = new Set(saved); next.add(id);
+      this.savedIds.set(next);
+    }
+    this.savingId.set(null);
+  }
+
+  async shareCard(id: number, title: string, priceDisplay: string, e: Event): Promise<void> {
+    e.preventDefault(); e.stopPropagation();
+    const url = `${window.location.origin}/commercial/${id}`;
+    if (navigator.share) {
+      try { await navigator.share({ title, text: `${title} — ${priceDisplay}`, url }); } catch {}
+    } else {
+      try { await navigator.clipboard.writeText(url); } catch {}
+    }
+    this.shareToastId.set(id);
+    setTimeout(() => this.shareToastId.set(null), 2500);
+    const { data } = await this.sb.from('properties').select('share_count').eq('id', id).single();
+    const next = ((data as any)?.share_count ?? 0) + 1;
+    await this.sb.from('properties').update({ share_count: next }).eq('id', id);
   }
 }

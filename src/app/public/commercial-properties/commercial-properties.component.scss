@@ -800,9 +800,23 @@ $white: #fff;
   transition: color .15s, box-shadow .15s;
 
   &:hover {
-    color: #e53e3e;
+    color: #ef4444;
     box-shadow: 0 4px 12px rgba(0, 0, 0, .16);
   }
+  &.active { color: #ef4444; }
+}
+.lpfs-share-toast {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  background: #1e293b;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
 }
 
 .lpfs-agent-bar {

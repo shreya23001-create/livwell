@@ -6,6 +6,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 export interface PropertyDetail {
   id: string;
@@ -31,6 +32,7 @@ export interface PropertyDetail {
   mortgageRate: number;
   mapUrl: string;
   nearbySchools: { name: string; distance: string; rating: string }[];
+  video_url?: string | null;
 }
 
 const AGENT_ANUJ = { name: 'Anuj Sharma', role: 'Luxury Property Specialist', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' };
@@ -570,8 +572,22 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
   safeMapUrl = signal<SafeResourceUrl>('');
 
-  loading = signal(false);
-  private sb = inject(SupabaseService).client;
+  loading    = signal(false);
+  isFaved    = signal(false);
+  favLoading = signal(false);
+  shareToast = signal(false);
+  private sb   = inject(SupabaseService).client;
+  private auth = inject(AuthService);
+
+  isLoggedIn = this.auth.isLoggedIn;
+
+  videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const url = this.property()?.video_url;
+    if (!url) return null;
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  });
 
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer) {}
 
@@ -630,7 +646,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
     const { data, error } = await this.sb
       .from('properties')
-      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, created_at, status')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, created_at, status, video_url, views')
       .eq('id', id)
       .single();
 
@@ -695,12 +711,60 @@ export class LuxuryPropertyDetailComponent implements OnInit {
       mortgageRate: 4.5,
       mapUrl:       '',
       nearbySchools: [],
+      video_url:    p.video_url ?? null,
     };
 
     this.property.set(detail);
     this.mortgageAmount.set(priceNum);
     this.geocodeAndSetMap(p.community ?? '', p.location ?? '');
     this.loading.set(false);
+    this.auth.waitForSession().then(() => this.checkFavStatus(p.id));
+    this.sb.from('properties').update({ views: (p.views || 0) + 1 }).eq('id', p.id).then(() => {});
+  }
+
+  private async checkFavStatus(propId: number): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('id').eq('user_id', userId).eq('property_id', propId).maybeSingle();
+    this.isFaved.set(!!data);
+  }
+
+  async toggleFav(): Promise<void> {
+    const p = this.property();
+    const userId = this.auth.currentUser()?.id;
+    const numId = p ? Number(p.id) : 0;
+    if (!userId || !numId || this.favLoading()) return;
+    this.favLoading.set(true);
+    if (this.isFaved()) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', numId);
+      this.isFaved.set(false);
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: numId });
+      this.isFaved.set(true);
+    }
+    this.favLoading.set(false);
+  }
+
+  async shareProperty(): Promise<void> {
+    const p = this.property();
+    if (!p) return;
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: p.title, text: p.title, url }); } catch {}
+    } else {
+      try { await navigator.clipboard.writeText(url); } catch {}
+    }
+    this.shareToast.set(true);
+    setTimeout(() => this.shareToast.set(false), 2500);
+    const numId = Number(p.id);
+    if (numId) await this.incrementShareCount(numId);
+  }
+
+  private async incrementShareCount(propId: number): Promise<void> {
+    const { data, error } = await this.sb.from('properties').select('share_count').eq('id', propId).single();
+    if (error) return;
+    const next = ((data as any)?.share_count ?? 0) + 1;
+    await this.sb.from('properties').update({ share_count: next }).eq('id', propId);
   }
 
   nextImage() {

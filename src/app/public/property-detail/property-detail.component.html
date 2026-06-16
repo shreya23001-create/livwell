@@ -64,13 +64,14 @@
                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                 </svg>
               </button>
-              <button class="pd-share-btn" title="Share">
+              <button class="pd-share-btn" title="Share" (click)="shareProperty()">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round"
                     d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                 </svg>
               </button>
+              <div *ngIf="shareToast()" class="pd-share-toast">Link copied!</div>
             </div>
           </div>
         </div>
@@ -211,67 +212,6 @@
         </button>
       </div>
 
-      <!-- ── Average Price per Sqft Chart ────────────── -->
-      <div class="pd-section">
-        <h2 class="pd-section-title">Average Property Price / sqft — {{ p.community }}</h2>
-        <div class="pd-chart-card">
-          <div class="pd-chart-legend">
-            <span class="pd-chart-dot"></span>
-            <span class="pd-chart-legend-label">Avg. Price per sqft (AED)</span>
-            <span class="pd-chart-legend-val">AED {{ priceTrendMax.toLocaleString() }}</span>
-          </div>
-          <div class="pd-line-chart-wrap">
-            <svg viewBox="0 0 620 140" class="pd-line-chart" preserveAspectRatio="none">
-              <!-- Grid lines -->
-              <line x1="10" y1="10" x2="610" y2="10" stroke="#f0f0f0" stroke-width="1" />
-              <line x1="10" y1="43" x2="610" y2="43" stroke="#f0f0f0" stroke-width="1" />
-              <line x1="10" y1="76" x2="610" y2="76" stroke="#f0f0f0" stroke-width="1" />
-              <line x1="10" y1="109" x2="610" y2="109" stroke="#f0f0f0" stroke-width="1" />
-              <!-- Area fill -->
-              <defs>
-                <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#1a5c3a" stop-opacity="0.15" />
-                  <stop offset="100%" stop-color="#1a5c3a" stop-opacity="0" />
-                </linearGradient>
-              </defs>
-              <path [attr.d]="getPriceTrendPath() + ' L610,130 L10,130 Z'" fill="url(#priceGrad)" />
-              <!-- Line -->
-              <path [attr.d]="getPriceTrendPath()" fill="none" stroke="#1a5c3a" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round" />
-              <!-- Dots -->
-              <circle *ngFor="let pt of priceTrendPoints; let i = index"
-                [attr.cx]="10 + (i / (priceTrendPoints.length - 1)) * 580"
-                [attr.cy]="130 - 10 - ((pt - (priceTrendMin - 30)) / ((priceTrendMax + 30) - (priceTrendMin - 30))) * 100"
-                r="3.5" fill="#1a5c3a" stroke="#fff" stroke-width="1.5" />
-            </svg>
-            <div class="pd-chart-x-labels">
-              <span *ngFor="let m of priceTrendMonths" class="pd-chart-x-lbl">{{ m }}</span>
-            </div>
-          </div>
-          <div class="pd-chart-footnote">Source: Livwell Research · Last 12 months</div>
-        </div>
-      </div>
-
-      <!-- ── Demand Trend Chart ────────────────────────── -->
-      <div class="pd-section">
-        <h2 class="pd-section-title">Demand Trend — {{ p.community }} Sales</h2>
-        <div class="pd-chart-card">
-          <div class="pd-chart-legend">
-            <span class="pd-bar-dot"></span>
-            <span class="pd-chart-legend-label">Transactions per quarter</span>
-          </div>
-          <div class="pd-bar-chart-wrap">
-            <div *ngFor="let val of demandValues; let i = index" class="pd-bar-col">
-              <div class="pd-bar-outer">
-                <div class="pd-bar-inner" [style.height.%]="getDemandBarHeight(val)"></div>
-              </div>
-              <span class="pd-bar-lbl">{{ demandQuarters[i] }}</span>
-            </div>
-          </div>
-          <div class="pd-chart-footnote">Source: Dubai Land Department (DLD) · Livwell Analysis</div>
-        </div>
-      </div>
-
       <!-- Amenities -->
       <div class="pd-section">
         <h2 class="pd-section-title">Amenities & Features</h2>
@@ -364,13 +304,24 @@
       </div>
 
       <!-- ── Video Section ────────────────────────────── -->
-      <div class="pd-section">
+      <div class="pd-section" *ngIf="property()?.video_url">
         <h2 class="pd-section-title">Property Video Tour</h2>
         <div class="pd-video-wrap">
-          <div class="pd-video-placeholder">
+
+          <!-- Signed in: show the video -->
+          <iframe *ngIf="isLoggedIn() && videoEmbedUrl()"
+            [src]="videoEmbedUrl()!"
+            class="pd-video-iframe"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy">
+          </iframe>
+
+          <!-- Not signed in: show lock gate -->
+          <div *ngIf="!isLoggedIn()" class="pd-video-placeholder">
             <div class="pd-video-lock-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 18.75 8.25Z" />
               </svg>
@@ -379,62 +330,7 @@
             <p class="pd-video-sub">To view this video of the property, please sign in.</p>
             <a routerLink="/customer" class="pd-video-signin-btn">Sign In to Watch</a>
           </div>
-        </div>
-      </div>
 
-      <!-- ── QR Code ───────────────────────────────────── -->
-      <div class="pd-section pd-qr-section">
-        <div class="pd-qr-inner">
-          <div class="pd-qr-text">
-            <h3 class="pd-qr-title">Scan to view on mobile</h3>
-            <p class="pd-qr-desc">Share this listing directly from your phone using the QR code.</p>
-          </div>
-          <div class="pd-qr-box">
-            <svg viewBox="0 0 100 100" class="pd-qr-svg" xmlns="http://www.w3.org/2000/svg">
-              <!-- QR code visual approximation -->
-              <rect width="100" height="100" fill="#fff" />
-              <!-- Top-left finder -->
-              <rect x="8" y="8" width="26" height="26" fill="none" stroke="#111" stroke-width="3" />
-              <rect x="14" y="14" width="14" height="14" fill="#111" />
-              <!-- Top-right finder -->
-              <rect x="66" y="8" width="26" height="26" fill="none" stroke="#111" stroke-width="3" />
-              <rect x="72" y="14" width="14" height="14" fill="#111" />
-              <!-- Bottom-left finder -->
-              <rect x="8" y="66" width="26" height="26" fill="none" stroke="#111" stroke-width="3" />
-              <rect x="14" y="72" width="14" height="14" fill="#111" />
-              <!-- Data dots -->
-              <rect x="40" y="8" width="6" height="6" fill="#111" />
-              <rect x="50" y="8" width="6" height="6" fill="#111" />
-              <rect x="40" y="18" width="6" height="6" fill="#111" />
-              <rect x="58" y="18" width="6" height="6" fill="#111" />
-              <rect x="40" y="28" width="6" height="6" fill="#111" />
-              <rect x="50" y="28" width="6" height="6" fill="#111" />
-              <rect x="8" y="40" width="6" height="6" fill="#111" />
-              <rect x="18" y="40" width="6" height="6" fill="#111" />
-              <rect x="28" y="40" width="6" height="6" fill="#111" />
-              <rect x="40" y="40" width="6" height="6" fill="#111" />
-              <rect x="50" y="40" width="6" height="6" fill="#111" />
-              <rect x="60" y="40" width="6" height="6" fill="#111" />
-              <rect x="70" y="40" width="6" height="6" fill="#111" />
-              <rect x="80" y="40" width="6" height="6" fill="#111" />
-              <rect x="8" y="50" width="6" height="6" fill="#111" />
-              <rect x="28" y="50" width="6" height="6" fill="#111" />
-              <rect x="40" y="50" width="6" height="6" fill="#111" />
-              <rect x="60" y="50" width="6" height="6" fill="#111" />
-              <rect x="80" y="50" width="6" height="6" fill="#111" />
-              <rect x="8" y="60" width="6" height="6" fill="#111" />
-              <rect x="18" y="60" width="6" height="6" fill="#111" />
-              <rect x="40" y="60" width="6" height="6" fill="#111" />
-              <rect x="50" y="60" width="6" height="6" fill="#111" />
-              <rect x="70" y="60" width="6" height="6" fill="#111" />
-              <rect x="80" y="60" width="6" height="6" fill="#111" />
-              <rect x="40" y="70" width="6" height="6" fill="#111" />
-              <rect x="60" y="70" width="6" height="6" fill="#111" />
-              <rect x="40" y="80" width="6" height="6" fill="#111" />
-              <rect x="50" y="80" width="6" height="6" fill="#111" />
-              <rect x="70" y="80" width="6" height="6" fill="#111" />
-            </svg>
-          </div>
         </div>
       </div>
 

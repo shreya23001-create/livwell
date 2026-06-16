@@ -55,14 +55,16 @@
           <!-- Image -->
           <div class="br-card-img-wrap">
             <img [src]="r.images?.[0] || 'images/dummy-image.png'" [alt]="r.title" class="br-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
-            <span *ngIf="r.badge" class="br-badge">{{ r.badge }}</span>
-            <span *ngIf="r.is_ultra_luxury" class="br-status status--ultra">Ultra Luxury</span>
-            <span *ngIf="!r.is_ultra_luxury && r.is_luxury" class="br-status status--luxury">Luxury</span>
+            <span class="br-badge">{{ r.status === 'Off-Plan' || r.status === 'Draft' ? 'Off Plan' : 'Ready' }}</span>
           </div>
 
           <!-- Body -->
           <div class="br-card-body">
-            <div class="br-card-brand">{{ r.brand || '—' }}</div>
+            <!-- Brand logo + name -->
+            <div class="br-card-brand-row">
+              <img *ngIf="r.brand_logo_url" [src]="r.brand_logo_url" [alt]="r.brand" class="br-brand-logo" (error)="$any($event.target).style.display='none'">
+              <span class="br-card-brand">{{ r.brand || '—' }}</span>
+            </div>
             <div class="br-card-developer">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               {{ r.developer }}

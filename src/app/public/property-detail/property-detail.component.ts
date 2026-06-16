@@ -27,7 +27,9 @@ interface Property {
   agent_name: string;
   created_at: string;
   views: number;
+  share_count: number;
   amenities: string[];
+  video_url: string | null;
 }
 
 @Component({
@@ -49,6 +51,18 @@ export class PropertyDetailComponent implements OnInit {
   agentAvatar       = signal('');
   agentPhone        = signal('');
 
+  isLoggedIn = this.auth.isLoggedIn;
+
+  videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const url = this.property()?.video_url;
+    if (!url) return null;
+    let embedUrl = url;
+    // Convert YouTube watch URLs to embed
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  });
+
   mapUrl = signal<SafeResourceUrl>(this.sanitizer.bypassSecurityTrustResourceUrl(''));
   loading           = signal(true);
   notFound          = signal(false);
@@ -56,6 +70,7 @@ export class PropertyDetailComponent implements OnInit {
   descExpanded      = signal(false);
   isFaved           = signal(false);
   favLoading        = signal(false);
+  shareToast        = signal(false);
 
   // Mortgage calculator
   mortgageDown   = signal(20);
@@ -279,6 +294,33 @@ export class PropertyDetailComponent implements OnInit {
     this.favLoading.set(false);
   }
 
+  async shareProperty(): Promise<void> {
+    const p = this.property();
+    if (!p) return;
+    const url  = window.location.href;
+    const text = `${p.title} — ${this.formatPrice(p.price)}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: p.title, text, url }); } catch {}
+    } else {
+      try { await navigator.clipboard.writeText(url); } catch {}
+    }
+    this.shareToast.set(true);
+    setTimeout(() => this.shareToast.set(false), 2500);
+    await this.incrementShareCount(p.id);
+  }
+
+  private async incrementShareCount(propId: number): Promise<void> {
+    const { data, error } = await this.sb
+      .from('properties')
+      .select('share_count')
+      .eq('id', propId)
+      .single();
+    if (error) return;
+    const next = ((data as any)?.share_count ?? 0) + 1;
+    await this.sb.from('properties').update({ share_count: next }).eq('id', propId);
+    this.property.update(x => x ? { ...x, share_count: next } : x);
+  }
+
   private mapProperty = (p: any): Property => ({
     id:           p.id,
     title:        p.title        || '',
@@ -299,7 +341,9 @@ export class PropertyDetailComponent implements OnInit {
     agent_name:   ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
     created_at:   p.created_at   || '',
     views:        p.views        || 0,
+    share_count:  p.share_count  || 0,
     amenities:    p.amenities    || [],
+    video_url:    p.video_url    || null,
   });
 
   setImage(i: number): void { this.activeImageIndex.set(i); }

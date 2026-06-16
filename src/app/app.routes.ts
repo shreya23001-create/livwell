@@ -91,6 +91,7 @@ export const routes: Routes = [
         children: [
           { path: 'dashboard', loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent) },
           { path: 'properties', loadComponent: () => import('./admin/properties/admin-properties.component').then(m => m.AdminPropertiesComponent) },
+          { path: 'properties/:id/view', loadComponent: () => import('./admin/properties/property-view/property-view.component').then(m => m.PropertyViewComponent) },
           { path: 'projects',  loadComponent: () => import('./admin/projects/admin-projects.component').then(m => m.AdminProjectsComponent) },
           { path: 'leads', loadComponent: () => import('./admin/leads/admin-leads.component').then(m => m.AdminLeadsComponent) },
           { path: 'users', loadComponent: () => import('./admin/users/admin-users.component').then(m => m.AdminUsersComponent) },
@@ -124,6 +125,7 @@ export const routes: Routes = [
         children: [
           { path: 'dashboard', loadComponent: () => import('./agent/dashboard/agent-dashboard.component').then(m => m.AgentDashboardComponent) },
           { path: 'leads', loadComponent: () => import('./agent/leads/agent-leads.component').then(m => m.AgentLeadsComponent) },
+          { path: 'leads/:id', loadComponent: () => import('./agent/lead-profile/lead-profile.component').then(m => m.LeadProfileComponent) },
           { path: 'customers', loadComponent: () => import('./agent/customers/agent-customers.component').then(m => m.AgentCustomersComponent) },
           { path: 'properties', loadComponent: () => import('./agent/properties/agent-properties.component').then(m => m.AgentPropertiesComponent) },
           { path: 'projects',  loadComponent: () => import('./agent/projects/agent-projects.component').then(m => m.AgentProjectsComponent) },

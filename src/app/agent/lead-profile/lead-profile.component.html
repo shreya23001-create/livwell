@@ -1,0 +1,218 @@
+<div class="lp-page">
+
+  <!-- Loading -->
+  <div class="lp-loader" *ngIf="loading()">
+    <div class="lp-spin"></div>
+    <span>Loading profile…</span>
+  </div>
+
+  <ng-container *ngIf="!loading() && lead() as l">
+
+    <!-- ── Page Header ─────────────────────────────────── -->
+    <div class="lp-header">
+      <button class="lp-back-btn" (click)="goBack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Leads
+      </button>
+      <div class="lp-header-main">
+        <div class="lp-avatar">{{ l.name.charAt(0).toUpperCase() }}</div>
+        <div>
+          <h1 class="lp-name">{{ l.name }}</h1>
+          <div class="lp-meta">Lead #{{ l.id }} &middot; {{ l.source }} &middot; {{ l.createdDate }}</div>
+        </div>
+        <span class="lp-status-badge badge badge--{{ l.status }}">{{ labelStatus(l.status) }}</span>
+      </div>
+    </div>
+
+    <!-- ── Main Grid ───────────────────────────────────── -->
+    <div class="lp-grid">
+
+      <!-- ══ LEFT COLUMN ══════════════════════════════════ -->
+      <div class="lp-col-left">
+
+        <!-- Customer Info -->
+        <div class="lp-card">
+          <div class="lp-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Customer Details
+          </div>
+          <div class="lp-info-grid">
+            <div class="lp-info-item"><span class="lp-lbl">Full Name</span><span class="lp-val lp-val--bold">{{ l.name }}</span></div>
+            <div class="lp-info-item"><span class="lp-lbl">Email</span><a [href]="'mailto:' + l.email" class="lp-val lp-val--link">{{ l.email }}</a></div>
+            <div class="lp-info-item"><span class="lp-lbl">Phone</span><a [href]="'tel:' + l.phone" class="lp-val lp-val--link">{{ l.phone }}</a></div>
+            <div class="lp-info-item"><span class="lp-lbl">Source</span><span class="lp-val">{{ l.source }}</span></div>
+            <div class="lp-info-item"><span class="lp-lbl">Category</span><span class="lp-val">{{ l.category }}</span></div>
+            <div class="lp-info-item"><span class="lp-lbl">Budget</span><span class="lp-val lp-val--bold">{{ l.budget || '—' }}</span></div>
+            <div class="lp-info-item"><span class="lp-lbl">Location</span><span class="lp-val">{{ l.location || '—' }}</span></div>
+            <div class="lp-info-item" *ngIf="l.propertyType"><span class="lp-lbl">Property Type</span><span class="lp-val">{{ l.propertyType }}</span></div>
+            <div class="lp-info-item lp-info-item--full" *ngIf="l.notes"><span class="lp-lbl">Customer Note</span><span class="lp-val">{{ l.notes }}</span></div>
+            <div class="lp-info-item lp-info-item--full" *ngIf="l.agentReply"><span class="lp-lbl">Agent Reply</span><span class="lp-val">{{ l.agentReply }}</span></div>
+          </div>
+          <div class="lp-contact-row">
+            <a [href]="'tel:' + l.phone" class="lp-cta lp-cta--call">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.94a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.92 16.92z"/></svg>
+              Call
+            </a>
+            <a [href]="'https://wa.me/' + l.phone.replace('+','')" target="_blank" class="lp-cta lp-cta--wa">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+              WhatsApp
+            </a>
+            <a [href]="'mailto:' + l.email" class="lp-cta lp-cta--email">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg>
+              Email
+            </a>
+          </div>
+        </div>
+
+        <!-- Lead Status -->
+        <div class="lp-card">
+          <div class="lp-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Lead Status
+          </div>
+          <div class="lp-pipeline">
+            @for (step of statusTimeline; track step.status) {
+              <div class="lp-pipe-step"
+                [class.done]="getStatusIndex(l.status) > getStatusIndex(step.status) && l.status !== 'lost'"
+                [class.active]="l.status === step.status"
+                (click)="updateStatus(step.status)"
+                title="Move to {{ step.label }}">
+                <div class="lp-pipe-dot"></div>
+                <span class="lp-pipe-label">{{ step.label }}</span>
+              </div>
+            }
+          </div>
+          <div class="lp-outcome-row">
+            <button class="lp-outcome-btn lp-outcome-btn--won" [class.active]="l.status === 'won'" (click)="updateStatus('won')" [disabled]="updatingStatus()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Mark as Won
+            </button>
+            <button class="lp-outcome-btn lp-outcome-btn--lost" [class.active]="l.status === 'lost'" (click)="updateStatus('lost')" [disabled]="updatingStatus()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              Mark as Lost
+            </button>
+          </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="lp-card">
+          <div class="lp-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Activity Log
+          </div>
+          <div class="lp-activity">
+            <div class="lp-act-empty" *ngIf="activity().length === 0">No activity yet.</div>
+            @for (log of activity(); track log.id) {
+              <div class="lp-act-item">
+                <div class="lp-act-icon lp-act-icon--{{ log.icon }}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    @if (log.icon === 'create')  { <path d="M12 5v14M5 12h14"/> }
+                    @if (log.icon === 'message') { <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/> }
+                    @if (log.icon === 'status')  { <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/> }
+                    @if (log.icon === 'save')    { <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/> }
+                    @if (log.icon === 'view')    { <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/> }
+                  </svg>
+                </div>
+                <div class="lp-act-body">
+                  <div class="lp-act-action">{{ log.action }}</div>
+                  <div class="lp-act-detail">{{ log.detail }}</div>
+                </div>
+                <div class="lp-act-time">{{ log.timestamp }}</div>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ RIGHT COLUMN ═════════════════════════════════ -->
+      <div class="lp-col-right">
+
+        <!-- Enquired Property -->
+        <div class="lp-card">
+          <div class="lp-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Enquired Property
+          </div>
+          <div class="lp-prop-skeleton" *ngIf="propLoading()"></div>
+          <div class="lp-prop-card" *ngIf="!propLoading() && property() as prop">
+            <img [src]="prop.images?.[0] || 'images/dummy-image.png'" [alt]="prop.title" class="lp-prop-img" (error)="$any($event.target).src='images/dummy-image.png'">
+            <div class="lp-prop-body">
+              <div class="lp-prop-type">{{ prop.type }} &middot; {{ prop.listing_type }}</div>
+              <div class="lp-prop-title">{{ prop.title }}</div>
+              <div class="lp-prop-loc">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                {{ prop.community || prop.location }}
+              </div>
+              <div class="lp-prop-specs">
+                <span class="lp-prop-price">{{ formatPrice(prop.price) }}</span>
+                <span class="lp-prop-spec" *ngIf="prop.bedrooms !== undefined">{{ prop.bedrooms === 0 ? 'Studio' : prop.bedrooms + ' Bed' }}</span>
+                <span class="lp-prop-spec" *ngIf="prop.area_sqft">{{ prop.area_sqft | number }} sqft</span>
+              </div>
+              <a [routerLink]="['/properties', prop.id]" target="_blank" class="lp-prop-link">View full property listing →</a>
+            </div>
+          </div>
+          <div class="lp-no-prop" *ngIf="!propLoading() && !property()">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>{{ l.propertyTitle || 'No specific property linked' }}</span>
+          </div>
+        </div>
+
+        <!-- Also Interested In -->
+        <div class="lp-card" *ngIf="savedProperties().length > 0">
+          <div class="lp-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Also Interested In ({{ savedProperties().length }})
+          </div>
+          <div class="lp-saved-list">
+            <div class="lp-saved-item" *ngFor="let s of savedProperties()">
+              <img [src]="s.property?.images?.[0] || 'images/dummy-image.png'" class="lp-saved-thumb" (error)="$any($event.target).src='images/dummy-image.png'" [alt]="s.property?.title">
+              <div class="lp-saved-body">
+                <div class="lp-saved-name">{{ s.property?.title || 'Property #' + s.property_id }}</div>
+                <div class="lp-saved-meta">{{ s.property?.type }} &middot; {{ formatPrice(s.property?.price || 0) }}</div>
+              </div>
+              <a [routerLink]="['/properties', s.property_id]" target="_blank" class="lp-saved-link" title="View">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversation with Customer -->
+        <div class="lp-card lp-chat-card">
+          <div class="lp-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Conversation with Customer
+          </div>
+
+          <div class="lp-chat-msgs" *ngIf="!msgLoading()">
+            <div class="lp-chat-empty" *ngIf="messages().length === 0">No messages yet. Start the conversation below.</div>
+            @for (msg of messages(); track msg.id) {
+              <div class="lp-chat-msg" [class.lp-chat-msg--mine]="msg.senderRole === 'agent'" [class.lp-chat-msg--theirs]="msg.senderRole === 'customer'">
+                <div class="lp-chat-bubble">{{ msg.content }}</div>
+                <div class="lp-chat-meta">{{ msg.senderName }} &middot; {{ msg.createdAt }}</div>
+              </div>
+            }
+          </div>
+          <div class="lp-chat-msgs" *ngIf="msgLoading()">
+            <div class="lp-chat-empty">Loading messages…</div>
+          </div>
+
+          <div class="lp-chat-input-row">
+            <textarea class="lp-chat-input" rows="2"
+              placeholder="Reply to customer… (Enter to send, Shift+Enter for new line)"
+              [value]="newMsg()"
+              (input)="newMsg.set($any($event.target).value)"
+              (keydown)="onEnter($event)">
+            </textarea>
+            <button class="lp-chat-send" (click)="sendMessage()" [disabled]="sending() || !newMsg().trim()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              {{ sending() ? '…' : 'Send' }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+</div>

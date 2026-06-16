@@ -48,6 +48,8 @@ export interface AdminUser {
   propertiesCount?: number;
   leadsCount?: number;
   password?: string;
+  designation?: string;
+  avatar_url?: string;
 }
 
 export interface Lead {
@@ -171,7 +173,7 @@ export class AdminDataService {
     this.usersError.set('');
     const { data, error } = await this.sb
       .from('profiles')
-      .select('id, name, email, phone, role, status, created_at')
+      .select('id, name, email, phone, role, status, created_at, designation, avatar_url')
       .order('created_at', { ascending: false });
 
     this.dbLog('loadUsers', error, data);
@@ -180,16 +182,18 @@ export class AdminDataService {
     } else if (data) {
       this.users.set(data.map((p: any) => ({
         id:              p.id,
-        name:            p.name    || '',
-        email:           p.email   || '',
-        phone:           p.phone   || '',
-        role:            p.role    || 'customer',
-        status:          p.status  || 'active',
+        name:            p.name        || '',
+        email:           p.email       || '',
+        phone:           p.phone       || '',
+        role:            p.role        || 'customer',
+        status:          p.status      || 'active',
         joinedDate:      (p.created_at || '').slice(0, 10),
         lastActive:      (p.created_at || '').slice(0, 10),
         propertiesCount: 0,
         leadsCount:      0,
         password:        '',
+        designation:     p.designation || '',
+        avatar_url:      p.avatar_url  || '',
       })));
     }
     this.usersLoading.set(false);
@@ -197,11 +201,13 @@ export class AdminDataService {
 
   async saveUser(u: Partial<AdminUser>, editingId: string | null): Promise<string | null> {
     const payload: any = {
-      name:   u.name?.trim(),
-      email:  u.email?.trim(),
-      phone:  u.phone?.trim() || null,
-      role:   u.role          || 'customer',
-      status: u.status        || 'active',
+      name:        u.name?.trim(),
+      email:       u.email?.trim(),
+      phone:       u.phone?.trim()       || null,
+      role:        u.role                || 'customer',
+      status:      u.status              || 'active',
+      designation: u.designation?.trim() || null,
+      avatar_url:  u.avatar_url?.trim()  || null,
     };
     let error: any;
     if (editingId !== null) {

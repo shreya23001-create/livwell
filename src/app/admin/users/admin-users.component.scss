@@ -735,3 +735,78 @@ $amber: #d97706;
 .select-wrapper { position: relative; display: inline-block; width: 100%; }
 .select-wrapper select { appearance: none; -webkit-appearance: none; padding-right: 2.25rem; width: 100%; cursor: pointer; }
 .dropdown-icon { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; pointer-events: none; color: #6b7280; }
+
+// ── Avatar drag-and-drop ──────────────────────────────────────
+.usr-avatar-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 1.5rem 1rem;
+  border: 2px dashed $border;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: $light;
+
+  &:hover, &--over {
+    border-color: $accent;
+    background: lighten($accent, 44%);
+  }
+
+  &-label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: $muted;
+  }
+
+  &-hint {
+    font-size: 0.72rem;
+    color: lighten($muted, 15%);
+  }
+}
+
+.usr-avatar-preview-wrap {
+  position: relative;
+  display: inline-block;
+  width: 96px;
+  height: 96px;
+}
+
+.usr-avatar-preview {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid $border;
+  display: block;
+}
+
+.usr-avatar-uploading {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.usr-avatar-remove {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: $red;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}

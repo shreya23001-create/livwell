@@ -1,10 +1,11 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 interface CommercialDetail {
   id: number;
@@ -25,6 +26,7 @@ interface CommercialDetail {
   features: string[];
   agent: { name: string; role: string; phone: string; email: string; avatar: string };
   mapUrl: string;
+  video_url?: string | null;
 }
 
 const A = { name: 'Anuj Sharma', role: 'Commercial Property Specialist', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' };
@@ -187,10 +189,24 @@ export class CommercialPropertyDetailComponent implements OnInit {
   activeImage = signal(0);
   showEnquiry = signal(false);
   mapUrl      = signal<SafeResourceUrl>('');
+  isFaved     = signal(false);
+  favLoading  = signal(false);
+  shareToast  = signal(false);
 
   private route     = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
   private sb        = inject(SupabaseService).client;
+  private auth      = inject(AuthService);
+
+  isLoggedIn = this.auth.isLoggedIn;
+
+  videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const url = this.property()?.video_url;
+    if (!url) return null;
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  });
 
   private async geocodeAndSetMap(community: string, location: string): Promise<void> {
     const raw   = community?.trim() || location?.trim() || 'Dubai';
@@ -229,7 +245,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
 
     const { data, error } = await this.sb
       .from('properties')
-      .select('id, title, location, community, price, listing_type, type, area_sqft, images, furnishing, agent_name, description, is_featured, created_at')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, images, furnishing, agent_name, description, is_featured, created_at, video_url, views')
       .eq('id', id)
       .in('type', ['Office', 'Shop', 'Warehouse', 'Plot'])
       .single();
@@ -291,10 +307,13 @@ export class CommercialPropertyDetailComponent implements OnInit {
         features:     featuresMap[p.type] ?? OFFICE_FEATURES,
         agent:        agentObj,
         mapUrl:       '',
+        video_url:    p.video_url ?? null,
       };
       this.property.set(detail);
       this.loading.set(false);
       this.geocodeAndSetMap(p.community ?? '', p.location ?? '');
+      this.auth.waitForSession().then(() => this.checkFavStatus(p.id));
+      this.sb.from('properties').update({ views: (p.views || 0) + 1 }).eq('id', p.id).then(() => {});
       return;
     }
 
@@ -304,6 +323,50 @@ export class CommercialPropertyDetailComponent implements OnInit {
     this.notFound.set(!found);
     this.loading.set(false);
     if (found) { this.geocodeAndSetMap(found.developer ?? '', found.location ?? ''); }
+  }
+
+  private async checkFavStatus(propId: number): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('id').eq('user_id', userId).eq('property_id', propId).maybeSingle();
+    this.isFaved.set(!!data);
+  }
+
+  async toggleFav(): Promise<void> {
+    const p = this.property();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { return; }
+    if (!p?.id || this.favLoading()) return;
+    this.favLoading.set(true);
+    if (this.isFaved()) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', p.id);
+      this.isFaved.set(false);
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: p.id });
+      this.isFaved.set(true);
+    }
+    this.favLoading.set(false);
+  }
+
+  async shareProperty(): Promise<void> {
+    const p = this.property();
+    if (!p) return;
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: p.title, text: p.title, url }); } catch {}
+    } else {
+      try { await navigator.clipboard.writeText(url); } catch {}
+    }
+    this.shareToast.set(true);
+    setTimeout(() => this.shareToast.set(false), 2500);
+    if (typeof p.id === 'number') await this.incrementShareCount(p.id);
+  }
+
+  private async incrementShareCount(propId: number): Promise<void> {
+    const { data, error } = await this.sb.from('properties').select('share_count').eq('id', propId).single();
+    if (error) return;
+    const next = ((data as any)?.share_count ?? 0) + 1;
+    await this.sb.from('properties').update({ share_count: next }).eq('id', propId);
   }
 
   safeMap(url: string): SafeResourceUrl {

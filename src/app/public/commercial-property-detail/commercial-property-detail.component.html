@@ -48,7 +48,20 @@
             <span *ngIf="p.furnished" class="cpd-tag cpd-tag--green">Furnished</span>
             <span *ngIf="p.view" class="cpd-tag cpd-tag--blue">{{ p.view }}</span>
           </div>
-          <h1 class="cpd-title">{{ p.title }}</h1>
+          <div class="cpd-title-row">
+            <h1 class="cpd-title">{{ p.title }}</h1>
+            <div class="cpd-action-btns">
+              <button class="cpd-icon-btn" [class.cpd-icon-btn--active]="isFaved()" [title]="isFaved() ? 'Remove from saved' : 'Save'" (click)="toggleFav()">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" [attr.fill]="isFaved() ? 'currentColor' : 'none'"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/></svg>
+              </button>
+              <div class="cpd-share-wrap">
+                <button class="cpd-icon-btn" title="Share" (click)="shareProperty()">
+                  <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/></svg>
+                </button>
+                <div *ngIf="shareToast()" class="cpd-share-toast">Link copied!</div>
+              </div>
+            </div>
+          </div>
           <div class="cpd-location">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
             {{ p.location }}
@@ -161,6 +174,28 @@
         </div>
 
       </aside>
+    </div>
+  </div>
+
+  <!-- ── Video Tour ───────────────────────────────────────── -->
+  <div class="cpd-video-section" *ngIf="property()?.video_url">
+    <h2 class="cpd-video-title">Property Video Tour</h2>
+    <div class="cpd-video-wrap">
+      <iframe *ngIf="isLoggedIn() && videoEmbedUrl()"
+        [src]="videoEmbedUrl()!" class="cpd-video-iframe"
+        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen loading="lazy">
+      </iframe>
+      <div *ngIf="!isLoggedIn()" class="cpd-video-placeholder">
+        <div class="cpd-video-lock">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 18.75 8.25Z" />
+          </svg>
+        </div>
+        <p class="cpd-video-msg">This video is private.</p>
+        <p class="cpd-video-sub">Please sign in to view the property video tour.</p>
+        <a routerLink="/customer" class="cpd-video-btn">Sign In to Watch</a>
+      </div>
     </div>
   </div>
 

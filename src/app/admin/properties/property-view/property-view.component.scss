@@ -1,0 +1,262 @@
+$accent:  #6366f1;
+$green:   #10b981;
+$gold:    #c8a84b;
+$text:    #111827;
+$muted:   #6b7280;
+$border:  #e5e7eb;
+$bg:      #f9fafb;
+$white:   #fff;
+$red:     #ef4444;
+$amber:   #f59e0b;
+$blue:    #3b82f6;
+$purple:  #8b5cf6;
+
+:host { display: block; padding: 1.5rem 2rem 3rem; background: $bg; min-height: 100vh; }
+
+// ── Loading ─────────────────────────────────────────────────
+.pv-loading {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 60vh; gap: 1rem; color: $muted;
+}
+.pv-spinner {
+  width: 44px; height: 44px; border: 3px solid $border; border-top-color: $accent;
+  border-radius: 50%; animation: pv-spin 0.8s linear infinite;
+}
+@keyframes pv-spin { to { transform: rotate(360deg); } }
+
+// ── Top Bar ─────────────────────────────────────────────────
+.pv-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;
+}
+.pv-back-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: $white; border: 1px solid $border; border-radius: 0.5rem;
+  padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: $text;
+  cursor: pointer; transition: all 0.15s;
+  svg { width: 16px; height: 16px; }
+  &:hover { background: $bg; border-color: #9ca3af; }
+}
+.pv-topbar-right { display: flex; gap: 0.5rem; align-items: center; }
+.pv-status-chip {
+  font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.9rem; border-radius: 2rem;
+  &--published    { background: rgba($green,0.12); color: darken($green,5%); }
+  &--draft        { background: rgba($muted,0.1);  color: $muted; }
+  &--pending      { background: rgba($amber,0.12); color: darken($amber,8%); }
+  &--pending\\ review { background: rgba($amber,0.12); color: darken($amber,8%); }
+  &--archived     { background: rgba($purple,0.12); color: $purple; }
+  &--sold         { background: rgba($blue,0.12);  color: $blue; }
+  &--rented       { background: rgba($accent,0.12); color: $accent; }
+}
+.pv-featured-chip {
+  font-size: 0.72rem; font-weight: 700; padding: 0.28rem 0.75rem; border-radius: 2rem;
+  background: rgba($gold,0.15); color: darken($gold, 12%); border: 1px solid rgba($gold,0.3);
+}
+
+// ── Main Grid ────────────────────────────────────────────────
+.pv-grid {
+  display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start;
+  @media(max-width: 1100px) { grid-template-columns: 1fr; }
+}
+
+// ── Cards shared ─────────────────────────────────────────────
+.pv-info-card, .pv-specs-card, .pv-section-card, .pv-analytics-card,
+.pv-pipeline-card, .pv-details-card, .pv-agent-card, .pv-price-card {
+  background: $white; border: 1px solid $border; border-radius: 1rem;
+  padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+// ── Gallery ──────────────────────────────────────────────────
+.pv-gallery { margin-bottom: 1rem; }
+.pv-gallery-main {
+  position: relative; border-radius: 1rem; overflow: hidden;
+  height: 380px; background: #1a1a1a;
+  @media(max-width: 768px) { height: 220px; }
+}
+.pv-gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pv-gallery-empty {
+  width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.5rem; color: #4b5563;
+  svg { width: 48px; height: 48px; }
+  span { font-size: 0.85rem; }
+}
+.pv-gallery-count {
+  position: absolute; bottom: 0.75rem; right: 0.75rem;
+  background: rgba(0,0,0,0.6); color: #fff; font-size: 0.75rem;
+  padding: 0.2rem 0.65rem; border-radius: 2rem;
+}
+.pv-gallery-thumbs {
+  display: flex; gap: 0.5rem; margin-top: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem;
+}
+.pv-gallery-thumb {
+  width: 80px; height: 56px; object-fit: cover; border-radius: 0.5rem;
+  cursor: pointer; opacity: 0.55; flex-shrink: 0;
+  border: 2px solid transparent; transition: opacity 0.15s, border-color 0.15s;
+  &.active, &:hover { opacity: 1; border-color: $accent; }
+}
+
+// ── Title / Info ─────────────────────────────────────────────
+.pv-title { font-size: 1.35rem; font-weight: 700; color: $text; margin: 0 0 0.75rem; line-height: 1.3; }
+.pv-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+.pv-tag {
+  font-size: 0.72rem; font-weight: 600; padding: 0.22rem 0.7rem; border-radius: 2rem;
+  border: 1px solid $border; color: $muted; background: $bg;
+  &--category { color: #059669; border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.06); }
+  &--type     { color: $accent; border-color: rgba($accent,0.3); background: rgba($accent,0.06); }
+}
+.pv-location {
+  display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; color: $muted;
+  svg { width: 16px; height: 16px; flex-shrink: 0; color: $gold; }
+}
+.pv-address { font-size: 0.8rem; color: #9ca3af; margin-top: 0.3rem; padding-left: 1.3rem; }
+
+// ── Specs ────────────────────────────────────────────────────
+.pv-specs-card {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;
+  @media(max-width: 600px) { grid-template-columns: repeat(2, 1fr); }
+}
+.pv-spec {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  padding: 0.75rem 0.5rem; text-align: center;
+}
+.pv-spec-icon {
+  width: 36px; height: 36px; border-radius: 0.5rem; background: rgba($accent,0.08);
+  display: flex; align-items: center; justify-content: center;
+  svg { width: 18px; height: 18px; color: $accent; }
+}
+.pv-spec-val { font-size: 1.1rem; font-weight: 800; color: $text; }
+.pv-spec-lbl { font-size: 0.7rem; color: $muted; text-transform: uppercase; letter-spacing: 0.05em; }
+
+// ── Section title ────────────────────────────────────────────
+.pv-section-title {
+  font-size: 0.95rem; font-weight: 700; color: $text;
+  margin: 0 0 0.875rem; padding-bottom: 0.6rem; border-bottom: 2px solid $border;
+}
+
+// ── Description ──────────────────────────────────────────────
+.pv-desc { font-size: 0.88rem; color: $muted; line-height: 1.8; margin: 0; }
+
+// ── Amenities ────────────────────────────────────────────────
+.pv-amenities { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; @media(max-width:600px){ grid-template-columns: repeat(2,1fr); } }
+.pv-amenity {
+  display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: $text;
+  svg { width: 14px; height: 14px; color: $green; flex-shrink: 0; }
+}
+
+// ── Video ────────────────────────────────────────────────────
+.pv-video-wrap { border-radius: 0.75rem; overflow: hidden; background: #111; }
+.pv-video { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+
+// ── Tabs ─────────────────────────────────────────────────────
+.pv-tabs {
+  display: flex; border-bottom: 2px solid $border; margin-bottom: 1rem; gap: 0;
+}
+.pv-tab {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem;
+  font-size: 0.85rem; font-weight: 600; color: $muted; cursor: pointer;
+  background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  &.active { color: $accent; border-bottom-color: $accent; }
+  &:hover:not(.active) { color: $text; }
+}
+.pv-tab-count {
+  background: $bg; border: 1px solid $border; border-radius: 2rem;
+  font-size: 0.72rem; font-weight: 700; padding: 0.1rem 0.5rem; color: $muted;
+  .active & { background: rgba($accent,0.1); border-color: rgba($accent,0.3); color: $accent; }
+}
+.pv-empty-tab { font-size: 0.85rem; color: $muted; text-align: center; padding: 2rem 0; }
+
+// ── Leads List ───────────────────────────────────────────────
+.pv-leads-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.pv-lead-row {
+  display: flex; align-items: flex-start; gap: 0.875rem; padding: 0.875rem;
+  background: $bg; border: 1px solid $border; border-radius: 0.75rem; transition: border-color 0.15s;
+  &:hover { border-color: #9ca3af; }
+}
+.pv-lead-avatar {
+  width: 38px; height: 38px; border-radius: 50%; background: rgba($accent,0.12);
+  color: $accent; display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; font-weight: 700; flex-shrink: 0;
+  &--purple { background: rgba($purple,0.12); color: $purple; }
+}
+.pv-lead-info { flex: 1; min-width: 0; }
+.pv-lead-name { font-size: 0.875rem; font-weight: 700; color: $text; }
+.pv-lead-contact { font-size: 0.78rem; color: $muted; margin-top: 0.15rem; }
+.pv-lead-meta { font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pv-lead-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; flex-shrink: 0; }
+.pv-lead-status {
+  font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 2rem; white-space: nowrap;
+}
+.pv-lead-source { font-size: 0.72rem; color: $muted; }
+.pv-lead-date   { font-size: 0.72rem; color: #9ca3af; }
+
+// ── Saved List ───────────────────────────────────────────────
+.pv-saved-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.pv-saved-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.6rem 0.75rem; background: $bg; border: 1px solid $border; border-radius: 0.625rem;
+}
+
+// ── Price Card ───────────────────────────────────────────────
+.pv-price-card {
+  background: linear-gradient(135deg, #1a5c3a 0%, #0f3d26 100%);
+  border: none; text-align: center; padding: 1.5rem;
+}
+.pv-price-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.65); margin-bottom: 0.4rem; }
+.pv-price-value { font-size: 1.75rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 0.35rem; }
+.pv-price-sqft  { font-size: 0.8rem; color: rgba(255,255,255,0.6); }
+
+// ── Analytics Card ───────────────────────────────────────────
+.pv-card-title { font-size: 0.9rem; font-weight: 700; color: $text; margin: 0 0 1rem; }
+.pv-analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.pv-analytic {
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  padding: 0.875rem 0.5rem; background: $bg; border: 1px solid $border;
+  border-radius: 0.75rem; text-align: center;
+}
+.pv-analytic-icon {
+  width: 36px; height: 36px; border-radius: 0.625rem;
+  display: flex; align-items: center; justify-content: center;
+  svg { width: 18px; height: 18px; }
+  &--blue   { background: rgba($blue,0.1);   svg { color: $blue;   } }
+  &--green  { background: rgba($green,0.1);  svg { color: $green;  } }
+  &--purple { background: rgba($purple,0.1); svg { color: $purple; } }
+  &--gold   { background: rgba($gold,0.15);  svg { color: darken($gold,10%); } }
+}
+.pv-analytic-val { font-size: 1.3rem; font-weight: 800; color: $text; }
+.pv-analytic-lbl { font-size: 0.68rem; color: $muted; text-transform: uppercase; letter-spacing: 0.05em; }
+
+// ── Pipeline ─────────────────────────────────────────────────
+.pv-pipeline { display: flex; flex-direction: column; gap: 0.6rem; }
+.pv-pipe-row { display: flex; align-items: center; gap: 0.5rem; }
+.pv-pipe-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pv-pipe-label { font-size: 0.78rem; color: $muted; width: 80px; flex-shrink: 0; }
+.pv-pipe-bar-wrap { flex: 1; height: 6px; background: $border; border-radius: 3px; overflow: hidden; }
+.pv-pipe-bar { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.pv-pipe-count { font-size: 0.78rem; font-weight: 700; color: $text; width: 24px; text-align: right; }
+
+// ── Property Details ─────────────────────────────────────────
+.pv-detail-rows { display: flex; flex-direction: column; }
+.pv-detail-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 0; border-bottom: 1px solid $border; font-size: 0.82rem;
+  &:last-child { border-bottom: none; }
+}
+.pv-detail-label { color: $muted; }
+.pv-detail-value { font-weight: 600; color: $text; text-align: right; }
+
+// ── Agent ────────────────────────────────────────────────────
+.pv-agent-inner { display: flex; align-items: center; gap: 0.875rem; }
+.pv-agent-avatar-wrap { flex-shrink: 0; }
+.pv-agent-avatar {
+  width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+  border: 2px solid $border; display: block;
+}
+.pv-agent-dummy {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  display: flex; align-items: center; justify-content: center;
+  svg { width: 24px; height: 24px; color: #9ca3af; }
+}
+.pv-agent-name { font-size: 0.9rem; font-weight: 700; color: $text; }
+.pv-agent-role { font-size: 0.75rem; color: $muted; margin-top: 0.1rem; }

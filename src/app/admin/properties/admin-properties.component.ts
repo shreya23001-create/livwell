@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
@@ -35,6 +36,7 @@ export interface Property {
   furnishing:      string;
   images:          string[];
   amenities:       string[];
+  video_url:       string;
 }
 
 const EMPTY_FORM = (): Partial<Property> => ({
@@ -42,13 +44,13 @@ const EMPTY_FORM = (): Partial<Property> => ({
   price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', address: '', description: '',
   furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, images: [],
-  amenities: [],
+  amenities: [], video_url: '',
 });
 
 @Component({
   selector: 'app-admin-properties',
   standalone: true,
-  imports: [CommonModule, FormsModule, SafeUrlPipe],
+  imports: [CommonModule, FormsModule, RouterModule, SafeUrlPipe],
   templateUrl: './admin-properties.component.html',
   styleUrl: './admin-properties.component.scss',
 })
@@ -83,10 +85,13 @@ export class AdminPropertiesComponent implements OnInit {
   form           = signal<Partial<Property>>(EMPTY_FORM());
   formErrors     = signal<Record<string, string>>({});
   saveError      = signal('');
-  uploadingImages = signal(false);
-  uploadedImages  = signal<string[]>([]);   // final public URLs (saved to DB)
-  previewImages   = signal<string[]>([]);   // local blob URLs for instant preview
-  amenityInput    = signal('');
+  uploadingImages  = signal(false);
+  uploadedImages   = signal<string[]>([]);   // final public URLs (saved to DB)
+  previewImages    = signal<string[]>([]);   // local blob URLs for instant preview
+  amenityInput     = signal('');
+  uploadingVideo   = signal(false);
+  videoDragOver    = signal(false);
+  videoTab         = signal<'url' | 'upload'>('url');
 
   // ── Computed ──────────────────────────────────────────
   filtered = computed(() => {
@@ -203,6 +208,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.uploadedImages.set([]);
     this.previewImages.set([]);
     this.amenityInput.set('');
+    this.videoTab.set('url');
     this.editingId.set(null);
     this.modalOpen.set(true);
   }
@@ -214,6 +220,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.uploadedImages.set(p.images ?? []);
     this.previewImages.set(p.images ?? []);
     this.amenityInput.set('');
+    this.videoTab.set(p.video_url ? 'url' : 'url');
     this.editingId.set(p.id);
     this.modalOpen.set(true);
   }
@@ -283,6 +290,45 @@ export class AdminPropertiesComponent implements OnInit {
   }
 
 
+  onVideoFileChange(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) this.uploadVideoFile(file);
+  }
+
+  onVideoDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.videoDragOver.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (file) this.uploadVideoFile(file);
+  }
+
+  private async uploadVideoFile(file: File): Promise<void> {
+    const allowed = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
+    const maxSize = 200 * 1024 * 1024; // 200 MB
+    if (!allowed.includes(file.type)) { this.toast.error('Unsupported video format. Use MP4, WebM, MOV, or AVI.'); return; }
+    if (file.size > maxSize) { this.toast.error('Video exceeds the 200 MB size limit.'); return; }
+
+    this.uploadingVideo.set(true);
+    this.saveError.set('');
+    try {
+      const ext  = (file.name.split('.').pop() || 'mp4').toLowerCase();
+      const path = `videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { data, error } = await this.sb.storage
+        .from('imagesFolder')
+        .upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
+      if (error) { this.toast.error('Video upload failed: ' + error.message); return; }
+      if (data) {
+        const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
+        this.patchForm('video_url', pub.publicUrl);
+        this.toast.success('Video uploaded successfully.');
+      }
+    } catch (e: any) {
+      this.toast.error('Upload error: ' + (e?.message ?? 'Unknown error'));
+    } finally {
+      this.uploadingVideo.set(false);
+    }
+  }
+
   addAmenity(): void {
     const v = this.amenityInput().trim();
     if (!v) return;
@@ -329,6 +375,7 @@ export class AdminPropertiesComponent implements OnInit {
       is_featured:     f.is_featured   ?? false,
       images:          this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
       amenities:       f.amenities ?? [],
+      video_url:       f.video_url?.trim() || null,
     };
 
     try {

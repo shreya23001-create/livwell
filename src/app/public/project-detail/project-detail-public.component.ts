@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 
 interface Project {
@@ -32,6 +33,7 @@ interface Project {
   is_ultra_luxury: boolean;
   agent_name: string;
   created_at: string;
+  video_url: string | null;
 }
 
 @Component({
@@ -45,6 +47,17 @@ export class ProjectDetailPublicComponent implements OnInit {
   private sb        = inject(SupabaseService).client;
   private route     = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
+  private auth      = inject(AuthService);
+
+  isLoggedIn = this.auth.isLoggedIn;
+
+  videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const url = this.project()?.video_url;
+    if (!url) return null;
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  });
 
   project    = signal<Project | null>(null);
   agent      = signal<{ name: string; email: string; phone: string; avatar_url: string } | null>(null);

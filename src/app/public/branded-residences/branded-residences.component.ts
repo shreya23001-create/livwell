@@ -21,6 +21,7 @@ export interface BrandedResidence {
   images: string[];
   badge: string;
   brand: string;
+  brand_logo_url: string;
   is_luxury: boolean;
   is_ultra_luxury: boolean;
 }
@@ -49,7 +50,7 @@ export class BrandedResidencesComponent implements OnInit {
   async ngOnInit() {
     const { data, error } = await this.sb
       .from('projects')
-      .select('id,title,developer,location,community,status,price_from,price_label,price_per_sqft,beds,completion_date,images,badge,brand,is_branded,is_luxury,is_ultra_luxury')
+      .select('id,title,developer,location,community,status,price_from,price_label,price_per_sqft,beds,completion_date,images,badge,brand,brand_logo_url,is_branded,is_luxury,is_ultra_luxury')
       .eq('is_branded', true)
       .order('created_at', { ascending: false });
 

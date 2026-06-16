@@ -31,6 +31,7 @@ export interface Project {
   is_ultra_luxury: boolean;
   is_branded: boolean;
   brand: string;
+  brand_logo_url: string;
   agent_name: string;
   created_at?: string;
 }
@@ -41,7 +42,7 @@ const BLANK: Project = {
   beds: '', bathrooms: 0, area_sqft: 0, completion_date: '', payment_plan: '',
   description: '', amenities: [], images: [], floor_plan_url: '',
   badge: '', is_featured: false, is_luxury: false, is_ultra_luxury: false,
-  is_branded: false, brand: '', agent_name: '',
+  is_branded: false, brand: '', brand_logo_url: '', agent_name: '',
 };
 
 @Component({
@@ -69,9 +70,10 @@ export class AdminProjectsComponent implements OnInit {
   editMode        = signal(false);
   form            = signal<Project>({ ...BLANK });
   amenityInput    = signal('');
-  uploadingImages = signal(false);
-  uploadedImages  = signal<string[]>([]);
-  previewImages   = signal<string[]>([]);
+  uploadingImages    = signal(false);
+  uploadedImages     = signal<string[]>([]);
+  previewImages      = signal<string[]>([]);
+  uploadingBrandLogo = signal(false);
 
   readonly types    = ['Apartment','Villa','Townhouse','Penthouse','Home','Mixed','Duplex'];
   readonly statuses = ['Draft','Published','Archived'];
@@ -228,6 +230,24 @@ export class AdminProjectsComponent implements OnInit {
     this.uploadedImages.update(imgs => imgs.filter((_, idx) => idx !== i));
   }
 
+  async uploadBrandLogo(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    input.value = '';
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+    if (!allowed.includes(file.type)) { alert('Please upload a JPG, PNG, WebP or SVG image.'); return; }
+    if (file.size > 2 * 1024 * 1024) { alert('Logo must be under 2 MB.'); return; }
+    this.uploadingBrandLogo.set(true);
+    const ext  = file.name.split('.').pop() ?? 'png';
+    const path = `brand-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { data, error } = await this.sb.storage.from('imagesFolder').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
+    if (error) { alert('Logo upload failed: ' + error.message); this.uploadingBrandLogo.set(false); return; }
+    const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
+    this.form.update(f => ({ ...f, brand_logo_url: pub.publicUrl }));
+    this.uploadingBrandLogo.set(false);
+  }
+
   async save() {
     const f = this.form();
     if (!f.title.trim()) return;
@@ -243,7 +263,7 @@ export class AdminProjectsComponent implements OnInit {
       images: this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
       floor_plan_url: f.floor_plan_url, badge: f.badge,
       is_featured: f.is_featured, is_luxury: f.is_luxury, is_ultra_luxury: f.is_ultra_luxury,
-      is_branded: f.is_branded, brand: f.brand,
+      is_branded: f.is_branded, brand: f.brand, brand_logo_url: f.brand_logo_url,
       agent_name: f.agent_name,
     };
 

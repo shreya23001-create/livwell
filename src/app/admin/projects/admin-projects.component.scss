@@ -101,6 +101,18 @@ $red:    #dc2626;
 }
 @keyframes apr-btn-spin { to { transform: rotate(360deg); } }
 
+.apr-btn--danger-ghost { background: #fff; border: 1px solid #fca5a5; color: #dc2626; }
+.apr-hint { font-size: 0.75rem; color: #9ca3af; margin-top: 0.3rem; display: block; }
+
+.apr-brand-logo-row {
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.4rem;
+}
+.apr-brand-logo-preview {
+  height: 40px; max-width: 120px; object-fit: contain;
+  border: 1px solid #e5e7eb; border-radius: 6px; padding: 4px; background: #fff;
+}
+.apr-brand-logo-btn { padding: 0.45rem 0.9rem; font-size: 0.8rem; }
+
 // ── Select wrapper ────────────────────────────────────────────
 .select-wrapper {
   position: relative; display: inline-block;

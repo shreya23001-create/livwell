@@ -145,6 +145,8 @@ export class HomeComponent implements OnInit {
   topAgentsLive          = signal<HomeAgent[]>([]);
   propertyCounts         = signal<Record<string, number>>({});
 
+  displayedAgents = computed(() => this.topAgentsLive().length ? this.topAgentsLive() : this.topAgents);
+
   private async loadHomeData(): Promise<void> {
     await Promise.all([
       this.loadFeaturedProperties(),
@@ -152,6 +154,7 @@ export class HomeComponent implements OnInit {
       this.loadOffPlanFeatured(),
       this.loadTrendingProjects(),
       this.loadPropertyCounts(),
+      this.loadTopAgents(),
     ]);
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => this.setupScrollAnimations(), 50);
@@ -528,10 +531,10 @@ export class HomeComponent implements OnInit {
     { name: 'Yash Uday Chari', role: 'Business Associate', avatar: 'images/Yash.jpeg',    phone: '+971585833629', email: 'yash@livwelldubai.ae'  },
   ];
 
-  teamAreas = [{
+  teamAreas = computed(() => [{
     area: 'Our Associates',
-    agents: this.topAgents,
-  }];
+    agents: this.displayedAgents(),
+  }]);
 
   scrollTrending(dir: 1 | -1): void {
     const track = this.trendingTrack?.nativeElement;

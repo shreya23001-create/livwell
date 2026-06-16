@@ -215,7 +215,18 @@ $accent: #1a5c3a;
   &:hover { border-color: $accent; color: $accent; }
 }
 
+.pd-fav-btn { &:hover { border-color: #ef4444 !important; color: #ef4444 !important; } }
 .pd-fav-btn.active { color: #ef4444; border-color: #ef4444; }
+
+.pd-price-actions { position: relative; display: flex; gap: 0.5rem; }
+.pd-share-toast {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: #111827; color: #fff; font-size: 0.75rem; font-weight: 600;
+  padding: 0.35rem 0.85rem; border-radius: 0.5rem; white-space: nowrap; pointer-events: none;
+  animation: pd-toast-in 0.2s ease;
+  &::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #111827; }
+}
+@keyframes pd-toast-in { from { opacity: 0; transform: translateX(-50%) translateY(4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
 .pd-location-row {
   display: flex;
@@ -1118,6 +1129,13 @@ $accent: #1a5c3a;
   border-radius: 0.75rem;
   overflow: hidden;
   background: #111;
+}
+
+.pd-video-iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  display: block;
 }
 
 .pd-video-placeholder {

@@ -4,6 +4,7 @@ import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 export interface PropertyListing {
   id: number;
@@ -384,9 +385,15 @@ export class PropertiesComponent implements OnInit {
   activeImageMap: Record<number, number> = {};
 
   private sanitizer = inject(DomSanitizer);
+  private auth      = inject(AuthService);
+
+  savedIds     = signal<Set<number>>(new Set());
+  savingId     = signal<number | null>(null);
+  shareToastId = signal<number | null>(null);
+
+  isSaved(id: number): boolean { return this.savedIds().has(id); }
 
   safeImg(url: string): string {
-    // Return URL as-is — Angular doesn't block https:// in img src
     return url || '';
   }
 
@@ -397,6 +404,7 @@ export class PropertiesComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    this.auth.waitForSession().then(() => this.loadSavedIds());
     this.route.queryParams.subscribe(params => {
       if (params['type'])      this.selectedType.set(params['type']);
       if (params['status'])    this.selectedStatus.set(params['status']);
@@ -596,5 +604,45 @@ export class PropertiesComponent implements OnInit {
   }
   clearMapProperty(): void {
     this.activeMapProperty.set(null);
+  }
+
+  private async loadSavedIds(): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('property_id').eq('user_id', userId);
+    if (data) this.savedIds.set(new Set(data.map((r: any) => r.property_id)));
+  }
+
+  async toggleSave(id: number, e: Event): Promise<void> {
+    e.preventDefault(); e.stopPropagation();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId || this.savingId() === id) return;
+    this.savingId.set(id);
+    const saved = this.savedIds();
+    if (saved.has(id)) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', id);
+      const next = new Set(saved); next.delete(id);
+      this.savedIds.set(next);
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: id });
+      const next = new Set(saved); next.add(id);
+      this.savedIds.set(next);
+    }
+    this.savingId.set(null);
+  }
+
+  async shareCard(id: number, title: string, price: string, e: Event): Promise<void> {
+    e.preventDefault(); e.stopPropagation();
+    const url = `${window.location.origin}/properties/${id}`;
+    if (navigator.share) {
+      try { await navigator.share({ title, text: `${title} — ${price}`, url }); } catch {}
+    } else {
+      try { await navigator.clipboard.writeText(url); } catch {}
+    }
+    this.shareToastId.set(id);
+    setTimeout(() => this.shareToastId.set(null), 2500);
+    const { data } = await this.sb.from('properties').select('share_count').eq('id', id).single();
+    const next = ((data as any)?.share_count ?? 0) + 1;
+    await this.sb.from('properties').update({ share_count: next }).eq('id', id);
   }
 }

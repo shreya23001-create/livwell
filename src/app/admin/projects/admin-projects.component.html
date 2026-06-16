@@ -299,10 +299,26 @@
         </label>
       </div>
 
-      <!-- Brand name (shown when is_branded) -->
+      <!-- Brand name + logo (shown when is_branded) -->
       <div class="apr-form-group" *ngIf="form().is_branded">
         <label>Brand Name</label>
         <input type="text" [value]="form().brand" (input)="form.update(f=>({...f,brand:$any($event.target).value}))" placeholder="e.g. Bulgari, Four Seasons, Armani">
+      </div>
+      <div class="apr-form-group" *ngIf="form().is_branded">
+        <label>Brand Logo</label>
+        <div class="apr-brand-logo-row">
+          <img *ngIf="form().brand_logo_url" [src]="form().brand_logo_url" alt="Brand Logo" class="apr-brand-logo-preview">
+          <label class="apr-btn apr-btn--ghost apr-brand-logo-btn" [class.apr-btn--loading]="uploadingBrandLogo()">
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" style="display:none" (change)="uploadBrandLogo($event)" [disabled]="uploadingBrandLogo()">
+            <ng-container *ngIf="uploadingBrandLogo()"><span class="apr-btn-spinner"></span> Uploading…</ng-container>
+            <ng-container *ngIf="!uploadingBrandLogo()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              {{ form().brand_logo_url ? 'Change Logo' : 'Upload Logo' }}
+            </ng-container>
+          </label>
+          <button *ngIf="form().brand_logo_url" class="apr-btn apr-btn--danger-ghost" type="button" (click)="form.update(f=>({...f,brand_logo_url:''}))">Remove</button>
+        </div>
+        <small class="apr-hint">PNG, SVG or WebP recommended. Max 2 MB. Will show next to brand name on listing.</small>
       </div>
 
       <!-- Images -->

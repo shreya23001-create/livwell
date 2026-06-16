@@ -152,3 +152,14 @@ $purple: #7c3aed;
 }
 .pd-meta-label { font-size: .8rem; color: #9ca3af; }
 .pd-meta-value { font-size: .8rem; font-weight: 600; color: $text; }
+
+// ── Video Tour ───────────────────────────────────────────────
+.pd-video-section { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+.pd-video-title { font-size: 1.2rem; font-weight: 700; color: $text; margin-bottom: 1rem; }
+.pd-video-wrap { border-radius: 0.75rem; overflow: hidden; background: #111; }
+.pd-video-iframe { width: 100%; aspect-ratio: 16 / 9; border: none; display: block; }
+.pd-video-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; padding: 3.5rem 1rem; text-align: center; }
+.pd-video-lock-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; svg { width: 26px; height: 26px; } }
+.pd-video-msg { font-size: 1rem; font-weight: 600; color: #e5e7eb; margin: 0; }
+.pd-video-sub { font-size: 0.85rem; color: #9ca3af; margin: 0; }
+.pd-video-signin-btn { display: inline-flex; align-items: center; padding: 0.6rem 1.5rem; background: $gold; color: #111; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; text-decoration: none; margin-top: 0.25rem; &:hover { opacity: 0.9; } }

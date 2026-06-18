@@ -79,7 +79,9 @@ export class ProjectsPublicComponent implements OnInit {
       .order('is_featured', { ascending: false })
       .order('created_at',  { ascending: false });
 
-    this.allProjects.set((data as Project[]) ?? []);
+    const projects = (data as Project[]) ?? [];
+    projects.forEach(p => { p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com')); });
+    this.allProjects.set(projects);
     this.loading.set(false);
   }
 

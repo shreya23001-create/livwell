@@ -1,4 +1,4 @@
-<!-- ============================================================
+﻿<!-- ============================================================
      HERO SECTION — Livwell Premium Layout
      ============================================================ -->
 <section class="hero-section">
@@ -302,7 +302,7 @@
         <div *ngFor="let p of latestProjects()" class="lp-card">
           <!-- Image -->
           <div class="lp-img-wrap">
-            <img [src]="p.image" [alt]="p.name" class="lp-img" (error)="$any($event.target).src='images/dummy-image.png'">
+            <img [src]="p.image" [alt]="p.name" class="lp-img" (error)="$any($event.target).src='/images/dummy-image.png'">
             <div class="lp-payment-badge">{{ p.paymentPlan }} Payment Plan</div>
             <div *ngIf="p.badge" class="lp-hot-dot"></div>
           </div>
@@ -502,7 +502,7 @@
         class="trending-card">
         <!-- Image -->
         <div class="trending-img-wrap">
-          <img [src]="p.image" [alt]="p.name" class="trending-img" (error)="$any($event.target).src='images/dummy-image.png'">
+          <img [src]="p.image" [alt]="p.name" class="trending-img" (error)="$any($event.target).src='/images/dummy-image.png'">
           <span class="trending-badge" [class.badge-red]="p.badge === 'Ready'" [class.badge-dark]="p.badge !== 'Ready'">
             {{ p.badge }}
           </span>
@@ -563,7 +563,7 @@
         class="property-card">
 
         <!-- Full image fills the card -->
-        <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
+        <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
 
         <!-- Gradient overlay darkens bottom -->
         <div class="property-overlay"></div>
@@ -635,7 +635,7 @@
     <div class="offplan-grid">
       <div *ngFor="let project of offPlanProjects(); let i = index" class="offplan-card">
         <div class="offplan-img-wrap">
-          <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
+          <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
           <div class="offplan-overlay"></div>
           <div class="offplan-top-badges">
             <span class="offplan-badge">{{ project.badge }}</span>

@@ -60,11 +60,14 @@ $bg:      #f4f6fa;
   &--closed   { background: rgba(#6366f1,0.12); color: #4f46e5; }
 }
 
+.cust-interests { display: flex; flex-direction: column; gap: 0.25rem; }
 .cust-interest {
   display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: $sub;
   svg { width: 0.9rem; height: 0.9rem; flex-shrink: 0; color: #6366f1; }
+  &--project svg { color: #d97706; }
+  &--general svg { color: #94a3b8; }
 }
-.cust-budget { font-size: 0.8rem; color: $sub; strong { color: $text; } }
+.cust-budget { font-size: 0.8rem; color: $sub; margin-top: 0.1rem; strong { color: $text; } }
 .cust-notes  { font-size: 0.78rem; color: $muted; font-style: italic; border-top: 1px solid $border; padding-top: 0.5rem; }
 .cust-footer { display: flex; justify-content: space-between; border-top: 1px solid $border; padding-top: 0.5rem; }
 .cust-meta   { font-size: 0.72rem; color: $muted; }

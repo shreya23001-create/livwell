@@ -1,4 +1,4 @@
-<!-- OFF-PLAN DETAIL PAGE -->
+﻿<!-- OFF-PLAN DETAIL PAGE -->
 
 <!-- NOT FOUND -->
 <div *ngIf="!project()" class="opd-not-found">
@@ -301,7 +301,7 @@
         <div class="opd-similar-grid">
           <a *ngFor="let sp of similarProjects()" [routerLink]="['/off-plan', sp.id]" class="opd-similar-card">
             <div class="opd-sim-img-wrap">
-              <img [src]="sp.image || 'images/dummy-image.png'" [alt]="sp.title" class="opd-sim-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
+              <img [src]="sp.image || '/images/dummy-image.png'" [alt]="sp.title" class="opd-sim-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
               <span *ngIf="sp.badge" class="opd-sim-badge">{{ sp.badge }}</span>
             </div>
             <div class="opd-sim-body">
@@ -331,7 +331,7 @@
         </div>
 
         <div class="opd-inquiry-project">
-          <img [src]="p.image || 'images/dummy-image.png'" [alt]="p.title" class="opd-iq-proj-img" (error)="$any($event.target).src='images/dummy-image.png'">
+          <img [src]="p.image || '/images/dummy-image.png'" [alt]="p.title" class="opd-iq-proj-img" (error)="$any($event.target).src='/images/dummy-image.png'">
           <div class="opd-iq-proj-info">
             <div class="opd-iq-proj-title">{{ p.title }}</div>
             <div class="opd-iq-proj-sub">{{ p.developer }} · {{ p.community }}</div>

@@ -33,6 +33,7 @@ export interface Project {
   brand: string;
   brand_logo_url: string;
   agent_name: string;
+  video_url: string | null;
   created_at?: string;
 }
 
@@ -42,7 +43,7 @@ const BLANK: Project = {
   beds: '', bathrooms: 0, area_sqft: 0, completion_date: '', payment_plan: '',
   description: '', amenities: [], images: [], floor_plan_url: '',
   badge: '', is_featured: false, is_luxury: false, is_ultra_luxury: false,
-  is_branded: false, brand: '', brand_logo_url: '', agent_name: '',
+  is_branded: false, brand: '', brand_logo_url: '', agent_name: '', video_url: null,
 };
 
 @Component({
@@ -138,7 +139,9 @@ export class AdminProjectsComponent implements OnInit {
   async loadProjects() {
     this.loading.set(true);
     const { data } = await this.sb.from('projects').select('*').order('created_at', { ascending: false });
-    this.projects.set((data as Project[]) ?? []);
+    const projects = (data as Project[]) ?? [];
+    projects.forEach(p => { p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com')); });
+    this.projects.set(projects);
     this.loading.set(false);
   }
 
@@ -265,6 +268,7 @@ export class AdminProjectsComponent implements OnInit {
       is_featured: f.is_featured, is_luxury: f.is_luxury, is_ultra_luxury: f.is_ultra_luxury,
       is_branded: f.is_branded, brand: f.brand, brand_logo_url: f.brand_logo_url,
       agent_name: f.agent_name,
+      video_url: (f as any).video_url ?? null,
     };
 
     if (this.editMode() && f.id) {

@@ -1,4 +1,4 @@
-<div class="apr-page">
+﻿<div class="apr-page">
 
   <!-- ── Header ── -->
   <div class="apr-header">
@@ -97,8 +97,8 @@
         <tr *ngFor="let p of paginated()">
           <td>
             <div class="apr-proj-cell">
-              <img *ngIf="p.images?.[0]" [src]="p.images[0]" class="apr-proj-thumb" [alt]="p.title" (error)="$any($event.target).style.display='none'">
-              <div class="apr-proj-thumb apr-proj-thumb--empty" *ngIf="!p.images?.[0]">
+              <img [src]="p.images?.[0] || '/images/dummy-image.png'" class="apr-proj-thumb" [alt]="p.title" (error)="$any($event.target).src='/images/dummy-image.png'">
+              <div class="apr-proj-thumb apr-proj-thumb--empty" *ngIf="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 9 4-4 4 4 4-6 4 8"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
               </div>
               <div>

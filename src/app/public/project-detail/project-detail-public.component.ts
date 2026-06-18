@@ -1,4 +1,5 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, HostListener, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
@@ -44,36 +45,87 @@ interface Project {
   styleUrl: './project-detail-public.component.scss',
 })
 export class ProjectDetailPublicComponent implements OnInit {
-  private sb        = inject(SupabaseService).client;
-  private route     = inject(ActivatedRoute);
-  private sanitizer = inject(DomSanitizer);
-  private auth      = inject(AuthService);
+  private sb         = inject(SupabaseService).client;
+  private route      = inject(ActivatedRoute);
+  private sanitizer  = inject(DomSanitizer);
+  private auth       = inject(AuthService);
+  private platformId = inject(PLATFORM_ID);
 
   isLoggedIn = this.auth.isLoggedIn;
 
   videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
     const url = this.project()?.video_url;
     if (!url) return null;
-    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    // Match watch?v=, youtu.be/, /shorts/, /live/
+    const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) {
+      const embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+      return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    }
+    // Vimeo
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${vimeoMatch[1]}`);
+    }
+    // Direct video file — not embeddable in iframe, return null
+    if (/\.(mp4|mov|avi|webm)(\?|$)/i.test(url)) return null;
+    // Fallback: try embedding as-is
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
+
+  videoDirectUrl = computed<string | null>(() => {
+    const url = this.project()?.video_url;
+    if (!url) return null;
+    // Only return direct URL for non-embeddable files
+    if (/\.(mp4|mov|avi|webm)(\?|$)/i.test(url)) return url;
+    return null;
   });
 
   project    = signal<Project | null>(null);
-  agent      = signal<{ name: string; email: string; phone: string; avatar_url: string } | null>(null);
+  agent      = signal<{ name: string; email: string; phone: string } | null>(null);
   loading    = signal(true);
   notFound   = signal(false);
   activeImg  = signal(0);
   mapUrl     = signal<SafeResourceUrl>('');
 
   avatarError  = signal(false);
-  agentAvatar  = computed(() => this.avatarError() ? '' : (this.agent()?.avatar_url ?? ''));
+  agentAvatar  = computed(() => '');
   agentPhone   = computed(() => this.agent()?.phone ?? '');
   agentEmail   = computed(() => this.agent()?.email ?? '');
+
+  lightboxOpen  = signal(false);
+  lightboxIndex = signal(0);
+
+  openLightbox(index: number): void {
+    this.lightboxIndex.set(index);
+    this.lightboxOpen.set(true);
+    if (isPlatformBrowser(this.platformId)) document.body.style.overflow = 'hidden';
+  }
+  closeLightbox(): void {
+    this.lightboxOpen.set(false);
+    if (isPlatformBrowser(this.platformId)) document.body.style.overflow = '';
+  }
+  lightboxPrev(): void {
+    const imgs = this.project()?.images ?? [];
+    this.lightboxIndex.set((this.lightboxIndex() - 1 + imgs.length) % imgs.length);
+  }
+  lightboxNext(): void {
+    const imgs = this.project()?.images ?? [];
+    this.lightboxIndex.set((this.lightboxIndex() + 1) % imgs.length);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKey(e: KeyboardEvent): void {
+    if (!this.lightboxOpen()) return;
+    if (e.key === 'ArrowRight') this.lightboxNext();
+    if (e.key === 'ArrowLeft')  this.lightboxPrev();
+    if (e.key === 'Escape')     this.closeLightbox();
+  }
 
   inquiryName    = '';
   inquiryPhone   = '';
   inquiryEmail   = '';
+  inquiryBudget  = '';
   inquiryMessage = '';
   inquirySent        = signal(false);
   inquirySubmitting  = signal(false);
@@ -95,12 +147,14 @@ export class ProjectDetailPublicComponent implements OnInit {
       .single();
 
     if (data) {
-      this.project.set(data as Project);
+      const p = data as Project;
+      p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com'));
+      this.project.set(p);
       this.geocodeAndSetMap(data as Project);
       if ((data as Project).agent_name) {
         const { data: agentData } = await this.sb
           .from('admin_users')
-          .select('name, email, phone, avatar_url')
+          .select('name, email, phone')
           .eq('name', (data as Project).agent_name)
           .maybeSingle();
         if (agentData) this.agent.set(agentData as any);
@@ -147,14 +201,36 @@ export class ProjectDetailPublicComponent implements OnInit {
     }
     this.inquirySubmitting.set(true);
     this.inquiryError.set('');
-    await this.sb.from('leads').insert({
-      name:     this.inquiryName,
-      phone:    this.inquiryPhone,
-      email:    this.inquiryEmail,
-      message:  this.inquiryMessage || `Enquiry about project: ${p.title}`,
-      source:   'Project Detail',
-      status:   'New',
-    });
+    const userId = this.auth.currentUser()?.id ?? null;
+
+    // Resolve agent email from agent_name so the lead appears in the agent portal
+    let agentEmail: string | null = null;
+    if (p.agent_name) {
+      const { data: agentData } = await this.sb
+        .from('admin_users')
+        .select('email')
+        .eq('name', p.agent_name)
+        .maybeSingle();
+      agentEmail = agentData?.email ?? null;
+    }
+
+    const payload = {
+      name:           this.inquiryName.trim(),
+      phone:          this.inquiryPhone.trim(),
+      email:          this.inquiryEmail.trim(),
+      notes:          this.inquiryMessage.trim() || `Enquiry about project: ${p.title}`,
+      budget:         this.inquiryBudget.trim() || null,
+      project_id:     p.id,
+      project_title:  p.title,
+      property_type:  p.type,
+      customer_id:    userId,
+      location:       p.community || p.location,
+      assigned_agent: p.agent_name || null,
+      agent_email:    agentEmail,
+      source:         'website',
+      status:         'new',
+    };
+    const { error: insertError } = await this.sb.from('admin_leads').insert(payload);
     this.inquirySubmitting.set(false);
     this.inquirySent.set(true);
   }

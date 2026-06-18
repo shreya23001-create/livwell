@@ -1,4 +1,4 @@
-<!-- NOT FOUND -->
+﻿<!-- NOT FOUND -->
 <div *ngIf="notFound()" class="lpd-page">
   <div class="lpd-nodata-hero">
     <div class="lpd-nodata-card">
@@ -61,7 +61,7 @@
       <div class="lpd-container">
         <div class="lpd-gallery">
           <div class="lpd-gallery-main">
-            <img [src]="p.images[activeImage()]" [alt]="p.title" class="lpd-gallery-main-img" (error)="$any($event.target).src='images/dummy-image.png'">
+            <img [src]="p.images[activeImage()]" [alt]="p.title" class="lpd-gallery-main-img" (error)="$any($event.target).src='/images/dummy-image.png'">
             <span *ngIf="p.badge" class="lpd-gallery-badge">{{ p.badge }}</span>
             <span class="lpd-gallery-status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
           </div>

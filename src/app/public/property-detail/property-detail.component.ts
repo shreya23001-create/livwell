@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -51,16 +51,55 @@ export class PropertyDetailComponent implements OnInit {
   agentAvatar       = signal('');
   agentPhone        = signal('');
 
+  lightboxOpen  = signal(false);
+  lightboxIndex = signal(0);
+
+  @HostListener('document:keydown', ['$event'])
+  onKey(e: KeyboardEvent): void {
+    if (!this.lightboxOpen()) return;
+    if (e.key === 'ArrowRight') this.lightboxNext();
+    if (e.key === 'ArrowLeft')  this.lightboxPrev();
+    if (e.key === 'Escape')     this.closeLightbox();
+  }
+
+  openLightbox(index: number): void {
+    this.lightboxIndex.set(index);
+    this.lightboxOpen.set(true);
+    if (isPlatformBrowser(this.platformId)) document.body.style.overflow = 'hidden';
+  }
+
+  closeLightbox(): void {
+    this.lightboxOpen.set(false);
+    if (isPlatformBrowser(this.platformId)) document.body.style.overflow = '';
+  }
+
+  lightboxPrev(): void {
+    const imgs = this.property()?.images ?? [];
+    this.lightboxIndex.set((this.lightboxIndex() - 1 + imgs.length) % imgs.length);
+  }
+
+  lightboxNext(): void {
+    const imgs = this.property()?.images ?? [];
+    this.lightboxIndex.set((this.lightboxIndex() + 1) % imgs.length);
+  }
+
   isLoggedIn = this.auth.isLoggedIn;
 
   videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
     const url = this.property()?.video_url;
     if (!url) return null;
-    let embedUrl = url;
-    // Convert YouTube watch URLs to embed
-    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${ytMatch[1]}`);
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) return this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${vimeoMatch[1]}`);
+    if (/\.(mp4|mov|avi|webm)(\?|$)/i.test(url)) return null;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
+
+  videoDirectUrl = computed<string | null>(() => {
+    const url = this.property()?.video_url;
+    if (!url) return null;
+    return /\.(mp4|mov|avi|webm)(\?|$)/i.test(url) ? url : null;
   });
 
   mapUrl = signal<SafeResourceUrl>(this.sanitizer.bypassSecurityTrustResourceUrl(''));
@@ -113,6 +152,7 @@ export class PropertyDetailComponent implements OnInit {
   inquiryForm_name    = '';
   inquiryForm_phone   = '';
   inquiryForm_email   = '';
+  inquiryForm_budget  = '';
   inquiryForm_message = '';
   inquirySent         = signal(false);
   inquirySubmitting   = signal(false);
@@ -139,6 +179,7 @@ export class PropertyDetailComponent implements OnInit {
       phone:          this.inquiryForm_phone.trim(),
       email:          this.inquiryForm_email.trim(),
       notes:          this.inquiryForm_message.trim() || `Enquiry about: ${p.title}`,
+      budget:         this.inquiryForm_budget.trim() || null,
       property_type:  p.type,
       property_id:    p.id,
       property_title: p.title,
@@ -152,7 +193,7 @@ export class PropertyDetailComponent implements OnInit {
     if (error) { this.inquiryError.set('Failed to send. Please try again.'); return; }
     this.inquirySent.set(true);
     this.inquiryForm_name = ''; this.inquiryForm_phone = '';
-    this.inquiryForm_email = ''; this.inquiryForm_message = '';
+    this.inquiryForm_email = ''; this.inquiryForm_budget = ''; this.inquiryForm_message = '';
   }
 
   // Mortgage price input
@@ -336,7 +377,7 @@ export class PropertyDetailComponent implements OnInit {
     address:      p.address      || '',
     description:  p.description  || '',
     furnishing:   p.furnishing   || '',
-    images:       p.images       || [],
+    images:       Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? JSON.parse(p.images) : []),
     is_featured:  p.is_featured  || false,
     agent_name:   ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
     created_at:   p.created_at   || '',
@@ -381,7 +422,4 @@ export class PropertyDetailComponent implements OnInit {
       `Spanning ${p.area_sqft.toLocaleString()} sqft with ${this.formatBeds(p.bedrooms)} and ${p.bathrooms} bathrooms.`;
   }
 
-  getFallbackImage(): string {
-    return 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80';
-  }
 }

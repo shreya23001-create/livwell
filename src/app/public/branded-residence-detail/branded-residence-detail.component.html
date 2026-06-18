@@ -1,4 +1,4 @@
-<!-- Loading -->
+﻿<!-- Loading -->
 <div class="brd-loading" *ngIf="loading()"><div class="brd-spin"></div></div>
 
 <div class="brd-page" *ngIf="!loading()">
@@ -53,7 +53,7 @@
   <!-- Gallery -->
   <div class="brd-gallery" *ngIf="p.images?.length">
     <div class="brd-gallery-main">
-      <img [src]="p.images[activeImage()]" [alt]="p.title" class="brd-gallery-main-img" (error)="$any($event.target).src='images/dummy-image.png'">
+      <img [src]="p.images[activeImage()]" [alt]="p.title" class="brd-gallery-main-img" (error)="$any($event.target).src='/images/dummy-image.png'">
       <div class="brd-gallery-overlay" *ngIf="p.images.length > 1">
         <button class="brd-gallery-nav brd-gallery-prev" (click)="activeImage.set((activeImage() - 1 + p.images.length) % p.images.length)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -292,12 +292,15 @@
   <div class="brd-video-section" *ngIf="property()?.video_url">
     <h2 class="brd-video-title">Residence Video Tour</h2>
     <div class="brd-video-wrap">
-      <iframe *ngIf="isLoggedIn() && videoEmbedUrl()"
-        [src]="videoEmbedUrl()!" class="brd-video-iframe"
-        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen loading="lazy">
-      </iframe>
-      <div *ngIf="!isLoggedIn()" class="brd-video-placeholder">
+      <ng-container *ngIf="isLoggedIn(); else brdVideoLocked">
+        <iframe *ngIf="videoEmbedUrl()" [src]="videoEmbedUrl()!" class="brd-video-iframe"
+          frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+        <video *ngIf="!videoEmbedUrl() && videoDirectUrl()" [src]="videoDirectUrl()!"
+          class="brd-video-iframe" controls preload="metadata"></video>
+      </ng-container>
+      <ng-template #brdVideoLocked>
+      <div class="brd-video-placeholder">
         <div class="brd-video-lock">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 18.75 8.25Z" />
@@ -307,6 +310,7 @@
         <p class="brd-video-sub">Please sign in to view the residence video tour.</p>
         <a routerLink="/customer" class="brd-video-btn">Sign In to Watch</a>
       </div>
+      </ng-template>
     </div>
   </div>
 

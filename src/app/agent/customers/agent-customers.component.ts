@@ -10,6 +10,8 @@ export interface AgentCustomer {
   email: string;
   phone: string;
   interest: string;
+  properties: string[];
+  projects: string[];
   budget: string;
   status: 'active' | 'inactive' | 'closed';
   enquiries: number;
@@ -62,11 +64,11 @@ export class AgentCustomersComponent implements OnInit {
 
     const [byEmail, byName] = await Promise.all([
       this.sb.from('admin_leads')
-        .select('id, name, email, phone, status, property_type, location, budget, notes, created_at')
+        .select('id, name, email, phone, status, property_type, property_title, project_title, location, budget, notes, created_at')
         .eq('agent_email', agentEmail)
         .order('created_at', { ascending: false }),
       this.sb.from('admin_leads')
-        .select('id, name, email, phone, status, property_type, location, budget, notes, created_at')
+        .select('id, name, email, phone, status, property_type, property_title, project_title, location, budget, notes, created_at')
         .eq('assigned_agent', agentName)
         .is('agent_email', null)
         .order('created_at', { ascending: false }),
@@ -83,9 +85,10 @@ export class AgentCustomersComponent implements OnInit {
         if (map.has(key)) {
           const existing = map.get(key)!;
           existing.enquiries++;
-          // keep latest date
-          if (r.created_at > existing.lastActive) existing.lastActive = r.created_at;
-          // promote status: won > negotiating > qualified > contacted > new
+          if (r.created_at > existing.lastActive) existing.lastActive = new Date(r.created_at).toLocaleString('en-AE', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+          if (r.property_title && !existing.properties.includes(r.property_title)) existing.properties.push(r.property_title);
+          if (r.project_title  && !existing.projects.includes(r.project_title))   existing.projects.push(r.project_title);
+          if (!existing.budget && r.budget) existing.budget = r.budget;
           const rank = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
           if (rank.indexOf(r.status) > rank.indexOf(existing.status === 'closed' ? 'won' : existing.status === 'active' ? 'contacted' : 'new')) {
             existing.status = r.status === 'won' || r.status === 'lost' ? 'closed' : 'active';
@@ -96,11 +99,13 @@ export class AgentCustomersComponent implements OnInit {
             name:       r.name  || 'Unknown',
             email:      r.email || '',
             phone:      r.phone || '',
-            interest:   [r.property_type, r.location].filter(Boolean).join(' · ') || 'General',
+            interest:   r.property_title || r.project_title || [r.property_type, r.location].filter(Boolean).join(' · ') || 'General',
+            properties: r.property_title ? [r.property_title] : [],
+            projects:   r.project_title  ? [r.project_title]  : [],
             budget:     r.budget || '',
             status:     r.status === 'won' || r.status === 'lost' ? 'closed' : 'active',
             enquiries:  1,
-            lastActive: r.created_at,
+            lastActive: new Date(r.created_at).toLocaleString('en-AE', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }),
             notes:      r.notes || '',
           });
         }

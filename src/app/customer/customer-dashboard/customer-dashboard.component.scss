@@ -83,7 +83,7 @@ $bg:      #f4f6fa;
 // KPIs
 .cdash-kpis {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -109,6 +109,7 @@ $bg:      #f4f6fa;
   &--enq     { background: #eff6ff; color: #2563eb; }
   &--replied { background: #f0fdf4; color: #4f46e5; }
   &--pending { background: #fffbeb; color: #d97706; }
+  &--project { background: #f0f9ff; color: #0284c7; }
 }
 .cdash-kpi-value { font-size: 1.6rem; font-weight: 800; color: $text; line-height: 1.1; }
 .cdash-kpi-label { font-size: 0.75rem; color: $sub; font-weight: 500; margin-top: 0.1rem; }
@@ -116,7 +117,7 @@ $bg:      #f4f6fa;
 // Two-col row
 .cdash-row {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -136,6 +137,7 @@ $bg:      #f4f6fa;
 }
 .cdash-card-title { font-size: 0.95rem; font-weight: 700; color: $text; margin: 0 0 0.2rem; }
 .cdash-card-sub   { font-size: 0.78rem; color: $muted; margin: 0; }
+.cdash-card-link  { font-size: 0.78rem; color: $accent; font-weight: 600; text-decoration: none; white-space: nowrap; flex-shrink: 0; &:hover { text-decoration: underline; } }
 .cdash-link {
   font-size: 0.78rem;
   color: $accent;
@@ -348,8 +350,11 @@ $bg:      #f4f6fa;
 }
 
 // Responsive
+@media (max-width: 1280px) {
+  .cdash-kpis { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 1024px) {
-  .cdash-kpis { grid-template-columns: repeat(2, 1fr); }
+  .cdash-kpis { grid-template-columns: repeat(3, 1fr); }
   .cdash-row  { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {

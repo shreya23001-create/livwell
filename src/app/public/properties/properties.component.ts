@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, PLATFORM_ID, Inject, inject } from '@angular/core';
+﻿import { Component, OnInit, signal, computed, PLATFORM_ID, Inject, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -111,9 +111,9 @@ export class PropertiesComponent implements OnInit {
       beds: 4, baths: 3, sqft: 3200, sqftLabel: '3,200 sqft',
       type: 'Penthouse', status: 'Sale', furnished: 'Furnished', badge: 'Featured',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Concierge', 'Balcony', 'Parking'],
       views: 1842, postedDate: '2026-05-10', lat: 25.1972, lng: 55.2744,
@@ -125,8 +125,8 @@ export class PropertiesComponent implements OnInit {
       beds: 5, baths: 5, sqft: 5800, sqftLabel: '5,800 sqft',
       type: 'Villa', status: 'Sale', furnished: 'Unfurnished', badge: 'Hot',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Beach Access', 'Parking', 'Security', 'BBQ Area'],
       views: 3210, postedDate: '2026-05-08', lat: 25.1124, lng: 55.1390,
@@ -138,8 +138,8 @@ export class PropertiesComponent implements OnInit {
       beds: 2, baths: 2, sqft: 1450, sqftLabel: '1,450 sqft',
       type: 'Apartment', status: 'Sale', furnished: 'Furnished', badge: 'New',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Beach Access', 'Balcony', 'Parking'],
       views: 987, postedDate: '2026-05-12', lat: 25.0777, lng: 55.1328,
@@ -151,8 +151,8 @@ export class PropertiesComponent implements OnInit {
       beds: 4, baths: 3, sqft: 2900, sqftLabel: '2,900 sqft',
       type: 'Townhouse', status: 'Sale', furnished: 'Unfurnished',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Kids Play Area', 'Security', 'Parking', 'BBQ Area'],
       views: 654, postedDate: '2026-05-06', lat: 25.0501, lng: 55.2607,
@@ -164,8 +164,8 @@ export class PropertiesComponent implements OnInit {
       beds: 'Studio', baths: 1, sqft: 650, sqftLabel: '650 sqft',
       type: 'Apartment', status: 'Sale', furnished: 'Furnished', badge: 'Reduced',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Gym', 'Concierge', 'Parking', 'Balcony'],
       views: 1543, postedDate: '2026-05-14', lat: 25.1867, lng: 55.2640,
@@ -177,8 +177,8 @@ export class PropertiesComponent implements OnInit {
       beds: 7, baths: 8, sqft: 12400, sqftLabel: '12,400 sqft',
       type: 'Villa', status: 'Sale', furnished: 'Furnished', badge: 'Exclusive',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Golf Course', 'Gym', 'Security', 'Concierge', 'Maid Room', 'Parking', 'BBQ Area'],
       views: 4120, postedDate: '2026-04-28', lat: 25.0798, lng: 55.1699,
@@ -190,8 +190,8 @@ export class PropertiesComponent implements OnInit {
       beds: 1, baths: 1, sqft: 1200, sqftLabel: '1,200 sqft',
       type: 'Apartment', status: 'Rent', furnished: 'Furnished',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Marina View', 'Balcony', 'Parking'],
       views: 2890, postedDate: '2026-05-15', lat: 25.0782, lng: 55.1401,
@@ -203,8 +203,8 @@ export class PropertiesComponent implements OnInit {
       beds: 3, baths: 3, sqft: 2500, sqftLabel: '2,500 sqft',
       type: 'Townhouse', status: 'Rent', furnished: 'Semi-Furnished',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Kids Play Area', 'Security', 'Parking'],
       views: 432, postedDate: '2026-05-13', lat: 25.1124, lng: 55.2233,
@@ -216,8 +216,8 @@ export class PropertiesComponent implements OnInit {
       beds: 0 as any, baths: 2, sqft: 2800, sqftLabel: '2,800 sqft',
       type: 'Office', status: 'Rent', furnished: 'Furnished',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Parking', 'Concierge', 'Security', 'Gym'],
       views: 765, postedDate: '2026-05-11', lat: 25.1881, lng: 55.2644,
@@ -229,8 +229,8 @@ export class PropertiesComponent implements OnInit {
       beds: 2, baths: 2, sqft: 1400, sqftLabel: '1,400 sqft',
       type: 'Apartment', status: 'Sale', furnished: 'Unfurnished',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Gym', 'Kids Play Area', 'Parking'],
       views: 312, postedDate: '2026-05-09', lat: 25.0609, lng: 55.2097,
@@ -242,8 +242,8 @@ export class PropertiesComponent implements OnInit {
       beds: 4, baths: 4, sqft: 4625, sqftLabel: '4,625 sqft',
       type: 'Villa', status: 'Sale', furnished: 'Unfurnished', badge: 'New',
       images: [
-        'images/dummy-image.png',
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Swimming Pool', 'Golf Course', 'Security', 'Parking', 'Maid Room'],
       views: 891, postedDate: '2026-05-07', lat: 25.1605, lng: 55.3119,
@@ -255,7 +255,7 @@ export class PropertiesComponent implements OnInit {
       beds: 0 as any, baths: 1, sqft: 1800, sqftLabel: '1,800 sqft',
       type: 'Retail', status: 'Rent', furnished: 'Unfurnished',
       images: [
-        'images/dummy-image.png',
+        '/images/dummy-image.png',
       ],
       amenities: ['Parking', 'Security'],
       views: 244, postedDate: '2026-05-05', lat: 25.0790, lng: 55.1320,
@@ -474,7 +474,7 @@ export class PropertiesComponent implements OnInit {
           isOffPlan:    p.listing_type === 'Off-Plan',
           furnished:    p.furnishing   ?? 'Unfurnished',
           badge:        p.is_featured  ? 'Featured' : undefined,
-          images:       p.images?.length ? p.images : ['images/dummy-image.png'],
+          images:       (() => { const raw = Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? (() => { try { return JSON.parse(p.images); } catch { return []; } })() : []); const imgs = raw.filter((u: string) => u && !u.includes('unsplash.com')); return imgs.length ? imgs : ['/images/dummy-image.png']; })(),
           amenities:    p.amenities    ?? [],
           views:        p.views        ?? 0,
           postedDate:   p.created_at?.slice(0, 10) ?? '',

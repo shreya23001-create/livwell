@@ -58,7 +58,9 @@ export class BrandedResidencesComponent implements OnInit {
       console.error('[BrandedResidences] Supabase error:', error);
       this.dbError.set(error.message);
     }
-    this.allResidences.set((data as BrandedResidence[]) ?? []);
+    const residences = (data as BrandedResidence[]) ?? [];
+    residences.forEach((r: any) => { r.images = (r.images ?? []).filter((u: string) => u && !u.includes('unsplash.com')); });
+    this.allResidences.set(residences);
     this.loading.set(false);
   }
 

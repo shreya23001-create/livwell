@@ -23,6 +23,19 @@ interface SavedProperty {
   image: string;
 }
 
+interface InterestedProject {
+  id: number;
+  title: string;
+  developer: string;
+  location: string;
+  priceLabel: string;
+  type: string;
+  badge: string;
+  status: string;
+  image: string;
+  enquiredOn: string;
+}
+
 @Component({
   selector: 'app-customer-properties',
   standalone: true,
@@ -34,12 +47,14 @@ export class CustomerPropertiesComponent implements OnInit {
   private auth = inject(AuthService);
   private sb   = inject(SupabaseService).client;
 
-  search       = signal('');
-  filterStatus = signal('all');
-  filterType   = signal('all');
-  loading      = signal(true);
+  search             = signal('');
+  filterStatus       = signal('all');
+  filterType         = signal('all');
+  loading            = signal(true);
+  activeTab          = signal<'properties' | 'projects'>('properties');
 
-  properties = signal<SavedProperty[]>([]);
+  properties         = signal<SavedProperty[]>([]);
+  interestedProjects = signal<InterestedProject[]>([]);
 
   filtered = computed(() => {
     const q  = this.search().toLowerCase();
@@ -66,16 +81,25 @@ export class CustomerPropertiesComponent implements OnInit {
       .order('created_at', { ascending: false });
 
     if (savedErr) { console.error('[SavedProps]', savedErr.message); this.loading.set(false); return; }
-    if (!saved || saved.length === 0) { this.loading.set(false); return; }
 
-    // Step 2: fetch matching properties
+    const userEmail = this.auth.currentUser()?.email ?? '';
+    await Promise.all([
+      this.loadProperties(userId, saved ?? []),
+      this.loadInterestedProjects(userEmail),
+    ]);
+    this.loading.set(false);
+  }
+
+  private async loadProperties(userId: string, saved: any[]): Promise<void> {
+    if (!saved || saved.length === 0) return;
+
     const propIds = saved.map((r: any) => r.property_id);
     const { data: props, error: propsErr } = await this.sb
       .from('properties')
       .select('id, title, location, community, price, bedrooms, bathrooms, area_sqft, type, listing_type, status, images, agent_name')
       .in('id', propIds);
 
-    if (propsErr) { console.error('[SavedProps properties]', propsErr.message); this.loading.set(false); return; }
+    if (propsErr) { console.error('[SavedProps properties]', propsErr.message); return; }
 
     const propMap = new Map((props ?? []).map((p: any) => [p.id, p]));
     this.properties.set(saved
@@ -105,7 +129,48 @@ export class CustomerPropertiesComponent implements OnInit {
         };
       })
       .filter(Boolean) as SavedProperty[]);
-    this.loading.set(false);
+  }
+
+  private async loadInterestedProjects(email: string): Promise<void> {
+    if (!email) return;
+    const { data: leads } = await this.sb
+      .from('admin_leads')
+      .select('id, project_id, created_at')
+      .eq('email', email)
+      .not('project_id', 'is', null)
+      .order('created_at', { ascending: false });
+
+    if (!leads || leads.length === 0) return;
+
+    const projectIds = [...new Set(leads.map((r: any) => r.project_id))];
+    const { data: projects } = await this.sb
+      .from('projects')
+      .select('id, title, developer, location, type, price_from, price_label, status, badge, images')
+      .in('id', projectIds);
+
+    const projectMap = new Map((projects ?? []).map((p: any) => [p.id, p]));
+    const seen = new Set<number>();
+    this.interestedProjects.set(leads
+      .filter((r: any) => {
+        if (seen.has(r.project_id)) return false;
+        seen.add(r.project_id);
+        return projectMap.has(r.project_id);
+      })
+      .map((r: any) => {
+        const p = projectMap.get(r.project_id);
+        return {
+          id:          p.id,
+          title:       p.title       || '',
+          developer:   p.developer   || '',
+          location:    p.location    || 'Dubai',
+          priceLabel:  p.price_label || (p.price_from ? `AED ${Number(p.price_from).toLocaleString()}` : 'Price on request'),
+          type:        p.type        || 'Residential',
+          badge:       p.badge       || 'Off-Plan',
+          status:      p.status      || 'Off-Plan',
+          image:       (p.images && p.images[0]) || '',
+          enquiredOn:  new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
+        };
+      }) as InterestedProject[]);
   }
 
   async removeProperty(savedRowId: number): Promise<void> {

@@ -1,4 +1,4 @@
-<div class="lpfs-page">
+﻿<div class="lpfs-page">
 
   <!-- ── Page Header ──────────────────────────────────────── -->
   <div class="lpfs-header">
@@ -234,7 +234,7 @@
       <div *ngFor="let p of filteredProperties()" class="lpfs-card">
 
         <a [routerLink]="['/luxury-property', detailLink(p)]" class="lpfs-card-img-wrap">
-          <img [src]="p.image || 'images/dummy-image.png'" [alt]="p.title" class="lpfs-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
+          <img [src]="p.image || '/images/dummy-image.png'" [alt]="p.title" class="lpfs-card-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
           <span *ngIf="p.badge" class="lpfs-badge">{{ p.badge }}</span>
           <span class="lpfs-status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
         </a>

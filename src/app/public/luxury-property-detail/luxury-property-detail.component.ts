@@ -584,9 +584,18 @@ export class LuxuryPropertyDetailComponent implements OnInit {
   videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
     const url = this.property()?.video_url;
     if (!url) return null;
-    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${ytMatch[1]}`);
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) return this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${vimeoMatch[1]}`);
+    if (/\.(mp4|mov|avi|webm)(\?|$)/i.test(url)) return null;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
+
+  videoDirectUrl = computed<string | null>(() => {
+    const url = this.property()?.video_url;
+    if (!url) return null;
+    return /\.(mp4|mov|avi|webm)(\?|$)/i.test(url) ? url : null;
   });
 
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer) {}

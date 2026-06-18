@@ -42,7 +42,9 @@ export class UltraLuxuryProjectsComponent implements OnInit {
       .eq('is_ultra_luxury', true)
       .order('created_at', { ascending: false });
 
-    this.projects.set((data as Project[]) ?? []);
+    const projects = (data as Project[]) ?? [];
+    projects.forEach(p => { p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com')); });
+    this.projects.set(projects);
     this.loading.set(false);
   }
 

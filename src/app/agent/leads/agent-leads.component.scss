@@ -41,6 +41,18 @@ $bg:      #f4f6fa;
 .stat-lbl { font-size: 0.75rem; color: $muted; font-weight: 500; }
 
 .filters-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.25rem; .select-wrapper { width: auto; } .select-wrapper select { width: auto; min-width: 140px; } }
+
+.type-filter-group { display: flex; gap: 0.35rem; }
+.type-filter-btn {
+  display: flex; align-items: center; gap: 0.3rem; height: 36px; padding: 0 0.875rem;
+  border: 1px solid $border; border-radius: 0.5rem; background: #fff;
+  font-size: 0.78rem; font-weight: 600; color: $sub; cursor: pointer; transition: all 0.15s;
+  svg { flex-shrink: 0; }
+  &:hover { border-color: #6366f1; color: #6366f1; }
+  &.active { background: #6366f1; border-color: #6366f1; color: #fff; }
+  &--proj.active { background: #d97706; border-color: #d97706; }
+}
+
 .search-box {
   display: flex; align-items: center; gap: 0.5rem; background: #fff; border: 1px solid $border;
   border-radius: 0.5rem; padding: 0 0.875rem; flex: 1; min-width: 240px; height: 36px; box-sizing: border-box;

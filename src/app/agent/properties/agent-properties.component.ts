@@ -1,9 +1,11 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
+import * as XLSX from 'xlsx';
 
 export type AgentPropStatus = 'Draft' | 'Pending Review' | 'Published' | 'Archived' | 'Sold' | 'Rented';
 
@@ -24,6 +26,7 @@ export interface AgentProperty {
   furnishing:   string;
   is_featured:  boolean;
   images:       string[];
+  video_url:    string | null;
   agent_name:   string;
   views:        number;
   created_at:   string;
@@ -33,13 +36,13 @@ const EMPTY_FORM = (): Partial<AgentProperty> => ({
   title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
   price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', address: '', description: '',
-  furnishing: 'Unfurnished', is_featured: false, images: [],
+  furnishing: 'Unfurnished', is_featured: false, images: [], video_url: null,
 });
 
 @Component({
   selector: 'app-agent-properties',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './agent-properties.component.html',
   styleUrl: './agent-properties.component.scss',
 })
@@ -67,6 +70,11 @@ export class AgentPropertiesComponent implements OnInit {
   uploadingImages = signal(false);
   uploadedImages  = signal<string[]>([]);
   previewImages   = signal<string[]>([]);
+  videoType       = signal<'url' | 'file'>('url');
+  videoFileName   = signal('');
+  uploadingVideo  = signal(false);
+  imgDragOver     = signal(false);
+  importing       = signal(false);
 
   readonly typeList       = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office'];
   readonly categoryList   = ['Sale', 'Rent', 'Off-Plan'];
@@ -107,7 +115,11 @@ export class AgentPropertiesComponent implements OnInit {
       .order('created_at', { ascending: false });
 
     if (error) console.error('Agent properties fetch:', error);
-    this.properties.set((data ?? []).map((p: any) => this.mapRow(p)));
+    const rows = (data ?? []).map((p: any) => {
+      p.images = (p.images ?? []).filter((u: string) => u && !u.includes('unsplash.com'));
+      return this.mapRow(p);
+    });
+    this.properties.set(rows);
     this.loading.set(false);
   }
 
@@ -129,6 +141,7 @@ export class AgentPropertiesComponent implements OnInit {
       furnishing:   p.furnishing   || 'Unfurnished',
       is_featured:  p.is_featured  ?? false,
       images:       p.images       ?? [],
+      video_url:    p.video_url    ?? null,
       agent_name:   p.agent_name   || '',
       views:        p.views        || 0,
       created_at:   p.created_at   || '',
@@ -141,6 +154,8 @@ export class AgentPropertiesComponent implements OnInit {
     this.saveError.set('');
     this.uploadedImages.set([]);
     this.previewImages.set([]);
+    this.videoType.set('url');
+    this.videoFileName.set('');
     this.isEdit.set(false);
     this.editId.set(null);
     this.showModal.set(true);
@@ -152,6 +167,8 @@ export class AgentPropertiesComponent implements OnInit {
     this.saveError.set('');
     this.uploadedImages.set(p.images ?? []);
     this.previewImages.set(p.images ?? []);
+    this.videoType.set('url');
+    this.videoFileName.set('');
     this.isEdit.set(true);
     this.editId.set(p.id);
     this.showModal.set(true);
@@ -162,6 +179,7 @@ export class AgentPropertiesComponent implements OnInit {
     this.saveError.set('');
     this.previewImages.set([]);
     this.uploadedImages.set([]);
+    this.videoFileName.set('');
   }
 
   patchForm(field: string, value: any): void {
@@ -224,6 +242,107 @@ export class AgentPropertiesComponent implements OnInit {
     this.uploadedImages.update(imgs => imgs.filter((_, i) => i !== index));
   }
 
+  async onVideoFileChange(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    input.value = '';
+    const allowed = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
+    const maxSize = 500 * 1024 * 1024;
+    if (!allowed.includes(file.type)) { this.toast.error('Unsupported video type. Use MP4, MOV, AVI, or WebM.'); return; }
+    if (file.size > maxSize) { this.toast.error('Video exceeds the 500 MB size limit.'); return; }
+
+    this.uploadingVideo.set(true);
+    this.videoFileName.set(file.name);
+    const ext  = (file.name.split('.').pop() || 'mp4').toLowerCase();
+    const path = `properties/videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { data, error } = await this.sb.storage
+      .from('imagesFolder')
+      .upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
+    if (error) {
+      this.toast.error('Video upload failed: ' + error.message);
+    } else if (data) {
+      const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
+      this.patchForm('video_url', pub.publicUrl);
+    }
+    this.uploadingVideo.set(false);
+  }
+
+  onImgDragOver(e: DragEvent): void  { e.preventDefault(); this.imgDragOver.set(true); }
+  onImgDragLeave(): void             { this.imgDragOver.set(false); }
+  onImgDrop(e: DragEvent): void {
+    e.preventDefault();
+    this.imgDragOver.set(false);
+    const files = Array.from(e.dataTransfer?.files ?? []).filter(f => f.type.startsWith('image/'));
+    if (files.length) this.runUpload(files);
+  }
+
+  exportToExcel(): void {
+    const rows = this.properties().map(p => ({
+      'Title':            p.title,
+      'Type':             p.type,
+      'Category':         p.listing_type,
+      'Status':           p.status,
+      'Price (AED)':      p.price,
+      'Area (sqft)':      p.area_sqft,
+      'Bedrooms':         p.bedrooms,
+      'Bathrooms':        p.bathrooms,
+      'Location':         p.location,
+      'Community':        p.community,
+      'Address':          p.address,
+      'Furnishing':       p.furnishing,
+      'Description':      p.description,
+      'Featured':         p.is_featured ? 'Yes' : 'No',
+      'Views':            p.views,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'My Properties');
+    XLSX.writeFile(wb, `my-properties-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+
+  async importFromExcel(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    this.importing.set(true);
+    const buffer = await input.files[0].arrayBuffer();
+    input.value = '';
+    const wb   = XLSX.read(buffer, { type: 'array' });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) as any[];
+    if (!rows.length) { this.toast.error('No data found in the file.'); this.importing.set(false); return; }
+
+    const agentName = this.auth.currentUser()?.name ?? '';
+    const records = rows.map(r => ({
+      title:        r['Title']       || '',
+      type:         r['Type']        || 'Apartment',
+      listing_type: r['Category']    || 'Sale',
+      status:       r['Status']      || 'Draft',
+      price:        Number(r['Price (AED)']) || 0,
+      area_sqft:    Number(r['Area (sqft)']) || 0,
+      bedrooms:     Number(r['Bedrooms'])    || 0,
+      bathrooms:    Number(r['Bathrooms'])   || 1,
+      location:     r['Location']    || '',
+      community:    r['Community']   || '',
+      address:      r['Address']     || '',
+      furnishing:   r['Furnishing']  || 'Unfurnished',
+      description:  r['Description'] || '',
+      is_featured:  r['Featured'] === 'Yes',
+      agent_name:   agentName,
+      images:       [],
+      views:        0,
+    })).filter(r => r.title.trim());
+
+    if (!records.length) { this.toast.error('No valid rows found.'); this.importing.set(false); return; }
+    const { data, error } = await this.sb.from('properties').insert(records).select();
+    if (error) { this.toast.error('Import failed: ' + error.message); }
+    else {
+      const imported = (data ?? []).map((p: any) => this.mapRow(p));
+      this.properties.update(list => [...imported, ...list]);
+      this.toast.success(`Imported ${imported.length} propert${imported.length === 1 ? 'y' : 'ies'}.`);
+    }
+    this.importing.set(false);
+  }
+
   async save(): Promise<void> {
     const f = this.form();
     const e: Record<string, string> = {};
@@ -257,6 +376,7 @@ export class AgentPropertiesComponent implements OnInit {
       agent_name:   agentName,
       is_featured:  f.is_featured   ?? false,
       images:       this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
+      video_url:    (f.video_url?.trim() || null),
     };
 
     try {

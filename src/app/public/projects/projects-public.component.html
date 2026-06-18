@@ -1,4 +1,4 @@
-<!-- ── Hero ──────────────────────────────────────────────────── -->
+﻿<!-- ── Hero ──────────────────────────────────────────────────── -->
 <section class="prj-hero">
   <div class="prj-hero-overlay"></div>
   <div class="prj-hero-content">
@@ -61,7 +61,7 @@
     <div class="prj-grid" *ngIf="!loading()">
       <a [routerLink]="['/projects', p.id]" class="prj-card" *ngFor="let p of filteredProjects()">
         <div class="prj-card-img-wrap">
-          <img [src]="p.images?.[0] || 'images/dummy-image.png'" [alt]="p.title" class="prj-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
+          <img [src]="p.images?.[0] || '/images/dummy-image.png'" [alt]="p.title" class="prj-card-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
           <span *ngIf="p.badge" class="prj-badge prj-badge--overlay">{{ p.badge }}</span>
           <span *ngIf="p.is_ultra_luxury" class="prj-badge prj-badge--ultra prj-badge--tl">Ultra Luxury</span>
           <span *ngIf="p.is_luxury && !p.is_ultra_luxury" class="prj-badge prj-badge--luxury prj-badge--tl">Luxury</span>

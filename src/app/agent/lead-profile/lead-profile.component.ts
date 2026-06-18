@@ -36,9 +36,10 @@ interface LeadDetail {
   id: number; name: string; email: string; phone: string;
   status: LeadStatus; category: string; budget: string;
   location: string; propertyType: string; propertyTitle: string;
-  propertyId: number | null; source: string; notes: string;
-  agentReply: string; createdDate: string; lastContact: string;
-  customerId?: string | null;
+  propertyId: number | null; projectId: number | null; projectTitle: string;
+  source: string; notes: string; agentReply: string;
+  createdDate: string; lastContact: string;
+  customerId?: string | null; assignedAgent: string;
 }
 
 @Component({
@@ -61,6 +62,8 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
   messages        = signal<LeadMessage[]>([]);
   savedProperties = signal<SavedProperty[]>([]);
   property        = signal<any | null>(null);
+  project         = signal<any | null>(null);
+  projectLoading  = signal(false);
   activity        = signal<ActivityLog[]>([]);
   activeTab       = signal<'chat' | 'activity'>('chat');
   newMsg          = signal('');
@@ -68,6 +71,10 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
   msgLoading      = signal(false);
   propLoading     = signal(false);
   updatingStatus  = signal(false);
+
+  propViewCount   = signal<number>(0);
+  propSaveCount   = signal<number>(0);
+  daysActive      = signal<number>(0);
 
   readonly statusTimeline: { status: LeadStatus; label: string }[] = [
     { status: 'new',         label: 'New Lead'    },
@@ -91,7 +98,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     this.loading.set(true);
     const { data } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, created_at, location, property_type, property_title, property_id, budget, customer_id, category')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id, category')
       .eq('id', id)
       .maybeSingle();
 
@@ -109,20 +116,28 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       propertyType:  data.property_type  || '',
       propertyTitle: data.property_title || '',
       propertyId:    data.property_id    ?? null,
+      projectId:     data.project_id     ?? null,
+      projectTitle:  data.project_title  || '',
       source:        data.source         || 'Website',
       notes:         data.notes          || '',
       agentReply:    data.agent_reply    || '',
       createdDate:   data.created_at ? new Date(data.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
       lastContact:   data.created_at ? new Date(data.created_at).toISOString().slice(0, 10) : '',
       customerId:    data.customer_id    ?? null,
+      assignedAgent: data.assigned_agent || '',
     };
     this.lead.set(lead);
     this.loading.set(false);
+
+    const created = data.created_at ? new Date(data.created_at) : new Date();
+    const days = Math.max(0, Math.floor((Date.now() - created.getTime()) / 86_400_000));
+    this.daysActive.set(days);
 
     await Promise.all([
       this.loadMessages(lead),
       this.loadSavedProperties(lead),
       this.loadProperty(lead),
+      this.loadProject(lead),
     ]);
     this.buildActivity();
     this.subscribeMsgs(lead.id);
@@ -155,30 +170,60 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       userId = prof?.id ?? null;
     }
     if (!userId) return;
+
+    const agentName = this.auth.currentUser()?.name ?? '';
+
     const { data } = await this.sb
       .from('saved_properties')
-      .select('id, property_id, created_at, properties(id, title, type, price, location, images, status, listing_type)')
+      .select('id, property_id, created_at, properties(id, title, type, price, location, images, status, listing_type, agent_name)')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-      .limit(10);
+      .limit(50);
+
     if (data) {
-      this.savedProperties.set((data as any[]).map(r => ({
+      const mapped = (data as any[]).map(r => ({
         ...r,
         property: Array.isArray(r.properties) ? r.properties[0] ?? null : r.properties,
-      })));
+      }));
+      const filtered = agentName
+        ? mapped.filter(r => r.property?.agent_name === agentName)
+        : mapped;
+      this.savedProperties.set(filtered);
     }
   }
 
   private async loadProperty(lead: LeadDetail): Promise<void> {
     if (!lead.propertyId) return;
     this.propLoading.set(true);
-    const { data } = await this.sb
-      .from('properties')
-      .select('id, title, type, price, location, images, status, listing_type, area_sqft, bedrooms, bathrooms, community')
-      .eq('id', lead.propertyId)
-      .maybeSingle();
-    if (data) this.property.set(data);
+    const [propRes, savesRes] = await Promise.all([
+      this.sb
+        .from('properties')
+        .select('id, title, type, price, location, images, status, listing_type, area_sqft, bedrooms, bathrooms, community, views')
+        .eq('id', lead.propertyId)
+        .maybeSingle(),
+      this.sb
+        .from('saved_properties')
+        .select('id', { count: 'exact', head: true })
+        .eq('property_id', lead.propertyId),
+    ]);
+    if (propRes.data) {
+      this.property.set(propRes.data);
+      this.propViewCount.set(propRes.data.views || 0);
+    }
+    this.propSaveCount.set(savesRes.count ?? 0);
     this.propLoading.set(false);
+  }
+
+  private async loadProject(lead: LeadDetail): Promise<void> {
+    if (!lead.projectId) return;
+    this.projectLoading.set(true);
+    const { data } = await this.sb
+      .from('projects')
+      .select('id, title, developer, location, type, price_from, price_label, beds, completion_date, images, status, badge, is_luxury')
+      .eq('id', lead.projectId)
+      .maybeSingle();
+    if (data) this.project.set(data);
+    this.projectLoading.set(false);
   }
 
   private buildActivity(): void {
@@ -251,7 +296,8 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     return ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'].indexOf(s);
   }
 
-  labelStatus(s: string): string {
+  labelStatus(s: string, lead?: LeadDetail | null): string {
+    if (s === 'won' && lead?.assignedAgent) return `Won by ${lead.assignedAgent}`;
     return ({ new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' } as Record<string, string>)[s] ?? s;
   }
 

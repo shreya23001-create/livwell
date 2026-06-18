@@ -56,9 +56,18 @@ export class BrandedResidenceDetailComponent implements OnInit {
   videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
     const url = this.property()?.video_url;
     if (!url) return null;
-    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${ytMatch[1]}`);
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) return this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${vimeoMatch[1]}`);
+    if (/\.(mp4|mov|avi|webm)(\?|$)/i.test(url)) return null;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
+
+  videoDirectUrl = computed<string | null>(() => {
+    const url = this.property()?.video_url;
+    if (!url) return null;
+    return /\.(mp4|mov|avi|webm)(\?|$)/i.test(url) ? url : null;
   });
 
   property         = signal<BRProperty | null>(null);
@@ -99,8 +108,10 @@ export class BrandedResidenceDetailComponent implements OnInit {
       .single();
 
     if (data) {
-      this.property.set(data as BRProperty);
-      this.geocodeAndSetMap(data as BRProperty);
+      const p = data as BRProperty;
+      p.images = (p.images ?? []).filter((u: string) => u && !u.includes('unsplash.com'));
+      this.property.set(p);
+      this.geocodeAndSetMap(p);
       this.sb.from('projects').update({ views: ((data as BRProperty).views || 0) + 1 }).eq('id', id).then(() => {});
       const agentName = (data as BRProperty).agent_name;
       if (agentName) {

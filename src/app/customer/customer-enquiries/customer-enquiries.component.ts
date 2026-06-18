@@ -23,6 +23,7 @@ interface Enquiry {
   budget: string;
   agent: string;
   agentInitials: string;
+  agentAvatar: string;
   date: string;
   status: EnqStatus;
 }
@@ -89,7 +90,22 @@ export class CustomerEnquiriesComponent implements OnInit, OnDestroy {
       .eq('email', email)
       .order('created_at', { ascending: false });
 
-    if (data) this.enquiries.set(data.map((r: any) => this.mapRow(r)));
+    if (data) {
+      // Batch-load agent avatars from profiles table (agent saves avatar_url to profiles)
+      const agentNames = [...new Set(data.map((r: any) => r.assigned_agent).filter(Boolean))];
+      let avatarMap: Record<string, string> = {};
+      if (agentNames.length) {
+        const { data: profileRows } = await this.sb
+          .from('profiles')
+          .select('name, avatar_url')
+          .in('name', agentNames);
+        (profileRows ?? []).forEach((ag: any) => {
+          const av = (ag.avatar_url ?? '').split('?')[0];
+          if (/\/avatars\/[^/]+/.test(av)) avatarMap[ag.name] = ag.avatar_url ?? '';
+        });
+      }
+      this.enquiries.set(data.map((r: any) => this.mapRow(r, avatarMap)));
+    }
     // Pre-seed legacy messages from notes/agent_reply for each enquiry
     if (data) {
       const seeded: Record<number, Message[]> = {};
@@ -203,7 +219,7 @@ export class CustomerEnquiriesComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  private mapRow(r: any): Enquiry {
+  private mapRow(r: any, avatarMap: Record<string, string> = {}): Enquiry {
     const agent = r.assigned_agent || '';
     return {
       id:            r.id,
@@ -213,6 +229,7 @@ export class CustomerEnquiriesComponent implements OnInit, OnDestroy {
       budget:        r.budget         || '',
       agent:         agent || 'Unassigned',
       agentInitials: agent ? agent.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase() : 'UA',
+      agentAvatar:   agent ? (avatarMap[agent] ?? '') : '',
       date:          new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
       status:        (r.status || 'new') as EnqStatus,
     };

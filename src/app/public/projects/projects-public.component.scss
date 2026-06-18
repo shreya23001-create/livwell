@@ -9,7 +9,7 @@ $white:  #fff;
 /* ── Hero ────────────────────────────────────────── */
 .prj-hero {
   position: relative; min-height: 420px; display: flex; align-items: center;
-  background: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1600&q=80') center/cover no-repeat;
+  background: url('/images/dummy-image.png') center/cover no-repeat, linear-gradient(135deg, #0a0e1a 0%, #1a5c3a 100%);
   padding: 8rem 0 4rem;
 }
 .prj-hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(10,14,26,.85) 0%, rgba(10,14,26,.6) 100%); }

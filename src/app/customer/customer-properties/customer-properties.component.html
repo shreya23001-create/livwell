@@ -2,94 +2,155 @@
 
   <div class="page-header">
     <div>
-      <h1 class="page-title">Saved Properties</h1>
-      <p class="page-sub">{{ filtered().length }} of {{ properties().length }} saved listings</p>
+      <h1 class="page-title">My Properties &amp; Projects</h1>
+      <p class="page-sub">{{ properties().length }} saved {{ properties().length === 1 ? 'property' : 'properties' }} · {{ interestedProjects().length }} interested {{ interestedProjects().length === 1 ? 'project' : 'projects' }}</p>
     </div>
-    <a routerLink="/properties" class="btn-primary">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Browse More
-    </a>
-  </div>
-
-  <!-- Filters -->
-  <div class="filters-row">
-    <div class="search-box">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Search saved properties…" [ngModel]="search()" (ngModelChange)="search.set($event)" />
-    </div>
-    <div class="select-wrapper">
-      <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)">
-        <option value="all">All Statuses</option>
-        <option value="available">Available</option>
-        <option value="reserved">Reserved</option>
-        <option value="sold">Sold</option>
-      </select>
-      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-    </div>
-    <div class="select-wrapper">
-      <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)">
-        <option value="all">Sale & Rent</option>
-        <option value="sale">For Sale</option>
-        <option value="rent">For Rent</option>
-      </select>
-      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+    <div class="page-header-actions">
+      <a routerLink="/properties" class="btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Browse Properties
+      </a>
+      <a routerLink="/projects" class="btn-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Browse Projects
+      </a>
     </div>
   </div>
 
-  <!-- Grid -->
-  @if (loading()) {
-    <div class="empty-state"><p>Loading saved properties…</p></div>
-  } @else if (filtered().length === 0) {
-    <div class="empty-state">
-      <p>{{ properties().length === 0 ? 'No saved properties yet.' : 'No saved properties match your filters.' }}</p>
-      <a routerLink="/properties">Browse all listings →</a>
+  <!-- Tabs -->
+  <div class="cprops-tabs">
+    <button class="cprops-tab" [class.active]="activeTab() === 'properties'" (click)="activeTab.set('properties')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Saved Properties <span class="cprops-tab-count">{{ properties().length }}</span>
+    </button>
+    <button class="cprops-tab" [class.active]="activeTab() === 'projects'" (click)="activeTab.set('projects')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Interested Projects <span class="cprops-tab-count">{{ interestedProjects().length }}</span>
+    </button>
+  </div>
+
+  @if (activeTab() === 'properties') {
+    <!-- Filters -->
+    <div class="filters-row">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search saved properties…" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+      </div>
+      <div class="select-wrapper">
+        <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)">
+          <option value="all">All Statuses</option>
+          <option value="available">Available</option>
+          <option value="reserved">Reserved</option>
+          <option value="sold">Sold</option>
+        </select>
+        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="select-wrapper">
+        <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)">
+          <option value="all">Sale & Rent</option>
+          <option value="sale">For Sale</option>
+          <option value="rent">For Rent</option>
+        </select>
+        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
     </div>
-  } @else {
-    <div class="prop-grid">
-      @for (prop of filtered(); track prop.id) {
-        <div class="prop-card">
-          <div class="prop-card-top">
-            <div class="prop-img-placeholder">
-              <img [src]="prop.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80'"
-                   [alt]="prop.title" class="prop-img" loading="lazy">
+
+    <!-- Properties Grid -->
+    @if (loading()) {
+      <div class="empty-state"><p>Loading saved properties…</p></div>
+    } @else if (filtered().length === 0) {
+      <div class="empty-state">
+        <p>{{ properties().length === 0 ? 'No saved properties yet.' : 'No saved properties match your filters.' }}</p>
+        <a routerLink="/properties">Browse all listings →</a>
+      </div>
+    } @else {
+      <div class="prop-grid">
+        @for (prop of filtered(); track prop.id) {
+          <div class="prop-card">
+            <div class="prop-card-top">
+              <div class="prop-img-placeholder">
+                <img [src]="prop.image || '/images/dummy-image.png'"
+                     [alt]="prop.title" class="prop-img" loading="lazy"
+                     (error)="$any($event.target).src='/images/dummy-image.png'">
+              </div>
+              <div class="prop-badges">
+                <span class="type-badge">{{ prop.type }}</span>
+                <span class="cat-badge cat-badge--{{ prop.category }}">{{ prop.category === 'sale' ? 'For Sale' : 'For Rent' }}</span>
+              </div>
+              <span class="status-badge status-badge--{{ prop.status }}">{{ statusLabel(prop.status) }}</span>
+              <button class="remove-btn" (click)="removeProperty(prop.savedRowId)" title="Remove from saved">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#e11d48" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
             </div>
-            <div class="prop-badges">
-              <span class="type-badge">{{ prop.type }}</span>
-              <span class="cat-badge cat-badge--{{ prop.category }}">{{ prop.category === 'sale' ? 'For Sale' : 'For Rent' }}</span>
-            </div>
-            <span class="status-badge status-badge--{{ prop.status }}">{{ statusLabel(prop.status) }}</span>
-            <button class="remove-btn" (click)="removeProperty(prop.savedRowId)" title="Remove from saved">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#e11d48" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            </button>
-          </div>
-          <div class="prop-body">
-            <div class="prop-title">{{ prop.title }}</div>
-            <div class="prop-location">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              {{ prop.location }}
-            </div>
-            <div class="prop-price">{{ prop.price }}</div>
-            <div class="prop-specs">
-              @if (prop.beds > 0) {
+            <div class="prop-body">
+              <div class="prop-title">{{ prop.title }}</div>
+              <div class="prop-location">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ prop.location }}
+              </div>
+              <div class="prop-price">{{ prop.price }}</div>
+              <div class="prop-specs">
+                @if (prop.beds > 0) {
+                  <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 16h20M6 8v8"/></svg>
+                    {{ prop.beds }} Beds
+                  </span>
+                }
                 <span>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 16h20M6 8v8"/></svg>
-                  {{ prop.beds }} Beds
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                  {{ prop.baths }} Baths
                 </span>
-              }
-              <span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                {{ prop.baths }} Baths
-              </span>
-              <span>{{ prop.area }} sq.ft</span>
+                <span>{{ prop.area }} sq.ft</span>
+              </div>
+            </div>
+            <div class="prop-footer">
+              <div class="prop-agent">Agent: <strong>{{ prop.agent }}</strong></div>
+              <div class="prop-saved-tag">Saved {{ prop.savedOn }}</div>
             </div>
           </div>
-          <div class="prop-footer">
-            <div class="prop-agent">Agent: <strong>{{ prop.agent }}</strong></div>
-            <div class="prop-saved-tag">Saved {{ prop.savedOn }}</div>
-          </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    }
+  } @else {
+    <!-- Projects Grid -->
+    @if (loading()) {
+      <div class="empty-state"><p>Loading interested projects…</p></div>
+    } @else if (interestedProjects().length === 0) {
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <p>No interested projects yet.</p>
+        <a routerLink="/projects">Browse off-plan projects →</a>
+      </div>
+    } @else {
+      <div class="proj-grid">
+        @for (proj of interestedProjects(); track proj.id) {
+          <a [routerLink]="['/projects', proj.id]" class="proj-card">
+            <div class="proj-img-wrap">
+              <img [src]="proj.image || '/images/dummy-image.png'" [alt]="proj.title"
+                   class="proj-img" loading="lazy"
+                   (error)="$any($event.target).src='/images/dummy-image.png'">
+              <span class="proj-badge">{{ proj.badge }}</span>
+            </div>
+            <div class="proj-body">
+              <div class="proj-title">{{ proj.title }}</div>
+              @if (proj.developer) {
+                <div class="proj-dev">{{ proj.developer }}</div>
+              }
+              <div class="proj-loc">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ proj.location }}
+              </div>
+              <div class="proj-price">{{ proj.priceLabel }}</div>
+              <div class="proj-type">{{ proj.type }}</div>
+            </div>
+            <div class="proj-footer">
+              <span class="proj-status proj-status--{{ proj.status?.toLowerCase() }}">{{ proj.status }}</span>
+              <span class="proj-enq">Enquired {{ proj.enquiredOn }}</span>
+            </div>
+          </a>
+        }
+      </div>
+    }
   }
 
 </div>

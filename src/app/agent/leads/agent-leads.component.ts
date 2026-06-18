@@ -29,6 +29,8 @@ export interface AgentLead {
   propertyType: string;
   propertyTitle: string;
   propertyId: number | null;
+  projectId: number | null;
+  projectTitle: string;
   source: string;
   notes: string;
   agentReply: string;
@@ -40,6 +42,7 @@ export interface AgentLead {
 const EMPTY_FORM = (): Partial<AgentLead> => ({
   name: '', email: '', phone: '', status: 'new', category: 'Buy',
   budget: '', location: '', propertyType: '', propertyTitle: '', propertyId: null,
+  projectId: null, projectTitle: '',
   source: 'Website', notes: '', agentReply: '',
   createdDate: new Date().toISOString().slice(0, 10),
   lastContact: new Date().toISOString().slice(0, 10),
@@ -64,6 +67,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   leads        = signal<AgentLead[]>([]);
   search       = signal('');
   filterStatus = signal<LeadStatus | ''>('');
+  filterType   = signal<'all' | 'property' | 'project'>('all');
   sortCol      = signal<keyof AgentLead>('createdDate');
   sortDir      = signal<'asc' | 'desc'>('desc');
   loading      = signal(true);
@@ -87,7 +91,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
 
 
   readonly statuses: LeadStatus[] = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
-  readonly categories = ['Buy', 'Rent', 'Invest'];
+  readonly categories = ['Buy', 'Rent'];
   readonly sources    = ['Website', 'Referral', 'Walk-in', 'Social Media', 'Portal', 'Cold Call'];
 
   readonly statusTimeline: { status: LeadStatus; label: string; color: string }[] = [
@@ -112,10 +116,12 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   filtered = computed(() => {
     const q  = this.search().toLowerCase();
     const st = this.filterStatus();
+    const tp = this.filterType();
     let list = this.leads().filter(l => {
       const mq  = !q  || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.location.toLowerCase().includes(q);
       const mst = !st || l.status === st;
-      return mq && mst;
+      const mtp = tp === 'all' || (tp === 'property' ? !!l.propertyTitle : !!l.projectTitle);
+      return mq && mst && mtp;
     });
     const col = this.sortCol();
     const dir = this.sortDir();
@@ -143,13 +149,13 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   private async fetchLeads(agentEmail: string, agentName: string): Promise<void> {
     const { data: byEmail } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, budget, customer_id')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id')
       .eq('agent_email', agentEmail)
       .order('created_at', { ascending: false });
 
     const { data: byName } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, budget, customer_id')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id')
       .eq('assigned_agent', agentName)
       .is('agent_email', null)
       .order('created_at', { ascending: false });
@@ -191,6 +197,8 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       propertyType:  r.property_type  || '',
       propertyTitle: r.property_title || '',
       propertyId:    r.property_id    ?? null,
+      projectId:     r.project_id     ?? null,
+      projectTitle:  r.project_title  || '',
       source:        r.source         || 'Website',
       notes:         r.notes          || '',
       agentReply:    r.agent_reply    || '',
@@ -296,20 +304,31 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     this.saveError.set('');
     const agentName  = this.auth.currentUser()?.name  ?? '';
     const agentEmail = this.auth.currentUser()?.email ?? '';
-    const payload = {
-      name: f.name!.trim(), email: f.email!.trim(), phone: f.phone!.trim(),
-      status: f.status || 'new', budget: f.budget!.trim(), location: f.location!.trim(),
-      property_type: f.propertyType || '', source: f.source || 'Website',
-      notes: f.notes || '', agent_reply: f.agentReply || null,
-      assigned_agent: agentName, agent_email: agentEmail,
-    };
 
     if (this.isEdit() && this.editId() !== null) {
-      const { error } = await this.sb.from('admin_leads').update(payload).eq('id', this.editId()!);
+      // Edit: never overwrite customer contact info
+      const editPayload = {
+        status: f.status || 'new', budget: f.budget!.trim(), location: f.location!.trim(),
+        property_type: f.propertyType || '', source: f.source || 'Website',
+        notes: f.notes || '', agent_reply: f.agentReply || null,
+        project_id: f.projectId || null, project_title: f.projectTitle || null,
+        property_title: f.propertyTitle || null,
+        assigned_agent: agentName, agent_email: agentEmail,
+      };
+      const { error } = await this.sb.from('admin_leads').update(editPayload).eq('id', this.editId()!);
       if (error) { this.toast.error('Failed to save. Please try again.'); this.saving.set(false); return; }
       this.leads.update(list => list.map(l => l.id === this.editId() ? { ...l, ...f, propertyType: f.propertyType || l.propertyType } as AgentLead : l));
     } else {
-      const { data, error } = await this.sb.from('admin_leads').insert(payload).select().single();
+      const addPayload = {
+        name: f.name!.trim(), email: f.email!.trim(), phone: f.phone!.trim(),
+        status: f.status || 'new', budget: f.budget!.trim(), location: f.location!.trim(),
+        property_type: f.propertyType || '', source: f.source || 'Website',
+        notes: f.notes || '', agent_reply: f.agentReply || null,
+        project_id: f.projectId || null, project_title: f.projectTitle || null,
+        property_title: f.propertyTitle || null,
+        assigned_agent: agentName, agent_email: agentEmail,
+      };
+      const { data, error } = await this.sb.from('admin_leads').insert(addPayload).select().single();
       if (error) { this.toast.error('Failed to add lead. Please try again.'); this.saving.set(false); return; }
       if (data) this.leads.update(list => [this.mapRow(data), ...list]);
     }

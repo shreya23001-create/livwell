@@ -1,4 +1,4 @@
-<div class="lxp-page">
+﻿<div class="lxp-page">
 
   <!-- ── Page Header ──────────────────────────────────────── -->
   <div class="lxp-header">
@@ -30,7 +30,7 @@
 
       <!-- Image -->
       <div class="lxp-card-img-wrap">
-        <img [src]="p.images[0] || 'images/dummy-image.png'" [alt]="p.title" class="lxp-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
+        <img [src]="p.images[0] || '/images/dummy-image.png'" [alt]="p.title" class="lxp-card-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
         <div class="lxp-card-img-overlay"></div>
         <span *ngIf="p.badge" class="lxp-badge">{{ p.badge }}</span>
       </div>

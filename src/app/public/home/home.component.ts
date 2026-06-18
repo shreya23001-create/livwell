@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, QueryList, ViewChild, ViewChildren, PLATFORM_ID, Inject, signal, computed, inject, NgZone } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, QueryList, ViewChild, ViewChildren, PLATFORM_ID, Inject, signal, computed, inject, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser, UpperCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -190,7 +190,7 @@ export class HomeComponent implements OnInit {
         sqft:     Number(p.area_sqft || 0).toLocaleString(),
         type:     p.type,
         badge:    p.is_featured ? 'Featured' : '',
-        image:    (p.images && p.images[0]) || 'images/dummy-image.png',
+        image:    (p.images && p.images[0]) || '/images/dummy-image.png',
       })));
     }
   }
@@ -213,7 +213,7 @@ export class HomeComponent implements OnInit {
         startingPrice: p.price_label || (p.price_from ? `AED ${Number(p.price_from).toLocaleString()}` : ''),
         paymentPlan:  p.payment_plan ?? '',
         badge:        !!p.is_featured,
-        image:        (p.images && p.images[0]) || 'images/dummy-image.png',
+        image:        (p.images && p.images[0]) || '/images/dummy-image.png',
       })));
     }
   }
@@ -246,7 +246,7 @@ export class HomeComponent implements OnInit {
         completion:   p.completion_date ?? '',
         type:         p.type ?? 'Apartments',
         roi:          '',
-        image:        (p.images && p.images[0]) || 'images/dummy-image.png',
+        image:        (p.images && p.images[0]) || '/images/dummy-image.png',
         badge:        p.badge || 'New Launch',
       })));
     }
@@ -279,7 +279,7 @@ export class HomeComponent implements OnInit {
           price:     priceStr,
           badge:     p.badge || 'New Launch',
           type:      tabType,
-          image:     (p.images && p.images[0]) || 'images/dummy-image.png',
+          image:     (p.images && p.images[0]) || '/images/dummy-image.png',
         };
       }));
     }

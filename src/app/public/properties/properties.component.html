@@ -1,4 +1,4 @@
-<!-- ============================================================
+﻿<!-- ============================================================
      MAIN CONTENT
      ============================================================ -->
 <div class="props-layout" [class.filters-hidden]="!showFilters()">
@@ -299,7 +299,7 @@
             <img [src]="property.images[getCardImageIndex(property.id)]"
                  [alt]="property.title"
                  class="prop-img" loading="lazy"
-                 (error)="$any($event.target).src='images/dummy-image.png'">
+                 (error)="$any($event.target).src='/images/dummy-image.png'">
 
             <!-- Image navigation (stops propagation so click doesn't navigate) -->
             <ng-container *ngIf="property.images.length > 1">
@@ -453,7 +453,7 @@
         <!-- Clickable area → detail page -->
         <a [routerLink]="['/properties', property.id]" class="plc-link">
           <div class="plc-img-wrap">
-            <img [src]="property.images[0]" [alt]="property.title" class="plc-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
+            <img [src]="property.images[0]" [alt]="property.title" class="plc-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
             <div class="plc-img-overlay"></div>
             <span class="prop-status-badge" [class.sale]="property.status === 'Sale'" [class.rent]="property.status === 'Rent'">
               {{ property.status === 'Sale' ? 'For Sale' : 'For Rent' }}
@@ -600,7 +600,7 @@
              class="map-prop-card"
              [class.active]="activeMapProperty()?.id === property.id"
              (click)="selectMapProperty(property)">
-          <img [src]="property.images[0]" [alt]="property.title" class="map-card-img" loading="lazy" (error)="$any($event.target).src='images/dummy-image.png'">
+          <img [src]="property.images[0]" [alt]="property.title" class="map-card-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
           <div class="map-card-body">
             <div class="map-card-price">{{ property.priceLabel }}</div>
             <div class="map-card-title">{{ property.title }}</div>

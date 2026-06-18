@@ -35,7 +35,7 @@
 
           <!-- Card header -->
           <div class="enq-card-header" (click)="toggleExpand(enq.id)">
-            <div class="agent-avatar">{{ enq.agentInitials }}</div>
+            <div class="agent-avatar">{{ enq.property.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase() }}</div>
             <div class="enq-info">
               <div class="enq-prop">
                 {{ enq.property }}
@@ -102,7 +102,14 @@
 
               <!-- Agent info -->
               <div class="enq-agent-row">
-                <div class="enq-agent-avatar">{{ enq.agentInitials }}</div>
+                <div class="enq-agent-avatar">
+                  @if (enq.agentAvatar) {
+                    <img [src]="enq.agentAvatar" [alt]="enq.agent" class="agent-avatar-img"
+                         (error)="enq.agentAvatar = ''">
+                  } @else {
+                    {{ enq.agentInitials }}
+                  }
+                </div>
                 <div>
                   <div class="enq-agent-name">
                     @if (enq.agent !== 'Unassigned') { {{ enq.agent }} } @else { Agent being assigned… }

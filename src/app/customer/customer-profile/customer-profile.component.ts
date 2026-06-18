@@ -19,10 +19,14 @@ export class CustomerProfileComponent implements OnInit {
   private sb    = inject(SupabaseService).client;
   private toast = inject(ToastService);
 
-  activeTab = signal<Tab>('profile');
-  saving    = signal(false);
-  saveSuccess = signal('');
-  saveError   = signal('');
+  activeTab    = signal<Tab>('profile');
+  saving       = signal(false);
+  saveSuccess  = signal('');
+  saveError    = signal('');
+  avatarUrl       = signal('');
+  uploadingAvatar = signal(false);
+  showDeleteModal = signal(false);
+  deleting        = signal(false);
 
   profileForm = { name: '', email: '', phone: '', nationality: '', budget: '', lookingFor: 'buy' };
   passwordForm = { newPw: '', confirmPw: '' };
@@ -46,6 +50,36 @@ export class CustomerProfileComponent implements OnInit {
       this.profileForm.email = user.email ?? '';
       this.profileForm.phone = user.phone ?? '';
     }
+    if (user?.id) {
+      const { data } = await this.sb.from('profiles').select('avatar_url').eq('id', user.id).maybeSingle();
+      const av = data?.avatar_url ?? '';
+      if (av && !av.startsWith('data:') && /\/avatars\/[^/]+/.test(av)) this.avatarUrl.set(av);
+    }
+  }
+
+  async onAvatarChange(event: Event): Promise<void> {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+
+    const ext  = file.name.split('.').pop() ?? 'jpg';
+    const path = `avatars/${userId}.${ext}`;
+
+    this.uploadingAvatar.set(true);
+    const { error: upErr } = await this.sb.storage.from('imagesFolder').upload(path, file, { upsert: true });
+    if (upErr) { this.toast.error('Upload failed: ' + upErr.message); this.uploadingAvatar.set(false); return; }
+
+    const { data: urlData } = this.sb.storage.from('imagesFolder').getPublicUrl(path);
+    const publicUrl = urlData.publicUrl + '?t=' + Date.now();
+
+    const { error: dbErr } = await this.sb.from('profiles').update({ avatar_url: publicUrl }).eq('id', userId);
+    if (dbErr) { this.toast.error('Failed to save avatar.'); this.uploadingAvatar.set(false); return; }
+
+    this.avatarUrl.set(publicUrl);
+    await this.auth.refreshProfile();
+    this.uploadingAvatar.set(false);
+    this.toast.success('Profile photo updated.');
   }
 
   initials(): string {
@@ -81,6 +115,25 @@ export class CustomerProfileComponent implements OnInit {
     if (error) { this.toast.error('Failed to update password. Please try again.'); return; }
     this.toast.success('Password changed successfully.');
     this.passwordForm = { newPw: '', confirmPw: '' };
+  }
+
+  async removeAvatar(): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    await this.sb.from('profiles').update({ avatar_url: null }).eq('id', userId);
+    this.avatarUrl.set('');
+    await this.auth.refreshProfile();
+    this.toast.success('Profile photo removed.');
+  }
+
+  async deleteAccount(): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    this.deleting.set(true);
+    // Delete profile data then sign out — actual auth user deletion requires admin API
+    await this.sb.from('profiles').delete().eq('id', userId);
+    await this.auth.logout();
+    this.deleting.set(false);
   }
 
   savePreferences(): void {

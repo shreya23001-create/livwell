@@ -28,9 +28,11 @@ export class CustomerDashboardComponent implements OnInit {
   showWelcome = signal(false);
   loading = signal(true);
 
-  savedCount       = signal(0);
-  totalEnquiries   = signal(0);
-  recentEnquiries  = signal<Enquiry[]>([]);
+  savedCount            = signal(0);
+  totalEnquiries        = signal(0);
+  projectEnqCount       = signal(0);
+  recentEnquiries       = signal<Enquiry[]>([]);
+  recentProjectEnqs     = signal<Enquiry[]>([]);
 
   constructor() {
     if (this.auth.newlyRegistered()) {
@@ -44,7 +46,7 @@ export class CustomerDashboardComponent implements OnInit {
     const user = this.auth.currentUser();
     if (!user?.email) { this.loading.set(false); return; }
 
-    const [savedRes, countRes, leadsRes] = await Promise.all([
+    const [savedRes, countRes, leadsRes, projEnqRes, projLeadsRes] = await Promise.all([
       this.sb.from('saved_properties').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
       this.sb.from('admin_leads').select('id', { count: 'exact', head: true }).eq('email', user.email),
       this.sb.from('admin_leads')
@@ -52,15 +54,34 @@ export class CustomerDashboardComponent implements OnInit {
         .eq('email', user.email)
         .order('created_at', { ascending: false })
         .limit(5),
+      this.sb.from('admin_leads').select('id', { count: 'exact', head: true }).eq('email', user.email).not('project_id', 'is', null),
+      this.sb.from('admin_leads')
+        .select('id, notes, status, assigned_agent, created_at, project_title, project_id')
+        .eq('email', user.email)
+        .not('project_id', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(5),
     ]);
 
     this.savedCount.set(savedRes.count ?? 0);
     this.totalEnquiries.set(countRes.count ?? 0);
+    this.projectEnqCount.set(projEnqRes.count ?? 0);
 
     if (leadsRes.data) {
       this.recentEnquiries.set(leadsRes.data.map((r: any) => ({
         id:       r.id,
         property: r.property_type || r.location || 'Property Enquiry',
+        agent:    r.assigned_agent || 'Unassigned',
+        date:     new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
+        status:   r.status || 'new',
+        message:  r.notes || '',
+      })));
+    }
+
+    if (projLeadsRes.data) {
+      this.recentProjectEnqs.set(projLeadsRes.data.map((r: any) => ({
+        id:       r.id,
+        property: r.project_title || 'Project Enquiry',
         agent:    r.assigned_agent || 'Unassigned',
         date:     new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
         status:   r.status || 'new',

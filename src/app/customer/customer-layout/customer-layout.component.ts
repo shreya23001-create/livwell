@@ -24,7 +24,6 @@ export class CustomerLayoutComponent {
     { route: '/my/future-interest', label: 'Future Interest',       icon: 'calendar' },
     { route: '/my/ratings',         label: 'My Project Ratings',    icon: 'star' },
     { route: '/my/profile',         label: 'Profile & Settings',    icon: 'user' },
-    { route: '/my/change-password', label: 'Change Your Password',  icon: 'lock' },
   ];
 
   constructor(public auth: AuthService) {}

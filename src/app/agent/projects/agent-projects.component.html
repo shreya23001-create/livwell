@@ -1,9 +1,30 @@
-<div class="agtp-page">
+﻿<div class="agtp-page">
 
   <div class="agtp-header">
     <div>
       <h1 class="agtp-title">My Projects</h1>
       <p class="agtp-sub">Off-plan and luxury projects assigned to you</p>
+    </div>
+    <div class="agtp-header-actions">
+      <label class="agtp-icon-btn" [class.agtp-icon-btn--loading]="importing()" title="Import from Excel">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+        </svg>
+        {{ importing() ? 'Importing…' : 'Import' }}
+        <input type="file" accept=".xlsx,.xls" (change)="importFromExcel($event)" [disabled]="importing()" style="display:none" />
+      </label>
+      <button class="agtp-icon-btn" (click)="exportToExcel()" [disabled]="!projects().length" title="Export to Excel">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/>
+        </svg>
+        Export
+      </button>
+      <button class="agtp-add-btn" (click)="openForm()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+        </svg>
+        Add Project
+      </button>
     </div>
   </div>
 
@@ -23,9 +44,12 @@
     <div class="select-wrapper">
       <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
         <option value="">All Statuses</option>
-        <option value="Published">Published</option>
         <option value="Draft">Draft</option>
+        <option value="Pending Review">Pending Review</option>
+        <option value="Published">Published</option>
         <option value="Archived">Archived</option>
+        <option value="Sold">Sold</option>
+        <option value="Rented">Rented</option>
       </select>
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
     </div>
@@ -38,7 +62,7 @@
   <div class="agtp-grid" *ngIf="!loading()">
     <div class="agtp-card" *ngFor="let p of filtered()">
       <div class="agtp-card-img">
-        <img *ngIf="p.images?.[0]" [src]="p.images[0]" [alt]="p.title">
+        <img *ngIf="p.images?.[0]" [src]="p.images[0]" [alt]="p.title" (error)="$any($event.target).src='/images/dummy-image.png'">
         <div *ngIf="!p.images?.[0]" class="agtp-card-img--empty">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 9 4-4 4 4 4-6 4 8"/></svg>
         </div>
@@ -65,10 +89,308 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
           {{ p.payment_plan }}
         </div>
-        <a [routerLink]="['/projects', p.id]" target="_blank" class="agtp-view-btn">View on Site →</a>
+        <div class="agtp-card-actions">
+          <a [routerLink]="['/projects', p.id]" target="_blank" class="agtp-view-btn">View on Site →</a>
+          <div class="agtp-card-btns">
+            <button class="agtp-card-btn agtp-card-btn--edit" (click)="openEdit(p)" title="Edit">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/>
+              </svg>
+            </button>
+            <button class="agtp-card-btn agtp-card-btn--delete" (click)="deleteProject(p)"
+                    [disabled]="deleting() === p.id" title="Delete">
+              <svg *ngIf="deleting() !== p.id" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+              </svg>
+              <div *ngIf="deleting() === p.id" class="agtp-btn-spin" style="width:12px;height:12px;border-width:2px"></div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <div *ngIf="filtered().length === 0" class="agtp-empty">No projects assigned to you yet.</div>
   </div>
 
+</div>
+
+<!-- ══ Add / Edit Project Modal ═══════════════════════════ -->
+<div class="prop-modal-backdrop" *ngIf="showForm()" (click)="closeForm()"></div>
+<div class="prop-modal agtp-proj-modal" *ngIf="showForm()" (click)="$event.stopPropagation()">
+  <ng-container *ngIf="form() as f">
+
+    <!-- Header -->
+    <div class="prop-modal-header">
+      <h2 class="prop-modal-title">{{ editMode() ? 'Edit Project' : 'Add New Project' }}</h2>
+      <button class="prop-modal-close" (click)="closeForm()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="prop-modal-body">
+      <p class="prop-save-error" *ngIf="saveError()">{{ saveError() }}</p>
+
+      <!-- Title -->
+      <div class="prop-form-field">
+        <label class="prop-form-label">Project Title *</label>
+        <input class="prop-form-input" type="text" placeholder="e.g. Marina Gate Phase III"
+               [ngModel]="f.title" (ngModelChange)="form.update(x => ({...x, title: $event}))" />
+      </div>
+
+      <!-- Developer + Type -->
+      <div class="prop-form-row">
+        <div class="prop-form-field">
+          <label class="prop-form-label">Developer</label>
+          <input class="prop-form-input" type="text" placeholder="e.g. Select Group"
+                 [ngModel]="f.developer" (ngModelChange)="form.update(x => ({...x, developer: $event}))" />
+        </div>
+        <div class="prop-form-field">
+          <label class="prop-form-label">Type</label>
+          <div class="select-wrapper">
+            <select class="prop-form-input" [ngModel]="f.type" (ngModelChange)="form.update(x => ({...x, type: $event}))">
+              <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status + Badge -->
+      <div class="prop-form-row">
+        <div class="prop-form-field">
+          <label class="prop-form-label">Status</label>
+          <div class="select-wrapper">
+            <select class="prop-form-input" [ngModel]="f.status" (ngModelChange)="form.update(x => ({...x, status: $event}))">
+              <option value="Draft">Draft</option>
+              <option value="Pending Review">Pending Review</option>
+              <option value="Published">Published</option>
+              <option value="Archived">Archived</option>
+              <option value="Sold">Sold</option>
+              <option value="Rented">Rented</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="prop-form-field">
+          <label class="prop-form-label">Badge</label>
+          <div class="select-wrapper">
+            <select class="prop-form-input" [ngModel]="f.badge" (ngModelChange)="form.update(x => ({...x, badge: $event}))">
+              <option *ngFor="let b of badges" [value]="b">{{ b || '— None —' }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price From + Price Label -->
+      <div class="prop-form-row">
+        <div class="prop-form-field">
+          <label class="prop-form-label">Price From (AED)</label>
+          <input class="prop-form-input" type="number" min="0" placeholder="e.g. 1500000"
+                 [ngModel]="f.price_from" (ngModelChange)="form.update(x => ({...x, price_from: +$event}))" />
+        </div>
+        <div class="prop-form-field">
+          <label class="prop-form-label">Price Label</label>
+          <input class="prop-form-input" type="text" placeholder="e.g. Starting from AED 1.5M"
+                 [ngModel]="f.price_label" (ngModelChange)="form.update(x => ({...x, price_label: $event}))" />
+        </div>
+      </div>
+
+      <!-- Location + Community -->
+      <div class="prop-form-row">
+        <div class="prop-form-field">
+          <label class="prop-form-label">Location *</label>
+          <input class="prop-form-input" type="text" placeholder="e.g. Dubai Marina"
+                 [ngModel]="f.location" (ngModelChange)="form.update(x => ({...x, location: $event}))" />
+        </div>
+        <div class="prop-form-field">
+          <label class="prop-form-label">Community</label>
+          <input class="prop-form-input" type="text" placeholder="e.g. Marina Walk"
+                 [ngModel]="f.community" (ngModelChange)="form.update(x => ({...x, community: $event}))" />
+        </div>
+      </div>
+
+      <!-- Beds + Bathrooms + Area -->
+      <div class="prop-form-row prop-form-row--3">
+        <div class="prop-form-field">
+          <label class="prop-form-label">Beds</label>
+          <input class="prop-form-input" type="text" placeholder="e.g. 1–3"
+                 [ngModel]="f.beds" (ngModelChange)="form.update(x => ({...x, beds: $event}))" />
+        </div>
+        <div class="prop-form-field">
+          <label class="prop-form-label">Bathrooms</label>
+          <input class="prop-form-input" type="number" min="0" placeholder="e.g. 2"
+                 [ngModel]="f.bathrooms" (ngModelChange)="form.update(x => ({...x, bathrooms: +$event}))" />
+        </div>
+        <div class="prop-form-field">
+          <label class="prop-form-label">Area (sqft)</label>
+          <input class="prop-form-input" type="number" min="0" placeholder="e.g. 850"
+                 [ngModel]="f.area_sqft" (ngModelChange)="form.update(x => ({...x, area_sqft: +$event}))" />
+        </div>
+      </div>
+
+      <!-- Completion Date + Payment Plan -->
+      <div class="prop-form-row">
+        <div class="prop-form-field">
+          <label class="prop-form-label">Completion Date</label>
+          <input class="prop-form-input" type="text" placeholder="e.g. Q3 2026"
+                 [ngModel]="f.completion_date" (ngModelChange)="form.update(x => ({...x, completion_date: $event}))" />
+        </div>
+        <div class="prop-form-field">
+          <label class="prop-form-label">Payment Plan</label>
+          <div class="select-wrapper">
+            <select class="prop-form-input" [ngModel]="f.payment_plan" (ngModelChange)="form.update(x => ({...x, payment_plan: $event}))">
+              <option value="">— Select —</option>
+              <option *ngFor="let pl of plans" [value]="pl">{{ pl }}</option>
+            </select>
+            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="prop-form-field">
+        <label class="prop-form-label">Description</label>
+        <textarea class="prop-form-input prop-form-textarea" rows="4" placeholder="Describe the project…"
+                  [ngModel]="f.description" (ngModelChange)="form.update(x => ({...x, description: $event}))"></textarea>
+      </div>
+
+      <!-- Amenities -->
+      <div class="prop-form-field">
+        <label class="prop-form-label">Amenities</label>
+        <div class="agtp-tag-input-row">
+          <input type="text" class="prop-form-input" placeholder="e.g. Swimming Pool"
+                 [ngModel]="amenityInput()" (ngModelChange)="amenityInput.set($event)"
+                 (keydown.enter)="$event.preventDefault(); addAmenity()" />
+          <button type="button" class="agtp-tag-add-btn" (click)="addAmenity()">Add</button>
+        </div>
+        <div class="agtp-tags" *ngIf="f.amenities.length" style="margin-top:0.5rem">
+          <span class="agtp-tag" *ngFor="let a of f.amenities; let i = index">
+            {{ a }}<button type="button" (click)="removeAmenity(i)">×</button>
+          </span>
+        </div>
+      </div>
+
+      <!-- Flags -->
+      <div class="prop-form-field">
+        <label class="prop-form-label">Flags</label>
+        <div class="agtp-checkbox-row">
+          <label class="agtp-checkbox">
+            <input type="checkbox" [ngModel]="f.is_featured" (ngModelChange)="form.update(x => ({...x, is_featured: $event}))" />
+            <span>Featured</span>
+          </label>
+          <label class="agtp-checkbox">
+            <input type="checkbox" [ngModel]="f.is_luxury" (ngModelChange)="form.update(x => ({...x, is_luxury: $event}))" />
+            <span>Luxury</span>
+          </label>
+          <label class="agtp-checkbox">
+            <input type="checkbox" [ngModel]="f.is_ultra_luxury" (ngModelChange)="form.update(x => ({...x, is_ultra_luxury: $event}))" />
+            <span>Ultra Luxury</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Images -->
+      <div class="prop-form-field">
+        <label class="prop-form-label">Project Images</label>
+        <label class="agtp-dropzone"
+               [class.dragover]="imgDragOver()"
+               (dragover)="onImgDragOver($event)"
+               (dragleave)="onImgDragLeave()"
+               (drop)="onImgDrop($event)">
+          <input type="file" multiple accept="image/*" (change)="onImgFileChange($event)" style="display:none" />
+          <ng-container *ngIf="!uploadingImg(); else imgUploading">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z"/>
+            </svg>
+            <span class="agtp-dropzone-text">Drag &amp; drop images here</span>
+            <span class="agtp-dropzone-sub">or click to browse</span>
+          </ng-container>
+          <ng-template #imgUploading>
+            <div class="agtp-spin"></div>
+            <span class="agtp-dropzone-sub">Uploading…</span>
+          </ng-template>
+        </label>
+        <div class="agtp-img-grid" *ngIf="f.images.length">
+          <div class="agtp-img-thumb" *ngFor="let img of f.images; let i = index">
+            <img [src]="img" alt="preview" (error)="$any($event.target).src='/images/dummy-image.png'" />
+            <button type="button" class="agtp-img-remove" (click)="removeImage(i)" title="Remove">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Tour -->
+      <div class="prop-form-field">
+        <label class="prop-form-label">Video Tour</label>
+        <div class="prop-video-toggle">
+          <button type="button" class="prop-vtab" [class.active]="f.video_type === 'url'"
+                  (click)="form.update(x => ({...x, video_type: 'url', video_url: ''})); videoFileName.set('')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>
+            </svg>
+            Paste URL
+          </button>
+          <button type="button" class="prop-vtab" [class.active]="f.video_type === 'file'"
+                  (click)="form.update(x => ({...x, video_type: 'file', video_url: ''})); videoFileName.set('')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/>
+            </svg>
+            Upload File
+          </button>
+        </div>
+        <div *ngIf="f.video_type === 'url'" style="margin-top:0.75rem">
+          <input class="prop-form-input" type="url" placeholder="YouTube, Vimeo or direct video URL…"
+                 [ngModel]="f.video_url" (ngModelChange)="form.update(x => ({...x, video_url: $event}))" />
+          <span class="prop-form-hint">Supports YouTube, Vimeo or direct .mp4 links</span>
+        </div>
+        <div *ngIf="f.video_type === 'file'" style="margin-top:0.75rem">
+          <label class="prop-video-upload-label">
+            <input type="file" accept="video/*" (change)="onVideoFileChange($event)" [disabled]="uploadingVideo()" style="display:none" />
+            <ng-container *ngIf="!uploadingVideo()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/>
+              </svg>
+              <span>{{ videoFileName() || 'Click to upload video' }}</span>
+              <span class="prop-upload-hint">MP4, MOV, AVI — max 500MB</span>
+            </ng-container>
+            <ng-container *ngIf="uploadingVideo()">
+              <div class="agtp-spin"></div>
+              <span>Uploading video…</span>
+            </ng-container>
+          </label>
+          <div class="prop-video-uploaded" *ngIf="f.video_url && !uploadingVideo()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+            Video uploaded successfully
+          </div>
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div class="agtp-form-success" *ngIf="saveSuccess()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+        </svg>
+        Project saved successfully!
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="prop-modal-footer">
+      <div class="prop-modal-footer-left"></div>
+      <div class="prop-modal-footer-right">
+        <button class="prop-btn prop-btn--ghost" (click)="closeForm()">Cancel</button>
+        <button class="prop-btn prop-btn--primary" (click)="save()" [disabled]="saving() || uploadingVideo() || uploadingImg()">
+          <div *ngIf="saving()" class="agtp-btn-spin" style="width:14px;height:14px;border-width:2px"></div>
+          {{ saving() ? 'Saving…' : (editMode() ? 'Update Project' : 'Save Project') }}
+        </button>
+      </div>
+    </div>
+
+  </ng-container>
 </div>

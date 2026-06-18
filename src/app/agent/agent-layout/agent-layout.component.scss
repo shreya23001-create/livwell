@@ -133,7 +133,7 @@ $topbar-h:      60px;
 .collapsed .agt-user-card { justify-content: center; }
 
 // ── Main ──
-.agt-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.agt-main { flex: 1; display: flex; flex-direction: column; overflow: auto; }
 
 .agt-topbar {
   height: $topbar-h; background: #fff; border-bottom: 1px solid #e5e7eb;

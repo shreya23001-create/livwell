@@ -271,6 +271,23 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       this.newMsg.set('');
       await this.loadMessages(lead);
       this.buildActivity();
+      // Notify the customer if this lead has a linked customer account
+      // Notify the customer — use customerId directly or look up by email
+      let custId = lead.customerId ?? null;
+      if (!custId && lead.email) {
+        const { data: prof } = await this.sb.from('profiles').select('id').eq('email', lead.email).maybeSingle();
+        custId = prof?.id ?? null;
+      }
+      if (custId) {
+        const { error: nErr } = await this.sb.from('notifications').insert({
+          user_id: custId,
+          title:   `Reply from ${user.name || 'your agent'}`,
+          message: text.length > 120 ? text.slice(0, 120) + '…' : text,
+          type:    lead.propertyTitle || lead.projectTitle || 'Enquiry',
+          read:    false,
+        });
+        if (nErr) console.error('[notif insert error]', nErr);
+      }
     }
     this.sending.set(false);
   }

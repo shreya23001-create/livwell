@@ -277,7 +277,29 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     const { error } = await this.sb.from('lead_messages').insert({
       lead_id: leadId, sender_role: 'agent', sender_name: user.name || user.email, content: text,
     });
-    if (!error) { this.newMessage.set(''); await this.loadModalMessages(leadId); }
+    if (!error) {
+      this.newMessage.set('');
+      await this.loadModalMessages(leadId);
+      // Notify the customer — use customerId directly or look up by email
+      const lead = this.leads().find(l => l.id === leadId);
+      if (lead) {
+        let custId = lead.customerId ?? null;
+        if (!custId && lead.email) {
+          const { data: prof } = await this.sb.from('profiles').select('id').eq('email', lead.email).maybeSingle();
+          custId = prof?.id ?? null;
+        }
+        if (custId) {
+          const { error: nErr } = await this.sb.from('notifications').insert({
+            user_id: custId,
+            title:   `Reply from ${user.name || 'your agent'}`,
+            message: text.length > 120 ? text.slice(0, 120) + '…' : text,
+            type:    lead.propertyTitle || lead.projectTitle || 'Enquiry',
+            read:    false,
+          });
+          if (nErr) console.error('[notif insert error]', nErr);
+        }
+      }
+    }
     this.sendingMsg.set(false);
   }
 
@@ -294,7 +316,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     if (!f.email?.trim())    e['email']    = 'Required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e['email'] = 'Enter a valid email.';
     if (!f.phone?.trim())    e['phone']    = 'Required.';
-    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(f.phone.trim()))   e['phone'] = 'Enter a valid phone number.';
+    else if (!/^\+?[\d\s\-()]+$/.test(f.phone.trim()) || (f.phone.replace(/\D/g, '').length < 7 || f.phone.replace(/\D/g, '').length > 15)) e['phone'] = 'Enter a valid phone number (7–15 digits).';
     if (!f.budget?.trim())   e['budget']   = 'Required.';
     if (!f.location?.trim()) e['location'] = 'Required.';
     this.formErrors.set(e);

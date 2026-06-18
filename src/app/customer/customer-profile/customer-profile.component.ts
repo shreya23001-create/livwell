@@ -6,6 +6,17 @@ import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
 
 type Tab = 'profile' | 'security' | 'preferences';
+type NotifTab = 'inbox' | 'preferences';
+
+interface NotifItem {
+  id: number;
+  title: string;
+  message: string;
+  type: string;
+  read: boolean;
+  created_at: string;
+  date: string;
+}
 
 @Component({
   selector: 'app-customer-profile',
@@ -18,6 +29,8 @@ export class CustomerProfileComponent implements OnInit {
   auth          = inject(AuthService);
   private sb    = inject(SupabaseService).client;
   private toast = inject(ToastService);
+
+  private readonly NOTIF_PREFS_KEY = 'lw_notif_prefs';
 
   activeTab    = signal<Tab>('profile');
   saving       = signal(false);
@@ -33,6 +46,31 @@ export class CustomerProfileComponent implements OnInit {
 
   showNewPw     = signal(false);
   showConfirmPw = signal(false);
+
+  // ── Notification inbox ───────────────────────────────────
+  notifTab       = signal<NotifTab>('inbox');
+  notifLoading   = signal(false);
+  notifications  = signal<NotifItem[]>([]);
+  prefsSaved     = signal(false);
+  unreadCount    = () => this.notifications().filter(n => !n.read).length;
+
+  readonly notifRoles = [
+    'Buyer', 'Seller', 'Landlord', 'Tenant', 'Landlord Rep',
+    'Real Estate Agent', 'Real Estate Developer', 'Real-estate agency', 'POA Holder',
+  ];
+  readonly notifOptions = [
+    'Property Tech Tools',
+    'Sales Transactions In Dubai Land Dept',
+    'Distressed Sale',
+    'Offers Notification',
+    'New Project Launch Notification',
+    'Project Construction Progress Notification',
+    'Project Handover/Completion Notification',
+    'Real Estate Market Update',
+    'I Am Not Interested. Do Not Send Me Any Kind Of Notification.',
+  ];
+  selectedRoles:  Record<string, boolean> = {};
+  selectedNotifs: Record<string, boolean> = {};
 
   preferences = {
     emailEnquiryReplies: true,
@@ -55,6 +93,54 @@ export class CustomerProfileComponent implements OnInit {
       const av = data?.avatar_url ?? '';
       if (av && !av.startsWith('data:') && /\/avatars\/[^/]+/.test(av)) this.avatarUrl.set(av);
     }
+    // Load saved notification preferences from localStorage
+    try {
+      const stored = localStorage.getItem(this.NOTIF_PREFS_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        this.selectedRoles  = parsed.roles  ?? {};
+        this.selectedNotifs = parsed.notifs ?? {};
+      }
+    } catch {}
+    // Load notifications inbox
+    await this.loadNotifications();
+  }
+
+  async loadNotifications(): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    this.notifLoading.set(true);
+    const { data } = await this.sb
+      .from('notifications')
+      .select('id, title, message, type, read, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    if (data) {
+      this.notifications.set(data.map((n: any) => ({
+        id:         n.id,
+        title:      n.title   || 'Notification',
+        message:    n.message || '',
+        type:       n.type    || '',
+        read:       n.read    ?? false,
+        created_at: n.created_at,
+        date:       new Date(n.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
+      })));
+    }
+    this.notifLoading.set(false);
+  }
+
+  async markNotifRead(n: NotifItem): Promise<void> {
+    if (n.read) return;
+    n.read = true;
+    this.notifications.update(list => [...list]);
+    await this.sb.from('notifications').update({ read: true }).eq('id', n.id);
+  }
+
+  async markAllNotifsRead(): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    this.notifications.update(list => list.map(n => ({ ...n, read: true })));
+    await this.sb.from('notifications').update({ read: true }).eq('user_id', userId).eq('read', false);
   }
 
   async onAvatarChange(event: Event): Promise<void> {
@@ -89,6 +175,10 @@ export class CustomerProfileComponent implements OnInit {
   async saveProfile(): Promise<void> {
     this.saveSuccess.set(''); this.saveError.set('');
     if (!this.profileForm.name.trim()) { this.saveError.set('Name is required.'); return; }
+    const ph = this.profileForm.phone.trim();
+    if (ph && (!/^\+?[\d\s\-()]+$/.test(ph) || ph.replace(/\D/g, '').length < 7 || ph.replace(/\D/g, '').length > 15)) {
+      this.saveError.set('Enter a valid phone number (7–15 digits, e.g. +971 50 123 4567).'); return;
+    }
     this.saving.set(true);
     const userId = this.auth.currentUser()?.id;
     if (userId) {
@@ -137,6 +227,14 @@ export class CustomerProfileComponent implements OnInit {
   }
 
   savePreferences(): void {
+    try {
+      localStorage.setItem(this.NOTIF_PREFS_KEY, JSON.stringify({
+        roles:  this.selectedRoles,
+        notifs: this.selectedNotifs,
+      }));
+    } catch {}
+    this.prefsSaved.set(true);
+    setTimeout(() => this.prefsSaved.set(false), 3000);
     this.toast.success('Notification preferences saved.');
   }
 }

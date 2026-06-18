@@ -1,8 +1,9 @@
-import { Component, signal, inject, computed } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit, OnDestroy, signal, inject, computed } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../shared/services/auth.service';
+import { LeadNotificationService } from '../../shared/services/lead-notification.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -11,9 +12,12 @@ import { AuthService } from '../../shared/services/auth.service';
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.scss',
 })
-export class AdminLayoutComponent {
+export class AdminLayoutComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
+  private router    = inject(Router);
+  readonly leadNotif = inject(LeadNotificationService);
   sidebarCollapsed = signal(false);
+  notifOpen = signal(false);
 
   safeIcon(svg: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(svg);
@@ -77,5 +81,23 @@ export class AdminLayoutComponent {
 
   constructor(public auth: AuthService) {}
 
+  ngOnInit(): void  { this.leadNotif.start(); }
+  ngOnDestroy(): void { this.leadNotif.stop(); }
+
   toggle() { this.sidebarCollapsed.update(v => !v); }
+
+  toggleNotif(): void {
+    const opening = !this.notifOpen();
+    this.notifOpen.set(opening);
+    if (opening) {
+      this.leadNotif.fetch();
+    } else {
+      this.leadNotif.markAllRead();
+    }
+  }
+
+  openLead(id: number): void {
+    this.notifOpen.set(false);
+    this.router.navigate(['/admin/leads'], { queryParams: { lead: id } });
+  }
 }

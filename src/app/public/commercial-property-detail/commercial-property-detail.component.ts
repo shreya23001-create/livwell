@@ -2,7 +2,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -239,6 +239,11 @@ export class CommercialPropertyDetailComponent implements OnInit {
       this.inquiryError.set('Name and phone are required.');
       return;
     }
+    const _ph = this.inquiryPhone.trim();
+    if (!/^\+?[\d\s\-()]+$/.test(_ph) || _ph.replace(/\D/g, '').length < 7 || _ph.replace(/\D/g, '').length > 15) {
+      this.inquiryError.set('Enter a valid phone number (7–15 digits).');
+      return;
+    }
     this.inquirySubmitting.set(true);
     this.inquiryError.set('');
     const userId = this.auth.currentUser()?.id ?? null;
@@ -261,6 +266,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
   }
 
   private route      = inject(ActivatedRoute);
+  private router     = inject(Router);
   private sanitizer  = inject(DomSanitizer);
   private sb         = inject(SupabaseService).client;
   private auth       = inject(AuthService);
@@ -412,7 +418,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
   async toggleFav(): Promise<void> {
     const p = this.property();
     const userId = this.auth.currentUser()?.id;
-    if (!userId) { return; }
+    if (!userId) { this.router.navigate(['/customer']); return; }
     if (!p?.id || this.favLoading()) return;
     this.favLoading.set(true);
     if (this.isFaved()) {

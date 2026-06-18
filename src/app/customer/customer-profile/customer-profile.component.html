@@ -8,19 +8,23 @@
   <!-- Profile hero -->
   <div class="profile-hero">
     <div class="profile-avatar-wrap">
-      <div class="profile-avatar">
+      <div class="profile-avatar-circle">
         @if (avatarUrl()) {
-          <img [src]="avatarUrl()" alt="Profile photo" class="profile-avatar-img"
-               (error)="avatarUrl.set('')">
+          <img [src]="avatarUrl()" alt="Profile photo" class="profile-avatar-img" (error)="avatarUrl.set('')">
         } @else {
-          {{ initials() }}
+          <span class="profile-avatar-initials">{{ initials() }}</span>
         }
+        <label class="profile-avatar-edit" title="Change photo" [class.uploading]="uploadingAvatar()">
+          <input type="file" accept="image/*" (change)="onAvatarChange($event)" hidden [disabled]="uploadingAvatar()" />
+          @if (uploadingAvatar()) {
+            <svg class="spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>
+          }
+        </label>
       </div>
       @if (avatarUrl()) {
-        <button class="btn-avatar-action btn-avatar-action--remove" (click)="removeAvatar()" type="button">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-          Remove Photo
-        </button>
+        <button class="profile-remove-photo" (click)="removeAvatar()" type="button">Remove photo</button>
       }
     </div>
     <div>
@@ -162,55 +166,93 @@
     </div>
   }
 
-  <!-- Preferences -->
+  <!-- Notifications tab -->
   @if (activeTab() === 'preferences') {
-    <div class="profile-card">
-      <h3 class="section-title">Email Notifications</h3>
-      <div class="pref-list">
-        <label class="pref-item">
-          <div class="pref-info">
-            <span class="pref-label">Enquiry replies</span>
-            <span class="pref-desc">Get notified when an agent replies to your enquiry</span>
-          </div>
-          <div class="toggle" [class.on]="preferences.emailEnquiryReplies" (click)="preferences.emailEnquiryReplies = !preferences.emailEnquiryReplies"><div class="toggle-thumb"></div></div>
-        </label>
-        <label class="pref-item">
-          <div class="pref-info">
-            <span class="pref-label">New matching listings</span>
-            <span class="pref-desc">Receive alerts for new properties that match your preferences</span>
-          </div>
-          <div class="toggle" [class.on]="preferences.emailNewListings" (click)="preferences.emailNewListings = !preferences.emailNewListings"><div class="toggle-thumb"></div></div>
-        </label>
-        <label class="pref-item">
-          <div class="pref-info">
-            <span class="pref-label">Weekly market digest</span>
-            <span class="pref-desc">A weekly summary of Dubai real estate market trends</span>
-          </div>
-          <div class="toggle" [class.on]="preferences.emailWeeklyDigest" (click)="preferences.emailWeeklyDigest = !preferences.emailWeeklyDigest"><div class="toggle-thumb"></div></div>
-        </label>
+    <div class="profile-card notif-card">
+
+      <!-- Sub-tabs -->
+      <div class="notif-sub-tabs">
+        <button class="notif-sub-tab" [class.active]="notifTab() === 'inbox'" (click)="notifTab.set('inbox')">
+          Inbox
+          @if (unreadCount() > 0) {
+            <span class="notif-count-badge">{{ unreadCount() }}</span>
+          }
+        </button>
+        <button class="notif-sub-tab" [class.active]="notifTab() === 'preferences'" (click)="notifTab.set('preferences')">
+          Preferences
+        </button>
       </div>
 
-      <h3 class="section-title" style="margin-top:1.5rem">SMS Notifications</h3>
-      <div class="pref-list">
-        <label class="pref-item">
-          <div class="pref-info">
-            <span class="pref-label">Viewing reminders</span>
-            <span class="pref-desc">Reminders 1 hour before scheduled property viewings</span>
+      <!-- ── Inbox ── -->
+      @if (notifTab() === 'inbox') {
+        @if (notifLoading()) {
+          <div class="notif-loading">Loading notifications…</div>
+        } @else if (notifications().length === 0) {
+          <div class="notif-empty-state">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <p>No notifications yet.</p>
           </div>
-          <div class="toggle" [class.on]="preferences.smsViewingReminders" (click)="preferences.smsViewingReminders = !preferences.smsViewingReminders"><div class="toggle-thumb"></div></div>
-        </label>
-        <label class="pref-item">
-          <div class="pref-info">
-            <span class="pref-label">Agent messages</span>
-            <span class="pref-desc">Direct messages from your assigned agent</span>
+        } @else {
+          <div class="notif-inbox-actions">
+            @if (unreadCount() > 0) {
+              <button class="notif-mark-all-btn" (click)="markAllNotifsRead()">Mark all as read</button>
+            }
           </div>
-          <div class="toggle" [class.on]="preferences.smsAgentMessages" (click)="preferences.smsAgentMessages = !preferences.smsAgentMessages"><div class="toggle-thumb"></div></div>
-        </label>
-      </div>
+          <div class="notif-inbox-list">
+            @for (n of notifications(); track n.id) {
+              <div class="notif-inbox-item" [class.unread]="!n.read" (click)="markNotifRead(n)">
+                <div class="notif-inbox-dot" [class.visible]="!n.read"></div>
+                <div class="notif-inbox-body">
+                  <div class="notif-inbox-top">
+                    <span class="notif-inbox-title">{{ n.title }}</span>
+                    <span class="notif-inbox-date">{{ n.date }}</span>
+                  </div>
+                  <p class="notif-inbox-msg">{{ n.message }}</p>
+                  @if (n.type) {
+                    <span class="notif-type-chip">{{ n.type }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
 
-      <div class="form-actions">
-        <button class="btn-primary" (click)="savePreferences()">Save Preferences</button>
-      </div>
+      <!-- ── Preferences ── -->
+      @if (notifTab() === 'preferences') {
+        <div class="notif-prefs-body">
+          <div class="notif-pref-section">
+            <div class="notif-pref-label">I am</div>
+            <div class="notif-pref-checks">
+              @for (role of notifRoles; track role) {
+                <label class="notif-check-item">
+                  <input type="checkbox" [(ngModel)]="selectedRoles[role]" />
+                  {{ role }}
+                </label>
+              }
+            </div>
+          </div>
+          <div class="notif-pref-divider"></div>
+          <div class="notif-pref-section">
+            <div class="notif-pref-label">Notify me about</div>
+            <div class="notif-pref-checks">
+              @for (opt of notifOptions; track opt) {
+                <label class="notif-check-item">
+                  <input type="checkbox" [(ngModel)]="selectedNotifs[opt]" />
+                  {{ opt }}
+                </label>
+              }
+            </div>
+          </div>
+          <div class="form-actions" style="margin-top:1.5rem">
+            <button class="btn-primary" (click)="savePreferences()">Save Preferences</button>
+            @if (prefsSaved()) {
+              <span class="notif-saved-msg">Saved successfully.</span>
+            }
+          </div>
+        </div>
+      }
+
     </div>
   }
 

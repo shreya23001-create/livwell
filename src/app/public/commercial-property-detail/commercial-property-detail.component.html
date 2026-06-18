@@ -301,14 +301,16 @@
             <button class="pd-submit-btn" (click)="showEnquiry.set(true)">Contact Agent</button>
           </ng-container>
           <ng-container *ngIf="showEnquiry()">
-            <input class="pd-input" type="text" placeholder="Your Name *" [(ngModel)]="inquiryName" />
-            <input class="pd-input" type="tel" placeholder="Phone *" [(ngModel)]="inquiryPhone" />
-            <input class="pd-input" type="email" placeholder="Email" [(ngModel)]="inquiryEmail" />
-            <textarea class="pd-textarea" rows="3" placeholder="Message (optional)" [(ngModel)]="inquiryMessage"></textarea>
-            <button class="pd-submit-btn" (click)="submitInquiry(p)" [disabled]="inquirySubmitting()">
-              {{ inquirySubmitting() ? 'Sending…' : 'Send Enquiry' }}
-            </button>
-            <p *ngIf="inquiryError()" class="pd-inquiry-error">{{ inquiryError() }}</p>
+            <ng-container *ngIf="!inquirySent()">
+              <input class="pd-input" type="text" placeholder="Your Name *" [(ngModel)]="inquiryName" />
+              <input class="pd-input" type="tel" placeholder="Phone *" [(ngModel)]="inquiryPhone" />
+              <input class="pd-input" type="email" placeholder="Email" [(ngModel)]="inquiryEmail" />
+              <textarea class="pd-textarea" rows="3" placeholder="Message (optional)" [(ngModel)]="inquiryMessage"></textarea>
+              <button class="pd-submit-btn" (click)="submitInquiry(p)" [disabled]="inquirySubmitting()">
+                {{ inquirySubmitting() ? 'Sending…' : 'Send Enquiry' }}
+              </button>
+              <p *ngIf="inquiryError()" class="pd-inquiry-error">{{ inquiryError() }}</p>
+            </ng-container>
             <div *ngIf="inquirySent()" class="pd-inquiry-success">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;flex-shrink:0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>

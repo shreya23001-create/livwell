@@ -440,3 +440,34 @@ $bg:      #f4f6fa;
 .select-wrapper { position: relative; display: inline-block; width: 100%; }
 .select-wrapper select { appearance: none; -webkit-appearance: none; padding-right: 2.25rem; width: 100%; cursor: pointer; }
 .dropdown-icon { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; pointer-events: none; color: #6b7280; }
+
+// ── View Lead Modal ──────────────────────────────────────
+.modal--view { max-width: 560px; }
+.btn--sm { padding: 0.4rem 0.9rem; font-size: 0.8rem; }
+.view-lead-hero {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem; border-bottom: 1px solid #f3f4f6;
+}
+.view-lead-avatar {
+  width: 3rem; height: 3rem; min-width: 3rem; border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff; font-size: 1.1rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.view-lead-name { font-size: 1rem; font-weight: 700; color: #111827; }
+.view-lead-contact { font-size: 0.8rem; color: #6b7280; margin-top: 2px; }
+.view-lead-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.view-lead-field {
+  display: flex; flex-direction: column; gap: 2px;
+  &--full { grid-column: 1 / -1; }
+}
+.vlf-label { font-size: 0.75rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.04em; }
+.vlf-value { font-size: 0.875rem; color: #111827; }
+.view-lead-notes {
+  background: #f9fafb; border: 1px solid #e5e7eb;
+  border-radius: 0.5rem; padding: 0.875rem 1rem;
+}
+.view-lead-notes-body { font-size: 0.875rem; color: #374151; margin-top: 0.4rem; line-height: 1.6; }

@@ -1,6 +1,7 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { AdminDataService, LeadStatus, LeadSource, LeadCategory, Lead } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
@@ -23,11 +24,12 @@ const EMPTY_FORM = (): Partial<Lead> => ({
   templateUrl: './admin-leads.component.html',
   styleUrl: './admin-leads.component.scss',
 })
-export class AdminLeadsComponent {
+export class AdminLeadsComponent implements OnInit {
 
-  dataSvc       = inject(AdminDataService);
-  private auth  = inject(AuthService);
-  private toast = inject(ToastService);
+  dataSvc        = inject(AdminDataService);
+  private auth   = inject(AuthService);
+  private toast  = inject(ToastService);
+  private route  = inject(ActivatedRoute);
   leads   = this.dataSvc.leads;
   loading = this.dataSvc.leadsLoading;
 
@@ -50,6 +52,10 @@ export class AdminLeadsComponent {
   saving          = signal(false);
   showDeleteModal = signal(false);
   deleteTarget    = signal<Lead | null>(null);
+
+  // ── View Modal (from notification) ───────────────────
+  showViewModal = signal(false);
+  viewLead      = signal<Lead | null>(null);
 
   // ── Import / Export ───────────────────────────────────
   importing     = signal(false);
@@ -115,6 +121,17 @@ export class AdminLeadsComponent {
   onSearch(): void { this.page.set(1); }
   onFilter(): void { this.page.set(1); }
 
+  ngOnInit(): void {
+    const leadIdParam = this.route.snapshot.queryParamMap.get('lead');
+    if (leadIdParam) {
+      const id = Number(leadIdParam);
+      setTimeout(() => {
+        const lead = this.leads().find(l => l.id === id);
+        if (lead) this.openView(lead);
+      }, 800);
+    }
+  }
+
   // ── Modal ─────────────────────────────────────────────
   openAdd(): void {
     this.form.set(EMPTY_FORM());
@@ -134,6 +151,13 @@ export class AdminLeadsComponent {
     this.showModal.set(true);
   }
 
+  openView(lead: Lead): void {
+    this.viewLead.set(lead);
+    this.showViewModal.set(true);
+  }
+
+  closeViewModal(): void { this.showViewModal.set(false); }
+
   closeModal(): void { this.showModal.set(false); }
 
   async saveLead(): Promise<void> {
@@ -143,7 +167,7 @@ export class AdminLeadsComponent {
     if (!f.email?.trim())    errs['email']    = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errs['email'] = 'Enter a valid email.';
     if (!f.phone?.trim())    errs['phone']    = 'Phone is required.';
-    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(f.phone.trim())) errs['phone'] = 'Enter a valid phone number.';
+    else if (!/^\+?[\d\s\-()]+$/.test(f.phone.trim()) || (f.phone.replace(/\D/g, '').length < 7 || f.phone.replace(/\D/g, '').length > 15)) errs['phone'] = 'Enter a valid phone number (7–15 digits).';
     if (!f.budget?.trim())   errs['budget']   = 'Budget is required.';
     if (!f.location?.trim()) errs['location'] = 'Location is required.';
     this.formErrors.set(errs);

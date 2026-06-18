@@ -392,6 +392,62 @@
   </div>
 </div>
 
+<!-- ── View Lead Modal (from notification) ── -->
+<div class="modal-overlay" *ngIf="showViewModal() && viewLead()" (click)="closeViewModal()">
+  <div class="modal modal--view" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Lead Details</h2>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <button class="btn-primary btn--sm" (click)="closeViewModal(); openEdit(viewLead()!)">Edit</button>
+        <button class="modal-close" (click)="closeViewModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" *ngIf="viewLead() as lead">
+      <div class="view-lead-hero">
+        <div class="view-lead-avatar">{{ lead.name.charAt(0).toUpperCase() }}</div>
+        <div class="view-lead-info">
+          <div class="view-lead-name">{{ lead.name }}</div>
+          <div class="view-lead-contact">{{ lead.email }}</div>
+          <div class="view-lead-contact">{{ lead.phone }}</div>
+        </div>
+        <span class="badge badge--status badge--{{ lead.status }}" style="margin-left:auto;align-self:flex-start">{{ labelStatus(lead.status) }}</span>
+      </div>
+      <div class="view-lead-grid">
+        <div class="view-lead-field">
+          <span class="vlf-label">Budget</span>
+          <span class="vlf-value">{{ lead.budget || '—' }}</span>
+        </div>
+        <div class="view-lead-field">
+          <span class="vlf-label">Location</span>
+          <span class="vlf-value">{{ lead.location || '—' }}</span>
+        </div>
+        <div class="view-lead-field">
+          <span class="vlf-label">Property Type</span>
+          <span class="vlf-value">{{ lead.propertyType || '—' }}</span>
+        </div>
+        <div class="view-lead-field">
+          <span class="vlf-label">Source</span>
+          <span class="vlf-value">{{ labelSource(lead.source) }}</span>
+        </div>
+        <div class="view-lead-field">
+          <span class="vlf-label">Assigned Agent</span>
+          <span class="vlf-value">{{ lead.assignedAgent || 'Unassigned' }}</span>
+        </div>
+        <div class="view-lead-field">
+          <span class="vlf-label">Created</span>
+          <span class="vlf-value">{{ lead.createdDate }}</span>
+        </div>
+      </div>
+      <div class="view-lead-notes" *ngIf="lead.notes">
+        <div class="vlf-label">Enquiry Message</div>
+        <div class="view-lead-notes-body">{{ lead.notes }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── Delete Confirm Modal ── -->
 <div class="modal-overlay" *ngIf="showDeleteModal()" (click)="cancelDelete()">
   <div class="modal modal--sm" (click)="$event.stopPropagation()">

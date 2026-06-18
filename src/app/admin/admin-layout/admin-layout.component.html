@@ -75,10 +75,40 @@
         <input type="text" placeholder="Search properties, leads, users…">
       </div>
       <div class="adm-topbar-right">
-        <button class="adm-topbar-icon-btn" title="Notifications">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
-          <span class="adm-notif-dot"></span>
-        </button>
+        <div class="adm-notif-wrap">
+          <button class="adm-topbar-icon-btn" title="Notifications" (click)="toggleNotif()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
+          </button>
+          @if (leadNotif.unreadCount() > 0) {
+            <span class="adm-notif-badge">{{ leadNotif.unreadCount() > 9 ? '9+' : leadNotif.unreadCount() }}</span>
+          }
+          @if (notifOpen()) {
+            <div class="adm-notif-dropdown">
+              <div class="adm-notif-header">
+                <span>New Enquiries</span>
+                <button class="adm-notif-close" (click)="toggleNotif()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+              @if (leadNotif.leads().length === 0) {
+                <div class="adm-notif-empty">No new enquiries</div>
+              } @else {
+                <div class="adm-notif-list">
+                  @for (lead of leadNotif.leads(); track lead.id) {
+                    <button class="adm-notif-item" (click)="openLead(lead.id)">
+                      <div class="adm-notif-item-avatar">{{ lead.name.charAt(0).toUpperCase() }}</div>
+                      <div class="adm-notif-item-body">
+                        <div class="adm-notif-item-name">{{ lead.name }}</div>
+                        <div class="adm-notif-item-sub">{{ lead.property_title || lead.project_title || 'General enquiry' }}</div>
+                      </div>
+                      <div class="adm-notif-item-time">{{ leadNotif.timeAgo(lead.created_at) }}</div>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
         <div class="adm-topbar-avatar">
           @if (userAvatar()) {
             <img [src]="userAvatar()" alt="Profile" class="adm-user-avatar-img">

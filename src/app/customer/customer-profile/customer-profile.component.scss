@@ -46,6 +46,29 @@ $bg: #f4f6fa;
   gap: 0.5rem;
 }
 
+.profile-avatar-circle {
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $accent, #8b5cf6);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.profile-avatar-initials {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  user-select: none;
+}
+
 .profile-avatar {
   width: 4rem;
   height: 4rem;
@@ -60,9 +83,20 @@ $bg: #f4f6fa;
   overflow: hidden;
 }
 
+.profile-remove-photo {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.15rem;
+  &:hover { text-decoration: underline; }
+}
+
 .profile-avatar-img {
-  width: 100%;
-  height: 100%;
+  width: 5rem;
+  height: 5rem;
   object-fit: cover;
   border-radius: 50%;
 }
@@ -71,8 +105,8 @@ $bg: #f4f6fa;
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   background: $accent;
   color: #fff;
@@ -80,10 +114,12 @@ $bg: #f4f6fa;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  border: 2px solid #fff;
 
   svg {
-    width: 0.7rem;
-    height: 0.7rem;
+    width: 0.85rem;
+    height: 0.85rem;
+    stroke: #fff;
   }
 
   &.uploading {
@@ -598,3 +634,78 @@ $bg: #f4f6fa;
     cursor: not-allowed;
   }
 }
+// ── Notifications Tab ────────────────────────────────────────
+.notif-card { padding: 0 !important; overflow: hidden; }
+
+.notif-sub-tabs {
+  display: flex; border-bottom: 2px solid #e5e7eb; padding: 0 1.5rem;
+}
+.notif-sub-tab {
+  background: none; border: none; padding: 0.75rem 1.25rem;
+  font-size: 0.875rem; font-weight: 500; color: #6b7280; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  display: flex; align-items: center; gap: 0.5rem; transition: color 0.15s;
+  &.active { color: #1a5c3a; border-bottom-color: #1a5c3a; font-weight: 700; }
+  &:hover:not(.active) { color: #111827; }
+}
+.notif-count-badge {
+  background: #ef4444; color: #fff; font-size: 0.68rem; font-weight: 700;
+  padding: 0.1rem 0.45rem; border-radius: 999px;
+}
+
+.notif-loading, .notif-empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 220px; gap: 0.75rem; color: #9ca3af; text-align: center;
+  padding: 1.5rem; font-size: 0.875rem;
+  p { margin: 0; }
+}
+
+.notif-inbox-actions {
+  display: flex; justify-content: flex-end; padding: 0.75rem 1.5rem 0;
+}
+.notif-mark-all-btn {
+  background: none; border: none; font-size: 0.8rem; color: #1a5c3a;
+  font-weight: 600; cursor: pointer; padding: 0;
+  &:hover { text-decoration: underline; }
+}
+
+.notif-inbox-list {
+  display: flex; flex-direction: column; margin: 0.75rem 1.5rem 1.5rem;
+  border: 1px solid #e5e7eb; border-radius: 0.75rem; overflow: hidden;
+}
+.notif-inbox-item {
+  display: flex; gap: 0.75rem; padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb; cursor: pointer; transition: background 0.15s;
+  align-items: flex-start;
+  &:last-child { border-bottom: none; }
+  &.unread { background: #f0fdf4; }
+  &:hover { background: #f9fafb; }
+}
+.notif-inbox-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #1a5c3a;
+  flex-shrink: 0; margin-top: 6px; opacity: 0;
+  &.visible { opacity: 1; }
+}
+.notif-inbox-body { flex: 1; min-width: 0; }
+.notif-inbox-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 1rem; margin-bottom: 0.3rem;
+}
+.notif-inbox-title { font-size: 0.875rem; font-weight: 600; color: #111827; }
+.notif-inbox-date  { font-size: 0.75rem; color: #9ca3af; white-space: nowrap; flex-shrink: 0; }
+.notif-inbox-msg   { font-size: 0.825rem; color: #6b7280; margin: 0 0 0.4rem; line-height: 1.4; }
+.notif-type-chip {
+  font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem;
+  border-radius: 999px; background: #f3f4f6; color: #6b7280;
+}
+
+.notif-prefs-body { padding: 1.5rem; }
+.notif-pref-section { padding: 1rem 0; }
+.notif-pref-label { font-size: 0.9rem; color: #374151; font-weight: 600; margin-bottom: 0.75rem; }
+.notif-pref-checks { display: flex; flex-direction: column; gap: 0.6rem; }
+.notif-check-item {
+  display: flex; align-items: center; gap: 0.6rem; font-size: 0.875rem; color: #111827; cursor: pointer;
+  input[type=checkbox] { width: 16px; height: 16px; accent-color: #1a5c3a; cursor: pointer; flex-shrink: 0; }
+}
+.notif-pref-divider { height: 1px; background: #e5e7eb; margin: 0.5rem 0; }
+.notif-saved-msg { font-size: 0.85rem; color: #16a34a; }

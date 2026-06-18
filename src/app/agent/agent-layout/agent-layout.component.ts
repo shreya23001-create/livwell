@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../shared/services/auth.service';
 import { EventNotificationService } from '../../shared/services/event-notification.service';
+import { LeadNotificationService } from '../../shared/services/lead-notification.service';
 
 @Component({
   selector: 'app-agent-layout',
@@ -14,8 +15,11 @@ import { EventNotificationService } from '../../shared/services/event-notificati
 })
 export class AgentLayoutComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
-  readonly notifSvc = inject(EventNotificationService);
+  private router    = inject(Router);
+  readonly notifSvc  = inject(EventNotificationService);
+  readonly leadNotif = inject(LeadNotificationService);
   sidebarCollapsed = signal(false);
+  notifOpen = signal(false);
 
   private s = (svg: string): SafeHtml => this.sanitizer.bypassSecurityTrustHtml(svg);
 
@@ -34,10 +38,26 @@ export class AgentLayoutComponent implements OnInit, OnDestroy {
 
   constructor(public auth: AuthService) {}
 
-  ngOnInit(): void { this.notifSvc.start(); }
-  ngOnDestroy(): void { this.notifSvc.stop(); }
+  ngOnInit(): void  { this.notifSvc.start(); this.leadNotif.start(); }
+  ngOnDestroy(): void { this.notifSvc.stop(); this.leadNotif.stop(); }
 
   toggle() { this.sidebarCollapsed.update(v => !v); }
+
+  toggleNotif(): void {
+    const opening = !this.notifOpen();
+    this.notifOpen.set(opening);
+    if (opening) {
+      this.leadNotif.fetch();
+    } else {
+      this.leadNotif.markAllRead();
+    }
+  }
+
+  openLead(notif: import('../../shared/services/lead-notification.service').LeadNotif): void {
+    this.notifOpen.set(false);
+    const targetId = notif.kind === 'message' ? notif.lead_id : notif.id;
+    if (targetId) this.router.navigate(['/agent/leads', targetId]);
+  }
 
   formatTime(time: string): string {
     const [h, m] = time.split(':').map(Number);

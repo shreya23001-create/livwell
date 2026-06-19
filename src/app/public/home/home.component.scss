@@ -316,6 +316,75 @@ $gold-light: #e8c870;
   }
 }
 
+/* Search dropdown */
+.hero-search-drop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.875rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  z-index: 200;
+  overflow: hidden;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.hero-sdrop-loading,
+.hero-sdrop-empty {
+  padding: 1rem 1.25rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.hero-sdrop-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: #f9fafb; }
+  & + & { border-top: 1px solid #f3f4f6; }
+}
+
+.hero-sdrop-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: #f3f4f6;
+  border-radius: 50%;
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+.hero-sdrop-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.hero-sdrop-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.hero-sdrop-sub {
+  font-size: 0.775rem;
+  color: #9ca3af;
+}
+
 /* Quick chips */
 .hero-chips {
   display: flex;

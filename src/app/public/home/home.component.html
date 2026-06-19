@@ -61,22 +61,55 @@
       </div>
 
       <!-- Search row -->
-      <div class="hero-search-row">
+      <div class="hero-search-row" style="position:relative">
         <div class="hero-search-field">
           <svg class="hero-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8" />
             <path stroke-linecap="round" d="m21 21-4.35-4.35" />
           </svg>
           <input type="text" class="hero-search-input" placeholder="Search area, community or project…"
-            [(ngModel)]="searchQuery" />
+            [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchInput($event)"
+            (focus)="onSearchFocus()"
+            (blur)="closeSearchDrop()"
+            (keydown.enter)="doSearch()" />
         </div>
-        <button class="hero-search-btn" routerLink="/properties">
+        <button class="hero-search-btn" (click)="doSearch()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <circle cx="11" cy="11" r="8" />
             <path stroke-linecap="round" d="m21 21-4.35-4.35" />
           </svg>
           Search
         </button>
+
+        <!-- Dropdown -->
+        @if (searchDropOpen()) {
+          <div class="hero-search-drop">
+            @if (searchLoading()) {
+              <div class="hero-sdrop-loading">Searching…</div>
+            } @else if (searchResults().length === 0) {
+              <div class="hero-sdrop-empty">No results found</div>
+            } @else {
+              @for (item of searchResults(); track item.label) {
+                <button class="hero-sdrop-item" (mousedown)="selectResult(item)">
+                  <span class="hero-sdrop-icon">
+                    @if (item.type === 'location') {
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                    } @else if (item.type === 'property') {
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    } @else {
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    }
+                  </span>
+                  <span class="hero-sdrop-text">
+                    <span class="hero-sdrop-label">{{ item.label }}</span>
+                    <span class="hero-sdrop-sub">{{ item.sub }}</span>
+                  </span>
+                </button>
+              }
+            }
+          </div>
+        }
       </div>
 
       <!-- Quick chips -->

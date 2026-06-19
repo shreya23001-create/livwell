@@ -1,6 +1,6 @@
 ﻿import { Component, OnInit, ElementRef, QueryList, ViewChild, ViewChildren, PLATFORM_ID, Inject, signal, computed, inject, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser, UpperCasePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
@@ -94,13 +94,109 @@ export class HomeComponent implements OnInit {
   private dataSvc = inject(AdminDataService);
   private sb      = inject(SupabaseService).client;
   private zone    = inject(NgZone);
+  private router  = inject(Router);
 
   homePage     = computed(() => this.dataSvc.pages().find(p => p.id === 'home-hero'));
   heroHeadline = computed(() => this.homePage()?.heading    || 'Find Your Dream Property in Dubai');
   heroSubline  = computed(() => this.homePage()?.subheading || 'Over 2,500 premium listings. Expert agents. End-to-end support.');
 
   searchQuery = signal('');
-  searchType = signal('buy');
+  searchType  = signal('buy');
+
+  // Search dropdown
+  searchDropOpen   = signal(false);
+  searchResults    = signal<{ type: 'location' | 'property' | 'project'; id?: number; label: string; sub: string }[]>([]);
+  searchLoading    = signal(false);
+  private searchTimer: any;
+
+  readonly popularLocations = [
+    'Downtown Dubai', 'Palm Jumeirah', 'Dubai Marina', 'Business Bay',
+    'Jumeirah Village Circle', 'Dubai Hills Estate', 'Dubai Creek Harbour',
+    'Arabian Ranches', 'Jumeirah', 'DIFC',
+  ];
+
+  onSearchInput(value: string): void {
+    this.searchQuery.set(value);
+    clearTimeout(this.searchTimer);
+    if (!value.trim()) {
+      // Show popular locations
+      this.searchResults.set(
+        this.popularLocations.map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
+      );
+      this.searchDropOpen.set(true);
+      return;
+    }
+    this.searchLoading.set(true);
+    this.searchTimer = setTimeout(() => this.runSearch(value.trim()), 300);
+  }
+
+  private async runSearch(q: string): Promise<void> {
+    const lower = q.toLowerCase();
+    const [propsRes, projsRes] = await Promise.all([
+      this.sb.from('properties')
+        .select('id, title, location, community')
+        .or(`title.ilike.%${q}%,location.ilike.%${q}%,community.ilike.%${q}%`)
+        .eq('status', 'Published')
+        .limit(5),
+      this.sb.from('projects')
+        .select('id, title, location')
+        .or(`title.ilike.%${q}%,location.ilike.%${q}%`)
+        .eq('status', 'Published')
+        .limit(5),
+    ]);
+
+    const locMatches = this.popularLocations
+      .filter(l => l.toLowerCase().includes(lower))
+      .map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }));
+
+    const propItems = (propsRes.data ?? []).map((p: any) => ({
+      type: 'property' as const, id: p.id,
+      label: p.title, sub: p.community || p.location || 'Property',
+    }));
+
+    const projItems = (projsRes.data ?? []).map((p: any) => ({
+      type: 'project' as const, id: p.id,
+      label: p.title, sub: p.location || 'Project',
+    }));
+
+    this.searchResults.set([...locMatches, ...propItems, ...projItems].slice(0, 10));
+    this.searchLoading.set(false);
+    this.searchDropOpen.set(true);
+  }
+
+  selectResult(item: { type: 'location' | 'property' | 'project'; id?: number; label: string; sub: string }): void {
+    this.searchDropOpen.set(false);
+    this.searchQuery.set(item.label);
+    if (item.type === 'property' && item.id) {
+      this.router.navigate(['/properties', item.id]);
+    } else if (item.type === 'project' && item.id) {
+      this.router.navigate(['/projects', item.id]);
+    } else {
+      // location — navigate to properties with location filter
+      const route = this.searchType() === 'new-projects' ? '/projects' : '/properties';
+      this.router.navigate([route], { queryParams: { location: item.label } });
+    }
+  }
+
+  doSearch(): void {
+    this.searchDropOpen.set(false);
+    const q = this.searchQuery().trim();
+    const route = this.searchType() === 'new-projects' ? '/projects' : '/properties';
+    this.router.navigate([route], q ? { queryParams: { q } } : {});
+  }
+
+  onSearchFocus(): void {
+    if (!this.searchQuery().trim()) {
+      this.searchResults.set(
+        this.popularLocations.map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
+      );
+    }
+    this.searchDropOpen.set(true);
+  }
+
+  closeSearchDrop(): void {
+    setTimeout(() => this.searchDropOpen.set(false), 150);
+  }
 
   searchTabs = [
     { value: 'buy', label: 'Buy' },

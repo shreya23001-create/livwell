@@ -36,20 +36,26 @@
   <section class="areas-section">
     <div class="areas-container">
 
+      <!-- Loading -->
+      <div class="areas-loading" *ngIf="loading()">
+        <div class="areas-spinner"></div>
+        <p>Loading areas…</p>
+      </div>
+
       <!-- Empty state -->
-      <div class="areas-empty" *ngIf="filtered().length === 0">
+      <div class="areas-empty" *ngIf="!loading() && filtered().length === 0">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <p>No areas match your search.</p>
         <button class="areas-clear-btn" (click)="searchQuery.set(''); activeType.set('All')">Clear Filters</button>
       </div>
 
-      <div class="areas-grid" *ngIf="filtered().length > 0">
-        <div *ngFor="let a of filtered()" class="area-card" (click)="goToArea(a.slug)">
+      <div class="areas-grid" *ngIf="!loading() && filtered().length > 0">
+        <div *ngFor="let a of filtered()" class="area-card">
           <!-- Image -->
-          <div class="area-card__img-wrap">
+          <div class="area-card__img-wrap" [routerLink]="['/properties']" [queryParams]="{location: a.name}" style="cursor:pointer">
             <img [src]="a.image" [alt]="a.name" class="area-card__img" loading="lazy" />
             <!-- Price badge -->
-            <div class="area-card__price-badge">
+            <div class="area-card__price-badge" *ngIf="a.avgPriceSale">
               <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><path d="M5 0L0 5h3v9h4V5h3L5 0z"/></svg>
               from {{ a.avgPriceSale }}
             </div>
@@ -57,13 +63,27 @@
           <!-- Body -->
           <div class="area-card__body">
             <h3 class="area-card__name">{{ a.name }}</h3>
-            <p class="area-card__desc">{{ a.description }}</p>
-            <div class="area-card__footer">
-              <a [routerLink]="['/areas', a.slug]" class="area-card__btn" (click)="$event.stopPropagation()">
-                <span>{{ a.propertiesForSale + a.propertiesForRent }} PROPERTIES</span>
-                <span class="area-card__btn-icon">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                </span>
+            <div class="area-card__counts">
+              <span *ngIf="a.propertiesForSale > 0">{{ a.propertiesForSale }} for sale</span>
+              <span *ngIf="a.propertiesForRent > 0">{{ a.propertiesForRent }} for rent</span>
+              <span *ngIf="(a.projectCount ?? 0) > 0">{{ a.projectCount }} project{{ (a.projectCount ?? 0) > 1 ? 's' : '' }}</span>
+              <span *ngIf="(a.commercialCount ?? 0) > 0">{{ a.commercialCount }} commercial</span>
+            </div>
+            <div class="area-card__links">
+              <a *ngIf="(a.propertiesForSale + a.propertiesForRent) > 0"
+                [routerLink]="['/properties']" [queryParams]="{location: a.name}"
+                class="area-card__link" (click)="$event.stopPropagation()">
+                Properties
+              </a>
+              <a *ngIf="(a.commercialCount ?? 0) > 0"
+                [routerLink]="['/commercial']" [queryParams]="{location: a.name}"
+                class="area-card__link" (click)="$event.stopPropagation()">
+                Commercial
+              </a>
+              <a *ngIf="(a.projectCount ?? 0) > 0"
+                [routerLink]="['/projects']" [queryParams]="{location: a.name}"
+                class="area-card__link" (click)="$event.stopPropagation()">
+                Projects
               </a>
             </div>
           </div>

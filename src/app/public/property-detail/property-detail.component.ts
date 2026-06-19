@@ -1,11 +1,12 @@
 import { Component, OnInit, signal, computed, inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { EmailService } from '../../shared/services/email.service';
 
 interface Property {
   id: number;
@@ -41,8 +42,10 @@ interface Property {
 })
 export class PropertyDetailComponent implements OnInit {
   private route      = inject(ActivatedRoute);
+  private router     = inject(Router);
   private sb         = inject(SupabaseService).client;
   private auth       = inject(AuthService);
+  private emailSvc   = inject(EmailService);
   private sanitizer  = inject(DomSanitizer);
   private platformId = inject(PLATFORM_ID);
 
@@ -171,6 +174,11 @@ export class PropertyDetailComponent implements OnInit {
       this.inquiryError.set('Please fill in Name, Phone and Email.');
       return;
     }
+    const _ph = this.inquiryForm_phone.trim();
+    if (!/^\+?[\d\s\-()]+$/.test(_ph) || _ph.replace(/\D/g, '').length < 7 || _ph.replace(/\D/g, '').length > 15) {
+      this.inquiryError.set('Enter a valid phone number (7–15 digits).');
+      return;
+    }
     this.inquirySubmitting.set(true);
     this.inquiryError.set('');
     const userId = this.auth.currentUser()?.id ?? null;
@@ -192,6 +200,14 @@ export class PropertyDetailComponent implements OnInit {
     this.inquirySubmitting.set(false);
     if (error) { this.inquiryError.set('Failed to send. Please try again.'); return; }
     this.inquirySent.set(true);
+    // Send confirmation email to the lead
+    this.emailSvc.send('enquiry_property', {
+      to_email:       this.inquiryForm_email.trim(),
+      name:           this.inquiryForm_name.trim(),
+      property_title: p.title,
+      agent_name:     p.agent_name || 'Livwell Team',
+      agent_phone:    this.agentPhone() || '+971 4 000 0000',
+    });
     this.inquiryForm_name = ''; this.inquiryForm_phone = '';
     this.inquiryForm_email = ''; this.inquiryForm_budget = ''; this.inquiryForm_message = '';
   }
@@ -321,8 +337,9 @@ export class PropertyDetailComponent implements OnInit {
 
   async toggleFav(): Promise<void> {
     const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
     const propId = this.property()?.id;
-    if (!userId || !propId || this.favLoading()) return;
+    if (!propId || this.favLoading()) return;
 
     this.favLoading.set(true);
     if (this.isFaved()) {

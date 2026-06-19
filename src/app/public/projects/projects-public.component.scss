@@ -25,6 +25,7 @@ $white:  #fff;
 }
 .prj-search-input-wrap { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 220px; svg { color: rgba(255,255,255,.6); } }
 .prj-search-input { border: none; background: none; outline: none; color: #fff; font-size: .9rem; width: 100%; &::placeholder { color: rgba(255,255,255,.55); } }
+.prj-search-clear { background: none; border: none; cursor: pointer; color: rgba(255,255,255,.7); display: flex; align-items: center; padding: 0 .25rem; flex-shrink: 0; &:hover { color: #fff; } }
 .prj-search-select { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: .5rem; color: #fff; padding: .45rem .875rem; font-size: .85rem; cursor: pointer; outline: none; option { color: $text; background: $white; } }
 
 /* ── Stats ───────────────────────────────────────── */
@@ -89,3 +90,10 @@ $white:  #fff;
 .prj-faq-q { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; font-weight: 600; color: $text; font-size: .9rem; svg { flex-shrink: 0; transition: transform .2s; } }
 .prj-faq-item.open .prj-faq-q svg { transform: rotate(180deg); }
 .prj-faq-a { padding: 0 1.25rem 1rem; font-size: .85rem; color: $muted; line-height: 1.6; }
+
+/* ── Pagination ──────────────────────────────────── */
+.prj-pagination { display: flex; align-items: center; justify-content: center; gap: .5rem; margin: 2rem 0 .5rem; flex-wrap: wrap; }
+.prj-pg-btn { display: flex; align-items: center; gap: .35rem; padding: .5rem 1rem; border: 1px solid $border; border-radius: .5rem; background: $white; color: $text; font-size: .85rem; font-weight: 600; cursor: pointer; transition: background .15s, border-color .15s; &:hover:not(:disabled) { background: $bg; border-color: $green; color: $green; } &:disabled { opacity: .4; cursor: not-allowed; } }
+.prj-pg-numbers { display: flex; align-items: center; gap: .35rem; }
+.prj-pg-num { width: 2.25rem; height: 2.25rem; border: 1px solid $border; border-radius: .5rem; background: $white; color: $text; font-size: .85rem; font-weight: 500; cursor: pointer; transition: background .15s, border-color .15s; &.active { background: $green; color: $white; border-color: $green; font-weight: 700; } &.ellipsis { border: none; background: none; cursor: default; } &:hover:not(.active):not(.ellipsis):not(:disabled) { background: $bg; border-color: $green; } }
+.prj-page-info { text-align: center; font-size: .82rem; color: $muted; margin-bottom: 2rem; }

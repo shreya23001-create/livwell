@@ -147,7 +147,7 @@ export class CustomerAuthComponent {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs['email'] = 'Enter a valid email.';
 
     if (!phone.trim()) errs['phone'] = 'Phone number is required.';
-    else if (!/^\+?[0-9\s\-()]{7,15}$/.test(phone)) errs['phone'] = 'Enter a valid phone (e.g. +971501234567).';
+    else if (!/^\+?[\d\s\-()]+$/.test(phone) || phone.replace(/\D/g, '').length < 7 || phone.replace(/\D/g, '').length > 15) errs['phone'] = 'Enter a valid phone number (7–15 digits).';
 
     if (!password) errs['password'] = 'Password is required.';
     else if (password.length < 8) errs['password'] = 'At least 8 characters.';

@@ -7,6 +7,8 @@ import { AdminDataService, AdminUser } from '../../shared/services/admin-data.se
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { EmailService } from '../../shared/services/email.service';
+import { environment } from '../../../environments/environment';
 
 export type { AdminUser };
 
@@ -30,9 +32,10 @@ interface UserForm extends Partial<AdminUser> { password?: string; }
 export class AdminUsersComponent {
 
   dataSvc = inject(AdminDataService);
-  private auth  = inject(AuthService);
-  private sb    = inject(SupabaseService).client;
-  private toast = inject(ToastService);
+  private auth    = inject(AuthService);
+  private sb      = inject(SupabaseService).client;
+  private toast   = inject(ToastService);
+  private emailSvc = inject(EmailService);
 
   showPassword    = signal(false);
   uploadingAvatar = signal(false);
@@ -194,34 +197,48 @@ export class AdminUsersComponent {
     const isNew = this.editingId() === null;
 
     if (isNew) {
-      // Create Supabase auth account
-      const { data: signUpData, error: signUpErr } = await this.sb.auth.signUp({
-        email:    f.email!.trim(),
-        password: f.password!,
-        options:  { data: { name: f.name!.trim(), phone: f.phone?.trim() ?? '', role: f.role } },
-      });
-      if (signUpErr) {
-        this.toast.error(signUpErr.message);
-        this.saving.set(false);
-        return;
-      }
-      const userId = signUpData.user?.id;
-      if (userId) {
-        await this.sb.from('profiles').upsert({
-          id:          userId,
-          name:        f.name!.trim(),
+      // Create user via edge function — avoids session hijacking from signUp()
+      const supabaseUrl = environment.supabase.url;
+      const anonKey     = environment.supabase.key;
+      const createRes = await fetch(`${supabaseUrl}/functions/v1/create-user`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${anonKey}` },
+        body: JSON.stringify({
           email:       f.email!.trim(),
+          password:    f.password!,
+          name:        f.name!.trim(),
           phone:       f.phone?.trim()       ?? null,
           role:        f.role                ?? 'customer',
           status:      f.status              ?? 'active',
           designation: f.designation?.trim() ?? null,
           avatar_url:  f.avatar_url?.trim()  ?? null,
-        });
+        }),
+      });
+      const createJson = await createRes.json().catch(() => null);
+      if (!createRes.ok) {
+        this.toast.error(createJson?.error ?? 'Failed to create user');
+        this.saving.set(false);
+        return;
       }
       await this.dataSvc.loadUsers();
       this.saving.set(false);
       this.closeModal();
       this.toast.success(`User "${f.name}" created successfully.`);
+      if (f.role === 'agent' && f.email && f.password) {
+        this.emailSvc.send('agent_credentials', {
+          to_email:   f.email.trim(),
+          name:       f.name?.trim() ?? '',
+          email:      f.email.trim(),
+          password:   f.password,
+          portal_url: 'https://testlivwelldubai.vercel.app/agent/login',
+        });
+      } else if (f.role === 'customer' && f.email) {
+        this.emailSvc.send('signup_welcome', {
+          to_email: f.email.trim(),
+          name:     f.name?.trim() ?? '',
+          email:    f.email.trim(),
+        });
+      }
       const actor = this.auth.currentUser()?.email ?? 'admin';
       const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
       this.dataSvc.logUserAction(actor, role, 'Create User', `User "${f.name}" (${f.role}) created`);
@@ -250,6 +267,7 @@ export class AdminUsersComponent {
       if (exists) errs['email'] = 'This email is already registered.';
     }
     if (!f.phone?.trim()) errs['phone'] = 'Phone number is required.';
+    else if (!/^\+?[\d\s\-()]+$/.test(f.phone.trim()) || (f.phone.replace(/\D/g, '').length < 7 || f.phone.replace(/\D/g, '').length > 15)) errs['phone'] = 'Enter a valid phone number (7–15 digits).';
     if (isNew) {
       if (!f.password?.trim()) errs['password'] = 'Password is required.';
       else if (f.password.length < 8) errs['password'] = 'At least 8 characters.';

@@ -1,0 +1,83 @@
+@if (guide(); as g) {
+  <!-- Hero -->
+  <div class="gd-hero">
+    <div class="gd-hero-inner">
+      <a routerLink="/guides" class="gd-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+        All Guides
+      </a>
+      <div class="gd-hero-badge">Guide</div>
+      <h1 class="gd-hero-title">{{ g.title }}</h1>
+      <p class="gd-hero-subtitle">{{ g.subtitle }}</p>
+      <p class="gd-hero-lead">{{ g.hero }}</p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="gd-body">
+    <div class="gd-layout">
+
+      <!-- Main -->
+      <div class="gd-main">
+        <!-- Intro -->
+        <p class="gd-intro">{{ g.intro }}</p>
+
+        <!-- Steps label -->
+        <div class="gd-steps-label">Step-by-step process</div>
+
+        <!-- Steps -->
+        <div class="gd-steps">
+          @for (step of g.steps; track step.number) {
+            <div class="gd-step">
+              <div class="gd-step-left">
+                <div class="gd-step-num">{{ step.number }}</div>
+                @if (!$last) {
+                  <div class="gd-step-line"></div>
+                }
+              </div>
+              <div class="gd-step-right">
+                <div class="gd-step-icon">{{ step.icon }}</div>
+                <h3 class="gd-step-title">{{ step.title }}</h3>
+                <p class="gd-step-desc">{{ step.description }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- CTA -->
+        <div class="gd-cta-box">
+          <div class="gd-cta-text">
+            <h3>Ready to get started?</h3>
+            <p>Our expert agents are here to guide you through every step of the process.</p>
+          </div>
+          <div class="gd-cta-btns">
+            <a [routerLink]="g.ctaLink" class="gd-btn-primary">{{ g.cta }}</a>
+            <a routerLink="/contact" class="gd-btn-secondary">Talk to an Agent</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="gd-sidebar">
+        <div class="gd-sidebar-label">All Guides</div>
+        @for (item of allGuides; track item.slug) {
+          <a [routerLink]="['/guides', item.slug]" class="gd-sidebar-item" [class.active]="item.slug === g.slug">
+            <span class="gd-sidebar-icon">{{ item.icon }}</span>
+            <div>
+              <div class="gd-sidebar-title">{{ item.title }}</div>
+              <div class="gd-sidebar-sub">{{ item.sub }}</div>
+            </div>
+          </a>
+        }
+      </aside>
+
+    </div>
+  </div>
+} @else {
+  <div class="gd-not-found">
+    <h2>Guide not found</h2>
+    <a routerLink="/guides">← Back to Guides</a>
+  </div>
+}

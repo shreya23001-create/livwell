@@ -219,7 +219,16 @@ export class AdminDataService {
   }
 
   async deleteUser(id: string): Promise<void> {
-    await this.sb.from('profiles').delete().eq('id', id);
+    const supabaseUrl = (this.sb as any).supabaseUrl as string;
+    const anonKey     = (this.sb as any).supabaseKey as string;
+    await fetch(`${supabaseUrl}/functions/v1/delete-user`, {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify({ userId: id }),
+    });
     await this.loadUsers();
   }
 

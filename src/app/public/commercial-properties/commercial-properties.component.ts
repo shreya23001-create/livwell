@@ -204,6 +204,9 @@ export class CommercialPropertiesComponent implements OnInit {
     },
   ];
 
+  currentPage = signal(1);
+  readonly pageSize = 9;
+
   filteredProperties = computed(() => {
     let list = [...this.allProperties()];
     const intent = this.interestedTo();
@@ -243,6 +246,29 @@ export class CommercialPropertiesComponent implements OnInit {
 
     return list;
   });
+
+  totalResults  = computed(() => this.filteredProperties().length);
+  totalPages    = computed(() => Math.max(1, Math.ceil(this.totalResults() / this.pageSize)));
+  pagedProperties = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize;
+    return this.filteredProperties().slice(start, start + this.pageSize);
+  });
+  pageNumbers = computed(() => {
+    const total = this.totalPages(), cur = this.currentPage();
+    const pages: (number | '...')[] = [];
+    if (total <= 7) { for (let i = 1; i <= total; i++) pages.push(i); }
+    else {
+      pages.push(1);
+      if (cur > 3) pages.push('...');
+      for (let i = Math.max(2, cur - 1); i <= Math.min(total - 1, cur + 1); i++) pages.push(i);
+      if (cur < total - 2) pages.push('...');
+      pages.push(total);
+    }
+    return pages;
+  });
+  goToPage(page: number | '...'): void {
+    if (typeof page === 'number') { this.currentPage.set(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  }
 
   pageTitle = computed(() => {
     const t = this.activeType();
@@ -373,14 +399,14 @@ export class CommercialPropertiesComponent implements OnInit {
     this.route.queryParamMap.subscribe(params => {
       const type = params.get('type');
       if (type && this.propertyTypes.includes(type)) this.activeType.set(type);
-      // status param from navbar = 'Rent' or 'Sale' → maps to Buy/Rent intent
       const status = params.get('status');
       if (status === 'Rent') this.interestedTo.set('Rent');
       else if (status === 'Sale') this.interestedTo.set('Buy');
-      // intent param (set by setIntent()) takes precedence
       const intent = params.get('intent');
       if (intent === 'Rent') this.interestedTo.set('Rent');
       else if (intent === 'Buy') this.interestedTo.set('Buy');
+      const location = params.get('location');
+      if (location) this.searchArea.set(location);
     });
   }
 
@@ -405,12 +431,14 @@ export class CommercialPropertiesComponent implements OnInit {
     this.filterFurnished.set(false); this.filterWaterfront.set(false);
     this.filterBeachfront.set(false); this.filterReducedPrice.set(false); this.filter360Tour.set(false);
     this.interestedTo.set('Buy'); this.searchArea.set('');
+    this.currentPage.set(1);
   }
 
   resetMoreFilters() {
     this.activeView.set('Any'); this.sizeMin.set(''); this.sizeMax.set(''); this.refNo.set('');
     this.filterFurnished.set(false); this.filterWaterfront.set(false);
     this.filterBeachfront.set(false); this.filterReducedPrice.set(false); this.filter360Tour.set(false);
+    this.currentPage.set(1);
   }
 
   slugify(title: string): string { return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
@@ -433,7 +461,8 @@ export class CommercialPropertiesComponent implements OnInit {
   async toggleSave(id: number, e: Event): Promise<void> {
     e.preventDefault(); e.stopPropagation();
     const userId = this.auth.currentUser()?.id;
-    if (!userId || this.savingId() === id) return;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.savingId() === id) return;
     this.savingId.set(id);
     const saved = this.savedIds();
     if (saved.has(id)) {

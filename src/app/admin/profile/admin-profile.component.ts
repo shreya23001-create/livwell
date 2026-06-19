@@ -123,7 +123,7 @@ export class AdminProfileComponent implements OnInit {
     const errs: Record<string, string> = {};
     if (!p.name.trim())  errs['name']  = 'Name is required.';
     if (!p.phone.trim()) errs['phone'] = 'Phone is required.';
-    else if (!/^\+?[0-9\s\-()\d]{7,15}$/.test(p.phone)) errs['phone'] = 'Enter a valid phone number.';
+    else if (!/^\+?[\d\s\-()]+$/.test(p.phone) || (p.phone.replace(/\D/g, '').length < 7 || p.phone.replace(/\D/g, '').length > 15)) errs['phone'] = 'Enter a valid phone number (7–15 digits).';
     this.profileErrors.set(errs);
     if (Object.keys(errs).length) return;
 

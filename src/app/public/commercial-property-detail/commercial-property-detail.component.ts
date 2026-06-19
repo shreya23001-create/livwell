@@ -8,6 +8,7 @@ import { NewsletterSectionComponent } from '../../shared/components/newsletter-s
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { EmailService } from '../../shared/services/email.service';
 
 interface CommercialDetail {
   id: number;
@@ -262,6 +263,15 @@ export class CommercialPropertyDetailComponent implements OnInit {
     };
     await this.sb.from('admin_leads').insert(payload);
     this.inquirySubmitting.set(false);
+    if (this.inquiryEmail.trim()) {
+      this.emailSvc.send('enquiry_commercial', {
+        to_email:       this.inquiryEmail.trim(),
+        name:           this.inquiryName.trim(),
+        property_title: p.title,
+        agent_name:     p.agent.name || 'Livwell Team',
+        agent_phone:    p.agent.phone || '+971 4 000 0000',
+      });
+    }
     this.inquirySent.set(true);
   }
 
@@ -270,6 +280,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
   private sanitizer  = inject(DomSanitizer);
   private sb         = inject(SupabaseService).client;
   private auth       = inject(AuthService);
+  private emailSvc   = inject(EmailService);
   private platformId = inject(PLATFORM_ID);
 
   isLoggedIn = this.auth.isLoggedIn;

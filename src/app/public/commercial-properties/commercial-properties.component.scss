@@ -107,6 +107,12 @@ $white: #fff;
   flex-shrink: 0;
 }
 
+.lpfs-search-clear {
+  background: none; border: none; cursor: pointer; color: $muted;
+  display: flex; align-items: center; padding: 0 .25rem; flex-shrink: 0;
+  &:hover { color: $text; }
+}
+
 .lpfs-search-input {
   flex: 1;
   border: none;
@@ -987,3 +993,9 @@ $white: #fff;
     }
   }
 }
+/* ── Pagination ──────────────────────────────────── */
+.lpfs-pagination { display: flex; align-items: center; justify-content: center; gap: .5rem; margin: 2rem 1rem .5rem; flex-wrap: wrap; }
+.lpfs-pg-btn { display: flex; align-items: center; gap: .35rem; padding: .5rem 1rem; border: 1px solid #e5e7eb; border-radius: .5rem; background: #fff; color: #111827; font-size: .85rem; font-weight: 600; cursor: pointer; transition: background .15s, border-color .15s; &:hover:not(:disabled) { background: #f9fafb; border-color: #4f46e5; color: #4f46e5; } &:disabled { opacity: .4; cursor: not-allowed; } }
+.lpfs-pg-numbers { display: flex; align-items: center; gap: .35rem; }
+.lpfs-pg-num { width: 2.25rem; height: 2.25rem; border: 1px solid #e5e7eb; border-radius: .5rem; background: #fff; color: #111827; font-size: .85rem; font-weight: 500; cursor: pointer; transition: background .15s, border-color .15s; &.active { background: #4f46e5; color: #fff; border-color: #4f46e5; font-weight: 700; } &.ellipsis { border: none; background: none; cursor: default; } &:hover:not(.active):not(.ellipsis):not(:disabled) { background: #f9fafb; border-color: #4f46e5; } }
+.lpfs-page-info { text-align: center; font-size: .82rem; color: #6b7280; margin-bottom: 2rem; }

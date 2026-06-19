@@ -26,6 +26,9 @@
         </svg>
         <input class="lpfs-search-input" type="text" placeholder="Search area, community or project…"
           [value]="searchArea()" (input)="searchArea.set($any($event.target).value)" />
+        <button *ngIf="searchArea()" class="lpfs-search-clear" (click)="searchArea.set('')" title="Clear">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </div>
 
       <div class="lpfs-divider-v"></div>
@@ -192,10 +195,10 @@
   <!-- ── Results Bar ───────────────────────────────────────── -->
   <div class="lpfs-results-bar" *ngIf="!loading()">
     <div class="lpfs-container">
-      <span class="lpfs-count"><strong>{{ filteredProperties().length }}</strong> properties found</span>
+      <span class="lpfs-count"><strong>{{ totalResults() }}</strong> properties found</span>
       <div class="lpfs-sort-wrap">
         <label class="lpfs-sort-label">Sort by</label>
-        <select class="lpfs-sort-select" [value]="sortBy()" (change)="sortBy.set($any($event.target).value)">
+        <select class="lpfs-sort-select" [value]="sortBy()" (change)="sortBy.set($any($event.target).value); currentPage.set(1)">
           <option value="default">Newest</option>
           <option value="price-asc">Price (Low – High)</option>
           <option value="price-desc">Price (High – Low)</option>
@@ -208,7 +211,7 @@
   <!-- ── Property Cards ─────────────────────────────────────── -->
   <div class="lpfs-container" *ngIf="!loading()">
     <div class="lpfs-list">
-      <div *ngFor="let p of filteredProperties()" class="lpfs-card">
+      <div *ngFor="let p of pagedProperties()" class="lpfs-card">
 
         <a [routerLink]="['/commercial', p.id]" class="lpfs-card-img-wrap">
           <img [src]="p.image || '/images/dummy-image.png'" [alt]="p.title" class="lpfs-card-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
@@ -333,6 +336,26 @@
         <p>No properties match your filters.</p>
         <button class="lpfs-btn-primary" (click)="resetAll()">Clear Filters</button>
       </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages() > 1" class="lpfs-pagination">
+      <button class="lpfs-pg-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+        Prev
+      </button>
+      <div class="lpfs-pg-numbers">
+        <button *ngFor="let page of pageNumbers()" class="lpfs-pg-num"
+          [class.active]="page === currentPage()" [class.ellipsis]="page === '...'"
+          [disabled]="page === '...'" (click)="goToPage(page)">{{ page }}</button>
+      </div>
+      <button class="lpfs-pg-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+        Next
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+      </button>
+    </div>
+    <div *ngIf="totalResults() > 0" class="lpfs-page-info">
+      Showing {{ (currentPage() - 1) * pageSize + 1 }}–{{ currentPage() * pageSize > totalResults() ? totalResults() : currentPage() * pageSize }} of {{ totalResults() }} properties
     </div>
   </div>
 

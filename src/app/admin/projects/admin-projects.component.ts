@@ -129,7 +129,7 @@ export class AdminProjectsComponent implements OnInit {
 
   async loadAgents(): Promise<void> {
     const { data } = await this.sb
-      .from('admin_users')
+      .from('profiles')
       .select('name')
       .eq('role', 'agent')
       .order('name');

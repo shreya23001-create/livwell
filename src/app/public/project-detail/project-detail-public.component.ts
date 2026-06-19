@@ -2,10 +2,11 @@ import { Component, OnInit, signal, computed, inject, HostListener, PLATFORM_ID 
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { EmailService } from '../../shared/services/email.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 
 interface Project {
@@ -47,8 +48,10 @@ interface Project {
 export class ProjectDetailPublicComponent implements OnInit {
   private sb         = inject(SupabaseService).client;
   private route      = inject(ActivatedRoute);
+  private router     = inject(Router);
   private sanitizer  = inject(DomSanitizer);
   private auth       = inject(AuthService);
+  private emailSvc   = inject(EmailService);
   private platformId = inject(PLATFORM_ID);
 
   isLoggedIn = this.auth.isLoggedIn;
@@ -92,6 +95,10 @@ export class ProjectDetailPublicComponent implements OnInit {
   agentAvatar  = computed(() => '');
   agentPhone   = computed(() => this.agent()?.phone ?? '');
   agentEmail   = computed(() => this.agent()?.email ?? '');
+
+  isFaved     = signal(false);
+  favLoading  = signal(false);
+  shareToast  = signal(false);
 
   lightboxOpen  = signal(false);
   lightboxIndex = signal(0);
@@ -151,6 +158,11 @@ export class ProjectDetailPublicComponent implements OnInit {
       p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com'));
       this.project.set(p);
       this.geocodeAndSetMap(data as Project);
+      const userId = this.auth.currentUser()?.id;
+      if (userId) {
+        const { data: saved } = await this.sb.from('saved_projects').select('id').eq('user_id', userId).eq('project_id', p.id).maybeSingle();
+        this.isFaved.set(!!saved);
+      }
       if ((data as Project).agent_name) {
         const { data: agentData } = await this.sb
           .from('admin_users')
@@ -187,6 +199,37 @@ export class ProjectDetailPublicComponent implements OnInit {
     }
   }
 
+  async toggleFav(): Promise<void> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    const projId = this.project()?.id;
+    if (!projId || this.favLoading()) return;
+    this.favLoading.set(true);
+    if (this.isFaved()) {
+      await this.sb.from('saved_projects').delete().eq('user_id', userId).eq('project_id', projId);
+      this.isFaved.set(false);
+    } else {
+      await this.sb.from('saved_projects').insert({ user_id: userId, project_id: projId });
+      this.isFaved.set(true);
+    }
+    this.favLoading.set(false);
+  }
+
+  async shareProject(): Promise<void> {
+    const p = this.project();
+    if (!p) return;
+    const url  = isPlatformBrowser(this.platformId) ? window.location.href : '';
+    const text = `Check out ${p.title} by ${p.developer} on LivWell Dubai`;
+    if (isPlatformBrowser(this.platformId) && navigator.share) {
+      try { await navigator.share({ title: p.title, text, url }); return; } catch {}
+    }
+    if (isPlatformBrowser(this.platformId)) {
+      navigator.clipboard?.writeText(url).catch(() => {});
+    }
+    this.shareToast.set(true);
+    setTimeout(() => this.shareToast.set(false), 2500);
+  }
+
   formatPrice(n: number): string {
     if (!n) return 'Price on request';
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
@@ -197,6 +240,11 @@ export class ProjectDetailPublicComponent implements OnInit {
   async submitInquiry(p: Project) {
     if (!this.inquiryName.trim() || !this.inquiryPhone.trim()) {
       this.inquiryError.set('Name and phone are required.');
+      return;
+    }
+    const _ph = this.inquiryPhone.trim();
+    if (!/^\+?[\d\s\-()]+$/.test(_ph) || _ph.replace(/\D/g, '').length < 7 || _ph.replace(/\D/g, '').length > 15) {
+      this.inquiryError.set('Enter a valid phone number (7–15 digits).');
       return;
     }
     this.inquirySubmitting.set(true);
@@ -232,6 +280,15 @@ export class ProjectDetailPublicComponent implements OnInit {
     };
     const { error: insertError } = await this.sb.from('admin_leads').insert(payload);
     this.inquirySubmitting.set(false);
+    if (!insertError && this.inquiryEmail.trim()) {
+      this.emailSvc.send('enquiry_project', {
+        to_email:      this.inquiryEmail.trim(),
+        name:          this.inquiryName.trim(),
+        project_title: p.title,
+        agent_name:    p.agent_name || 'Livwell Team',
+        agent_phone:   this.agentPhone() || '+971 4 000 0000',
+      });
+    }
     this.inquirySent.set(true);
   }
 }

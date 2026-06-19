@@ -16,7 +16,8 @@ interface ContactForm {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^\+?[0-9\s\-()\d]{7,15}$/;
+const PHONE_RE = /^\+?[\d\s\-()]+$/;
+const PHONE_DIGITS = (p: string) => { const d = p.replace(/\D/g, '').length; return d >= 7 && d <= 15; };
 
 interface Office {
   name: string;
@@ -59,7 +60,7 @@ export class ContactComponent {
     if (!f.firstName.trim())                        e['firstName'] = 'First name is required.';
     if (!f.email.trim())                            e['email']     = 'Email is required.';
     else if (!EMAIL_RE.test(f.email.trim()))        e['email']     = 'Enter a valid email address.';
-    if (f.phone.trim() && !PHONE_RE.test(f.phone.trim())) e['phone'] = 'Enter a valid phone number.';
+    if (f.phone.trim() && (!PHONE_RE.test(f.phone.trim()) || !PHONE_DIGITS(f.phone))) e['phone'] = 'Enter a valid phone number (7–15 digits).';
     if (!f.subject.trim())                          e['subject']   = 'Subject is required.';
     if (!f.message.trim())                          e['message']   = 'Message is required.';
     else if (f.message.trim().length < 10)          e['message']   = 'Message must be at least 10 characters.';

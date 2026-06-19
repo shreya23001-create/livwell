@@ -108,20 +108,19 @@ export class HomeComponent implements OnInit {
   searchResults    = signal<{ type: 'location' | 'property' | 'project'; id?: number; label: string; sub: string }[]>([]);
   searchLoading    = signal(false);
   private searchTimer: any;
+  private propLocations    = signal<string[]>([]);
+  private projectLocations = signal<string[]>([]);
 
-  readonly popularLocations = [
-    'Downtown Dubai', 'Palm Jumeirah', 'Dubai Marina', 'Business Bay',
-    'Jumeirah Village Circle', 'Dubai Hills Estate', 'Dubai Creek Harbour',
-    'Arabian Ranches', 'Jumeirah', 'DIFC',
-  ];
+  private activeLocations(): string[] {
+    return this.searchType() === 'new-projects' ? this.projectLocations() : this.propLocations();
+  }
 
   onSearchInput(value: string): void {
     this.searchQuery.set(value);
     clearTimeout(this.searchTimer);
     if (!value.trim()) {
-      // Show popular locations
       this.searchResults.set(
-        this.popularLocations.map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
+        this.activeLocations().map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
       );
       this.searchDropOpen.set(true);
       return;
@@ -132,34 +131,42 @@ export class HomeComponent implements OnInit {
 
   private async runSearch(q: string): Promise<void> {
     const lower = q.toLowerCase();
-    const [propsRes, projsRes] = await Promise.all([
-      this.sb.from('properties')
-        .select('id, title, location, community')
-        .or(`title.ilike.%${q}%,location.ilike.%${q}%,community.ilike.%${q}%`)
-        .eq('status', 'Published')
-        .limit(5),
-      this.sb.from('projects')
-        .select('id, title, location')
-        .or(`title.ilike.%${q}%,location.ilike.%${q}%`)
-        .eq('status', 'Published')
-        .limit(5),
-    ]);
+    const tab   = this.searchType();
 
-    const locMatches = this.popularLocations
+    const locMatches = this.activeLocations()
       .filter(l => l.toLowerCase().includes(lower))
       .map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }));
 
-    const propItems = (propsRes.data ?? []).map((p: any) => ({
-      type: 'property' as const, id: p.id,
-      label: p.title, sub: p.community || p.location || 'Property',
-    }));
+    if (tab === 'new-projects') {
+      const { data } = await this.sb.from('projects')
+        .select('id, title, location, community')
+        .or(`title.ilike.%${q}%,location.ilike.%${q}%,community.ilike.%${q}%`)
+        .eq('status', 'Published')
+        .limit(8);
 
-    const projItems = (projsRes.data ?? []).map((p: any) => ({
-      type: 'project' as const, id: p.id,
-      label: p.title, sub: p.location || 'Project',
-    }));
+      const projItems = (data ?? []).map((p: any) => ({
+        type: 'project' as const, id: p.id,
+        label: p.title, sub: p.community || p.location || 'Project',
+      }));
 
-    this.searchResults.set([...locMatches, ...propItems, ...projItems].slice(0, 10));
+      this.searchResults.set([...locMatches, ...projItems].slice(0, 10));
+    } else {
+      const listingType = tab === 'rent' ? 'Rent' : 'Sale';
+      const { data } = await this.sb.from('properties')
+        .select('id, title, location, community, listing_type')
+        .or(`title.ilike.%${q}%,location.ilike.%${q}%,community.ilike.%${q}%`)
+        .eq('status', 'Published')
+        .eq('listing_type', listingType)
+        .limit(8);
+
+      const propItems = (data ?? []).map((p: any) => ({
+        type: 'property' as const, id: p.id,
+        label: p.title, sub: p.community || p.location || 'Property',
+      }));
+
+      this.searchResults.set([...locMatches, ...propItems].slice(0, 10));
+    }
+
     this.searchLoading.set(false);
     this.searchDropOpen.set(true);
   }
@@ -167,35 +174,43 @@ export class HomeComponent implements OnInit {
   selectResult(item: { type: 'location' | 'property' | 'project'; id?: number; label: string; sub: string }): void {
     this.searchDropOpen.set(false);
     this.searchQuery.set(item.label);
+    const tab = this.searchType();
     if (item.type === 'property' && item.id) {
       this.router.navigate(['/properties', item.id]);
     } else if (item.type === 'project' && item.id) {
       this.router.navigate(['/projects', item.id]);
     } else {
-      // location — navigate to properties with location filter
-      const route = this.searchType() === 'new-projects' ? '/projects' : '/properties';
-      this.router.navigate([route], { queryParams: { location: item.label } });
+      // location — route depends on active tab
+      if (tab === 'new-projects') {
+        this.router.navigate(['/projects'], { queryParams: { location: item.label } });
+      } else {
+        this.router.navigate(['/properties'], { queryParams: { location: item.label, status: tab === 'rent' ? 'rent' : 'sale' } });
+      }
     }
   }
 
   doSearch(): void {
     this.searchDropOpen.set(false);
     const q = this.searchQuery().trim();
-    const route = this.searchType() === 'new-projects' ? '/projects' : '/properties';
-    this.router.navigate([route], q ? { queryParams: { q } } : {});
+    const tab = this.searchType();
+    if (tab === 'new-projects') {
+      this.router.navigate(['/projects'], q ? { queryParams: { q } } : {});
+    } else {
+      this.router.navigate(['/properties'], q ? { queryParams: { q, status: tab === 'rent' ? 'rent' : 'sale' } } : { queryParams: { status: tab === 'rent' ? 'rent' : 'sale' } });
+    }
   }
 
   onSearchFocus(): void {
     if (!this.searchQuery().trim()) {
       this.searchResults.set(
-        this.popularLocations.map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
+        this.activeLocations().map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
       );
     }
     this.searchDropOpen.set(true);
   }
 
   closeSearchDrop(): void {
-    setTimeout(() => this.searchDropOpen.set(false), 150);
+    setTimeout(() => this.searchDropOpen.set(false), 300);
   }
 
   searchTabs = [
@@ -251,10 +266,31 @@ export class HomeComponent implements OnInit {
       this.loadTrendingProjects(),
       this.loadPropertyCounts(),
       this.loadTopAgents(),
+      this.loadLocations(),
     ]);
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => this.setupScrollAnimations(), 50);
     }
+  }
+
+  private async loadLocations(): Promise<void> {
+    const [propsRes, projsRes] = await Promise.all([
+      this.sb.from('properties').select('location').eq('status', 'Published'),
+      this.sb.from('projects').select('location').eq('status', 'Published'),
+    ]);
+    const propSet  = new Set<string>();
+    const projSet  = new Set<string>();
+    const clean = (v: string) => v.split(',')[0].trim();
+    for (const r of (propsRes.data ?? [])) {
+      const v = clean(r.location ?? '');
+      if (v) propSet.add(v);
+    }
+    for (const r of (projsRes.data ?? [])) {
+      const v = clean(r.location ?? '');
+      if (v) projSet.add(v);
+    }
+    this.propLocations.set([...propSet].sort());
+    this.projectLocations.set([...projSet].sort());
   }
 
   private async loadFeaturedProperties(): Promise<void> {
@@ -615,10 +651,10 @@ export class HomeComponent implements OnInit {
   });
 
   guides = [
-    { title: 'Buying Guide', subtitle: 'How to Buy Property in Dubai', avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
-    { title: 'Buying Offplan Guide', subtitle: 'How to Buy Off Plan in Dubai', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-    { title: 'Renting Guide', subtitle: 'How to Rent Property in Dubai', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
-    { title: 'Selling Guide', subtitle: 'How to Sell Property in Dubai', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
+    { title: 'Buying Guide',        subtitle: 'How to Buy Property in Dubai',      slug: 'buying-guide',         icon: '🏠', avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
+    { title: 'Buying Offplan Guide',subtitle: 'How to Buy Off Plan in Dubai',       slug: 'off-plan-guide',       icon: '🏗️', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+    { title: 'Renting Guide',       subtitle: 'How to Rent Property in Dubai',      slug: 'renting-guide',        icon: '🔑', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
+    { title: 'Selling Guide',       subtitle: 'How to Sell Property in Dubai',      slug: 'selling-guide',        icon: '💰', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
   ];
 
   topAgents: HomeAgent[] = [

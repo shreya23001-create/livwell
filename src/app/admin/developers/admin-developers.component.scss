@@ -1,0 +1,163 @@
+$green: #16a34a;
+$red:   #dc2626;
+$border: #e5e7eb;
+$muted:  #6b7280;
+$text:   #111827;
+$bg:     #f9fafb;
+
+.adv-page { padding: 2rem; max-width: 1300px; margin: 0 auto; }
+
+.adv-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem;
+  &__title { font-size: 1.5rem; font-weight: 700; color: $text; margin: 0 0 .25rem; }
+  &__sub    { font-size: .875rem; color: $muted; margin: 0; }
+}
+
+.adv-toolbar { margin-bottom: 1.25rem; }
+
+.adv-search {
+  display: flex; align-items: center; gap: .5rem;
+  border: 1px solid $border; border-radius: 8px; padding: .5rem .75rem;
+  background: #fff; max-width: 320px;
+  svg { color: $muted; flex-shrink: 0; }
+  &__input { border: none; outline: none; font-size: .875rem; width: 100%; background: transparent; }
+}
+
+.adv-loading { display: flex; justify-content: center; padding: 4rem; }
+.adv-spinner {
+  width: 36px; height: 36px; border: 3px solid $border;
+  border-top-color: $green; border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.adv-table-wrap { background: #fff; border: 1px solid $border; border-radius: 12px; overflow: auto; }
+.adv-table {
+  width: 100%; border-collapse: collapse; font-size: .875rem;
+  th {
+    text-align: left; padding: .75rem 1rem; background: $bg;
+    font-size: .75rem; font-weight: 600; color: $muted; text-transform: uppercase;
+    letter-spacing: .05em; border-bottom: 1px solid $border; white-space: nowrap;
+  }
+  td {
+    padding: .75rem 1rem; border-bottom: 1px solid $border; color: $text; vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: $bg; }
+}
+
+.adv-dev-cell { display: flex; align-items: center; gap: .75rem; }
+.adv-logo-wrap {
+  width: 40px; height: 40px; border-radius: 8px; border: 1px solid $border;
+  overflow: hidden; flex-shrink: 0; background: $bg;
+  display: flex; align-items: center; justify-content: center;
+}
+.adv-logo { width: 100%; height: 100%; object-fit: contain; }
+.adv-logo-fallback {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .9rem; color: #fff; background: #374151;
+}
+.adv-dev-name { font-weight: 600; }
+.adv-dev-slug  { font-size: .75rem; color: $muted; }
+
+.adv-badge {
+  display: inline-block; padding: .2rem .6rem; border-radius: 20px; font-size: .72rem;
+  font-weight: 600; background: #dcfce7; color: #15803d;
+  &--intl { background: #ede9fe; color: #6d28d9; }
+}
+
+.adv-toggle {
+  width: 36px; height: 20px; border-radius: 20px; background: $border;
+  border: none; cursor: pointer; position: relative; transition: background .2s;
+  &--on { background: $green; }
+  &__dot {
+    position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+    border-radius: 50%; background: #fff; transition: left .2s;
+  }
+  &--on &__dot { left: 18px; }
+}
+
+.adv-actions { display: flex; gap: .5rem; }
+.adv-icon-btn {
+  width: 30px; height: 30px; border-radius: 6px; border: 1px solid $border;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  background: #fff; transition: all .15s;
+  &--edit:hover { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
+  &--del:hover  { border-color: $red; color: $red; background: #fef2f2; }
+}
+
+.adv-empty { text-align: center; padding: 2rem; color: $muted; }
+
+// Buttons
+.adv-btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .55rem 1.1rem; border-radius: 8px; font-size: .875rem;
+  font-weight: 600; cursor: pointer; border: none; transition: all .15s;
+  &--primary { background: $green; color: #fff; &:hover { background: #15803d; } }
+  &--ghost   { background: #fff; color: $text; border: 1px solid $border; &:hover { background: $bg; } }
+  &--danger  { background: $red; color: #fff; &:hover { background: #b91c1c; } }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+
+// Modal
+.adv-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000;
+}
+.adv-modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 1001; background: #fff; border-radius: 14px; width: 640px; max-width: 95vw;
+  max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+
+  &__head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid $border;
+    h2 { font-size: 1.1rem; font-weight: 700; margin: 0; }
+  }
+  &__close {
+    width: 30px; height: 30px; border: none; background: $bg; border-radius: 6px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    &:hover { background: $border; }
+  }
+  &__body { padding: 1.5rem; overflow-y: auto; flex: 1; }
+  &__foot {
+    padding: 1rem 1.5rem; border-top: 1px solid $border;
+    display: flex; justify-content: flex-end; gap: .75rem;
+  }
+}
+
+.adv-logo-preview {
+  margin-bottom: 1rem; padding: .75rem; border: 1px solid $border;
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  background: $bg; height: 80px;
+  &__img { max-height: 60px; max-width: 200px; object-fit: contain; }
+}
+
+.adv-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+
+.adv-field {
+  display: flex; flex-direction: column; gap: .35rem;
+  &--full { grid-column: 1 / -1; }
+  &--checkbox { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: .5rem; }
+
+  label { font-size: .8rem; font-weight: 600; color: $muted; }
+  input[type="text"], input[type="number"], select, textarea {
+    border: 1px solid $border; border-radius: 8px; padding: .55rem .75rem;
+    font-size: .875rem; outline: none; width: 100%; box-sizing: border-box;
+    font-family: inherit; background: #fff;
+    &:focus { border-color: $green; box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
+  }
+  textarea { resize: vertical; }
+  input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: $green; }
+}
+
+// Delete confirm
+.adv-confirm {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 1001; background: #fff; border-radius: 12px; padding: 1.5rem;
+  width: 360px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  p { margin: 0 0 1.25rem; font-size: .9rem; line-height: 1.5; }
+  &__btns { display: flex; justify-content: flex-end; gap: .75rem; }
+}

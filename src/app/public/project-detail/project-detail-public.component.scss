@@ -82,6 +82,22 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   display: flex; align-items: flex-start;
   justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;
 }
+.pd-action-btns { display: flex; align-items: center; gap: .5rem; flex-shrink: 0; margin-top: .25rem; }
+.pd-action-btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .45rem 1rem; border: 1.5px solid #e5e7eb; border-radius: .5rem;
+  background: #fff; color: #374151; font-size: .82rem; font-weight: 600;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+  &:hover:not(:disabled) { border-color: #1a5c3a; color: #1a5c3a; }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+  &--faved { color: #e11d48; border-color: #fecdd3; background: #fff1f2; &:hover:not(:disabled) { border-color: #e11d48; color: #e11d48; } }
+}
+.pd-share-toast {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: #1a5c3a; color: #fff; font-size: .75rem; font-weight: 600;
+  padding: .3rem .75rem; border-radius: .375rem; white-space: nowrap;
+  pointer-events: none;
+}
 
 /* ── Badges ──────────────────────────────────────── */
 .pd-badges-row {
@@ -368,6 +384,10 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   border-radius: 1rem; padding: 1.375rem;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   display: flex; flex-direction: column; gap: 0.625rem;
+
+  form {
+    display: flex; flex-direction: column; gap: 0.75rem;
+  }
 }
 .pd-inquiry-title {
   font-size: 0.9rem; font-weight: 700; color: $dark; margin-bottom: 0.25rem;

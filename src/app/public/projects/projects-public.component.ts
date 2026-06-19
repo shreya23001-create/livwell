@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
@@ -35,7 +35,8 @@ interface Project {
   styleUrl: './projects-public.component.scss',
 })
 export class ProjectsPublicComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb    = inject(SupabaseService).client;
+  private route = inject(ActivatedRoute);
 
   allProjects = signal<Project[]>([]);
   loading     = signal(true);
@@ -44,6 +45,8 @@ export class ProjectsPublicComponent implements OnInit {
   selectedType     = signal('All');
   selectedHandover = signal('All');
   sortBy           = signal('newest');
+  currentPage      = signal(1);
+  readonly pageSize = 9;
 
   readonly projectTypes  = ['All', 'Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Home', 'Mixed', 'Duplex'];
   readonly handoverOptions = ['All', 'Q1 2026', 'Q2 2026', 'Q3 2026', 'Q4 2026', 'Q1 2027', 'Q2 2027', 'Q3 2027', 'Q4 2027', '2028', '2029+'];
@@ -54,7 +57,8 @@ export class ProjectsPublicComponent implements OnInit {
     if (q) list = list.filter(p =>
       p.title.toLowerCase().includes(q) ||
       (p.developer ?? '').toLowerCase().includes(q) ||
-      (p.community ?? '').toLowerCase().includes(q)
+      (p.community ?? '').toLowerCase().includes(q) ||
+      (p.location ?? '').toLowerCase().includes(q)
     );
     if (this.selectedType() !== 'All') list = list.filter(p => p.type === this.selectedType());
     if (this.selectedHandover() !== 'All') list = list.filter(p => (p.completion_date ?? '').includes(this.selectedHandover()));
@@ -64,6 +68,29 @@ export class ProjectsPublicComponent implements OnInit {
     return list;
   });
 
+  totalResults    = computed(() => this.filteredProjects().length);
+  totalPages      = computed(() => Math.max(1, Math.ceil(this.totalResults() / this.pageSize)));
+  pagedProjects   = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize;
+    return this.filteredProjects().slice(start, start + this.pageSize);
+  });
+  pageNumbers = computed(() => {
+    const total = this.totalPages(), cur = this.currentPage();
+    const pages: (number | '...')[] = [];
+    if (total <= 7) { for (let i = 1; i <= total; i++) pages.push(i); }
+    else {
+      pages.push(1);
+      if (cur > 3) pages.push('...');
+      for (let i = Math.max(2, cur - 1); i <= Math.min(total - 1, cur + 1); i++) pages.push(i);
+      if (cur < total - 2) pages.push('...');
+      pages.push(total);
+    }
+    return pages;
+  });
+  goToPage(page: number | '...'): void {
+    if (typeof page === 'number') { this.currentPage.set(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  }
+
   stats = computed(() => ({
     total:      this.allProjects().length,
     featured:   this.allProjects().filter(p => p.is_featured).length,
@@ -72,6 +99,13 @@ export class ProjectsPublicComponent implements OnInit {
   }));
 
   async ngOnInit() {
+    // Subscribe so query params apply even if component was already active
+    this.route.queryParams.subscribe(params => {
+      if (params['q'])        this.searchQuery.set(params['q']);
+      if (params['location']) this.searchQuery.set(params['location']);
+      this.currentPage.set(1);
+    });
+
     const { data } = await this.sb
       .from('projects')
       .select('*')
@@ -98,6 +132,11 @@ export class ProjectsPublicComponent implements OnInit {
     { question: 'What payment plans are typically available?', answer: 'Most developers offer 40/60, 50/50, or post-handover plans. Some offer 1% monthly plans. Terms vary by developer and project.', open: false },
     { question: 'Can I invest if I\'m based outside the UAE?', answer: 'Yes. Foreign nationals can purchase freehold property in designated areas. We assist with remote signing and power of attorney.', open: false },
   ];
+
+  setSearch(v: string)   { this.searchQuery.set(v);      this.currentPage.set(1); }
+  setType(v: string)     { this.selectedType.set(v);     this.currentPage.set(1); }
+  setHandover(v: string) { this.selectedHandover.set(v); this.currentPage.set(1); }
+  setSort(v: string)     { this.sortBy.set(v);           this.currentPage.set(1); }
 
   toggleFaq(i: number) {
     this.faqs = this.faqs.map((f, idx) => ({ ...f, open: idx === i ? !f.open : false }));

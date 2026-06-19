@@ -79,14 +79,14 @@ function buildGeneric(slug: string, areas: Area[]): (AreaDetail & { agent: typeo
   const base = areas.find(a => a.slug === slug);
   if (!base) return null;
   return {
-    ...base, projects: base.propertiesForSale + base.propertiesForRent, avgRoi: '6%',
+    ...base, projects: (base.projectCount ?? 0) + base.propertiesForSale + base.propertiesForRent, avgRoi: '6%',
     about: `${base.name} is one of Dubai's most sought-after communities, located in ${base.location}. The area offers a mix of ${base.types.join(', ')} and is known for its vibrant lifestyle, excellent amenities, and strong investment returns. ${base.description}`,
     whyInvest: ['Strong rental demand year-round', 'Freehold ownership available', 'Good transport connectivity', 'Established community infrastructure', 'Consistent capital appreciation'],
     lifestyle: ['Community parks and leisure facilities', 'Retail and dining options', 'Schools and healthcare nearby', 'Sports and wellness facilities', 'Easy access to major highways'],
     faqs: [
-      { q: `Is ${base.name} freehold for expats?`, a: `${base.name} is a ${base.category} area. ${base.category === 'Freehold' ? 'All nationalities can purchase property here with full ownership rights.' : 'Please check current DLD regulations for ownership eligibility.'}` },
-      { q: `What types of properties are available in ${base.name}?`, a: `${base.name} primarily offers ${base.types.join(', ')} for sale and rent across a range of price points to suit different budgets.` },
-      { q: `What is the average sale price in ${base.name}?`, a: `The average property sale price in ${base.name} is approximately ${base.avgPriceSale}. Rental prices average ${base.avgPriceRent} per year.` },
+      { q: `Is ${base.name} freehold for expats?`, a: `${base.name} is a popular Dubai community. Please check current DLD regulations for ownership eligibility in this area.` },
+      { q: `What types of properties are available in ${base.name}?`, a: `${base.name} primarily offers ${base.types.length ? base.types.join(', ') : 'residential and commercial properties'} for sale and rent across a range of price points to suit different budgets.` },
+      { q: `What is the average sale price in ${base.name}?`, a: `The average property sale price in ${base.name} is approximately ${base.avgPriceSale || 'available on request'}.` },
     ],
     nearbyAreas: [],
     agent: AGENT_A, images: [base.image, base.image, base.image],

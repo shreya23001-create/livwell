@@ -1,0 +1,107 @@
+<div class="tpl-page">
+
+  <div class="tpl-header">
+    <div>
+      <h1 class="tpl-title">Email Templates</h1>
+      <p class="tpl-sub">Manage transactional emails. Use <code>{{ wrapVar('variable') }}</code> placeholders in subject &amp; body.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="tpl-loading">Loading templates…</div>
+  } @else {
+    <div class="tpl-layout">
+
+      <!-- Sidebar -->
+      <aside class="tpl-sidebar">
+        <div class="tpl-sidebar-head">Templates</div>
+        @for (tpl of templates(); track tpl.id) {
+          <button class="tpl-item" [class.active]="selected()?.id === tpl.id" (click)="selectTemplate(tpl)">
+            <div class="tpl-item-top">
+              <span class="tpl-item-label">{{ tpl.label }}</span>
+              <span class="tpl-badge" [class.enabled]="tpl.enabled" (click)="$event.stopPropagation(); toggleEnabled(tpl)">
+                {{ tpl.enabled ? 'ON' : 'OFF' }}
+              </span>
+            </div>
+            <div class="tpl-item-desc">{{ tpl.description }}</div>
+          </button>
+        }
+      </aside>
+
+      <!-- Editor panel -->
+      @if (selected(); as t) {
+        <div class="tpl-editor">
+
+          <!-- Toolbar -->
+          <div class="tpl-editor-bar">
+            <div class="tpl-editor-left">
+              <div class="tpl-editor-title">{{ t.label }}</div>
+              <div class="tpl-editor-meta">{{ t.description }}</div>
+            </div>
+            <div class="tpl-editor-actions">
+              <div class="tpl-view-toggle">
+                <button [class.active]="previewMode()" (click)="previewMode.set(true)">Preview</button>
+                <button [class.active]="!previewMode()" (click)="previewMode.set(false)">Edit HTML</button>
+              </div>
+              <button class="btn-save" (click)="save()" [disabled]="saving()">
+                {{ saving() ? 'Saving…' : 'Save' }}
+              </button>
+            </div>
+          </div>
+
+          @if (!previewMode()) {
+            <!-- Edit mode -->
+            <div class="tpl-fields">
+              <div class="tpl-row">
+                <div class="tpl-field">
+                  <label>From Name</label>
+                  <input type="text" [(ngModel)]="t.from_name" />
+                </div>
+                <div class="tpl-field">
+                  <label>From Email</label>
+                  <input type="email" [(ngModel)]="t.from_email" />
+                </div>
+              </div>
+              <div class="tpl-field">
+                <label>Subject</label>
+                <input type="text" [(ngModel)]="t.subject" />
+              </div>
+              <div class="tpl-field">
+                <label>Body (HTML)</label>
+                <div class="tpl-vars">
+                  Available variables:
+                  @for (v of t.variables; track v) {
+                    <code class="tpl-var-chip">{{ wrapVar(v) }}</code>
+                  }
+                  <code class="tpl-var-chip">{{ wrapVar('to_email') }}</code>
+                </div>
+                <textarea class="tpl-body-editor" [(ngModel)]="t.body" rows="22" spellcheck="false"></textarea>
+              </div>
+            </div>
+          } @else {
+            <!-- Preview mode -->
+            <div class="tpl-preview-wrap">
+              <div class="tpl-preview-top">
+                <span class="tpl-preview-label">Subject</span>
+                <span class="tpl-preview-subject">{{ t.subject }}</span>
+              </div>
+              <iframe class="tpl-preview-frame" [srcdoc]="previewHtml" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+          }
+
+          <!-- Test send -->
+          <div class="tpl-test-bar">
+            <span class="tpl-test-label">Send test</span>
+            <input type="email" class="tpl-test-input" [(ngModel)]="testEmail" placeholder="Enter email address…" (keydown.enter)="sendTest()" />
+            <button class="btn-test" (click)="sendTest()" [disabled]="sendingTest() || !testEmail()">
+              {{ sendingTest() ? 'Sending…' : 'Send Test Email' }}
+            </button>
+          </div>
+
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

@@ -289,6 +289,17 @@ $white: #fff;
 }
 
 // ── Empty ─────────────────────────────────────────────────────
+.areas-loading {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 5rem 1rem; gap: 1rem; color: $muted;
+}
+.areas-spinner {
+  width: 40px; height: 40px; border: 3px solid #e5e7eb;
+  border-top-color: #1a3c5e; border-radius: 50%;
+  animation: areas-spin 0.8s linear infinite;
+}
+@keyframes areas-spin { to { transform: rotate(360deg); } }
+
 .areas-empty {
   display: flex;
   flex-direction: column;
@@ -297,6 +308,26 @@ $white: #fff;
   padding: 4rem 0;
   color: $muted;
   text-align: center;
+}
+
+.area-card__counts {
+  display: flex; flex-wrap: wrap; gap: .35rem .75rem;
+  font-size: .78rem; color: $muted; margin: .4rem 0 .75rem;
+  span { display: flex; align-items: center; gap: .25rem;
+    &::before { content: '·'; display: none; }
+    &:not(:first-child)::before { display: inline; }
+  }
+}
+
+.area-card__links {
+  display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem;
+}
+.area-card__link {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .35rem .75rem; border-radius: 20px; font-size: .78rem; font-weight: 600;
+  background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;
+  text-decoration: none; transition: all .15s;
+  &:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
 }
 
 .areas-clear-btn {

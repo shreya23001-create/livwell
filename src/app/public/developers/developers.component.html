@@ -29,8 +29,14 @@
     </div>
   </div>
 
+  <!-- ── Loading ──────────────────────────────────────────── -->
+  <div class="dev-loading" *ngIf="loading()">
+    <div class="dev-loading__spinner"></div>
+    <p>Loading developers…</p>
+  </div>
+
   <!-- ── Featured Strip ────────────────────────────────────── -->
-  <section class="dev-section" *ngIf="searchQuery() === '' && activeFilter() === 'All'">
+  <section class="dev-section" *ngIf="!loading() && searchQuery() === '' && activeFilter() === 'All'">
     <div class="dev-container">
       <div class="dev-section__header">
         <h2 class="dev-section__title">Featured Developers</h2>
@@ -73,7 +79,7 @@
   </section>
 
   <!-- ── All Developers Grid ───────────────────────────────── -->
-  <section class="dev-section dev-section--all">
+  <section class="dev-section dev-section--all" *ngIf="!loading()">
     <div class="dev-container">
       <div class="dev-section__header">
         <h2 class="dev-section__title">

@@ -283,7 +283,13 @@ export class PropertiesComponent implements OnInit {
       const s = this.selectedStatus().toLowerCase();
       result = result.filter(p => p.status.toLowerCase() === s);
     }
-    if (this.selectedLocation()) result = result.filter(p => p.community === this.selectedLocation());
+    if (this.selectedLocation()) {
+      const loc = this.selectedLocation().toLowerCase();
+      result = result.filter(p =>
+        p.community.toLowerCase().includes(loc) ||
+        p.location.toLowerCase().includes(loc)
+      );
+    }
     if (this.minPrice() !== null) result = result.filter(p => p.price >= this.minPrice()!);
     if (this.maxPrice() !== null) result = result.filter(p => p.price <= this.maxPrice()!);
     if (this.selectedBeds()) {
@@ -616,7 +622,8 @@ export class PropertiesComponent implements OnInit {
   async toggleSave(id: number, e: Event): Promise<void> {
     e.preventDefault(); e.stopPropagation();
     const userId = this.auth.currentUser()?.id;
-    if (!userId || this.savingId() === id) return;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.savingId() === id) return;
     this.savingId.set(id);
     const saved = this.savedIds();
     if (saved.has(id)) {

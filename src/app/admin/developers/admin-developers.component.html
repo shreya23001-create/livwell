@@ -1,0 +1,167 @@
+<div class="adv-page">
+
+  <!-- Header -->
+  <div class="adv-header">
+    <div>
+      <h1 class="adv-header__title">Developers</h1>
+      <p class="adv-header__sub">{{ developers().length }} developers · {{ developers().filter(d => d.featured).length }} featured</p>
+    </div>
+    <button class="adv-btn adv-btn--primary" (click)="openAdd()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Add Developer
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="adv-toolbar">
+    <div class="adv-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search developers…" [value]="search()" (input)="search.set($any($event.target).value)" class="adv-search__input" />
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="adv-loading" *ngIf="loading()">
+    <div class="adv-spinner"></div>
+  </div>
+
+  <!-- Table -->
+  <div class="adv-table-wrap" *ngIf="!loading()">
+    <table class="adv-table">
+      <thead>
+        <tr>
+          <th>Developer</th>
+          <th>Nationality</th>
+          <th>Projects</th>
+          <th>Delivered</th>
+          <th>Est.</th>
+          <th>Order</th>
+          <th>Featured</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of filtered()">
+          <td>
+            <div class="adv-dev-cell">
+              <div class="adv-logo-wrap">
+                <img *ngIf="d.logo" [src]="d.logo" [alt]="d.name" class="adv-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                <span class="adv-logo-fallback" [style.display]="d.logo ? 'none' : 'flex'">{{ d.name.charAt(0) }}</span>
+              </div>
+              <div>
+                <div class="adv-dev-name">{{ d.name }}</div>
+                <div class="adv-dev-slug">{{ d.slug }}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="adv-badge" [class.adv-badge--intl]="d.nationality === 'International'">{{ d.nationality }}</span></td>
+          <td>{{ d.projects }}</td>
+          <td>{{ d.delivered_projects }}</td>
+          <td>{{ d.established ?? '—' }}</td>
+          <td>{{ d.sort_order }}</td>
+          <td>
+            <button class="adv-toggle" [class.adv-toggle--on]="d.featured" (click)="toggleFeatured(d)" [title]="d.featured ? 'Remove from featured' : 'Mark as featured'">
+              <span class="adv-toggle__dot"></span>
+            </button>
+          </td>
+          <td>
+            <div class="adv-actions">
+              <button class="adv-icon-btn adv-icon-btn--edit" (click)="openEdit(d)" title="Edit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="adv-icon-btn adv-icon-btn--del" (click)="confirmDelete(d)" title="Delete">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filtered().length === 0">
+          <td colspan="8" class="adv-empty">No developers found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ── Add / Edit Modal ──────────────────────────────────────────── -->
+<div class="adv-overlay" *ngIf="modalOpen()" (click)="closeModal()"></div>
+<div class="adv-modal" *ngIf="modalOpen()">
+  <div class="adv-modal__head">
+    <h2>{{ editingId() ? 'Edit Developer' : 'Add Developer' }}</h2>
+    <button class="adv-modal__close" (click)="closeModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="adv-modal__body">
+    <!-- Logo preview -->
+    <div class="adv-logo-preview" *ngIf="logoPreview()">
+      <img [src]="logoPreview()" alt="Logo preview" class="adv-logo-preview__img" onerror="this.style.display='none'" />
+    </div>
+
+    <div class="adv-form-grid">
+      <div class="adv-field adv-field--full">
+        <label>Name *</label>
+        <input type="text" [value]="form().name" (input)="patch('name', $any($event.target).value)" placeholder="e.g. Emaar Properties" />
+      </div>
+      <div class="adv-field">
+        <label>Slug *</label>
+        <input type="text" [value]="form().slug" (input)="patch('slug', $any($event.target).value)" placeholder="e.g. emaar" />
+      </div>
+      <div class="adv-field">
+        <label>Nationality</label>
+        <select [value]="form().nationality" (change)="patch('nationality', $any($event.target).value)">
+          <option *ngFor="let n of nationalities" [value]="n">{{ n }}</option>
+        </select>
+      </div>
+      <div class="adv-field adv-field--full">
+        <label>Logo URL</label>
+        <input type="text" [value]="form().logo" (input)="patch('logo', $any($event.target).value)" placeholder="https://..." />
+      </div>
+      <div class="adv-field">
+        <label>Established Year</label>
+        <input type="number" [value]="form().established ?? ''" (input)="patch('established', $any($event.target).value)" placeholder="e.g. 1997" />
+      </div>
+      <div class="adv-field">
+        <label>Total Projects</label>
+        <input type="number" [value]="form().projects" (input)="patch('projects', $any($event.target).value)" />
+      </div>
+      <div class="adv-field">
+        <label>Delivered Projects</label>
+        <input type="number" [value]="form().delivered_projects" (input)="patch('delivered_projects', $any($event.target).value)" />
+      </div>
+      <div class="adv-field">
+        <label>Sort Order</label>
+        <input type="number" [value]="form().sort_order" (input)="patch('sort_order', $any($event.target).value)" />
+      </div>
+      <div class="adv-field adv-field--full">
+        <label>About</label>
+        <textarea rows="3" [value]="form().about" (input)="patch('about', $any($event.target).value)" placeholder="Short description…"></textarea>
+      </div>
+      <div class="adv-field adv-field--checkbox">
+        <label>
+          <input type="checkbox" [checked]="form().featured" (change)="patch('featured', $any($event.target).checked)" />
+          Featured developer
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="adv-modal__foot">
+    <button class="adv-btn adv-btn--ghost" (click)="closeModal()">Cancel</button>
+    <button class="adv-btn adv-btn--primary" (click)="save()" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : (editingId() ? 'Save Changes' : 'Add Developer') }}
+    </button>
+  </div>
+</div>
+
+<!-- ── Delete Confirm ────────────────────────────────────────────── -->
+<div class="adv-overlay" *ngIf="deleteTarget()" (click)="cancelDelete()"></div>
+<div class="adv-confirm" *ngIf="deleteTarget()">
+  <p>Delete <strong>{{ deleteTarget()?.name }}</strong>? This cannot be undone.</p>
+  <div class="adv-confirm__btns">
+    <button class="adv-btn adv-btn--ghost" (click)="cancelDelete()">Cancel</button>
+    <button class="adv-btn adv-btn--danger" (click)="doDelete()">Delete</button>
+  </div>
+</div>

@@ -188,6 +188,11 @@ export class BrandedResidenceDetailComponent implements OnInit {
       this.inquiryError.set('Name and phone are required.');
       return;
     }
+    const _ph = this.inquiryPhone.trim();
+    if (!/^\+?[\d\s\-()]+$/.test(_ph) || _ph.replace(/\D/g, '').length < 7 || _ph.replace(/\D/g, '').length > 15) {
+      this.inquiryError.set('Enter a valid phone number (7–15 digits).');
+      return;
+    }
     this.inquirySubmitting.set(true);
     this.inquiryError.set('');
     await this.sb.from('leads').insert({

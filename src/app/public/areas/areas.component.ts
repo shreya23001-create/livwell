@@ -1,6 +1,7 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 export interface Area {
   slug: string;
@@ -9,12 +10,59 @@ export interface Area {
   image: string;
   propertiesForSale: number;
   propertiesForRent: number;
+  projectCount?: number;
+  commercialCount?: number;
+  totalListings?: number;
   avgPriceSale: string;
-  avgPriceRent: string;
+  avgPriceRent?: string;
   types: string[];
-  category: 'Freehold' | 'Leasehold' | 'Both';
-  featured?: boolean;
+  category?: string;
+  featured: boolean;
   description: string;
+}
+
+const AREA_IMAGES: Record<string, string> = {
+  'palm jumeirah':           'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80',
+  'downtown dubai':          'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80',
+  'business bay':            'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=800&q=80',
+  'dubai marina':            'https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=800&q=80',
+  'jumeirah village circle': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
+  'jvc':                     'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
+  'dubai hills estate':      'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80',
+  'jumeirah lake towers':    'https://images.unsplash.com/photo-1582407947304-fd86f28f4e94?w=800&q=80',
+  'jlt':                     'https://images.unsplash.com/photo-1582407947304-fd86f28f4e94?w=800&q=80',
+  'arabian ranches':         'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
+  'jumeirah beach residence':'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',
+  'jbr':                     'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',
+  'mbr city':                'https://images.unsplash.com/photo-1544984243-ec57ea16fe25?w=800&q=80',
+  'mohammed bin rashid city':'https://images.unsplash.com/photo-1544984243-ec57ea16fe25?w=800&q=80',
+  'difc':                    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+  'damac hills':             'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',
+  'the springs':             'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=800&q=80',
+  'dubai sports city':       'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=800&q=80',
+  'al barsha':               'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=800&q=80',
+  'international city':      'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
+  'bluewaters island':       'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80',
+  'sobha hartland':          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',
+  'jumeirah':                'https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?w=800&q=80',
+  'dubai creek harbour':     'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
+  'al furjan':               'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&q=80',
+  'tilal al ghaf':           'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80',
+  'meydan':                  'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&q=80',
+  'dubai south':             'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80',
+};
+
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80';
+
+function toSlug(name: string): string {
+  // Use only the first comma-separated part to avoid long slugs from full addresses
+  const short = name.split(',')[0].trim();
+  return short.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function getImage(name: string): string {
+  const key = name.toLowerCase().trim();
+  return AREA_IMAGES[key] ?? DEFAULT_IMAGE;
 }
 
 @Component({
@@ -24,9 +72,14 @@ export interface Area {
   templateUrl: './areas.component.html',
   styleUrl: './areas.component.scss',
 })
-export class AreasComponent {
-  searchQuery = signal('');
-  activeType = signal('All');
+export class AreasComponent implements OnInit {
+  private sb     = inject(SupabaseService).client;
+  private router = inject(Router);
+
+  searchQuery  = signal('');
+  activeType   = signal('All');
+  loading      = signal(true);
+  allAreas     = signal<Area[]>([]);
 
   readonly propertyTypes = ['All', 'Apartments', 'Villas', 'Townhouses', 'Offices', 'Plots'];
 
@@ -42,49 +95,128 @@ export class AreasComponent {
   openFaq = signal<number | null>(null);
   toggleFaq(i: number) { this.openFaq.set(this.openFaq() === i ? null : i); }
 
-  readonly areas: Area[] = [
-    { slug: 'palm-jumeirah', name: 'Palm Jumeirah', location: 'Palm Island', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80', propertiesForSale: 276, propertiesForRent: 142, avgPriceSale: 'AED 5.2M', avgPriceRent: 'AED 180K/yr', types: ['Apartments', 'Villas', 'Townhouses'], category: 'Freehold', featured: true, description: "Dubai's iconic palm-shaped island, home to luxury villas, beachfront apartments, and world-famous hotels." },
-    { slug: 'downtown-dubai', name: 'Downtown Dubai', location: 'Central Dubai', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80', propertiesForSale: 342, propertiesForRent: 218, avgPriceSale: 'AED 2.8M', avgPriceRent: 'AED 120K/yr', types: ['Apartments', 'Penthouses'], category: 'Freehold', featured: true, description: "Home to the Burj Khalifa and Dubai Mall, Downtown is Dubai's most iconic address for luxury living." },
-    { slug: 'business-bay', name: 'Business Bay', location: 'Central Dubai', image: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=800&q=80', propertiesForSale: 401, propertiesForRent: 312, avgPriceSale: 'AED 1.6M', avgPriceRent: 'AED 85K/yr', types: ['Apartments', 'Offices'], category: 'Freehold', featured: true, description: 'A commercial and residential hub on the Dubai Canal, adjacent to Downtown Dubai with superb connectivity.' },
-    { slug: 'dubai-marina', name: 'Dubai Marina', location: 'New Dubai', image: 'https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=800&q=80', propertiesForSale: 489, propertiesForRent: 376, avgPriceSale: 'AED 1.9M', avgPriceRent: 'AED 95K/yr', types: ['Apartments', 'Penthouses'], category: 'Freehold', featured: true, description: 'A vibrant waterfront district with world-class dining, a yacht marina, and stunning high-rise views.' },
-    { slug: 'jumeirah-village-circle', name: 'Jumeirah Village Circle', location: 'New Dubai', image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80', propertiesForSale: 654, propertiesForRent: 421, avgPriceSale: 'AED 750K', avgPriceRent: 'AED 55K/yr', types: ['Apartments', 'Townhouses', 'Villas'], category: 'Freehold', featured: true, description: "Dubai's most popular affordable community offering high rental yields and great family-friendly amenities." },
-    { slug: 'dubai-hills-estate', name: 'Dubai Hills Estate', location: 'Dubai Hills', image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80', propertiesForSale: 312, propertiesForRent: 187, avgPriceSale: 'AED 3.1M', avgPriceRent: 'AED 130K/yr', types: ['Villas', 'Townhouses', 'Apartments'], category: 'Freehold', featured: true, description: 'A master-planned community wrapped around an 18-hole championship golf course with lush green surroundings.' },
-    { slug: 'jumeirah-lake-towers', name: 'Jumeirah Lake Towers', location: 'New Dubai', image: 'https://images.unsplash.com/photo-1582407947304-fd86f28f4e94?w=800&q=80', propertiesForSale: 287, propertiesForRent: 244, avgPriceSale: 'AED 1.1M', avgPriceRent: 'AED 65K/yr', types: ['Apartments', 'Offices'], category: 'Both', description: 'A DMCC free zone community with 79 towers, lakefront promenades, and excellent metro connectivity.' },
-    { slug: 'arabian-ranches', name: 'Arabian Ranches', location: 'Dubailand', image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80', propertiesForSale: 198, propertiesForRent: 94, avgPriceSale: 'AED 4.2M', avgPriceRent: 'AED 160K/yr', types: ['Villas', 'Townhouses'], category: 'Freehold', description: "Emaar's flagship villa community known for spacious homes, an equestrian club, and polo fields." },
-    { slug: 'jumeirah-beach-residence', name: 'Jumeirah Beach Residence', location: 'New Dubai', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80', propertiesForSale: 221, propertiesForRent: 189, avgPriceSale: 'AED 2.2M', avgPriceRent: 'AED 100K/yr', types: ['Apartments'], category: 'Freehold', description: "Dubai's original beachfront community — 40 towers lining the famous JBR Walk with sea views." },
-    { slug: 'mbr-city', name: 'Mohammed Bin Rashid City', location: 'MBR City', image: 'https://images.unsplash.com/photo-1544984243-ec57ea16fe25?w=800&q=80', propertiesForSale: 267, propertiesForRent: 98, avgPriceSale: 'AED 3.8M', avgPriceRent: 'AED 145K/yr', types: ['Villas', 'Apartments', 'Townhouses'], category: 'Freehold', description: 'A mega-development encompassing Meydan, District One, and Crystal Lagoons — Dubai\'s city of the future.' },
-    { slug: 'difc', name: 'DIFC', location: 'Central Dubai', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80', propertiesForSale: 87, propertiesForRent: 156, avgPriceSale: 'AED 6.1M', avgPriceRent: 'AED 280K/yr', types: ['Apartments', 'Offices'], category: 'Both', description: "Dubai's financial centre — prestigious offices, luxury residences, and world-class restaurants in one district." },
-    { slug: 'damac-hills', name: 'DAMAC Hills', location: 'Dubailand', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80', propertiesForSale: 223, propertiesForRent: 134, avgPriceSale: 'AED 2.4M', avgPriceRent: 'AED 95K/yr', types: ['Villas', 'Townhouses', 'Apartments'], category: 'Freehold', description: 'A Trump International Golf Course community with villas, townhouses, and luxury apartments in Dubailand.' },
-    { slug: 'the-springs', name: 'The Springs', location: 'Emirates Living', image: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=800&q=80', propertiesForSale: 142, propertiesForRent: 89, avgPriceSale: 'AED 2.8M', avgPriceRent: 'AED 120K/yr', types: ['Villas', 'Townhouses'], category: 'Freehold', description: 'A tranquil Emaar community with lake-facing townhouses and a peaceful suburban lifestyle in Emirates Living.' },
-    { slug: 'dubai-sports-city', name: 'Dubai Sports City', location: 'Dubailand', image: 'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=800&q=80', propertiesForSale: 198, propertiesForRent: 176, avgPriceSale: 'AED 650K', avgPriceRent: 'AED 40K/yr', types: ['Apartments', 'Villas'], category: 'Freehold', description: 'A sports-themed city with cricket stadium, football academies, and affordable residential units.' },
-    { slug: 'al-barsha', name: 'Al Barsha', location: 'Central Dubai', image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=800&q=80', propertiesForSale: 167, propertiesForRent: 234, avgPriceSale: 'AED 1.2M', avgPriceRent: 'AED 60K/yr', types: ['Apartments', 'Villas'], category: 'Both', description: 'A well-established mixed community near Mall of the Emirates with schools, clinics, and great retail.' },
-    { slug: 'international-city', name: 'International City', location: 'Dubailand', image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80', propertiesForSale: 312, propertiesForRent: 289, avgPriceSale: 'AED 380K', avgPriceRent: 'AED 28K/yr', types: ['Apartments'], category: 'Freehold', description: "Dubai's most affordable community offering studios and 1-bedrooms for investors seeking high rental yields." },
-    { slug: 'bluewaters-island', name: 'Bluewaters Island', location: 'JBR', image: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80', propertiesForSale: 78, propertiesForRent: 54, avgPriceSale: 'AED 4.8M', avgPriceRent: 'AED 200K/yr', types: ['Apartments', 'Penthouses'], category: 'Freehold', description: "A luxury island destination home to Ain Dubai — the world's largest observation wheel — and Caesars Palace." },
-    { slug: 'sobha-hartland', name: 'Sobha Hartland', location: 'MBR City', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80', propertiesForSale: 187, propertiesForRent: 76, avgPriceSale: 'AED 2.9M', avgPriceRent: 'AED 120K/yr', types: ['Apartments', 'Villas', 'Townhouses'], category: 'Freehold', description: 'An ultra-lush green community built around 2.4 million sqft of landscaped parkland in MBR City.' },
-    { slug: 'jumeirah', name: 'Jumeirah', location: 'Old Dubai', image: 'https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?w=800&q=80', propertiesForSale: 156, propertiesForRent: 112, avgPriceSale: 'AED 5.8M', avgPriceRent: 'AED 200K/yr', types: ['Villas'], category: 'Both', description: 'A prestigious beachside neighbourhood famous for luxury villas, private beaches, and diplomatic residences.' },
-    { slug: 'dubai-creek-harbour', name: 'Dubai Creek Harbour', location: 'Creek', image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80', propertiesForSale: 234, propertiesForRent: 87, avgPriceSale: 'AED 1.8M', avgPriceRent: 'AED 80K/yr', types: ['Apartments'], category: 'Freehold', description: "Emaar's ambitious waterfront city, set to be home to Dubai Creek Tower — the world's next tallest structure." },
-    { slug: 'al-furjan', name: 'Al Furjan', location: 'New Dubai', image: 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&q=80', propertiesForSale: 189, propertiesForRent: 156, avgPriceSale: 'AED 1.4M', avgPriceRent: 'AED 65K/yr', types: ['Villas', 'Townhouses', 'Apartments'], category: 'Freehold', description: 'A Nakheel master community near Ibn Battuta Mall offering villa plots, townhouses, and apartments.' },
-    { slug: 'tilal-al-ghaf', name: 'Tilal Al Ghaf', location: 'Dubailand', image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80', propertiesForSale: 143, propertiesForRent: 42, avgPriceSale: 'AED 3.6M', avgPriceRent: 'AED 145K/yr', types: ['Villas', 'Townhouses'], category: 'Freehold', description: "Majid Al Futtaim's master community centred around a stunning crystal lagoon and pristine private beach." },
-    { slug: 'meydan', name: 'Meydan', location: 'MBR City', image: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&q=80', propertiesForSale: 176, propertiesForRent: 68, avgPriceSale: 'AED 2.2M', avgPriceRent: 'AED 90K/yr', types: ['Villas', 'Apartments'], category: 'Freehold', description: 'Home to the famous Meydan Racecourse and an emerging premium residential and commercial community.' },
-    { slug: 'dubai-south', name: 'Dubai South', location: 'Dubai South', image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80', propertiesForSale: 198, propertiesForRent: 89, avgPriceSale: 'AED 550K', avgPriceRent: 'AED 32K/yr', types: ['Apartments', 'Villas', 'Plots'], category: 'Freehold', description: 'The city of the future built around Al Maktoum International Airport and the vibrant Expo City Dubai.' },
-  ];
+  async ngOnInit(): Promise<void> {
+    // Fetch all data in parallel — commercial listings are in properties table filtered by type
+    const commercialTypes = ['Office', 'Shop', 'Warehouse', 'Plot'];
+    const [propRes, projRes] = await Promise.all([
+      this.sb.from('properties').select('location,community,listing_type,type,price').eq('status', 'Published'),
+      this.sb.from('projects').select('location'),
+    ]);
+
+    // Aggregate by area name (community > location for properties)
+    const areaMap = new Map<string, {
+      forSale: number; forRent: number; commercial: number;
+      projects: number; types: Set<string>; prices: number[];
+    }>();
+
+    const ensure = (name: string) => {
+      const key = name.trim();
+      if (!key) return;
+      if (!areaMap.has(key)) {
+        areaMap.set(key, { forSale: 0, forRent: 0, commercial: 0, projects: 0, types: new Set(), prices: [] });
+      }
+      return areaMap.get(key)!;
+    };
+
+    // Properties (residential + commercial — all in same table)
+    for (const p of (propRes.data ?? [])) {
+      const areaName = (p.community?.trim() || p.location?.trim());
+      if (!areaName) continue;
+      const entry = ensure(areaName);
+      if (!entry) continue;
+      const isCommercial = commercialTypes.includes(p.type);
+      if (isCommercial) {
+        entry.commercial++;
+        entry.types.add('Offices');
+      } else {
+        if ((p.listing_type as string) === 'Rent') entry.forRent++;
+        else entry.forSale++;
+        if (p.type) entry.types.add(this.normaliseType(p.type));
+      }
+      if (p.price) entry.prices.push(Number(p.price));
+    }
+
+    // Projects
+    for (const p of (projRes.data ?? [])) {
+      const areaName = p.location?.trim();
+      if (!areaName) continue;
+      const entry = ensure(areaName);
+      if (!entry) continue;
+      entry.projects++;
+    }
+
+    // Build Area objects — merge entries with the same slug (e.g. full address vs short name)
+    const slugMap = new Map<string, Area>();
+    areaMap.forEach((v, name) => {
+      const total = v.forSale + v.forRent + v.commercial + v.projects;
+      if (total === 0) return;
+      const slug = toSlug(name);
+      const displayName = name.split(',')[0].trim(); // use short name for display
+      const avgPrice = v.prices.length
+        ? Math.round(v.prices.reduce((a, b) => a + b, 0) / v.prices.length)
+        : 0;
+      if (slugMap.has(slug)) {
+        // Merge into existing entry
+        const ex = slugMap.get(slug)!;
+        ex.propertiesForSale += v.forSale;
+        ex.propertiesForRent += v.forRent;
+        ex.projectCount      = (ex.projectCount ?? 0) + v.projects;
+        ex.commercialCount   = (ex.commercialCount ?? 0) + v.commercial;
+        ex.totalListings     = (ex.totalListings ?? 0) + total;
+      } else {
+        slugMap.set(slug, {
+          slug,
+          name:              displayName,
+          location:          displayName,
+          image:             getImage(displayName),
+          propertiesForSale: v.forSale,
+          propertiesForRent: v.forRent,
+          projectCount:      v.projects,
+          commercialCount:   v.commercial,
+          totalListings:     total,
+          avgPriceSale:      avgPrice ? `AED ${this.formatPrice(avgPrice)}` : '',
+          types:             Array.from(v.types),
+          featured:          total >= 3,
+          description:       '',
+        });
+      }
+    });
+    const areas = Array.from(slugMap.values());
+
+    // Sort by total listings descending
+    areas.sort((a, b) => (b.totalListings ?? 0) - (a.totalListings ?? 0));
+    this.allAreas.set(areas);
+    this.loading.set(false);
+  }
+
+  private normaliseType(t: string): string {
+    const lower = t.toLowerCase();
+    if (lower.includes('apartment') || lower.includes('flat') || lower.includes('studio')) return 'Apartments';
+    if (lower.includes('villa'))       return 'Villas';
+    if (lower.includes('townhouse'))   return 'Townhouses';
+    if (lower.includes('office'))      return 'Offices';
+    if (lower.includes('plot') || lower.includes('land')) return 'Plots';
+    return t;
+  }
+
+  private formatPrice(n: number): string {
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (n >= 1_000)     return (n / 1_000).toFixed(0) + 'K';
+    return n.toString();
+  }
 
   filtered = computed(() => {
-    let list = [...this.areas];
+    let list = [...this.allAreas()];
     const type = this.activeType();
-    const q = this.searchQuery().toLowerCase().trim();
+    const q    = this.searchQuery().toLowerCase().trim();
     if (type !== 'All') list = list.filter(a => a.types.includes(type));
     if (q) list = list.filter(a =>
-      a.name.toLowerCase().includes(q) ||
-      a.location.toLowerCase().includes(q) ||
-      a.description.toLowerCase().includes(q)
+      a.name.toLowerCase().includes(q) || a.location.toLowerCase().includes(q)
     );
     return list;
   });
 
-  constructor(private router: Router) {}
+  featuredAreas = computed(() => this.allAreas().filter(a => a.featured).slice(0, 6));
 
-  goToArea(slug: string) {
-    this.router.navigate(['/areas', slug]);
-  }
+  goToArea(slug: string) { this.router.navigate(['/areas', slug]); }
 }

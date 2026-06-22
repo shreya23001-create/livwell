@@ -169,6 +169,10 @@ export class PropertyDetailComponent implements OnInit {
     if (!this.inquiryForm_email) this.inquiryForm_email = user.email ?? '';
   }
 
+  redirectToLogin(): void {
+    this.router.navigate(['/customer'], { queryParams: { returnUrl: this.router.url } });
+  }
+
   async submitInquiry(p: Property): Promise<void> {
     if (!this.inquiryForm_name.trim() || !this.inquiryForm_phone.trim() || !this.inquiryForm_email.trim()) {
       this.inquiryError.set('Please fill in Name, Phone and Email.');
@@ -182,6 +186,19 @@ export class PropertyDetailComponent implements OnInit {
     this.inquirySubmitting.set(true);
     this.inquiryError.set('');
     const userId = this.auth.currentUser()?.id ?? null;
+
+    // Resolve agent email
+    let agentEmail: string | null = null;
+    const hasAgent = p.agent_name && p.agent_name !== 'Unassigned' && p.agent_name !== 'LivWell Agent';
+    if (hasAgent) {
+      const { data: agentProf } = await this.sb.from('profiles').select('email').eq('name', p.agent_name).eq('role', 'agent').maybeSingle();
+      agentEmail = agentProf?.email ?? null;
+    }
+    if (!agentEmail) {
+      const { data: adminProf } = await this.sb.from('profiles').select('email').eq('role', 'admin').limit(1).maybeSingle();
+      agentEmail = adminProf?.email ?? null;
+    }
+
     const { error } = await this.sb.from('admin_leads').insert({
       name:           this.inquiryForm_name.trim(),
       phone:          this.inquiryForm_phone.trim(),
@@ -193,21 +210,48 @@ export class PropertyDetailComponent implements OnInit {
       property_title: p.title,
       customer_id:    userId,
       location:       p.community || p.location,
-      assigned_agent: p.agent_name !== 'Unassigned' ? p.agent_name : null,
+      assigned_agent: hasAgent ? p.agent_name : null,
+      agent_email:    agentEmail,
       status:         'new',
       source:         'website',
     });
     this.inquirySubmitting.set(false);
     if (error) { this.inquiryError.set('Failed to send. Please try again.'); return; }
     this.inquirySent.set(true);
-    // Send confirmation email to the lead
+
+    // Email confirmation to the enquirer
     this.emailSvc.send('enquiry_property', {
       to_email:       this.inquiryForm_email.trim(),
       name:           this.inquiryForm_name.trim(),
       property_title: p.title,
-      agent_name:     p.agent_name || 'Livwell Team',
+      agent_name:     hasAgent ? p.agent_name : 'Livwell Team',
       agent_phone:    this.agentPhone() || '+971 4 000 0000',
     });
+
+    // Email to assigned agent (or admin if no agent)
+    if (agentEmail) {
+      if (hasAgent) {
+        this.emailSvc.send('agent_new_lead', {
+          to_email:       agentEmail,
+          agent_name:     p.agent_name,
+          customer_name:  this.inquiryForm_name.trim(),
+          customer_phone: this.inquiryForm_phone.trim(),
+          customer_email: this.inquiryForm_email.trim(),
+          property_title: p.title,
+          message:        this.inquiryForm_message.trim() || '',
+        });
+      } else {
+        this.emailSvc.send('admin_unassigned_lead', {
+          to_email:       agentEmail,
+          customer_name:  this.inquiryForm_name.trim(),
+          customer_phone: this.inquiryForm_phone.trim(),
+          customer_email: this.inquiryForm_email.trim(),
+          property_title: p.title,
+          message:        this.inquiryForm_message.trim() || '',
+        });
+      }
+    }
+
     this.inquiryForm_name = ''; this.inquiryForm_phone = '';
     this.inquiryForm_email = ''; this.inquiryForm_budget = ''; this.inquiryForm_message = '';
   }

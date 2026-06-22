@@ -296,15 +296,17 @@
 
         <!-- Inquiry card -->
         <div class="pd-inquiry-card">
-          <div class="pd-inquiry-title">Request a Viewing</div>
-          <ng-container *ngIf="!showEnquiry()">
-            <button class="pd-submit-btn" (click)="showEnquiry.set(true)">Contact Agent</button>
+          <div class="pd-inquiry-title">Send Enquiry</div>
+          <ng-container *ngIf="!isLoggedIn()">
+            <p style="font-size:.85rem;color:#555;margin:0 0 12px;line-height:1.5;">Please sign in to send an enquiry.</p>
+            <button class="pd-submit-btn" (click)="redirectToLogin()">Sign In to Enquire</button>
           </ng-container>
-          <ng-container *ngIf="showEnquiry()">
+          <ng-container *ngIf="isLoggedIn()">
             <ng-container *ngIf="!inquirySent()">
               <input class="pd-input" type="text" placeholder="Your Name *" [(ngModel)]="inquiryName" />
               <input class="pd-input" type="tel" placeholder="Phone *" [(ngModel)]="inquiryPhone" />
-              <input class="pd-input" type="email" placeholder="Email" [(ngModel)]="inquiryEmail" />
+              <input class="pd-input" type="email" placeholder="Email *" [(ngModel)]="inquiryEmail" />
+              <input class="pd-input" type="text" placeholder="Your Budget (e.g. AED 2M)" [(ngModel)]="inquiryBudget" />
               <textarea class="pd-textarea" rows="3" placeholder="Message (optional)" [(ngModel)]="inquiryMessage"></textarea>
               <button class="pd-submit-btn" (click)="submitInquiry(p)" [disabled]="inquirySubmitting()">
                 {{ inquirySubmitting() ? 'Sending…' : 'Send Enquiry' }}

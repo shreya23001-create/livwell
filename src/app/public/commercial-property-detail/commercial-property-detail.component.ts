@@ -204,6 +204,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
   inquiryName       = '';
   inquiryPhone      = '';
   inquiryEmail      = '';
+  inquiryBudget     = '';
   inquiryMessage    = '';
   inquirySent       = signal(false);
   inquirySubmitting = signal(false);
@@ -248,30 +249,70 @@ export class CommercialPropertyDetailComponent implements OnInit {
     this.inquirySubmitting.set(true);
     this.inquiryError.set('');
     const userId = this.auth.currentUser()?.id ?? null;
-    const payload = {
-      name:          this.inquiryName.trim(),
-      phone:         this.inquiryPhone.trim(),
-      email:         this.inquiryEmail.trim(),
-      notes:         this.inquiryMessage.trim() || `Enquiry about commercial: ${p.title}`,
-      property_type: p.type,
-      customer_id:   userId,
-      location:      p.location,
-      assigned_agent: p.agent.name || null,
-      agent_email:   p.agent.email || null,
-      source:        'website',
-      status:        'new',
-    };
-    await this.sb.from('admin_leads').insert(payload);
+
+    // Resolve agent email from profiles, fallback to admin
+    const hasAgent = !!(p.agent.name && p.agent.name !== 'LivWell Agent');
+    let agentEmail = p.agent.email || null;
+    if (hasAgent && !agentEmail) {
+      const { data: agentProf } = await this.sb.from('profiles').select('email').eq('name', p.agent.name).eq('role', 'agent').maybeSingle();
+      agentEmail = agentProf?.email ?? null;
+    }
+    if (!agentEmail) {
+      const { data: adminProf } = await this.sb.from('profiles').select('email').eq('role', 'admin').limit(1).maybeSingle();
+      agentEmail = adminProf?.email ?? null;
+    }
+
+    await this.sb.from('admin_leads').insert({
+      name:           this.inquiryName.trim(),
+      phone:          this.inquiryPhone.trim(),
+      email:          this.inquiryEmail.trim(),
+      notes:          this.inquiryMessage.trim() || `Enquiry about commercial: ${p.title}`,
+      budget:         this.inquiryBudget.trim() || null,
+      property_type:  p.type,
+      customer_id:    userId,
+      location:       p.location,
+      assigned_agent: hasAgent ? p.agent.name : null,
+      agent_email:    agentEmail,
+      source:         'website',
+      status:         'new',
+    });
     this.inquirySubmitting.set(false);
+
+    // Confirmation email to enquirer
     if (this.inquiryEmail.trim()) {
       this.emailSvc.send('enquiry_commercial', {
         to_email:       this.inquiryEmail.trim(),
         name:           this.inquiryName.trim(),
         property_title: p.title,
-        agent_name:     p.agent.name || 'Livwell Team',
+        agent_name:     hasAgent ? p.agent.name : 'Livwell Team',
         agent_phone:    p.agent.phone || '+971 4 000 0000',
       });
     }
+
+    // Email agent or admin
+    if (agentEmail) {
+      if (hasAgent) {
+        this.emailSvc.send('agent_new_lead', {
+          to_email:       agentEmail,
+          agent_name:     p.agent.name,
+          customer_name:  this.inquiryName.trim(),
+          customer_phone: this.inquiryPhone.trim(),
+          customer_email: this.inquiryEmail.trim(),
+          property_title: p.title,
+          message:        this.inquiryMessage.trim() || '',
+        });
+      } else {
+        this.emailSvc.send('admin_unassigned_lead', {
+          to_email:       agentEmail,
+          customer_name:  this.inquiryName.trim(),
+          customer_phone: this.inquiryPhone.trim(),
+          customer_email: this.inquiryEmail.trim(),
+          property_title: p.title,
+          message:        this.inquiryMessage.trim() || '',
+        });
+      }
+    }
+
     this.inquirySent.set(true);
   }
 
@@ -330,6 +371,19 @@ export class CommercialPropertyDetailComponent implements OnInit {
       window.scrollTo({ top: 0 });
       this.loadProperty(id);
     });
+    this.auth.waitForSession().then(() => this.prefillInquiryForm());
+  }
+
+  private prefillInquiryForm(): void {
+    const user = this.auth.currentUser();
+    if (!user) return;
+    if (!this.inquiryName)  this.inquiryName  = user.name  ?? '';
+    if (!this.inquiryPhone) this.inquiryPhone = user.phone ?? '';
+    if (!this.inquiryEmail) this.inquiryEmail = user.email ?? '';
+  }
+
+  redirectToLogin(): void {
+    this.router.navigate(['/customer'], { queryParams: { returnUrl: this.router.url } });
   }
 
   private async loadProperty(id: number): Promise<void> {

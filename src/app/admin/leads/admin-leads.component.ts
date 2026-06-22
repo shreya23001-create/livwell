@@ -6,6 +6,8 @@ import * as XLSX from 'xlsx';
 import { AdminDataService, LeadStatus, LeadSource, LeadCategory, Lead } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { EmailService } from '../../shared/services/email.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 export type { LeadStatus, LeadSource, LeadCategory, Lead };
 
@@ -30,6 +32,8 @@ export class AdminLeadsComponent implements OnInit {
   private auth   = inject(AuthService);
   private toast  = inject(ToastService);
   private route  = inject(ActivatedRoute);
+  private emailSvc = inject(EmailService);
+  private sb       = inject(SupabaseService).client;
   leads   = this.dataSvc.leads;
   loading = this.dataSvc.leadsLoading;
 
@@ -176,11 +180,35 @@ export class AdminLeadsComponent implements OnInit {
     this.saving.set(true);
     this.saveError.set('');
     const isEdit = this.editId() !== null;
+
+    // Capture previous agent before saving (to detect assignment change)
+    const prevLead = isEdit ? this.leads().find(l => l.id === this.editId()) : null;
+    const prevAgent = prevLead?.assignedAgent ?? 'Unassigned';
+    const newAgent  = f.assignedAgent ?? 'Unassigned';
+    const agentChanged = isEdit && newAgent !== 'Unassigned' && newAgent !== prevAgent;
+
     const err = await this.dataSvc.saveLead(f, this.editId());
     this.saving.set(false);
     if (err) { this.toast.error(err); return; }
     this.showModal.set(false);
     this.toast.success(`Lead "${f.name}" ${isEdit ? 'updated' : 'created'} successfully.`);
+
+    // Send email to newly assigned agent
+    if (agentChanged) {
+      const { data: agentProf } = await this.sb.from('profiles').select('email').eq('name', newAgent).eq('role', 'agent').maybeSingle();
+      if (agentProf?.email) {
+        this.emailSvc.send('agent_new_lead', {
+          to_email:       agentProf.email,
+          agent_name:     newAgent,
+          customer_name:  f.name?.trim() ?? '',
+          customer_phone: f.phone?.trim() ?? '',
+          customer_email: f.email?.trim() ?? '',
+          property_title: [f.propertyType, f.location].filter(Boolean).join(' — ') || 'Lead enquiry',
+          message:        f.notes?.trim() ?? '',
+        });
+      }
+    }
+
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
     this.dataSvc.logLeadAction(actor, role, isEdit ? 'Update Lead' : 'Add Lead', `Lead "${f.name}" ${isEdit ? 'updated' : 'created'}`);

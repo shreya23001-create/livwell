@@ -1,9 +1,10 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { SocialLoginModule, GoogleSigninButtonModule, SocialAuthService, GoogleLoginProvider, SocialUser } from '@abacritt/angularx-social-login';
 import { AuthService } from '../../shared/services/auth.service';
+import { EmailService } from '../../shared/services/email.service';
 
 type Tab = 'signin' | 'signup';
 type ForgotStep = 'email' | 'otp' | 'reset';
@@ -78,7 +79,10 @@ export class CustomerAuthComponent {
     return score;
   });
 
-  constructor(private auth: AuthService, private socialAuth: SocialAuthService) {
+  private route  = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  constructor(private auth: AuthService, private socialAuth: SocialAuthService, private emailSvc: EmailService) {
     this.socialAuth.authState.subscribe((user: SocialUser | null) => {
       if (user) {
         this.auth.loginWithGoogle({
@@ -114,6 +118,8 @@ export class CustomerAuthComponent {
     this.loading.set(false);
 
     if (result.success) {
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      if (returnUrl) { this.router.navigateByUrl(returnUrl); return; }
       const user = this.auth.currentUser();
       if (user) this.auth.redirectByRole(user.role);
     } else {
@@ -169,6 +175,11 @@ export class CustomerAuthComponent {
     this.loading.set(false);
 
     if (result.success) {
+      this.emailSvc.send('signup_welcome', {
+        to_email: email.trim(),
+        name:     name.trim(),
+        email:    email.trim(),
+      });
       const user = this.auth.currentUser();
       if (user) this.auth.redirectByRole(user.role);
     } else if (result.error === 'email_exists') {

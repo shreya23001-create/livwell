@@ -175,6 +175,19 @@ export class ProjectDetailPublicComponent implements OnInit {
       this.notFound.set(true);
     }
     this.loading.set(false);
+    this.auth.waitForSession().then(() => this.prefillInquiryForm());
+  }
+
+  private prefillInquiryForm(): void {
+    const user = this.auth.currentUser();
+    if (!user) return;
+    if (!this.inquiryName)  this.inquiryName  = user.name  ?? '';
+    if (!this.inquiryPhone) this.inquiryPhone = user.phone ?? '';
+    if (!this.inquiryEmail) this.inquiryEmail = user.email ?? '';
+  }
+
+  redirectToLogin(): void {
+    this.router.navigate(['/customer'], { queryParams: { returnUrl: this.router.url } });
   }
 
   private async geocodeAndSetMap(p: Project): Promise<void> {
@@ -251,18 +264,19 @@ export class ProjectDetailPublicComponent implements OnInit {
     this.inquiryError.set('');
     const userId = this.auth.currentUser()?.id ?? null;
 
-    // Resolve agent email from agent_name so the lead appears in the agent portal
+    // Resolve agent email, fallback to admin
+    const hasAgent = !!(p.agent_name);
     let agentEmail: string | null = null;
-    if (p.agent_name) {
-      const { data: agentData } = await this.sb
-        .from('admin_users')
-        .select('email')
-        .eq('name', p.agent_name)
-        .maybeSingle();
+    if (hasAgent) {
+      const { data: agentData } = await this.sb.from('profiles').select('email').eq('name', p.agent_name).eq('role', 'agent').maybeSingle();
       agentEmail = agentData?.email ?? null;
     }
+    if (!agentEmail) {
+      const { data: adminProf } = await this.sb.from('profiles').select('email').eq('role', 'admin').limit(1).maybeSingle();
+      agentEmail = adminProf?.email ?? null;
+    }
 
-    const payload = {
+    const { error: insertError } = await this.sb.from('admin_leads').insert({
       name:           this.inquiryName.trim(),
       phone:          this.inquiryPhone.trim(),
       email:          this.inquiryEmail.trim(),
@@ -273,22 +287,48 @@ export class ProjectDetailPublicComponent implements OnInit {
       property_type:  p.type,
       customer_id:    userId,
       location:       p.community || p.location,
-      assigned_agent: p.agent_name || null,
+      assigned_agent: hasAgent ? p.agent_name : null,
       agent_email:    agentEmail,
       source:         'website',
       status:         'new',
-    };
-    const { error: insertError } = await this.sb.from('admin_leads').insert(payload);
+    });
     this.inquirySubmitting.set(false);
+
+    // Confirmation email to enquirer
     if (!insertError && this.inquiryEmail.trim()) {
       this.emailSvc.send('enquiry_project', {
         to_email:      this.inquiryEmail.trim(),
         name:          this.inquiryName.trim(),
         project_title: p.title,
-        agent_name:    p.agent_name || 'Livwell Team',
+        agent_name:    hasAgent ? p.agent_name : 'Livwell Team',
         agent_phone:   this.agentPhone() || '+971 4 000 0000',
       });
     }
+
+    // Email agent or admin
+    if (agentEmail) {
+      if (hasAgent) {
+        this.emailSvc.send('agent_new_lead', {
+          to_email:       agentEmail,
+          agent_name:     p.agent_name,
+          customer_name:  this.inquiryName.trim(),
+          customer_phone: this.inquiryPhone.trim(),
+          customer_email: this.inquiryEmail.trim(),
+          property_title: p.title,
+          message:        this.inquiryMessage.trim() || '',
+        });
+      } else {
+        this.emailSvc.send('admin_unassigned_lead', {
+          to_email:       agentEmail,
+          customer_name:  this.inquiryName.trim(),
+          customer_phone: this.inquiryPhone.trim(),
+          customer_email: this.inquiryEmail.trim(),
+          property_title: p.title,
+          message:        this.inquiryMessage.trim() || '',
+        });
+      }
+    }
+
     this.inquirySent.set(true);
   }
 }

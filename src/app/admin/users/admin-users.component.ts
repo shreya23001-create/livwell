@@ -224,19 +224,22 @@ export class AdminUsersComponent {
       this.saving.set(false);
       this.closeModal();
       this.toast.success(`User "${f.name}" created successfully.`);
-      if (f.role === 'agent' && f.email && f.password) {
-        this.emailSvc.send('agent_credentials', {
+      if (f.email && f.password) {
+        const portalUrl =
+          f.role === 'agent'                              ? 'https://testlivwelldubai.vercel.app/agent/login'
+          : f.role === 'admin' || f.role === 'super_admin' ? 'https://testlivwelldubai.vercel.app/admin/login'
+          : 'https://testlivwelldubai.vercel.app/customer';
+        const templateKey =
+          f.role === 'agent'       ? 'agent_credentials'
+          : f.role === 'admin'     ? 'admin_credentials'
+          : f.role === 'super_admin' ? 'admin_credentials'
+          : 'customer_credentials';
+        this.emailSvc.send(templateKey, {
           to_email:   f.email.trim(),
           name:       f.name?.trim() ?? '',
           email:      f.email.trim(),
           password:   f.password,
-          portal_url: 'https://testlivwelldubai.vercel.app/agent/login',
-        });
-      } else if (f.role === 'customer' && f.email) {
-        this.emailSvc.send('signup_welcome', {
-          to_email: f.email.trim(),
-          name:     f.name?.trim() ?? '',
-          email:    f.email.trim(),
+          portal_url: portalUrl,
         });
       }
       const actor = this.auth.currentUser()?.email ?? 'admin';

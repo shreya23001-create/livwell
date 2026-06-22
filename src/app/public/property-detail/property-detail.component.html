@@ -413,8 +413,11 @@
 
       <!-- Inquiry form card -->
       <div class="pd-inquiry-card">
-        <div class="pd-inquiry-title">Request a Viewing</div>
-        @if (inquirySent()) {
+        <div class="pd-inquiry-title">Send Enquiry</div>
+        @if (!isLoggedIn()) {
+          <p style="font-size:.85rem;color:#555;margin:0 0 12px;line-height:1.5;">Please sign in to send an enquiry.</p>
+          <button class="pd-submit-btn" (click)="redirectToLogin()">Sign In to Enquire</button>
+        } @else if (inquirySent()) {
           <div class="pd-inquiry-success">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
             Inquiry sent! An agent will contact you shortly.
@@ -431,7 +434,7 @@
               <p class="pd-inquiry-error">{{ inquiryError() }}</p>
             }
             <button type="submit" class="pd-submit-btn" [disabled]="inquirySubmitting()">
-              {{ inquirySubmitting() ? 'Sending…' : 'Request Viewing' }}
+              {{ inquirySubmitting() ? 'Sending…' : 'Send Enquiry' }}
             </button>
           </form>
         }

@@ -18,25 +18,25 @@ interface CoreValue { title: string; body: string; }
 export class AboutComponent {
   private dataSvc = inject(AdminDataService);
 
-  aboutPage    = computed(() => this.dataSvc.pages().find(p => p.id === 'about-hero'));
-  heroTitle    = computed(() => this.aboutPage()?.heading    || 'About Livwell');
+  aboutPage = computed(() => this.dataSvc.pages().find(p => p.id === 'about-hero'));
+  heroTitle = computed(() => this.aboutPage()?.heading || 'About Livwell');
   heroSubtitle = computed(() => this.aboutPage()?.subheading || "Dubai's most trusted real estate partner — connecting people with exceptional properties since 2008.");
   stats: Stat[] = [
-    { value: '950+',    label: 'Expert Agents' },
+    { value: '20+', label: 'Expert Agents' },
     { value: '17 Years', label: 'of Excellence' },
-    { value: '25',      label: 'Offices Across Dubai' },
+    { value: '25', label: 'Offices Across Dubai' },
     { value: '18,000+', label: 'Clients & Investors' },
   ];
 
   coreValues: CoreValue[] = [
-    { title: 'Integrity',            body: 'We uphold the highest ethical standards, ensuring transparency and honesty in all our dealings.' },
-    { title: 'Innovation',           body: 'We continuously seek creative solutions and leverage cutting-edge technology to deliver better outcomes for our clients.' },
-    { title: 'Excellence',           body: 'We are committed to delivering the highest quality service at every stage of your real estate journey.' },
-    { title: 'Respect',              body: 'We value and respect our clients, teammates, and partners, fostering a culture of trust and mutual respect.' },
-    { title: 'Authenticity',         body: 'We foster authentic relationships built on trust and collaboration, putting your interests at the heart of every recommendation.' },
-    { title: 'Collaboration',        body: 'Collaboration is at the core of what we do — internally across departments, and externally with all valued partners.' },
+    { title: 'Integrity', body: 'We uphold the highest ethical standards, ensuring transparency and honesty in all our dealings.' },
+    { title: 'Innovation', body: 'We continuously seek creative solutions and leverage cutting-edge technology to deliver better outcomes for our clients.' },
+    { title: 'Excellence', body: 'We are committed to delivering the highest quality service at every stage of your real estate journey.' },
+    { title: 'Respect', body: 'We value and respect our clients, teammates, and partners, fostering a culture of trust and mutual respect.' },
+    { title: 'Authenticity', body: 'We foster authentic relationships built on trust and collaboration, putting your interests at the heart of every recommendation.' },
+    { title: 'Collaboration', body: 'Collaboration is at the core of what we do — internally across departments, and externally with all valued partners.' },
     { title: 'Social Responsibility', body: 'We are committed to sustainable practices for the communities we serve, operating with purpose beyond profit.' },
-    { title: 'Kindness',             body: 'We inspire a positive and caring working environment, and simply enjoy doing business with a smile — every interaction matters.' },
+    { title: 'Kindness', body: 'We inspire a positive and caring working environment, and simply enjoy doing business with a smile — every interaction matters.' },
   ];
 
   promises: string[] = [

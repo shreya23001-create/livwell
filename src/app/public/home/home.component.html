@@ -68,11 +68,8 @@
             <path stroke-linecap="round" d="m21 21-4.35-4.35" />
           </svg>
           <input type="text" class="hero-search-input" placeholder="Search area, community or project…"
-            [ngModel]="searchQuery()"
-            (ngModelChange)="onSearchInput($event)"
-            (focus)="onSearchFocus()"
-            (blur)="closeSearchDrop()"
-            (keydown.enter)="doSearch()" />
+            [ngModel]="searchQuery()" (ngModelChange)="onSearchInput($event)" (focus)="onSearchFocus()"
+            (blur)="closeSearchDrop()" (keydown.enter)="doSearch()" />
         </div>
         <button class="hero-search-btn" (click)="doSearch()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -84,31 +81,40 @@
 
         <!-- Dropdown -->
         @if (searchDropOpen()) {
-          <div class="hero-search-drop">
-            @if (searchLoading()) {
-              <div class="hero-sdrop-loading">Searching…</div>
-            } @else if (searchResults().length === 0) {
-              <div class="hero-sdrop-empty">No results found</div>
-            } @else {
-              @for (item of searchResults(); track item.label) {
-                <button class="hero-sdrop-item" (click)="selectResult(item)">
-                  <span class="hero-sdrop-icon">
-                    @if (item.type === 'location') {
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-                    } @else if (item.type === 'property') {
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    } @else {
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    }
-                  </span>
-                  <span class="hero-sdrop-text">
-                    <span class="hero-sdrop-label">{{ item.label }}</span>
-                    <span class="hero-sdrop-sub">{{ item.sub }}</span>
-                  </span>
-                </button>
+        <div class="hero-search-drop">
+          @if (searchLoading()) {
+          <div class="hero-sdrop-loading">Searching…</div>
+          } @else if (searchResults().length === 0) {
+          <div class="hero-sdrop-empty">No results found</div>
+          } @else {
+          @for (item of searchResults(); track item.label) {
+          <button class="hero-sdrop-item" (click)="selectResult(item)">
+            <span class="hero-sdrop-icon">
+              @if (item.type === 'location') {
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                <circle cx="12" cy="9" r="2.5" />
+              </svg>
+              } @else if (item.type === 'property') {
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              } @else {
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
               }
-            }
-          </div>
+            </span>
+            <span class="hero-sdrop-text">
+              <span class="hero-sdrop-label">{{ item.label }}</span>
+              <span class="hero-sdrop-sub">{{ item.sub }}</span>
+            </span>
+          </button>
+          }
+          }
+        </div>
         }
       </div>
 
@@ -166,7 +172,7 @@
       </div>
       <div class="hero-stat-div"></div>
       <div class="hero-stat-item">
-        <span class="hero-stat-num">950<sup>+</sup></span>
+        <span class="hero-stat-num">20<sup>+</sup></span>
         <span class="hero-stat-lbl">Agents</span>
       </div>
       <div class="hero-stat-div"></div>
@@ -199,7 +205,7 @@
         <div class="trust-left">
           <div class="trust-stats-row">
             <div class="trust-stat">
-              <span class="trust-num">950+</span>
+              <span class="trust-num">20+</span>
               <span class="trust-lbl">Agents</span>
             </div>
             <div class="trust-stat">
@@ -335,7 +341,8 @@
         <div *ngFor="let p of latestProjects()" class="lp-card">
           <!-- Image -->
           <div class="lp-img-wrap">
-            <img [src]="p.image" [alt]="p.name" class="lp-img" (error)="$any($event.target).src='/images/dummy-image.png'">
+            <img [src]="p.image" [alt]="p.name" class="lp-img"
+              (error)="$any($event.target).src='/images/dummy-image.png'">
             <div class="lp-payment-badge">{{ p.paymentPlan }} Payment Plan</div>
             <div *ngIf="p.badge" class="lp-hot-dot"></div>
           </div>
@@ -437,8 +444,8 @@
     <div class="teams-body">
       <!-- Left: scrollable team name list — hidden when only one area -->
       <div class="teams-list" [class.teams-list--hidden]="teamAreas().length === 1">
-        <button *ngFor="let team of teamAreas(); let i = index" class="team-name-btn" [class.active]="activeTeam() === i"
-          (click)="activeTeam.set(i)">
+        <button *ngFor="let team of teamAreas(); let i = index" class="team-name-btn"
+          [class.active]="activeTeam() === i" (click)="activeTeam.set(i)">
           {{ team.area }}
         </button>
       </div>
@@ -535,7 +542,8 @@
         class="trending-card">
         <!-- Image -->
         <div class="trending-img-wrap">
-          <img [src]="p.image" [alt]="p.name" class="trending-img" (error)="$any($event.target).src='/images/dummy-image.png'">
+          <img [src]="p.image" [alt]="p.name" class="trending-img"
+            (error)="$any($event.target).src='/images/dummy-image.png'">
           <span class="trending-badge" [class.badge-red]="p.badge === 'Ready'" [class.badge-dark]="p.badge !== 'Ready'">
             {{ p.badge }}
           </span>
@@ -596,7 +604,8 @@
         class="property-card">
 
         <!-- Full image fills the card -->
-        <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
+        <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy"
+          (error)="$any($event.target).src='/images/dummy-image.png'">
 
         <!-- Gradient overlay darkens bottom -->
         <div class="property-overlay"></div>
@@ -668,7 +677,8 @@
     <div class="offplan-grid">
       <div *ngFor="let project of offPlanProjects(); let i = index" class="offplan-card">
         <div class="offplan-img-wrap">
-          <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
+          <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy"
+            (error)="$any($event.target).src='/images/dummy-image.png'">
           <div class="offplan-overlay"></div>
           <div class="offplan-top-badges">
             <span class="offplan-badge">{{ project.badge }}</span>

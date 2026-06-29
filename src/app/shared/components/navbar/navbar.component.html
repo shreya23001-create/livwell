@@ -3,8 +3,9 @@
 
     <!-- Logo -->
     <a routerLink="/" class="nav-logo" (click)="closeMobileMenu()">
-      <img *ngIf="navbarWhite()" src="images/livwell favicon logo black.svg" alt="Livwell Real Estate LLC" class="logo-img">
-      <img *ngIf="!navbarWhite()" src="images/livwell favicon logo white.svg" alt="Livwell Real Estate LLC" class="logo-img">
+      <img *ngIf="navbarWhite()" src="images/livwell fav logo.png" alt="Livwell Real Estate LLC" class="logo-img">
+      <img *ngIf="!navbarWhite()" src="images/livwell favicon logo white.svg" alt="Livwell Real Estate LLC"
+        class="logo-img">
     </a>
 
     <!-- Desktop Nav Links with dropdowns -->
@@ -117,9 +118,12 @@
         </button>
         <div class="nav-dropdown">
           <a routerLink="/luxury-projects" class="nav-dd-item" (click)="closeMobileMenu()">Luxury Projects</a>
-          <a routerLink="/ultra-luxury-projects" class="nav-dd-item" (click)="closeMobileMenu()">Ultra Luxury Projects</a>
-          <a routerLink="/branded-residences" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Branded Residences</a>
-          <a routerLink="/luxury-properties-for-sale" class="nav-dd-item" (click)="closeMobileMenu()">Luxury Properties</a>
+          <a routerLink="/ultra-luxury-projects" class="nav-dd-item" (click)="closeMobileMenu()">Ultra Luxury
+            Projects</a>
+          <a routerLink="/branded-residences" class="nav-dd-item" (click)="closeMobileMenu()">Dubai Branded
+            Residences</a>
+          <a routerLink="/luxury-properties-for-sale" class="nav-dd-item" (click)="closeMobileMenu()">Luxury
+            Properties</a>
           <!-- Luxury for Sale flyout -->
           <div class="nav-dd-flyout-wrap">
             <span class="nav-dd-item nav-dd-has-flyout">
@@ -129,10 +133,8 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a *ngFor="let t of luxeSaleTypes()"
-                routerLink="/luxury-properties-for-sale"
-                [queryParams]="{type: t, intent: 'Buy'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">{{ t }}s</a>
+              <a *ngFor="let t of luxeSaleTypes()" routerLink="/luxury-properties-for-sale"
+                [queryParams]="{type: t, intent: 'Buy'}" class="nav-dd-item" (click)="closeMobileMenu()">{{ t }}s</a>
             </div>
           </div>
           <!-- Luxury for Rent flyout -->
@@ -144,10 +146,8 @@
               </svg>
             </span>
             <div class="nav-dd-flyout">
-              <a *ngFor="let t of luxeRentTypes()"
-                routerLink="/luxury-properties-for-sale"
-                [queryParams]="{type: t, intent: 'Rent'}"
-                class="nav-dd-item" (click)="closeMobileMenu()">{{ t }}s</a>
+              <a *ngFor="let t of luxeRentTypes()" routerLink="/luxury-properties-for-sale"
+                [queryParams]="{type: t, intent: 'Rent'}" class="nav-dd-item" (click)="closeMobileMenu()">{{ t }}s</a>
             </div>
           </div>
         </div>
@@ -238,7 +238,9 @@
         <button class="nav-profile-btn">
           <div class="nav-avatar">{{ auth.currentUser()?.name?.charAt(0)?.toUpperCase() }}</div>
           <span class="nav-profile-name">{{ (auth.currentUser()?.name || '').split(' ')[0] }}</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </button>
         <div class="nav-dropdown nav-dropdown--right nav-profile-dropdown">
           <div class="nav-profile-header">
@@ -252,27 +254,49 @@
           <!-- Dashboard link — role-aware -->
           @if (auth.isAdmin()) {
           <a routerLink="/admin/dashboard" target="_blank" class="nav-dd-item nav-dd-item--icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
             Dashboard
           </a>
           } @else if (auth.isAgent()) {
           <a routerLink="/agent/dashboard" target="_blank" class="nav-dd-item nav-dd-item--icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
             Dashboard
           </a>
           } @else {
           <a routerLink="/my/dashboard" target="_blank" class="nav-dd-item nav-dd-item--icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
             Dashboard
           </a>
           <a routerLink="/my/profile" class="nav-dd-item nav-dd-item--icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
             Profile
           </a>
           }
           <div class="nav-profile-divider"></div>
           <button class="nav-dd-item nav-dd-item--icon nav-dd-item--danger" (click)="auth.logout()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
             Logout
           </button>
         </div>

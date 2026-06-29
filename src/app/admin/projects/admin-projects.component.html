@@ -221,6 +221,11 @@
             <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
           </div>
         </div>
+        <div class="apr-form-group">
+          <label>Trending Category</label>
+          <input type="text" [value]="form().trending_category" (input)="form.update(f=>({...f,trending_category:$any($event.target).value}))" placeholder="e.g. Villas, Flats, Luxury">
+          <small class="apr-field-hint">Shown as a tab on the home page. Leave blank to hide from trending.</small>
+        </div>
       </div>
 
       <!-- Row 4: Price + Beds + Completion -->

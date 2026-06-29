@@ -34,6 +34,7 @@ export interface Project {
   brand_logo_url: string;
   agent_name: string;
   video_url: string | null;
+  trending_category: string;
   created_at?: string;
 }
 
@@ -44,6 +45,7 @@ const BLANK: Project = {
   description: '', amenities: [], images: [], floor_plan_url: '',
   badge: '', is_featured: false, is_luxury: false, is_ultra_luxury: false,
   is_branded: false, brand: '', brand_logo_url: '', agent_name: '', video_url: null,
+  trending_category: '',
 };
 
 @Component({
@@ -269,6 +271,7 @@ export class AdminProjectsComponent implements OnInit {
       is_branded: f.is_branded, brand: f.brand, brand_logo_url: f.brand_logo_url,
       agent_name: f.agent_name,
       video_url: (f as any).video_url ?? null,
+      trending_category: f.trending_category ?? '',
     };
 
     if (this.editMode() && f.id) {

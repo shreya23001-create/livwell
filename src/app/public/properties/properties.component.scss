@@ -367,7 +367,29 @@
   color: #374151;
   cursor: pointer;
   &:hover { background: #f3f4f6; }
-  &.selected { background: #f0fdf4; color: #22754a; font-weight: 600; }
+  &.selected { background: #f0fdf4; color: #22754a; }
+}
+.loc-checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  user-select: none;
+}
+.loc-checkbox {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  &.checked {
+    background: #22754a;
+    border-color: #22754a;
+  }
 }
 
 /* Range inputs */

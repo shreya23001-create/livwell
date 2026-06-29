@@ -58,7 +58,7 @@ export class PropertiesComponent implements OnInit {
   searchQuery = signal('');
   selectedType = signal('');
   selectedStatus = signal('');
-  selectedLocation = signal('');
+  selectedLocations = signal<string[]>([]);
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
   selectedBeds = signal('');
@@ -72,15 +72,27 @@ export class PropertiesComponent implements OnInit {
     return this.filterOptions.locations.filter(l => l.toLowerCase().includes(q));
   });
 
-  selectLocation(loc: string): void {
-    this.selectedLocation.set(loc);
-    this.locationSearch.set(loc);
-    this.locationDropdownOpen.set(false);
+  locationInputPlaceholder = computed(() => {
+    const sel = this.selectedLocations();
+    return sel.length === 0 ? 'Search location…' : `${sel.length} selected`;
+  });
+
+  isLocationSelected(loc: string): boolean {
+    return this.selectedLocations().includes(loc);
+  }
+
+  toggleLocation(loc: string): void {
+    const current = this.selectedLocations();
+    if (current.includes(loc)) {
+      this.selectedLocations.set(current.filter(l => l !== loc));
+    } else {
+      this.selectedLocations.set([...current, loc]);
+    }
     this.onFilterChange();
   }
 
   clearLocation(): void {
-    this.selectedLocation.set('');
+    this.selectedLocations.set([]);
     this.locationSearch.set('');
     this.locationDropdownOpen.set(false);
     this.onFilterChange();
@@ -306,11 +318,13 @@ export class PropertiesComponent implements OnInit {
       const s = this.selectedStatus().toLowerCase();
       result = result.filter(p => p.status.toLowerCase() === s);
     }
-    if (this.selectedLocation()) {
-      const loc = this.selectedLocation().toLowerCase();
+    const selLocs = this.selectedLocations();
+    if (selLocs.length) {
       result = result.filter(p =>
-        p.community.toLowerCase().includes(loc) ||
-        p.location.toLowerCase().includes(loc)
+        selLocs.some(loc => {
+          const l = loc.toLowerCase();
+          return p.community.toLowerCase().includes(l) || p.location.toLowerCase().includes(l);
+        })
       );
     }
     if (this.minPrice() !== null) result = result.filter(p => p.price >= this.minPrice()!);
@@ -396,7 +410,7 @@ export class PropertiesComponent implements OnInit {
     let count = 0;
     if (this.selectedType()) count++;
     if (this.selectedStatus()) count++;
-    if (this.selectedLocation()) count++;
+    count += this.selectedLocations().length;
     if (this.minPrice() !== null || this.maxPrice() !== null) count++;
     if (this.selectedBeds()) count++;
     if (this.selectedBaths()) count++;
@@ -437,7 +451,7 @@ export class PropertiesComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['type'])      this.selectedType.set(params['type']);
       if (params['status'])    this.selectedStatus.set(params['status']);
-      if (params['location'])  { this.selectedLocation.set(params['location']); this.locationSearch.set(params['location']); }
+      if (params['location'])  { this.selectedLocations.set([params['location']]); }
       if (params['q'])         this.searchQuery.set(params['q']);
       if (params['beds'])      this.selectedBeds.set(params['beds']);
       if (params['minPrice'])  this.minPrice.set(Number(params['minPrice']));
@@ -547,7 +561,7 @@ export class PropertiesComponent implements OnInit {
     this.searchQuery.set('');
     this.selectedType.set('');
     this.selectedStatus.set('');
-    this.selectedLocation.set('');
+    this.selectedLocations.set([]);
     this.locationSearch.set('');
     this.minPrice.set(null);
     this.maxPrice.set(null);

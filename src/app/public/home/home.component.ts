@@ -267,6 +267,7 @@ export class HomeComponent implements OnInit {
       this.loadPropertyCounts(),
       this.loadTopAgents(),
       this.loadLocations(),
+      this.loadSuccessStories(),
     ]);
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => this.setupScrollAnimations(), 50);
@@ -450,29 +451,41 @@ export class HomeComponent implements OnInit {
     this.propertyCounts.set(counts);
   }
 
-  testimonials: Testimonial[] = [
+  testimonials = signal<Testimonial[]>([
     {
       name: 'James & Emily Carter',
       role: 'Purchased Villa in Palm Jumeirah',
       text: 'Livwell made our dream of owning a home in Dubai a reality. The team was incredibly professional, transparent through every step, and found us the perfect property within our budget.',
       rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/men/34.jpg',
+      avatar: '',
     },
     {
       name: 'Fatima Al-Rashidi',
       role: 'Sold Apartment in Downtown Dubai',
       text: 'I was amazed by how quickly my property sold and at a price above my expectations. The marketing team did an exceptional job and my agent was always available to answer questions.',
       rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+      avatar: '',
     },
     {
       name: 'Raj Patel',
       role: 'Investment Portfolio – 5 Properties',
       text: 'As an investor, I need data-driven advice. Livwell\'s team provided in-depth market analysis that helped me build a portfolio with consistent returns. Highly recommend their investment consulting.',
       rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/men/57.jpg',
+      avatar: '',
     },
-  ];
+  ]);
+
+  private async loadSuccessStories(): Promise<void> {
+    const { data } = await this.sb
+      .from('success_stories')
+      .select('name, role, text, rating, avatar')
+      .eq('active', true)
+      .order('sort_order');
+    if (data && data.length) {
+      this.testimonials.set(data as Testimonial[]);
+      this.activeTestimonial.set(0);
+    }
+  }
 
   newsArticles: NewsArticle[] = [
     {
@@ -602,7 +615,7 @@ export class HomeComponent implements OnInit {
 
   private startTestimonialRotation(): void {
     setInterval(() => {
-      this.activeTestimonial.set((this.activeTestimonial() + 1) % this.testimonials.length);
+      this.activeTestimonial.set((this.activeTestimonial() + 1) % (this.testimonials().length || 1));
     }, 5000);
   }
 

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import * as XLSX from 'xlsx';
 
-type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' | 'locations';
+type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' | 'locations' | 'communities';
 
 @Component({
   selector: 'app-admin-master',
@@ -24,6 +24,7 @@ export class AdminMasterComponent {
   statuses      = this.dataSvc.propStatuses;
   trendingTabs  = this.dataSvc.trendingTabs;
   locations     = this.dataSvc.locations;
+  communities   = this.dataSvc.communities;
 
   // Form fields
   newCategory    = signal('');
@@ -35,15 +36,24 @@ export class AdminMasterComponent {
   statusError    = signal('');
   newTrendingTab   = signal('');
   trendingTabError = signal('');
-  newLocation      = signal('');
-  locationError    = signal('');
-  locationSearch   = signal('');
-  importingLoc     = signal(false);
+  newLocation        = signal('');
+  locationError      = signal('');
+  locationSearch     = signal('');
+  importingLoc       = signal(false);
+  newCommunity       = signal('');
+  communityError     = signal('');
+  communitySearch    = signal('');
+  importingCommunity = signal(false);
   saving           = signal(false);
 
   filteredLocations = computed(() => {
     const q = this.locationSearch().toLowerCase();
     return q ? this.locations().filter(l => l.toLowerCase().includes(q)) : this.locations();
+  });
+
+  filteredCommunities = computed(() => {
+    const q = this.communitySearch().toLowerCase();
+    return q ? this.communities().filter(c => c.toLowerCase().includes(q)) : this.communities();
   });
 
   counts = computed(() => ({
@@ -52,6 +62,7 @@ export class AdminMasterComponent {
     statuses:     this.statuses().length,
     trendingTabs: this.trendingTabs().length,
     locations:    this.locations().length,
+    communities:  this.communities().length,
   }));
 
   // ── Categories ────────────────────────────────────────
@@ -186,5 +197,66 @@ export class AdminMasterComponent {
     this.importingLoc.set(false);
     input.value = '';
     if (added === 0) this.locationError.set('No new locations found in the file.');
+  }
+
+  // ── Communities (Developers) ──────────────────────────
+  async addCommunity(): Promise<void> {
+    const val = this.newCommunity().trim();
+    if (!val) { this.communityError.set('Enter a developer name.'); return; }
+    if (this.communities().includes(val)) { this.communityError.set('Already exists.'); return; }
+    this.saving.set(true);
+    const err = await this.dataSvc.addMasterItem('community', val);
+    this.saving.set(false);
+    if (err) { this.communityError.set(err); return; }
+    this.newCommunity.set('');
+    this.communityError.set('');
+  }
+
+  async removeCommunity(name: string): Promise<void> {
+    const err = await this.dataSvc.removeMasterItem('community', name);
+    if (err) this.communityError.set('Delete failed: ' + err);
+  }
+
+  exportCommunitiesExcel(): void {
+    const rows = this.communities().map(c => ({ 'Developer': c }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Developers');
+    XLSX.writeFile(wb, 'livwell-developers.xlsx');
+  }
+
+  downloadSampleCommunitiesExcel(): void {
+    const sample = [
+      { 'Developer': 'Emaar Properties' }, { 'Developer': 'DAMAC Properties' },
+      { 'Developer': 'Nakheel' }, { 'Developer': 'Meraas' },
+      { 'Developer': 'Azizi Developments' }, { 'Developer': 'Binghatti' },
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Developers');
+    XLSX.writeFile(wb, 'livwell-developers-sample.xlsx');
+  }
+
+  async importCommunitiesExcel(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    this.importingCommunity.set(true);
+    this.communityError.set('');
+    const buffer = await input.files[0].arrayBuffer();
+    const wb = XLSX.read(buffer, { type: 'array' });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) as any[];
+    const existing = new Set(this.communities());
+    let added = 0;
+    for (const r of rows) {
+      const name = (r['Developer'] ?? '').toString().trim();
+      if (name && !existing.has(name)) {
+        await this.dataSvc.addMasterItem('community', name);
+        existing.add(name);
+        added++;
+      }
+    }
+    this.importingCommunity.set(false);
+    input.value = '';
+    if (added === 0) this.communityError.set('No new developers found in the file.');
   }
 }

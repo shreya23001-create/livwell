@@ -207,11 +207,11 @@ $bg:      #f4f6fa;
 
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
 .form-field {
-  display: flex; flex-direction: column; gap: 0.35rem; &--full { grid-column: 1/-1; }
+  display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; &--full { grid-column: 1/-1; }
   label { font-size: 0.8rem; font-weight: 600; color: $sub; }
-  input, select, textarea { border: 1px solid $border; border-radius: 0.5rem; padding: 0.55rem 0.75rem; font-size: 0.875rem; color: $text; outline: none; background: #fff; width: 100%; box-sizing: border-box; transition: border-color 0.15s; &:focus { border-color: $accent; } }
+  input:not([type="checkbox"]), select, textarea { border: 1px solid $border; border-radius: 0.5rem; padding: 0.55rem 0.75rem; font-size: 0.875rem; color: $text; outline: none; background: #fff; width: 100%; box-sizing: border-box; transition: border-color 0.15s; &:focus { border-color: $accent; } }
   textarea { resize: vertical; font-family: inherit; }
-  &.has-error input, &.has-error select, &.has-error textarea { border-color: $red; }
+  &.has-error input:not([type="checkbox"]), &.has-error select, &.has-error textarea { border-color: $red; }
 }
 .field-error { font-size: 0.75rem; color: $red; }
 .delete-msg { font-size: 0.9rem; color: $sub; line-height: 1.6; margin: 0; }
@@ -220,4 +220,42 @@ $bg:      #f4f6fa;
   .form-row { grid-template-columns: 1fr; }
   .cms-banner-card { flex-direction: column; align-items: flex-start; }
   .cms-banner-actions { width: 100%; justify-content: flex-end; }
+}
+
+// ── Success Story modal extras ────────────────────────────
+.story-check-row {
+  display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem;
+  input[type="checkbox"] { width: 16px; height: 16px; accent-color: $accent; cursor: pointer; flex-shrink: 0; }
+  label { font-size: 0.875rem; color: $sub; cursor: pointer; margin: 0; font-weight: 500; }
+}
+
+// ── Success Stories ──────────────────────────────────────
+.cms-loading { padding: 2rem; text-align: center; color: $muted; }
+.cms-empty   { padding: 2rem; text-align: center; color: $muted; }
+.stories-list { display: flex; flex-direction: column; gap: 1rem; }
+.story-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid $border;
+  border-radius: 10px;
+  background: #fff;
+  &.inactive { opacity: 0.55; }
+}
+.story-card-left { display: flex; gap: 0.75rem; align-items: flex-start; min-width: 200px; }
+.story-avatar {
+  width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  &--placeholder { display:flex; align-items:center; justify-content:center; background:#e5e7eb; color:#6b7280; font-weight:700; font-size:1.1rem; }
+}
+.story-name  { font-weight: 600; font-size: 0.9rem; color: $text; }
+.story-role  { font-size: 0.78rem; color: $muted; margin-top: 2px; }
+.story-stars { font-size: 0.85rem; color: #f59e0b; margin-top: 4px; }
+.story-text  { font-size: 0.85rem; color: $sub; line-height: 1.6; font-style: italic; align-self: center; }
+.story-actions { display: flex; gap: 0.5rem; align-items: center; }
+.btn-toggle {
+  font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: none; cursor: pointer;
+  background: #e5e7eb; color: $sub;
+  &.active { background: #dcfce7; color: #15803d; }
 }

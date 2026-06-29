@@ -318,6 +318,17 @@ export class AdminUsersComponent {
     XLSX.writeFile(wb, `livwell-users-${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 
+  downloadSampleExcel(): void {
+    const sample = [
+      { 'Name': 'Ahmed Hassan', 'Email': 'ahmed@example.com', 'Phone': '+971501234567', 'Role': 'Agent', 'Status': 'Active', 'Joined Date': '2026-01-01', 'Last Active': '2026-06-01', 'Properties Count': 0, 'Leads Count': 0 },
+      { 'Name': 'Sara Ali', 'Email': 'sara@example.com', 'Phone': '+971509876543', 'Role': 'Customer', 'Status': 'Active', 'Joined Date': '2026-02-15', 'Last Active': '2026-06-10', 'Properties Count': 0, 'Leads Count': 0 },
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Users');
+    XLSX.writeFile(wb, 'livwell-users-sample.xlsx');
+  }
+
   // ── Import ────────────────────────────────────────────
   async importFromExcel(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;

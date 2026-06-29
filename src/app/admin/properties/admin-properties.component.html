@@ -455,9 +455,23 @@
         <span *ngIf="formErrors()['location']" class="prop-form-error">{{ formErrors()['location'] }}</span>
       </div>
       <div class="prop-form-field">
-        <label class="prop-form-label">Community</label>
-        <input class="prop-form-input" type="text" placeholder="e.g. Burj Views" [value]="form()['community'] || ''"
-          (input)="patchForm('community', $any($event.target).value)">
+        <label class="prop-form-label">Project</label>
+        <div class="adm-loc-wrap">
+          <svg class="adm-loc-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="prop-form-input adm-loc-input" type="text"
+            placeholder="Search or type project name…"
+            [value]="projSearch()"
+            (input)="projSearch.set($any($event.target).value); projDropdownOpen.set(true); patchForm('project_name', $any($event.target).value)"
+            (focus)="projDropdownOpen.set(true)"
+            (blur)="projDropdownOpen.set(false)"
+            autocomplete="off">
+          <div class="adm-loc-dropdown" *ngIf="projDropdownOpen() && filteredProjects().length">
+            <div class="adm-loc-option" *ngFor="let n of filteredProjects()"
+              (mousedown)="projSearch.set(n); patchForm('project_name', n); projDropdownOpen.set(false)">
+              {{ n }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

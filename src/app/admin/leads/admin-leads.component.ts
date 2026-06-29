@@ -253,6 +253,17 @@ export class AdminLeadsComponent implements OnInit {
     XLSX.writeFile(wb, `livwell-leads-${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 
+  downloadSampleExcel(): void {
+    const sample = [
+      { 'Name': 'John Smith', 'Email': 'john@example.com', 'Phone': '+971501234567', 'Status': 'New', 'Source': 'Website', 'Category': 'buy', 'Budget': 'AED 2,000,000', 'Location': 'Dubai Marina', 'Property Type': 'Apartment', 'Assigned Agent': 'Unassigned', 'Notes': 'Looking for 2BR', 'Created Date': '2026-06-01', 'Last Contact': '2026-06-01' },
+      { 'Name': 'Sara Ali', 'Email': 'sara@example.com', 'Phone': '+971509876543', 'Status': 'Contacted', 'Source': 'Referral', 'Category': 'rent', 'Budget': 'AED 120,000', 'Location': 'Business Bay', 'Property Type': 'Office', 'Assigned Agent': 'Unassigned', 'Notes': '', 'Created Date': '2026-06-02', 'Last Contact': '2026-06-03' },
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Leads');
+    XLSX.writeFile(wb, 'livwell-leads-sample.xlsx');
+  }
+
   // ── Import ────────────────────────────────────────────
   async importFromExcel(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;

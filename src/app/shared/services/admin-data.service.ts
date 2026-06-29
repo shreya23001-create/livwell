@@ -79,6 +79,7 @@ export class AdminDataService {
   readonly categories   = signal<string[]>(['Sale', 'Rent', 'Off-Plan']);
   readonly propTypes    = signal<string[]>(['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office', 'Shop', 'Warehouse', 'Plot']);
   readonly trendingTabs = signal<string[]>(['Villas', 'Luxury', 'Flats']);
+  readonly communities  = signal<string[]>(['Emaar Properties', 'DAMAC Properties', 'Nakheel', 'Meraas', 'Dubai Properties', 'Azizi Developments', 'Binghatti', 'Sobha Realty', 'Aldar Properties', 'Select Group', 'Omniyat', 'Ellington Properties', 'Tiger Properties', 'Danube Properties', 'Object 1', 'Reportage Properties', 'Deyaar', 'MAG Property Development', 'Samana Developers', 'Imtiaz Developments']);
   readonly locations    = signal<string[]>(['Downtown Dubai', 'Palm Jumeirah', 'Dubai Marina', 'Business Bay', 'JBR', 'Arabian Ranches', 'Emirates Hills', 'Jumeirah Village Circle', 'Dubai Hills Estate', 'Meydan', 'Dubai Creek Harbour', 'Jumeirah', 'Al Barsha', 'DIFC', 'Dubai South', 'Bluewaters Island', 'City Walk', 'Al Furjan', 'Sports City', 'Motor City', 'Silicon Oasis', 'International City', 'Discovery Gardens', 'Green Community', 'The Springs', 'The Meadows', 'The Lakes', 'The Greens', 'Al Quoz', 'Deira', 'Bur Dubai', 'Karama', 'Satwa', 'Oud Metha', 'Rashidiya', 'Muhaisnah', 'Al Nahda', 'Al Qusais', 'Mirdif', 'Academic City']);
   readonly propStatuses = signal<MasterStatus[]>([
     { name: 'Draft', color: '#6b7280' }, { name: 'Pending Review', color: '#f59e0b' },
@@ -137,11 +138,13 @@ export class AdminDataService {
         if (dbTrending.length) this.trendingTabs.set(dbTrending);
         const dbLocations = data.filter((r: any) => r.type === 'location').map((r: any) => r.name);
         if (dbLocations.length) this.locations.set(dbLocations);
+        const dbCommunities = data.filter((r: any) => r.type === 'community').map((r: any) => r.name);
+        if (dbCommunities.length) this.communities.set(dbCommunities);
       }
     } catch { /* table not created yet — defaults remain */ }
   }
 
-  async addMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location', name: string, color?: string): Promise<string | null> {
+  async addMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location' | 'community', name: string, color?: string): Promise<string | null> {
     const order = type === 'category'
       ? this.categories().length + 1
       : type === 'property_type'
@@ -150,19 +153,21 @@ export class AdminDataService {
           ? this.trendingTabs().length + 1
           : type === 'location'
             ? this.locations().length + 1
-            : this.propStatuses().length + 1;
+            : type === 'community'
+              ? this.communities().length + 1
+              : this.propStatuses().length + 1;
     const { error } = await this.sb.from('master_data').insert({ type, name, color: color || null, sort_order: order });
     if (error) return error.message;
     await this.loadMasterData();
     return null;
   }
 
-  async removeMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location', name: string): Promise<string | null> {
-    // Optimistic update immediately
+  async removeMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location' | 'community', name: string): Promise<string | null> {
     if (type === 'category')      this.categories.update(l => l.filter(x => x !== name));
     if (type === 'property_type') this.propTypes.update(l => l.filter(x => x !== name));
     if (type === 'trending_tab')  this.trendingTabs.update(l => l.filter(x => x !== name));
     if (type === 'location')      this.locations.update(l => l.filter(x => x !== name));
+    if (type === 'community')     this.communities.update(l => l.filter(x => x !== name));
     if (type === 'status')        this.propStatuses.update(l => l.filter(x => x.name !== name));
 
     const { error } = await this.sb.from('master_data').delete().eq('type', type).eq('name', name);

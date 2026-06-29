@@ -6,7 +6,18 @@ import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
 
-type CmsTab = 'banners' | 'featured' | 'announcements' | 'pages';
+type CmsTab = 'banners' | 'featured' | 'announcements' | 'pages' | 'success-stories';
+
+export interface SuccessStory {
+  id?: number;
+  name: string;
+  role: string;
+  text: string;
+  rating: number;
+  avatar: string;
+  sort_order: number;
+  active: boolean;
+}
 
 @Component({
   selector: 'app-admin-cms',
@@ -20,6 +31,7 @@ export class AdminCmsComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
     this.loadFeaturedProperties();
+    this.loadSuccessStories();
   }
   private dataSvc = inject(AdminDataService);
   private auth    = inject(AuthService);
@@ -208,5 +220,130 @@ export class AdminCmsComponent implements OnInit {
   annTypeLabel(t: AnnouncementType): string {
     return { info: 'Info', success: 'Success', warning: 'Warning' }[t];
   }
+
+  // ── Success Stories ───────────────────────────────────
+  successStories     = signal<SuccessStory[]>([]);
+  storiesLoading     = signal(false);
+  showStoryModal     = signal(false);
+  editingStoryId     = signal<number | null>(null);
+  deleteStoryId      = signal<number | null>(null);
+  storyForm          = signal<Omit<SuccessStory, 'id'>>({ name: '', role: '', text: '', rating: 5, avatar: '', sort_order: 1, active: true });
+  storyErrors        = signal<Record<string, string>>({});
+
+  async loadSuccessStories(): Promise<void> {
+    this.storiesLoading.set(true);
+    const { data, error } = await this.sb.from('success_stories').select('*').order('sort_order');
+    if (error) {
+      this.toast.error('Could not load success stories: ' + error.message);
+    } else if (data && data.length > 0) {
+      this.successStories.set(data as SuccessStory[]);
+    } else if (data && data.length === 0) {
+      await this.seedSuccessStories();
+    }
+    this.storiesLoading.set(false);
+  }
+
+  private async seedSuccessStories(): Promise<void> {
+    const seeds = [
+      {
+        name: 'James & Emily Carter',
+        role: 'Purchased Villa in Palm Jumeirah',
+        text: 'Livwell made our dream of owning a home in Dubai a reality. The team was incredibly professional, transparent through every step, and found us the perfect villa within our budget. Could not be happier.',
+        rating: 5,
+        avatar: '',
+        sort_order: 1,
+        active: true,
+      },
+      {
+        name: 'Fatima Al-Rashidi',
+        role: 'Sold Apartment in Downtown Dubai',
+        text: 'I was amazed by how quickly my apartment sold and at a price above my expectations. The marketing was exceptional and my agent kept me informed at every stage. Truly a stress-free experience.',
+        rating: 5,
+        avatar: '',
+        sort_order: 2,
+        active: true,
+      },
+      {
+        name: 'Raj Patel',
+        role: 'Investment Portfolio – 5 Properties',
+        text: "As an investor I need data-driven advice. Livwell's team provided in-depth market analysis that helped me build a portfolio with consistent returns across Dubai Marina and Business Bay. Highly recommend.",
+        rating: 5,
+        avatar: '',
+        sort_order: 3,
+        active: true,
+      },
+      {
+        name: 'Sophie Lefebvre',
+        role: 'Rented Studio in Dubai Marina',
+        text: 'Relocating from Paris was daunting, but Livwell handled everything remotely. They shortlisted properties matching my exact requirements and I signed the tenancy agreement before even landing in Dubai.',
+        rating: 5,
+        avatar: '',
+        sort_order: 4,
+        active: true,
+      },
+      {
+        name: 'Ahmed Al-Mansoori',
+        role: 'Off-Plan Investor – Creek Harbour',
+        text: 'Livwell guided me through my first off-plan purchase with complete transparency on payment plans and developer credibility. My unit has already appreciated 18% since handover. Exceptional team.',
+        rating: 5,
+        avatar: '',
+        sort_order: 5,
+        active: true,
+      },
+    ];
+    const { data } = await this.sb.from('success_stories').insert(seeds).select();
+    if (data) this.successStories.set(data as SuccessStory[]);
+  }
+
+  openAddStory(): void {
+    this.editingStoryId.set(null);
+    this.storyForm.set({ name: '', role: '', text: '', rating: 5, avatar: '', sort_order: this.successStories().length + 1, active: true });
+    this.storyErrors.set({});
+    this.showStoryModal.set(true);
+  }
+
+  openEditStory(s: SuccessStory): void {
+    this.editingStoryId.set(s.id!);
+    this.storyForm.set({ name: s.name, role: s.role, text: s.text, rating: s.rating, avatar: s.avatar, sort_order: s.sort_order, active: s.active });
+    this.storyErrors.set({});
+    this.showStoryModal.set(true);
+  }
+
+  async saveStory(): Promise<void> {
+    const f = this.storyForm();
+    const errs: Record<string, string> = {};
+    if (!f.name.trim()) errs['name'] = 'Name is required.';
+    if (!f.text.trim()) errs['text'] = 'Story text is required.';
+    this.storyErrors.set(errs);
+    if (Object.keys(errs).length) return;
+
+    this.saving.set(true);
+    const id = this.editingStoryId();
+    const payload = { name: f.name.trim(), role: f.role.trim(), text: f.text.trim(), rating: f.rating, avatar: f.avatar.trim(), sort_order: f.sort_order, active: f.active };
+    const { error } = id
+      ? await this.sb.from('success_stories').update(payload).eq('id', id)
+      : await this.sb.from('success_stories').insert(payload);
+    this.saving.set(false);
+    if (error) { this.toast.error(error.message); return; }
+    this.showStoryModal.set(false);
+    this.toast.success('Success story saved.');
+    await this.loadSuccessStories();
+  }
+
+  async toggleStoryActive(s: SuccessStory): Promise<void> {
+    await this.sb.from('success_stories').update({ active: !s.active }).eq('id', s.id!);
+    await this.loadSuccessStories();
+  }
+
+  async deleteStory(): Promise<void> {
+    const id = this.deleteStoryId();
+    if (id === null) return;
+    await this.sb.from('success_stories').delete().eq('id', id);
+    this.deleteStoryId.set(null);
+    this.toast.success('Story deleted.');
+    await this.loadSuccessStories();
+  }
+
+  storyRatingOptions = [1, 2, 3, 4, 5];
 
 }

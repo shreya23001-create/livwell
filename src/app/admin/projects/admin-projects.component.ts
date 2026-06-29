@@ -79,9 +79,14 @@ export class AdminProjectsComponent implements OnInit {
   locDropdownOpen = signal(false);
   filteredLocs    = computed(() => {
     const q = this.locSearch().toLowerCase();
-    return q
-      ? this.dataSvc.locations().filter(l => l.toLowerCase().includes(q))
-      : this.dataSvc.locations();
+    return q ? this.dataSvc.locations().filter(l => l.toLowerCase().includes(q)) : this.dataSvc.locations();
+  });
+
+  commSearch       = signal('');
+  commDropdownOpen = signal(false);
+  filteredComms    = computed(() => {
+    const q = this.commSearch().toLowerCase();
+    return q ? this.dataSvc.communities().filter(c => c.toLowerCase().includes(q)) : this.dataSvc.communities();
   });
   uploadingImages    = signal(false);
   uploadedImages     = signal<string[]>([]);
@@ -162,6 +167,7 @@ export class AdminProjectsComponent implements OnInit {
     this.form.set({ ...BLANK });
     this.amenityInput.set('');
     this.locSearch.set('');
+    this.commSearch.set('');
     this.uploadedImages.set([]);
     this.previewImages.set([]);
     this.editMode.set(false);
@@ -172,6 +178,7 @@ export class AdminProjectsComponent implements OnInit {
     this.form.set({ ...p });
     this.amenityInput.set('');
     this.locSearch.set(p.location ?? '');
+    this.commSearch.set(p.community ?? '');
     this.uploadedImages.set(p.images ?? []);
     this.previewImages.set(p.images ?? []);
     this.editMode.set(true);

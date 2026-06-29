@@ -25,6 +25,7 @@ export interface Property {
   bathrooms:       number;
   location:        string;
   community:       string;
+  project_name:    string;
   agent_name:      string;
   agent_avatar:    string;
   created_by:      string;
@@ -42,7 +43,7 @@ export interface Property {
 const EMPTY_FORM = (): Partial<Property> => ({
   title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
   price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
-  location: '', community: '', address: '', description: '',
+  location: '', community: '', project_name: '', address: '', description: '',
   furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, images: [],
   amenities: [], video_url: '',
 });
@@ -94,13 +95,27 @@ export class AdminPropertiesComponent implements OnInit {
   videoTab         = signal<'url' | 'upload'>('url');
 
   // ── Location dropdown ─────────────────────────────────
-  locSearch       = signal('');
-  locDropdownOpen = signal(false);
-  filteredLocs    = computed(() => {
+  locSearch        = signal('');
+  locDropdownOpen  = signal(false);
+  filteredLocs     = computed(() => {
     const q = this.locSearch().toLowerCase();
-    return q
-      ? this.dataSvc.locations().filter(l => l.toLowerCase().includes(q))
-      : this.dataSvc.locations();
+    return q ? this.dataSvc.locations().filter(l => l.toLowerCase().includes(q)) : this.dataSvc.locations();
+  });
+
+  commSearch       = signal('');
+  commDropdownOpen = signal(false);
+  filteredComms    = computed(() => {
+    const q = this.commSearch().toLowerCase();
+    return q ? this.dataSvc.communities().filter(c => c.toLowerCase().includes(q)) : this.dataSvc.communities();
+  });
+
+  // ── Project name dropdown ─────────────────────────────
+  projectNames       = signal<string[]>([]);
+  projSearch         = signal('');
+  projDropdownOpen   = signal(false);
+  filteredProjects   = computed(() => {
+    const q = this.projSearch().toLowerCase();
+    return q ? this.projectNames().filter(n => n.toLowerCase().includes(q)) : this.projectNames();
   });
 
   // ── Computed ──────────────────────────────────────────
@@ -151,7 +166,7 @@ export class AdminPropertiesComponent implements OnInit {
   // ── Lifecycle ─────────────────────────────────────────
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
-    await Promise.all([this.loadProperties(), this.loadAgents()]);
+    await Promise.all([this.loadProperties(), this.loadAgents(), this.loadProjectNames()]);
   }
 
   async loadProperties(): Promise<void> {
@@ -187,6 +202,11 @@ export class AdminPropertiesComponent implements OnInit {
     this.loading.set(false);
   }
 
+  async loadProjectNames(): Promise<void> {
+    const { data } = await this.sb.from('projects').select('title').order('title');
+    if (data) this.projectNames.set(data.map((p: any) => p.title).filter(Boolean));
+  }
+
   async loadAgents(): Promise<void> {
     const { data } = await this.sb
       .from('profiles')
@@ -219,6 +239,8 @@ export class AdminPropertiesComponent implements OnInit {
     this.previewImages.set([]);
     this.amenityInput.set('');
     this.locSearch.set('');
+    this.commSearch.set('');
+    this.projSearch.set('');
     this.videoTab.set('url');
     this.editingId.set(null);
     this.modalOpen.set(true);
@@ -231,6 +253,8 @@ export class AdminPropertiesComponent implements OnInit {
     this.uploadedImages.set(p.images ?? []);
     this.previewImages.set(p.images ?? []);
     this.locSearch.set(p.location ?? '');
+    this.commSearch.set(p.community ?? '');
+    this.projSearch.set(p.project_name ?? '');
     this.amenityInput.set('');
     this.videoTab.set(p.video_url ? 'url' : 'url');
     this.editingId.set(p.id);
@@ -379,6 +403,7 @@ export class AdminPropertiesComponent implements OnInit {
       bathrooms:       Number(f.bathrooms) || 1,
       location:        f.location?.trim()  || '',
       community:       f.community?.trim() || '',
+      project_name:    f.project_name?.trim() || '',
       address:         f.address?.trim()   || '',
       description:     f.description?.trim() || '',
       furnishing:      f.furnishing    || 'Unfurnished',

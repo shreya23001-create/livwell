@@ -396,33 +396,6 @@
 <!-- ============================================================
      GUIDES SECTION
      ============================================================ -->
-<section class="guides-section">
-  <div class="container-custom">
-    <div class="guides-header">
-      <h2 class="guides-title">Guides</h2>
-      <a routerLink="/guides" class="lp-view-all">
-        VIEW ALL GUIDES
-        <span class="lp-view-all-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M7 17L17 7M17 7H7M17 7v10" />
-          </svg>
-        </span>
-      </a>
-    </div>
-    <div class="guides-grid">
-      <a *ngFor="let guide of guides" [routerLink]="['/guides', guide.slug]" class="guide-card">
-        <img [src]="guide.avatar" [alt]="guide.title" class="guide-avatar">
-        <h4 class="guide-name">{{ guide.title }}</h4>
-        <p class="guide-sub">{{ guide.subtitle }}</p>
-        <span class="guide-arrow">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M7 17L17 7M17 7H7M17 7v10" />
-          </svg>
-        </span>
-      </a>
-    </div>
-  </div>
-</section>
 
 <!-- ============================================================
      OUR TEAMS SECTION
@@ -974,24 +947,29 @@
 
     <div class="testimonial-slider animate-on-scroll">
       <div class="testimonial-card">
+        @if (testimonials().length) {
         <div class="testimonial-stars">
-          <span *ngFor="let s of getStars(testimonials[activeTestimonial()].rating)">★</span>
+          <span *ngFor="let s of getStars(testimonials()[activeTestimonial()].rating)">★</span>
         </div>
         <blockquote class="testimonial-text">
-          "{{ testimonials[activeTestimonial()].text }}"
+          "{{ testimonials()[activeTestimonial()].text }}"
         </blockquote>
         <div class="testimonial-author">
-          <img [src]="testimonials[activeTestimonial()].avatar" [alt]="testimonials[activeTestimonial()].name"
-            class="testimonial-avatar">
+          @if (testimonials()[activeTestimonial()].avatar) {
+            <img [src]="testimonials()[activeTestimonial()].avatar" [alt]="testimonials()[activeTestimonial()].name" class="testimonial-avatar">
+          } @else {
+            <div class="testimonial-avatar testimonial-avatar--initials">{{ initials(testimonials()[activeTestimonial()].name) }}</div>
+          }
           <div>
-            <div class="testimonial-name">{{ testimonials[activeTestimonial()].name }}</div>
-            <div class="testimonial-role">{{ testimonials[activeTestimonial()].role }}</div>
+            <div class="testimonial-name">{{ testimonials()[activeTestimonial()].name }}</div>
+            <div class="testimonial-role">{{ testimonials()[activeTestimonial()].role }}</div>
           </div>
         </div>
+        }
       </div>
 
       <div class="testimonial-dots">
-        <button *ngFor="let t of testimonials; let i = index" class="dot" [class.active]="activeTestimonial() === i"
+        <button *ngFor="let t of testimonials(); let i = index" class="dot" [class.active]="activeTestimonial() === i"
           (click)="setTestimonial(i)">
         </button>
       </div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { AdminDataService } from '../../shared/services/admin-data.service';
 import * as XLSX from 'xlsx';
 
 export interface Project {
@@ -56,8 +57,9 @@ const BLANK: Project = {
   styleUrl: './admin-projects.component.scss',
 })
 export class AdminProjectsComponent implements OnInit {
-  private sb   = inject(SupabaseService).client;
-  public  auth = inject(AuthService);
+  private sb      = inject(SupabaseService).client;
+  public  auth    = inject(AuthService);
+  private dataSvc = inject(AdminDataService);
 
   projects     = signal<Project[]>([]);
   agents       = signal<{ name: string }[]>([]);
@@ -73,6 +75,14 @@ export class AdminProjectsComponent implements OnInit {
   editMode        = signal(false);
   form            = signal<Project>({ ...BLANK });
   amenityInput    = signal('');
+  locSearch       = signal('');
+  locDropdownOpen = signal(false);
+  filteredLocs    = computed(() => {
+    const q = this.locSearch().toLowerCase();
+    return q
+      ? this.dataSvc.locations().filter(l => l.toLowerCase().includes(q))
+      : this.dataSvc.locations();
+  });
   uploadingImages    = signal(false);
   uploadedImages     = signal<string[]>([]);
   previewImages      = signal<string[]>([]);
@@ -151,6 +161,7 @@ export class AdminProjectsComponent implements OnInit {
   openAdd() {
     this.form.set({ ...BLANK });
     this.amenityInput.set('');
+    this.locSearch.set('');
     this.uploadedImages.set([]);
     this.previewImages.set([]);
     this.editMode.set(false);
@@ -160,6 +171,7 @@ export class AdminProjectsComponent implements OnInit {
   openEdit(p: Project) {
     this.form.set({ ...p });
     this.amenityInput.set('');
+    this.locSearch.set(p.location ?? '');
     this.uploadedImages.set(p.images ?? []);
     this.previewImages.set(p.images ?? []);
     this.editMode.set(true);
@@ -339,6 +351,17 @@ export class AdminProjectsComponent implements OnInit {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Projects');
     XLSX.writeFile(wb, `livwell-projects-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+
+  downloadSampleExcel(): void {
+    const sample = [
+      { 'Title': 'Palm Vista Residences', 'Developer': 'Emaar', 'Location': 'Palm Jumeirah, Dubai', 'Community': 'Palm Jumeirah', 'Type': 'Apartment', 'Status': 'Published', 'Price From (AED)': 1200000, 'Price Label': 'AED 1.2M', 'Price/sqft': 'AED 1200/sqft', 'Beds': '1 - 3 Beds', 'Bathrooms': 2, 'Area (sqft)': 1000, 'Completion': 'Q4 2026', 'Payment Plan': '40/60', 'Description': 'Luxury waterfront residences', 'Amenities': 'Pool, Gym, Parking', 'Badge': 'New Launch', 'Featured': 'No', 'Luxury': 'Yes', 'Ultra Luxury': 'No', 'Agent': '' },
+      { 'Title': 'Creek Horizon Towers', 'Developer': 'DAMAC', 'Location': 'Dubai Creek Harbour', 'Community': 'Dubai Creek Harbour', 'Type': 'Villa', 'Status': 'Draft', 'Price From (AED)': 3500000, 'Price Label': 'AED 3.5M', 'Price/sqft': '', 'Beds': '3 - 5 Beds', 'Bathrooms': 4, 'Area (sqft)': 3200, 'Completion': 'Q2 2027', 'Payment Plan': '20/80', 'Description': 'Premium creek-view villas', 'Amenities': 'Pool, Security, Kids Play Area', 'Badge': 'Hot', 'Featured': 'Yes', 'Luxury': 'No', 'Ultra Luxury': 'No', 'Agent': '' },
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Projects');
+    XLSX.writeFile(wb, 'livwell-projects-sample.xlsx');
   }
 
   // ── Import ────────────────────────────────────────────

@@ -7,6 +7,11 @@
       <p class="apr-sub">Manage all off-plan, luxury and ultra-luxury projects</p>
     </div>
     <div class="apr-header-actions">
+      <!-- Sample -->
+      <button class="apr-btn apr-btn--ghost" (click)="downloadSampleExcel()" title="Download sample Excel template">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+        Sample Excel
+      </button>
       <!-- Import -->
       <label class="apr-btn apr-btn--ghost" [class.apr-btn--loading]="importing()" title="Import from Excel">
         <input type="file" accept=".xlsx,.xls,.csv" (change)="importFromExcel($event)" style="display:none" [disabled]="importing()">
@@ -184,7 +189,22 @@
       <div class="apr-form-row">
         <div class="apr-form-group apr-form-group--grow">
           <label>Location</label>
-          <input type="text" [value]="form().location" (input)="form.update(f=>({...f,location:$any($event.target).value}))" placeholder="e.g. Business Bay, Dubai">
+          <div class="adm-loc-wrap">
+            <svg class="adm-loc-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input class="adm-loc-input" type="text"
+              placeholder="Search or type location…"
+              [value]="locSearch()"
+              (input)="locSearch.set($any($event.target).value); locDropdownOpen.set(true); form.update(f=>({...f,location:$any($event.target).value}))"
+              (focus)="locDropdownOpen.set(true)"
+              (blur)="locDropdownOpen.set(false)"
+              autocomplete="off">
+            <div class="adm-loc-dropdown" *ngIf="locDropdownOpen() && filteredLocs().length">
+              <div class="adm-loc-option" *ngFor="let l of filteredLocs()"
+                (mousedown)="locSearch.set(l); form.update(f=>({...f,location:l})); locDropdownOpen.set(false)">
+                {{ l }}
+              </div>
+            </div>
+          </div>
         </div>
         <div class="apr-form-group">
           <label>Community</label>

@@ -1223,3 +1223,9 @@ $amber: #d97706;
   border-top-color: $accent; border-radius: 50%; animation: prop-spin 0.7s linear infinite;
 }
 @keyframes prop-spin { to { transform: rotate(360deg); } }
+/* Location search dropdown */
+.adm-loc-wrap { position: relative; display: flex; align-items: center; }
+.adm-loc-icon { position: absolute; left: 0.75rem; color: #9ca3af; pointer-events: none; flex-shrink: 0; }
+.adm-loc-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.25rem !important; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; outline: none; cursor: text; &:focus { border-color: #1a5c3a; } }
+.adm-loc-dropdown { position: absolute; top: calc(100% + 3px); left: 0; right: 0; background: #fff; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 200; max-height: 200px; overflow-y: auto; }
+.adm-loc-option { padding: 0.55rem 0.875rem; font-size: 0.875rem; color: #374151; cursor: pointer; &:hover { background: #f0fdf4; color: #1a5c3a; } }

@@ -93,6 +93,16 @@ export class AdminPropertiesComponent implements OnInit {
   videoDragOver    = signal(false);
   videoTab         = signal<'url' | 'upload'>('url');
 
+  // ── Location dropdown ─────────────────────────────────
+  locSearch       = signal('');
+  locDropdownOpen = signal(false);
+  filteredLocs    = computed(() => {
+    const q = this.locSearch().toLowerCase();
+    return q
+      ? this.dataSvc.locations().filter(l => l.toLowerCase().includes(q))
+      : this.dataSvc.locations();
+  });
+
   // ── Computed ──────────────────────────────────────────
   filtered = computed(() => {
     const q  = this.search().toLowerCase();
@@ -208,6 +218,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.uploadedImages.set([]);
     this.previewImages.set([]);
     this.amenityInput.set('');
+    this.locSearch.set('');
     this.videoTab.set('url');
     this.editingId.set(null);
     this.modalOpen.set(true);
@@ -219,6 +230,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.saveError.set('');
     this.uploadedImages.set(p.images ?? []);
     this.previewImages.set(p.images ?? []);
+    this.locSearch.set(p.location ?? '');
     this.amenityInput.set('');
     this.videoTab.set(p.video_url ? 'url' : 'url');
     this.editingId.set(p.id);
@@ -504,6 +516,17 @@ export class AdminPropertiesComponent implements OnInit {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Properties');
     XLSX.writeFile(wb, `livwell-properties-${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+
+  downloadSampleExcel(): void {
+    const sample = [
+      { 'Title': 'Marina Heights Apartment', 'Type': 'Apartment', 'Category': 'Sale', 'Status': 'Published', 'Price (AED)': 1500000, 'Area (sqft)': 1200, 'Bedrooms': 2, 'Bathrooms': 2, 'Location': 'Dubai Marina, Dubai', 'Community': 'Dubai Marina', 'Address': 'Marina Walk, Tower A', 'Furnishing': 'Furnished', 'Description': 'Stunning marina-view apartment', 'Featured': 'No' },
+      { 'Title': 'Business Bay Office Space', 'Type': 'Office', 'Category': 'Rent', 'Status': 'Published', 'Price (AED)': 350000, 'Area (sqft)': 2500, 'Bedrooms': 0, 'Bathrooms': 2, 'Location': 'Business Bay, Dubai', 'Community': 'Business Bay', 'Address': 'Opus Tower, Floor 12', 'Furnishing': 'Unfurnished', 'Description': 'Premium office with city views', 'Featured': 'Yes' },
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Properties');
+    XLSX.writeFile(wb, 'livwell-properties-sample.xlsx');
   }
 
   // ── Import ────────────────────────────────────────────

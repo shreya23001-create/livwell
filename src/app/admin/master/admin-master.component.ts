@@ -2,8 +2,9 @@ import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+import * as XLSX from 'xlsx';
 
-type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs';
+type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' | 'locations';
 
 @Component({
   selector: 'app-admin-master',
@@ -22,6 +23,7 @@ export class AdminMasterComponent {
   propertyTypes = this.dataSvc.propTypes;
   statuses      = this.dataSvc.propStatuses;
   trendingTabs  = this.dataSvc.trendingTabs;
+  locations     = this.dataSvc.locations;
 
   // Form fields
   newCategory    = signal('');
@@ -31,15 +33,25 @@ export class AdminMasterComponent {
   newStatus      = signal('');
   newStatusColor = signal('#6b7280');
   statusError    = signal('');
-  newTrendingTab = signal('');
+  newTrendingTab   = signal('');
   trendingTabError = signal('');
-  saving         = signal(false);
+  newLocation      = signal('');
+  locationError    = signal('');
+  locationSearch   = signal('');
+  importingLoc     = signal(false);
+  saving           = signal(false);
+
+  filteredLocations = computed(() => {
+    const q = this.locationSearch().toLowerCase();
+    return q ? this.locations().filter(l => l.toLowerCase().includes(q)) : this.locations();
+  });
 
   counts = computed(() => ({
     categories:   this.categories().length,
     types:        this.propertyTypes().length,
     statuses:     this.statuses().length,
     trendingTabs: this.trendingTabs().length,
+    locations:    this.locations().length,
   }));
 
   // ── Categories ────────────────────────────────────────
@@ -113,5 +125,66 @@ export class AdminMasterComponent {
   async removeTrendingTab(name: string): Promise<void> {
     const err = await this.dataSvc.removeMasterItem('trending_tab', name);
     if (err) this.trendingTabError.set('Delete failed: ' + err);
+  }
+
+  // ── Locations ─────────────────────────────────────────
+  async addLocation(): Promise<void> {
+    const val = this.newLocation().trim();
+    if (!val) { this.locationError.set('Enter a location name.'); return; }
+    if (this.locations().includes(val)) { this.locationError.set('Already exists.'); return; }
+    this.saving.set(true);
+    const err = await this.dataSvc.addMasterItem('location', val);
+    this.saving.set(false);
+    if (err) { this.locationError.set(err); return; }
+    this.newLocation.set('');
+    this.locationError.set('');
+  }
+
+  async removeLocation(name: string): Promise<void> {
+    const err = await this.dataSvc.removeMasterItem('location', name);
+    if (err) this.locationError.set('Delete failed: ' + err);
+  }
+
+  exportLocationsExcel(): void {
+    const rows = this.locations().map(l => ({ 'Location': l }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Locations');
+    XLSX.writeFile(wb, 'livwell-locations.xlsx');
+  }
+
+  downloadSampleLocationsExcel(): void {
+    const sample = [
+      { 'Location': 'Downtown Dubai' }, { 'Location': 'Palm Jumeirah' },
+      { 'Location': 'Dubai Marina' }, { 'Location': 'Business Bay' },
+      { 'Location': 'JBR' }, { 'Location': 'Arabian Ranches' },
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Locations');
+    XLSX.writeFile(wb, 'livwell-locations-sample.xlsx');
+  }
+
+  async importLocationsExcel(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    this.importingLoc.set(true);
+    this.locationError.set('');
+    const buffer = await input.files[0].arrayBuffer();
+    const wb = XLSX.read(buffer, { type: 'array' });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) as any[];
+    const existing = new Set(this.locations());
+    let added = 0;
+    for (const r of rows) {
+      const name = (r['Location'] ?? '').toString().trim();
+      if (name && !existing.has(name)) {
+        await this.dataSvc.addMasterItem('location', name);
+        existing.add(name);
+        added++;
+      }
+    }
+    this.importingLoc.set(false);
+    input.value = '';
+    if (added === 0) this.locationError.set('No new locations found in the file.');
   }
 }

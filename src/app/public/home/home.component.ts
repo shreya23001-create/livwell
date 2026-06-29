@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ElementRef, QueryList, ViewChild, ViewChildren, PLATFORM_ID, Inject, signal, computed, inject, NgZone } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, QueryList, ViewChild, ViewChildren, PLATFORM_ID, Inject, signal, computed, effect, inject, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser, UpperCasePipe } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -253,7 +253,6 @@ export class HomeComponent implements OnInit {
   latestProjectsLive     = signal<HomeProject[]>([]);
   offPlanProjectsLive    = signal<OffPlanCard[]>([]);
   trendingProjectsDb     = signal<TrendingProject[]>([]);
-  trendingTabsDb         = signal<string[]>([]);
   topAgentsLive          = signal<HomeAgent[]>([]);
   propertyCounts         = signal<Record<string, number>>({});
 
@@ -413,10 +412,7 @@ export class HomeComponent implements OnInit {
           };
         });
 
-      const orderedTabs = [...new Set(mapped.map(p => p.type))];
-      this.trendingTabsDb.set(orderedTabs);
       this.trendingProjectsDb.set(mapped);
-      if (orderedTabs.length) this.activeTrendingTab.set(orderedTabs[0]);
     }
   }
 
@@ -561,7 +557,14 @@ export class HomeComponent implements OnInit {
     ];
   });
 
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
+    effect(() => {
+      const tabs = this.dataSvc.trendingTabs();
+      if (tabs.length && !tabs.includes(this.activeTrendingTab())) {
+        this.activeTrendingTab.set(tabs[0]);
+      }
+    });
+  }
 
   private slideInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -632,15 +635,9 @@ export class HomeComponent implements OnInit {
   activeTeam = signal(0);
   activeTrendingTab = signal('Luxury');
 
-  trendingTabs = computed(() => {
-    const dbTabs = this.trendingTabsDb();
-    if (dbTabs.length) return dbTabs.map(t => ({ value: t, label: t }));
-    return [
-      { value: 'Villas', label: 'Villas' },
-      { value: 'Luxury', label: 'Luxury' },
-      { value: 'Flats', label: 'Flats' },
-    ];
-  });
+  trendingTabs = computed(() =>
+    this.dataSvc.trendingTabs().map(t => ({ value: t, label: t }))
+  );
 
   filteredTrendingProjects = computed(() => {
     const tab  = this.activeTrendingTab();
@@ -654,8 +651,7 @@ export class HomeComponent implements OnInit {
       { id: 0, name: 'Skyline Tower', developer: 'DAMAC', price: '890K', badge: '60 / 40 Payment Plan', type: 'Flats', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80' },
       { id: 0, name: 'Creek Horizon', developer: 'Emaar', price: '1.25M', badge: '20 / 60 / 20 Payment Plan', type: 'Flats', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80' },
     ];
-    const activeTab = tab || 'Luxury';
-    return fallback.filter(p => p.type === activeTab);
+    return fallback.filter(p => p.type === (tab || 'Luxury'));
   });
 
   guides = [

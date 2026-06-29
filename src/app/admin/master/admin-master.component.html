@@ -22,13 +22,18 @@
       <div class="master-stat-val">{{ counts().statuses }}</div>
       <div class="master-stat-lbl">Statuses</div>
     </div>
+    <div class="master-stat" [class.active]="activeTab()==='trending-tabs'" (click)="activeTab.set('trending-tabs')">
+      <div class="master-stat-val">{{ counts().trendingTabs }}</div>
+      <div class="master-stat-lbl">Trending Tabs</div>
+    </div>
   </div>
 
   <!-- ── Tabs ── -->
   <div class="master-tabs">
-    <button class="master-tab" [class.active]="activeTab()==='categories'"    (click)="activeTab.set('categories')">Categories</button>
+    <button class="master-tab" [class.active]="activeTab()==='categories'"     (click)="activeTab.set('categories')">Categories</button>
     <button class="master-tab" [class.active]="activeTab()==='property-types'" (click)="activeTab.set('property-types')">Property Types</button>
-    <button class="master-tab" [class.active]="activeTab()==='statuses'"      (click)="activeTab.set('statuses')">Statuses</button>
+    <button class="master-tab" [class.active]="activeTab()==='statuses'"       (click)="activeTab.set('statuses')">Statuses</button>
+    <button class="master-tab" [class.active]="activeTab()==='trending-tabs'"  (click)="activeTab.set('trending-tabs')">Trending Tabs</button>
   </div>
 
   <!-- ══ CATEGORIES ══════════════════════════════════════ -->
@@ -141,6 +146,47 @@
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
             </button>
           </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ══ TRENDING TABS ═══════════════════════════════════ -->
+  @if (activeTab() === 'trending-tabs') {
+    <div class="master-card">
+      <div class="master-card-header">
+        <h2 class="master-card-title">Trending Project Tabs</h2>
+        <p class="master-card-sub">These tabs appear on the home page "Most Trending Projects" section. Add any category — Villas, Apartments, Flats, Luxury, etc.</p>
+      </div>
+
+      <div class="master-add-row">
+        <input class="master-input" type="text" placeholder="e.g. Apartments"
+               [ngModel]="newTrendingTab()" (ngModelChange)="newTrendingTab.set($event)"
+               (keyup.enter)="addTrendingTab()">
+        <button class="master-btn master-btn--primary" (click)="addTrendingTab()" [disabled]="saving()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Add Tab
+        </button>
+      </div>
+      @if (trendingTabError()) {
+        <p class="master-error">{{ trendingTabError() }}</p>
+      }
+
+      <div class="master-list">
+        @for (tab of trendingTabs(); track tab) {
+          <div class="master-item">
+            <span class="master-item-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+            </span>
+            <span class="master-item-name">{{ tab }}</span>
+            <span class="master-item-badge">Home Page Tab</span>
+            <button class="master-item-del" (click)="removeTrendingTab(tab)" title="Remove">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        }
+        @if (trendingTabs().length === 0) {
+          <p class="master-empty">No trending tabs yet. Add one above.</p>
         }
       </div>
     </div>

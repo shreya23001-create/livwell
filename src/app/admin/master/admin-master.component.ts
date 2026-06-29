@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 
-type MasterTab = 'categories' | 'property-types' | 'statuses';
+type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs';
 
 @Component({
   selector: 'app-admin-master',
@@ -21,6 +21,7 @@ export class AdminMasterComponent {
   categories    = this.dataSvc.categories;
   propertyTypes = this.dataSvc.propTypes;
   statuses      = this.dataSvc.propStatuses;
+  trendingTabs  = this.dataSvc.trendingTabs;
 
   // Form fields
   newCategory    = signal('');
@@ -30,12 +31,15 @@ export class AdminMasterComponent {
   newStatus      = signal('');
   newStatusColor = signal('#6b7280');
   statusError    = signal('');
+  newTrendingTab = signal('');
+  trendingTabError = signal('');
   saving         = signal(false);
 
   counts = computed(() => ({
-    categories: this.categories().length,
-    types:      this.propertyTypes().length,
-    statuses:   this.statuses().length,
+    categories:   this.categories().length,
+    types:        this.propertyTypes().length,
+    statuses:     this.statuses().length,
+    trendingTabs: this.trendingTabs().length,
   }));
 
   // ── Categories ────────────────────────────────────────
@@ -91,5 +95,23 @@ export class AdminMasterComponent {
   async removeStatus(name: string): Promise<void> {
     const err = await this.dataSvc.removeMasterItem('status', name);
     if (err) this.statusError.set('Delete failed: ' + err);
+  }
+
+  // ── Trending Tabs ─────────────────────────────────────
+  async addTrendingTab(): Promise<void> {
+    const val = this.newTrendingTab().trim();
+    if (!val) { this.trendingTabError.set('Enter a tab name.'); return; }
+    if (this.trendingTabs().includes(val)) { this.trendingTabError.set('Already exists.'); return; }
+    this.saving.set(true);
+    const err = await this.dataSvc.addMasterItem('trending_tab', val);
+    this.saving.set(false);
+    if (err) { this.trendingTabError.set(err); return; }
+    this.newTrendingTab.set('');
+    this.trendingTabError.set('');
+  }
+
+  async removeTrendingTab(name: string): Promise<void> {
+    const err = await this.dataSvc.removeMasterItem('trending_tab', name);
+    if (err) this.trendingTabError.set('Delete failed: ' + err);
   }
 }

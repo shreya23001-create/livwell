@@ -81,6 +81,7 @@ export class AdminProjectsComponent implements OnInit {
   readonly types    = ['Apartment','Villa','Townhouse','Penthouse','Home','Mixed','Duplex'];
   readonly statuses = ['Draft','Published','Archived'];
   readonly badges   = ['','New Launch','Featured','Hot','Exclusive','Trending','Luxury','Ultra Luxury','Limited Units'];
+  readonly trendingCategoryOptions = ['Villas','Flats','Luxury','Apartments','Townhouses','Penthouses','Off-Plan'];
 
   page     = signal(1);
   pageSize = signal(10);

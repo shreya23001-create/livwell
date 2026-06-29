@@ -78,6 +78,7 @@ export class AdminDataService {
   // ── Master Data Signals ───────────────────────────────
   readonly categories   = signal<string[]>(['Sale', 'Rent', 'Off-Plan']);
   readonly propTypes    = signal<string[]>(['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office', 'Shop', 'Warehouse', 'Plot']);
+  readonly trendingTabs = signal<string[]>(['Villas', 'Luxury', 'Flats']);
   readonly propStatuses = signal<MasterStatus[]>([
     { name: 'Draft', color: '#6b7280' }, { name: 'Pending Review', color: '#f59e0b' },
     { name: 'Published', color: '#10b981' }, { name: 'Archived', color: '#8b5cf6' },
@@ -131,26 +132,31 @@ export class AdminDataService {
             color: r.color || '#6b7280',
           }))
         );
+        const dbTrending = data.filter((r: any) => r.type === 'trending_tab').map((r: any) => r.name);
+        if (dbTrending.length) this.trendingTabs.set(dbTrending);
       }
     } catch { /* table not created yet — defaults remain */ }
   }
 
-  async addMasterItem(type: 'category' | 'property_type' | 'status', name: string, color?: string): Promise<string | null> {
+  async addMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab', name: string, color?: string): Promise<string | null> {
     const order = type === 'category'
       ? this.categories().length + 1
       : type === 'property_type'
         ? this.propTypes().length + 1
-        : this.propStatuses().length + 1;
+        : type === 'trending_tab'
+          ? this.trendingTabs().length + 1
+          : this.propStatuses().length + 1;
     const { error } = await this.sb.from('master_data').insert({ type, name, color: color || null, sort_order: order });
     if (error) return error.message;
     await this.loadMasterData();
     return null;
   }
 
-  async removeMasterItem(type: 'category' | 'property_type' | 'status', name: string): Promise<string | null> {
+  async removeMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab', name: string): Promise<string | null> {
     // Optimistic update immediately
     if (type === 'category')      this.categories.update(l => l.filter(x => x !== name));
     if (type === 'property_type') this.propTypes.update(l => l.filter(x => x !== name));
+    if (type === 'trending_tab')  this.trendingTabs.update(l => l.filter(x => x !== name));
     if (type === 'status')        this.propStatuses.update(l => l.filter(x => x.name !== name));
 
     const { error } = await this.sb.from('master_data').delete().eq('type', type).eq('name', name);

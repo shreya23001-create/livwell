@@ -223,7 +223,13 @@
         </div>
         <div class="apr-form-group">
           <label>Trending Category</label>
-          <input type="text" [value]="form().trending_category" (input)="form.update(f=>({...f,trending_category:$any($event.target).value}))" placeholder="e.g. Villas, Flats, Luxury">
+          <input type="text" list="trending-category-list"
+            [value]="form().trending_category"
+            (input)="form.update(f=>({...f,trending_category:$any($event.target).value}))"
+            placeholder="Select or type a category…">
+          <datalist id="trending-category-list">
+            <option *ngFor="let c of trendingCategoryOptions" [value]="c"></option>
+          </datalist>
           <small class="apr-field-hint">Shown as a tab on the home page. Leave blank to hide from trending.</small>
         </div>
       </div>

@@ -317,6 +317,59 @@
   &:focus, &:hover { border-color: #22754a; }
 }
 
+/* Location search + dropdown */
+.loc-filter-group { position: static; }
+.loc-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.loc-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #9ca3af;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.loc-search-input {
+  padding-left: 2.25rem !important;
+  padding-right: 2rem !important;
+  cursor: text !important;
+}
+.loc-clear-btn {
+  position: absolute;
+  right: 0.625rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  &:hover { color: #374151; }
+}
+.loc-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  z-index: 100;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.loc-option {
+  padding: 0.6rem 0.875rem;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  &:hover { background: #f3f4f6; }
+  &.selected { background: #f0fdf4; color: #22754a; font-weight: 600; }
+}
+
 /* Range inputs */
 .range-inputs {
   display: flex;

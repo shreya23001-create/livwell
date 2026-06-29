@@ -50,12 +50,32 @@
     </div>
 
     <!-- Location -->
-    <div class="filter-group">
+    <div class="filter-group loc-filter-group">
       <label class="filter-label">Community / Location</label>
-      <select class="filter-select" [ngModel]="selectedLocation()" (ngModelChange)="selectedLocation.set($event); onFilterChange()">
-        <option value="">All Locations</option>
-        <option *ngFor="let l of filterOptions.locations" [value]="l">{{ l }}</option>
-      </select>
+      <div class="loc-search-wrap">
+        <svg class="loc-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input
+          class="filter-select loc-search-input"
+          type="text"
+          placeholder="Search location…"
+          [ngModel]="locationSearch()"
+          (ngModelChange)="locationSearch.set($event); locationDropdownOpen.set(true)"
+          (focus)="locationDropdownOpen.set(true)"
+          (blur)="locationDropdownOpen.set(false)"
+          autocomplete="off"
+        />
+        <button *ngIf="locationSearch()" class="loc-clear-btn" (mousedown)="clearLocation()" type="button">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="loc-dropdown" *ngIf="locationDropdownOpen() && filteredLocations().length">
+          <div
+            class="loc-option"
+            *ngFor="let l of filteredLocations()"
+            [class.selected]="selectedLocation() === l"
+            (mousedown)="selectLocation(l)"
+          >{{ l }}</div>
+        </div>
+      </div>
     </div>
 
     <!-- Price Range -->

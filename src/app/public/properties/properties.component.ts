@@ -62,6 +62,29 @@ export class PropertiesComponent implements OnInit {
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
   selectedBeds = signal('');
+
+  // ── Location search ──────────────────────────────────────────
+  locationSearch = signal('');
+  locationDropdownOpen = signal(false);
+
+  filteredLocations = computed(() => {
+    const q = this.locationSearch().toLowerCase();
+    return this.filterOptions.locations.filter(l => l.toLowerCase().includes(q));
+  });
+
+  selectLocation(loc: string): void {
+    this.selectedLocation.set(loc);
+    this.locationSearch.set(loc);
+    this.locationDropdownOpen.set(false);
+    this.onFilterChange();
+  }
+
+  clearLocation(): void {
+    this.selectedLocation.set('');
+    this.locationSearch.set('');
+    this.locationDropdownOpen.set(false);
+    this.onFilterChange();
+  }
   selectedBaths = signal('');
   minArea = signal<number | null>(null);
   maxArea = signal<number | null>(null);
@@ -414,7 +437,7 @@ export class PropertiesComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['type'])      this.selectedType.set(params['type']);
       if (params['status'])    this.selectedStatus.set(params['status']);
-      if (params['location'])  this.selectedLocation.set(params['location']);
+      if (params['location'])  { this.selectedLocation.set(params['location']); this.locationSearch.set(params['location']); }
       if (params['q'])         this.searchQuery.set(params['q']);
       if (params['beds'])      this.selectedBeds.set(params['beds']);
       if (params['minPrice'])  this.minPrice.set(Number(params['minPrice']));
@@ -525,6 +548,7 @@ export class PropertiesComponent implements OnInit {
     this.selectedType.set('');
     this.selectedStatus.set('');
     this.selectedLocation.set('');
+    this.locationSearch.set('');
     this.minPrice.set(null);
     this.maxPrice.set(null);
     this.selectedBeds.set('');

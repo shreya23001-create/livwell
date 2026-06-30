@@ -360,12 +360,12 @@ $bg:      #f4f6fa;
   background: #fff;
   border-radius: 0.875rem;
   width: 100%;
-  max-width: 680px;
+  max-width: 900px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-  &--sm { max-width: 420px; }
+  &--sm { max-width: 500px; }
 }
 .modal-header {
   display: flex;

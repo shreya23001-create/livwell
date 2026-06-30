@@ -92,10 +92,8 @@
     <div class="select-wrapper">
       <select class="usr-select" [value]="filterRole()" (change)="filterRole.set($any($event.target).value); onFilter()">
         <option value="">All Roles</option>
-        <option value="super_admin">Super Admin</option>
         <option value="admin">Admin</option>
         <option value="agent">Agent</option>
-        <option value="customer">Customer</option>
       </select>
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
     </div>
@@ -369,8 +367,8 @@
       </div>
     </div>
 
-    <!-- Agent-only fields -->
-    <div *ngIf="form()['role'] === 'agent'" class="usr-form-row">
+    <!-- Agent / Admin fields -->
+    <div *ngIf="form()['role'] === 'agent' || form()['role'] === 'admin'" class="usr-form-row">
       <div class="usr-form-field">
         <label class="usr-form-label">Designation / Title</label>
         <input class="usr-form-input" type="text" placeholder="e.g. Business Associate"

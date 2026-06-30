@@ -229,6 +229,8 @@ export class AdminCmsComponent implements OnInit {
   deleteStoryId      = signal<number | null>(null);
   storyForm          = signal<Omit<SuccessStory, 'id'>>({ name: '', role: '', text: '', rating: 5, avatar: '', sort_order: 1, active: true });
   storyErrors        = signal<Record<string, string>>({});
+  avatarDragging     = signal(false);
+  avatarUploading    = signal(false);
 
   async loadSuccessStories(): Promise<void> {
     this.storiesLoading.set(true);
@@ -299,6 +301,7 @@ export class AdminCmsComponent implements OnInit {
     this.editingStoryId.set(null);
     this.storyForm.set({ name: '', role: '', text: '', rating: 5, avatar: '', sort_order: this.successStories().length + 1, active: true });
     this.storyErrors.set({});
+    this.avatarDragging.set(false);
     this.showStoryModal.set(true);
   }
 
@@ -306,8 +309,36 @@ export class AdminCmsComponent implements OnInit {
     this.editingStoryId.set(s.id!);
     this.storyForm.set({ name: s.name, role: s.role, text: s.text, rating: s.rating, avatar: s.avatar, sort_order: s.sort_order, active: s.active });
     this.storyErrors.set({});
+    this.avatarDragging.set(false);
     this.showStoryModal.set(true);
   }
+
+  onAvatarDragOver(e: DragEvent): void { e.preventDefault(); this.avatarDragging.set(true); }
+  onAvatarDragLeave(): void            { this.avatarDragging.set(false); }
+  onAvatarDrop(e: DragEvent): void {
+    e.preventDefault();
+    this.avatarDragging.set(false);
+    const file = e.dataTransfer?.files?.[0];
+    if (file) this.uploadAvatar(file);
+  }
+  onAvatarFileChange(e: Event): void {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) this.uploadAvatar(file);
+  }
+
+  private async uploadAvatar(file: File): Promise<void> {
+    if (!file.type.startsWith('image/')) { this.toast.error('Please select an image file.'); return; }
+    this.avatarUploading.set(true);
+    const ext  = file.name.split('.').pop();
+    const path = `avatars/${Date.now()}.${ext}`;
+    const { error } = await this.sb.storage.from('imagesFolder').upload(path, file, { upsert: true });
+    if (error) { this.toast.error('Upload failed: ' + error.message); this.avatarUploading.set(false); return; }
+    const { data } = this.sb.storage.from('imagesFolder').getPublicUrl(path);
+    this.storyForm.update(f => ({ ...f, avatar: data.publicUrl }));
+    this.avatarUploading.set(false);
+  }
+
+  removeAvatar(): void { this.storyForm.update(f => ({ ...f, avatar: '' })); }
 
   async saveStory(): Promise<void> {
     const f = this.storyForm();

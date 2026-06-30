@@ -995,7 +995,7 @@
 
     <div class="news-grid animate-on-scroll">
       <!-- Featured article -->
-      <a [routerLink]="['/blog', featuredArticle.id]" class="news-featured">
+      <a [routerLink]="['/blog', featuredArticle.slug ?? featuredArticle.id]" class="news-featured">
         <div class="news-featured-img-wrap">
           <img [src]="featuredArticle.image" [alt]="featuredArticle.title" class="news-featured-img" loading="lazy">
           <div class="news-img-overlay"></div>
@@ -1024,7 +1024,7 @@
 
       <!-- Side articles -->
       <div class="news-side">
-        <a *ngFor="let article of sideArticles; let i = index" [routerLink]="['/blog', article.id]"
+        <a *ngFor="let article of sideArticles; let i = index" [routerLink]="['/blog', article.slug ?? article.id]"
           class="news-card animate-on-scroll" [class]="'delay-' + (i * 100 + 100)">
           <div class="news-card-img-wrap">
             <img [src]="article.image" [alt]="article.title" class="news-card-img" loading="lazy">

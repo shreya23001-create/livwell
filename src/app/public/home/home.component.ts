@@ -73,6 +73,7 @@ interface Testimonial {
 
 interface NewsArticle {
   id: number;
+  slug?: string;
   category: string;
   title: string;
   excerpt: string;
@@ -268,6 +269,7 @@ export class HomeComponent implements OnInit {
       this.loadTopAgents(),
       this.loadLocations(),
       this.loadSuccessStories(),
+      this.loadBlogPosts(),
     ]);
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => this.setupScrollAnimations(), 50);
@@ -487,49 +489,24 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  newsArticles: NewsArticle[] = [
-    {
-      id: 1,
-      category: 'Market Insights',
-      title: 'Dubai Real Estate Market Hits Record AED 141 Billion in 2025 Transactions',
-      excerpt: 'The UAE property market continues its remarkable growth trajectory, with off-plan sales driving unprecedented demand across premium communities.',
-      author: 'Sarah Al-Mansouri',
-      date: 'May 14, 2026',
-      readTime: '5 min read',
-      image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
-      featured: true,
-    },
-    {
-      id: 2,
-      category: 'Investment',
-      title: 'Top 5 Communities for ROI in Dubai: Where Smart Money Is Flowing',
-      excerpt: 'From Business Bay to Jumeirah Village Circle, we break down which communities are delivering the strongest rental yields for investors in 2026.',
-      author: 'Ahmed Hassan',
-      date: 'May 12, 2026',
-      readTime: '4 min read',
-      image: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=800&q=80',
-    },
-    {
-      id: 3,
-      category: 'Lifestyle',
-      title: 'Palm Jumeirah Residences: A Complete Living Guide for New Homeowners',
-      excerpt: 'Everything you need to know about settling into one of the world\'s most iconic addresses — from amenities to community life.',
-      author: 'Priya Sharma',
-      date: 'May 10, 2026',
-      readTime: '6 min read',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-    },
-    {
-      id: 4,
-      category: 'Regulations',
-      title: 'New UAE Golden Visa Rules: How Property Ownership Qualifies You',
-      excerpt: 'Updated guidelines make it easier than ever for property investors to secure long-term residency through real estate investments above AED 2 million.',
-      author: 'Michael Chen',
-      date: 'May 8, 2026',
-      readTime: '3 min read',
-      image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
-    },
-  ];
+  newsArticles = signal<NewsArticle[]>([
+    { id: 1, category: 'Market Insights', title: 'Dubai Real Estate Market Hits Record AED 141 Billion in 2025 Transactions', excerpt: 'The UAE property market continues its remarkable growth trajectory, with off-plan sales driving unprecedented demand across premium communities.', author: 'Sarah Al-Mansouri', date: 'May 14, 2026', readTime: '5 min read', image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80', featured: true },
+    { id: 2, category: 'Investment', title: 'Top 5 Communities for ROI in Dubai: Where Smart Money Is Flowing', excerpt: 'From Business Bay to Jumeirah Village Circle, we break down which communities are delivering the strongest rental yields for investors in 2026.', author: 'Ahmed Hassan', date: 'May 12, 2026', readTime: '4 min read', image: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=800&q=80' },
+    { id: 3, category: 'Lifestyle', title: 'Palm Jumeirah Residences: A Complete Living Guide for New Homeowners', excerpt: 'Everything you need to know about settling into one of the world\'s most iconic addresses — from amenities to community life.', author: 'Priya Sharma', date: 'May 10, 2026', readTime: '6 min read', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80' },
+    { id: 4, category: 'Regulations', title: 'New UAE Golden Visa Rules: How Property Ownership Qualifies You', excerpt: 'Updated guidelines make it easier than ever for property investors to secure long-term residency through real estate investments above AED 2 million.', author: 'Michael Chen', date: 'May 8, 2026', readTime: '3 min read', image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80' },
+  ]);
+
+  private async loadBlogPosts(): Promise<void> {
+    const { data } = await this.sb.from('blogs').select('id,title,slug,category,excerpt,author,image,read_time,featured,published_at')
+      .eq('published', true).order('published_at', { ascending: false }).limit(4);
+    if (data && data.length) {
+      this.newsArticles.set(data.map((p: any) => ({
+        id: p.id, category: p.category, title: p.title, excerpt: p.excerpt,
+        author: p.author, date: new Date(p.published_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'long', year: 'numeric' }),
+        readTime: p.read_time, image: p.image ?? '', featured: p.featured, slug: p.slug,
+      })));
+    }
+  }
 
   propertyTypes = computed(() => {
     const c = this.propertyCounts();
@@ -696,10 +673,11 @@ export class HomeComponent implements OnInit {
   }
 
   get featuredArticle(): NewsArticle {
-    return this.newsArticles.find(a => a.featured) ?? this.newsArticles[0];
+    return this.newsArticles().find(a => a.featured) ?? this.newsArticles()[0];
   }
 
   get sideArticles(): NewsArticle[] {
-    return this.newsArticles.filter(a => !a.featured);
+    const featured = this.featuredArticle;
+    return this.newsArticles().filter(a => a.id !== featured?.id);
   }
 }

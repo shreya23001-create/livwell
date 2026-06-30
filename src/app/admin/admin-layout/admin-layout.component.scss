@@ -7,7 +7,7 @@ $text:    rgba(255,255,255,0.90);
 
 $sidebar-w:     240px;
 $sidebar-w-col: 72px;
-$topbar-h:      60px;
+$topbar-h:      56px;
 
 // ── Shell ────────────────────────────────────────────────
 .adm-shell {
@@ -90,7 +90,13 @@ $topbar-h:      60px;
   gap: 0.2rem;
   padding: 0.75rem 0.625rem;
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.12) transparent;
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
 }
 .adm-nav--small {
   flex: unset;
@@ -285,27 +291,32 @@ $topbar-h:      60px;
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0 1.5rem;
+  padding: 0 1.25rem;
   flex-shrink: 0;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 .adm-topbar-search {
-  flex: 1;
-  max-width: 380px;
+  width: 280px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   background: #f4f6fa;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.875rem;
-  svg { width: 0.9rem; height: 0.9rem; color: #9ca3af; flex-shrink: 0; }
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.38rem 0.875rem;
+  transition: border-color 0.15s, background 0.15s;
+  &:focus-within {
+    background: #fff;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
+  }
+  svg { width: 0.875rem; height: 0.875rem; color: #9ca3af; flex-shrink: 0; }
   input {
     border: none;
     background: none;
     outline: none;
-    font-size: 0.83rem;
-    color: #374151;
+    font-size: 0.825rem;
+    color: #111827;
     width: 100%;
     &::placeholder { color: #9ca3af; }
   }

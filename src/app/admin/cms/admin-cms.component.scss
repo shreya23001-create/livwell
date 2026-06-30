@@ -199,7 +199,7 @@ $bg:      #f4f6fa;
 
 // ── Modal
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
-.modal { background: #fff; border-radius: 0.875rem; width: 100%; max-width: 560px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.2); &--sm { max-width: 420px; } }
+.modal { background: #fff; border-radius: 0.875rem; width: 100%; max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.2); &--sm { max-width: 500px; } }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid $border; h2 { font-size: 1.05rem; font-weight: 700; color: $text; margin: 0; } &--danger h2 { color: $red; } }
 .modal-close { background: none; border: none; cursor: pointer; color: $muted; display: flex; padding: 0.25rem; svg { width: 1.1rem; height: 1.1rem; } &:hover { color: $text; } }
 .modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; }
@@ -259,3 +259,52 @@ $bg:      #f4f6fa;
   background: #e5e7eb; color: $sub;
   &.active { background: #dcfce7; color: #15803d; }
 }
+
+// ── Story image drag-and-drop ─────────────────────────────
+.story-dropzone {
+  border: 2px dashed $border; border-radius: 10px; padding: 1.5rem 1rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s; text-align: center;
+  &:hover, &--over { border-color: $accent; background: rgba(99,102,241,0.04); }
+  &--uploading { cursor: default; opacity: 0.7; pointer-events: none; }
+}
+.story-drop-label { font-size: 0.8rem; color: $sub; }
+.story-drop-hint  { font-size: 0.72rem; color: $muted; }
+
+// reuse blg thumb styles (defined in blogs SCSS) — duplicate here for CMS scope
+.blg-img-thumbs {
+  display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.75rem;
+}
+.blg-img-thumb {
+  position: relative; width: 120px; height: 90px; border-radius: 8px; overflow: hidden;
+  border: 1px solid $border; background: $bg; flex-shrink: 0;
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+.blg-img-thumb-remove {
+  position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(0,0,0,0.55); border: none; color: #fff; font-size: 0.7rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  &:hover { background: $red; }
+}
+.blg-img-count { font-size: 0.78rem; color: $muted; margin: 0.4rem 0 0; }
+
+.story-avatar-preview {
+  display: flex; align-items: center; gap: 0.75rem; margin-top: 0.75rem;
+  img {
+    width: 56px; height: 56px; border-radius: 50%; object-fit: cover;
+    border: 2px solid $border; display: block; flex-shrink: 0;
+  }
+}
+.story-avatar-remove {
+  width: 24px; height: 24px; border-radius: 50%; border: none;
+  background: rgba(0,0,0,0.45); color: #fff; font-size: 0.7rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  flex-shrink: 0;
+  &:hover { background: $red; }
+}
+
+.story-spinner {
+  width: 16px; height: 16px; border: 2px solid $border; border-top-color: $accent;
+  border-radius: 50%; animation: story-spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes story-spin { to { transform: rotate(360deg); } }

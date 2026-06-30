@@ -1,0 +1,86 @@
+<section class="bl-hero">
+  <div class="container-custom">
+    <div class="bl-hero-inner">
+      <div class="section-label">Stay Informed</div>
+      <h1 class="bl-hero-title">Real Estate News &amp; Insights</h1>
+      <p class="bl-hero-sub">Expert analysis, market updates and lifestyle guides from our property specialists.</p>
+      <input class="bl-search" type="text" placeholder="Search articles…" [value]="search()" (input)="search.set($any($event.target).value)">
+    </div>
+  </div>
+</section>
+
+<section class="bl-main">
+  <div class="container-custom">
+
+    <!-- Category tabs -->
+    <div class="bl-tabs">
+      @for (c of categories; track c) {
+        <button class="bl-tab" [class.active]="activecat() === c" (click)="activecat.set(c)">{{ c }}</button>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="bl-loading">Loading articles…</div>
+    } @else if (!posts().length) {
+      <div class="bl-empty">No articles published yet. Check back soon.</div>
+    } @else {
+
+      <!-- Featured -->
+      @if (featured()) {
+        <a [routerLink]="['/blog', featured()!.slug]" class="bl-featured">
+          <div class="bl-featured-img-wrap">
+            @if (featured()!.image) {
+              <img [src]="featured()!.image" [alt]="featured()!.title" class="bl-featured-img">
+            } @else {
+              <div class="bl-featured-img bl-featured-img--placeholder"></div>
+            }
+            <div class="bl-featured-overlay"></div>
+            <span class="bl-cat-pill">{{ featured()!.category }}</span>
+          </div>
+          <div class="bl-featured-body">
+            <h2 class="bl-featured-title">{{ featured()!.title }}</h2>
+            <p class="bl-featured-excerpt">{{ featured()!.excerpt }}</p>
+            <div class="bl-meta">
+              <span>{{ featured()!.author }}</span>
+              <span class="bl-dot">·</span>
+              <span>{{ formatDate(featured()!.published_at) }}</span>
+              <span class="bl-dot">·</span>
+              <span>{{ featured()!.read_time }}</span>
+            </div>
+            <span class="bl-read-more">Read Article →</span>
+          </div>
+        </a>
+      }
+
+      <!-- Grid -->
+      @if (filtered().length) {
+        <div class="bl-grid">
+          @for (p of filtered(); track p.id) {
+            <a [routerLink]="['/blog', p.slug]" class="bl-card">
+              <div class="bl-card-img-wrap">
+                @if (p.image) {
+                  <img [src]="p.image" [alt]="p.title" class="bl-card-img">
+                } @else {
+                  <div class="bl-card-img bl-card-img--placeholder"></div>
+                }
+              </div>
+              <div class="bl-card-body">
+                <span class="bl-cat-pill bl-cat-pill--sm">{{ p.category }}</span>
+                <h3 class="bl-card-title">{{ p.title }}</h3>
+                <p class="bl-card-excerpt">{{ p.excerpt }}</p>
+                <div class="bl-meta">
+                  <span>{{ formatDate(p.published_at) }}</span>
+                  <span class="bl-dot">·</span>
+                  <span>{{ p.read_time }}</span>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<app-newsletter-section></app-newsletter-section>
+<app-footer></app-footer>

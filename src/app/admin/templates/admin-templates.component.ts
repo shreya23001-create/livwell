@@ -118,7 +118,13 @@ export class AdminTemplatesComponent implements OnInit {
       .select('*')
       .order('id');
 
-    if (data && data.length > 0) this.templates.set(data as EmailTemplate[]);
+    if (data && data.length > 0) {
+      const HIDDEN_KEYS = ['signup_welcome', 'customer_credentials', 'customer_account_credentials'];
+      const HIDDEN_LABELS = ['customer account credentials'];
+      this.templates.set((data as EmailTemplate[]).filter(t =>
+        !HIDDEN_KEYS.includes(t.key) && !HIDDEN_LABELS.includes(t.label.toLowerCase())
+      ));
+    }
 
     this.loading.set(false);
     if (this.templates().length > 0 && !this.selected()) {

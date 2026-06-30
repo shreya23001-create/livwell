@@ -405,6 +405,6 @@ export class AdminUsersComponent {
     return [1, -1, cur-1, cur, cur+1, -1, total];
   }
 
-  readonly roleList:   UserRole[]   = ['super_admin', 'admin', 'agent', 'customer'];
+  readonly roleList:   UserRole[]   = ['admin', 'agent'];
   readonly statusList: UserStatus[] = ['active', 'pending_verification', 'suspended', 'locked'];
 }

@@ -1,0 +1,116 @@
+@if (loading()) {
+  <div class="bd-loading">Loading article…</div>
+} @else if (notFound()) {
+  <div class="bd-notfound">
+    <h2>Article not found</h2>
+    <a routerLink="/blog" class="bd-back">← Back to Articles</a>
+  </div>
+} @else if (post()) {
+  <!-- Hero -->
+  <div class="bd-hero">
+    @if (post()!.image) {
+      <img [src]="post()!.image" [alt]="post()!.title" class="bd-hero-img">
+      <div class="bd-hero-overlay"></div>
+    } @else {
+      <div class="bd-hero-img bd-hero-img--placeholder"></div>
+    }
+    <div class="container-custom bd-hero-content">
+      <div class="bd-hero-top">
+        <a routerLink="/blog" class="bd-back-link">← All Articles</a>
+        <span class="bd-cat-pill">{{ post()!.category }}</span>
+      </div>
+      <h1 class="bd-title">{{ post()!.title }}</h1>
+      <div class="bd-meta">
+        <span class="bd-author">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+          {{ post()!.author }}
+        </span>
+        <span class="bd-dot">·</span>
+        <span>{{ formatDate(post()!.published_at) }}</span>
+        <span class="bd-dot">·</span>
+        <span>{{ post()!.read_time }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="container-custom bd-layout">
+    <article class="bd-article">
+      <p class="bd-excerpt">{{ post()!.excerpt }}</p>
+      <div class="bd-body">
+        @for (para of paragraphs; track $index) {
+          <p>{{ para }}</p>
+        }
+      </div>
+    </article>
+
+    <!-- Sidebar -->
+    <aside class="bd-sidebar">
+      <div class="bd-sidebar-card">
+        <h4 class="bd-sidebar-title">About the Author</h4>
+        <div class="bd-author-block">
+          <div class="bd-author-avatar">{{ post()!.author[0] }}</div>
+          <div>
+            <div class="bd-author-name">{{ post()!.author }}</div>
+            <div class="bd-author-role">Property Specialist</div>
+          </div>
+        </div>
+      </div>
+      @if (related().length) {
+        <div class="bd-sidebar-card">
+          <h4 class="bd-sidebar-title">Related Articles</h4>
+          <div class="bd-related-list">
+            @for (r of related(); track r.id) {
+              <a [routerLink]="['/blog', r.slug]" class="bd-related-item">
+                @if (r.image) { <img [src]="r.image" [alt]="r.title" class="bd-related-img"> }
+                <div>
+                  <span class="bd-related-cat">{{ r.category }}</span>
+                  <p class="bd-related-title">{{ r.title }}</p>
+                </div>
+              </a>
+            }
+          </div>
+        </div>
+      }
+    </aside>
+  </div>
+
+
+  <!-- Suggestions -->
+  @if (related().length) {
+    <section class="bd-suggestions">
+      <div class="container-custom">
+        <div class="bd-sugg-header">
+          <h2 class="bd-sugg-title">You May Also Like</h2>
+          <a routerLink="/blog" class="bd-sugg-all">View all articles →</a>
+        </div>
+        <div class="bd-sugg-grid">
+          @for (r of related(); track r.id) {
+            <a [routerLink]="['/blog', r.slug]" class="bd-sugg-card">
+              <div class="bd-sugg-img-wrap">
+                @if (r.image) {
+                  <img [src]="r.image" [alt]="r.title" class="bd-sugg-img">
+                } @else {
+                  <div class="bd-sugg-img bd-sugg-img--placeholder"></div>
+                }
+              </div>
+              <div class="bd-sugg-body">
+                <span class="bd-sugg-cat">{{ r.category }}</span>
+                <h3 class="bd-sugg-card-title">{{ r.title }}</h3>
+                <p class="bd-sugg-excerpt">{{ r.excerpt }}</p>
+                <div class="bd-sugg-meta">
+                  <span>{{ r.author }}</span>
+                  <span class="bd-sugg-dot">·</span>
+                  <span>{{ r.read_time }}</span>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+  }
+}
+
+<app-newsletter-section></app-newsletter-section>
+<app-footer></app-footer>

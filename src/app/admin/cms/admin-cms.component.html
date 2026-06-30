@@ -331,8 +331,28 @@
             </div>
           </div>
           <div class="form-field">
-            <label>Avatar URL</label>
-            <input type="text" placeholder="https://…" [ngModel]="storyForm().avatar" (ngModelChange)="storyForm.update(f=>({...f,avatar:$event}))">
+            <label>Photo</label>
+            <input #avatarInput type="file" accept="image/*" style="display:none" (change)="onAvatarFileChange($event)">
+            @if (!avatarUploading()) {
+              <div class="story-dropzone" [class.story-dropzone--over]="avatarDragging()"
+                (dragover)="onAvatarDragOver($event)" (dragleave)="onAvatarDragLeave()" (drop)="onAvatarDrop($event)"
+                (click)="avatarInput.click()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span class="story-drop-label">{{ storyForm().avatar ? 'Replace photo' : 'Drag &amp; drop or browse' }}</span>
+                <span class="story-drop-hint">PNG, JPG, WebP — max 5 MB</span>
+              </div>
+            } @else {
+              <div class="story-dropzone story-dropzone--uploading">
+                <div class="story-spinner"></div>
+                <span>Uploading…</span>
+              </div>
+            }
+            @if (storyForm().avatar) {
+              <div class="story-avatar-preview">
+                <img [src]="storyForm().avatar" alt="Photo preview">
+                <button type="button" class="story-avatar-remove" (click)="removeAvatar()">✕</button>
+              </div>
+            }
           </div>
           <div class="story-check-row">
             <input type="checkbox" id="storyActive" [ngModel]="storyForm().active" (ngModelChange)="storyForm.update(f=>({...f,active:$event}))">

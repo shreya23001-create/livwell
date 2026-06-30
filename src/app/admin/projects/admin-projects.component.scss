@@ -123,7 +123,7 @@ $red:    #dc2626;
 // ── Modal ────────────────────────────────────────────────────
 .apr-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
 .apr-modal {
-  background: $white; border-radius: 1rem; width: 100%; max-width: 760px; max-height: 90vh;
+  background: $white; border-radius: 1rem; width: 100%; max-width: 1000px; max-height: 90vh;
   display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
 }
 .apr-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid $border; h2 { font-size: 1.1rem; font-weight: 700; color: $text; margin: 0; } }
@@ -136,13 +136,15 @@ $red:    #dc2626;
   &--flags { align-items: center; gap: 1.5rem; }
 }
 .apr-form-group {
-  display: flex; flex-direction: column; gap: 0.35rem; min-width: 160px;
-  &--grow { flex: 1; }
+  display: flex; flex-direction: column; gap: 0.35rem; min-width: 140px; flex: 1;
+  &--grow { flex: 2; }
   label { font-size: 0.78rem; font-weight: 600; color: $text; }
   input, textarea, select { border: 1.5px solid $border; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.85rem; color: $text; outline: none; background: $white; width: 100%; box-sizing: border-box; &:focus { border-color: $green; } }
   textarea { resize: vertical; }
   .select-wrapper { width: 100%; select { width: 100%; height: 38px; } }
 }
+
+.adm-loc-wrap { width: 100%; }
 
 .apr-checkbox { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: $text; cursor: pointer; input { width: 16px; height: 16px; accent-color: $green; } }
 
@@ -207,6 +209,6 @@ $red:    #dc2626;
 /* Location search dropdown */
 .adm-loc-wrap { position: relative; display: flex; align-items: center; }
 .adm-loc-icon { position: absolute; left: 0.75rem; color: #9ca3af; pointer-events: none; flex-shrink: 0; }
-.adm-loc-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.25rem; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; outline: none; cursor: text; &:focus { border-color: #1a5c3a; } }
+.adm-loc-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.25rem !important; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; outline: none; cursor: text; &:focus { border-color: #1a5c3a; } }
 .adm-loc-dropdown { position: absolute; top: calc(100% + 3px); left: 0; right: 0; background: #fff; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 200; max-height: 200px; overflow-y: auto; }
 .adm-loc-option { padding: 0.55rem 0.875rem; font-size: 0.875rem; color: #374151; cursor: pointer; &:hover { background: #f0fdf4; color: #1a5c3a; } }

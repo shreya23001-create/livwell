@@ -33,7 +33,10 @@
           <th>Developer</th>
           <th>Nationality</th>
           <th>Projects</th>
-          <th>Delivered</th>
+          <th>Units</th>
+          <th>Sales Vol.</th>
+          <th>Sales Val.</th>
+          <th>Capital Gain</th>
           <th>Est.</th>
           <th>Order</th>
           <th>Featured</th>
@@ -56,7 +59,10 @@
           </td>
           <td><span class="adv-badge" [class.adv-badge--intl]="d.nationality === 'International'">{{ d.nationality }}</span></td>
           <td>{{ d.projects }}</td>
-          <td>{{ d.delivered_projects }}</td>
+          <td>{{ d.units || '—' }}</td>
+          <td>{{ d.sales_volume || '—' }}</td>
+          <td>{{ d.sales_value || '—' }}</td>
+          <td>{{ d.capital_gain || '—' }}</td>
           <td>{{ d.established ?? '—' }}</td>
           <td>{{ d.sort_order }}</td>
           <td>
@@ -76,7 +82,7 @@
           </td>
         </tr>
         <tr *ngIf="filtered().length === 0">
-          <td colspan="8" class="adv-empty">No developers found.</td>
+          <td colspan="11" class="adv-empty">No developers found.</td>
         </tr>
       </tbody>
     </table>
@@ -95,12 +101,9 @@
   </div>
 
   <div class="adv-modal__body">
-    <!-- Logo preview -->
-    <div class="adv-logo-preview" *ngIf="logoPreview()">
-      <img [src]="logoPreview()" alt="Logo preview" class="adv-logo-preview__img" onerror="this.style.display='none'" />
-    </div>
-
     <div class="adv-form-grid">
+
+      <!-- Name & Slug -->
       <div class="adv-field adv-field--full">
         <label>Name *</label>
         <input type="text" [value]="form().name" (input)="patch('name', $any($event.target).value)" placeholder="e.g. Emaar Properties" />
@@ -115,10 +118,69 @@
           <option *ngFor="let n of nationalities" [value]="n">{{ n }}</option>
         </select>
       </div>
+
+      <!-- Logo + Cover side by side -->
       <div class="adv-field adv-field--full">
-        <label>Logo URL</label>
-        <input type="text" [value]="form().logo" (input)="patch('logo', $any($event.target).value)" placeholder="https://..." />
+        <div class="adv-img-row">
+
+          <!-- Logo -->
+          <div class="adv-img-col">
+            <label>Logo</label>
+            <input #logoInput type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" style="display:none" (change)="onLogoFile($event)" />
+            <div *ngIf="!logoPreview()" class="adv-upload-area"
+              [class.adv-upload-area--over]="logoDragOver()"
+              (click)="logoInput.click()"
+              (dragover)="$event.preventDefault(); logoDragOver.set(true)"
+              (dragleave)="logoDragOver.set(false)"
+              (drop)="onLogoDrop($event)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span class="adv-upload-label">Click or drag logo</span>
+              <span class="adv-upload-hint">PNG, SVG, JPG · 1 image</span>
+            </div>
+            <div *ngIf="logoPreview()" class="adv-img-thumbs">
+              <div class="adv-img-thumb">
+                <img [src]="logoPreview()" alt="Logo" />
+                <div *ngIf="uploadingLogo()" class="adv-thumb-uploading"><div class="adv-thumb-spin"></div></div>
+                <button type="button" class="adv-img-thumb-remove" (click)="removeLogo()">✕</button>
+              </div>
+              <div class="adv-upload-area adv-upload-area--small" (click)="logoInput.click()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                <span class="adv-upload-hint">Change</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cover Image -->
+          <div class="adv-img-col">
+            <label>Cover Image <span class="adv-field-hint">(listing page banner)</span></label>
+            <input #coverInput type="file" accept="image/jpeg,image/png,image/webp" style="display:none" (change)="onCoverFile($event)" />
+            <div *ngIf="!coverPreview()" class="adv-upload-area"
+              [class.adv-upload-area--over]="coverDragOver()"
+              (click)="coverInput.click()"
+              (dragover)="$event.preventDefault(); coverDragOver.set(true)"
+              (dragleave)="coverDragOver.set(false)"
+              (drop)="onCoverDrop($event)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span class="adv-upload-label">Click or drag cover image</span>
+              <span class="adv-upload-hint">JPG, PNG, WebP · 1 image</span>
+            </div>
+            <div *ngIf="coverPreview()" class="adv-img-thumbs">
+              <div class="adv-img-thumb adv-img-thumb--wide">
+                <img [src]="coverPreview()" alt="Cover" />
+                <div *ngIf="uploadingCover()" class="adv-thumb-uploading"><div class="adv-thumb-spin"></div></div>
+                <button type="button" class="adv-img-thumb-remove" (click)="removeCover()">✕</button>
+              </div>
+              <div class="adv-upload-area adv-upload-area--small" (click)="coverInput.click()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                <span class="adv-upload-hint">Change</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
+
+      <!-- Stats row -->
       <div class="adv-field">
         <label>Established Year</label>
         <input type="number" [value]="form().established ?? ''" (input)="patch('established', $any($event.target).value)" placeholder="e.g. 1997" />
@@ -128,23 +190,44 @@
         <input type="number" [value]="form().projects" (input)="patch('projects', $any($event.target).value)" />
       </div>
       <div class="adv-field">
+        <label>Units</label>
+        <input type="number" [value]="form().units" (input)="patch('units', $any($event.target).value)" placeholder="e.g. 50000" />
+      </div>
+      <div class="adv-field">
         <label>Delivered Projects</label>
         <input type="number" [value]="form().delivered_projects" (input)="patch('delivered_projects', $any($event.target).value)" />
+      </div>
+      <div class="adv-field">
+        <label>Sales Volume <span class="adv-field-hint">(e.g. AED 5B)</span></label>
+        <input type="text" [value]="form().sales_volume" (input)="patch('sales_volume', $any($event.target).value)" placeholder="e.g. AED 5B" />
+      </div>
+      <div class="adv-field">
+        <label>Sales Value <span class="adv-field-hint">(e.g. AED 2.3B)</span></label>
+        <input type="text" [value]="form().sales_value" (input)="patch('sales_value', $any($event.target).value)" placeholder="e.g. AED 2.3B" />
+      </div>
+      <div class="adv-field">
+        <label>Capital Gain <span class="adv-field-hint">(e.g. 18%)</span></label>
+        <input type="text" [value]="form().capital_gain" (input)="patch('capital_gain', $any($event.target).value)" placeholder="e.g. 18%" />
       </div>
       <div class="adv-field">
         <label>Sort Order</label>
         <input type="number" [value]="form().sort_order" (input)="patch('sort_order', $any($event.target).value)" />
       </div>
+
+      <!-- About -->
       <div class="adv-field adv-field--full">
         <label>About</label>
-        <textarea rows="3" [value]="form().about" (input)="patch('about', $any($event.target).value)" placeholder="Short description…"></textarea>
+        <app-rich-editor [placeholder]="'Short description…'" [initialValue]="form().about" (valueChange)="patch('about', $event)"></app-rich-editor>
       </div>
+
+      <!-- Featured -->
       <div class="adv-field adv-field--checkbox">
         <label>
           <input type="checkbox" [checked]="form().featured" (change)="patch('featured', $any($event.target).checked)" />
           Featured developer
         </label>
       </div>
+
     </div>
   </div>
 

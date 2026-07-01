@@ -3,11 +3,12 @@ import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
+import { AMENITY_ICONS } from '../../admin/master/admin-master.component';
 
 interface Project {
   id: number;
@@ -56,6 +57,21 @@ export class ProjectDetailPublicComponent implements OnInit {
 
   isLoggedIn = this.auth.isLoggedIn;
 
+  masterAmenities = signal<{ name: string; icon: string }[]>([]);
+
+  getAmenityIconSvg(name: string): SafeHtml {
+    // 1. Try exact match from master_data (name → icon key → svg)
+    const masterEntry = this.masterAmenities().find(a => a.name.toLowerCase() === name.toLowerCase());
+    const byKey = masterEntry ? AMENITY_ICONS.find(i => i.key === masterEntry.icon) : null;
+    if (byKey) return this.sanitizer.bypassSecurityTrustHtml(byKey.svg);
+
+    // 2. Fallback: match amenity name against AMENITY_ICONS label directly
+    const byLabel = AMENITY_ICONS.find(i => i.label.toLowerCase() === name.toLowerCase())
+                 ?? AMENITY_ICONS.find(i => name.toLowerCase().includes(i.key));
+    const svg = byLabel?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>';
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
+
   videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
     const url = this.project()?.video_url;
     if (!url) return null;
@@ -85,7 +101,7 @@ export class ProjectDetailPublicComponent implements OnInit {
   });
 
   project    = signal<Project | null>(null);
-  agent      = signal<{ name: string; email: string; phone: string } | null>(null);
+  agent      = signal<{ name: string; email: string; phone: string; avatar_url?: string; designation?: string } | null>(null);
   loading    = signal(true);
   notFound   = signal(false);
   activeImg  = signal(0);
@@ -99,6 +115,36 @@ export class ProjectDetailPublicComponent implements OnInit {
   isFaved     = signal(false);
   favLoading  = signal(false);
   shareToast  = signal(false);
+
+  faqOpen = signal<string | null>(null);
+  toggleFaq(idx: number): void {
+    const key = String(idx);
+    this.faqOpen.set(this.faqOpen() === key ? null : key);
+  }
+
+  fpOpenIndex = signal<number | null>(null);
+  toggleFpRow(i: number): void {
+    this.fpOpenIndex.set(this.fpOpenIndex() === i ? null : i);
+  }
+
+  floorPlanRows = computed(() => {
+    const p = this.project();
+    if (!p?.floor_plan_url) return [];
+    const beds = p.beds?.trim();
+    if (!beds) return [{ label: p.type || 'Unit', sqft: p.area_sqft ? `${p.area_sqft.toLocaleString()} Sqft` : '—' }];
+    // Parse comma/slash-separated bed configs e.g. "1, 2, 3" or "3 & 4"
+    const parts = beds.split(/[,\/&]/).map(b => b.trim()).filter(Boolean);
+    return parts.map(b => ({
+      label: isNaN(Number(b)) ? b : `${b} Bed${Number(b) !== 1 ? 's' : ''}`,
+      sqft: p.area_sqft ? `${p.area_sqft.toLocaleString()} Sqft` : '—',
+    }));
+  });
+
+  scrollToEnquiry(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      document.querySelector('.pd-inquiry-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
 
   lightboxOpen  = signal(false);
   lightboxIndex = signal(0);
@@ -145,6 +191,7 @@ export class ProjectDetailPublicComponent implements OnInit {
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) { this.notFound.set(true); this.loading.set(false); return; }
+    this.loadMasterAmenities();
 
     const { data } = await this.sb
       .from('projects')
@@ -165,8 +212,8 @@ export class ProjectDetailPublicComponent implements OnInit {
       }
       if ((data as Project).agent_name) {
         const { data: agentData } = await this.sb
-          .from('admin_users')
-          .select('name, email, phone')
+          .from('profiles')
+          .select('name, email, phone, avatar_url, designation')
           .eq('name', (data as Project).agent_name)
           .maybeSingle();
         if (agentData) this.agent.set(agentData as any);
@@ -245,6 +292,13 @@ export class ProjectDetailPublicComponent implements OnInit {
 
   formatPrice(n: number): string {
     if (!n) return 'Price on request';
+    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
+    return `AED ${n.toLocaleString()}`;
+  }
+
+  formatPriceShort(n: number): string {
+    if (!n) return 'Call for Price';
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
@@ -330,5 +384,12 @@ export class ProjectDetailPublicComponent implements OnInit {
     }
 
     this.inquirySent.set(true);
+  }
+
+  private async loadMasterAmenities(): Promise<void> {
+    try {
+      const { data } = await this.sb.from('master_data').select('name, color').eq('type', 'amenity');
+      if (data) this.masterAmenities.set(data.map((r: any) => ({ name: r.name, icon: r.color || 'star' })));
+    } catch { /* table may not have amenities yet */ }
   }
 }

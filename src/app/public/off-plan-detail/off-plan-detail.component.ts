@@ -4,6 +4,7 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { OffPlanProject } from '../off-plan/off-plan.component';
+import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 
 const ALL_PROJECTS: OffPlanProject[] = [
   {
@@ -198,7 +199,7 @@ export interface FaqItem { question: string; answer: string; open: boolean; }
 @Component({
   selector: 'app-off-plan-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, NewsletterSectionComponent],
   templateUrl: './off-plan-detail.component.html',
   styleUrl: './off-plan-detail.component.scss',
 })
@@ -318,6 +319,12 @@ export class OffPlanDetailComponent implements OnInit {
 
   toggleFaq(i: number): void {
     this.faqs = this.faqs.map((f, idx) => ({ ...f, open: idx === i ? !f.open : false }));
+  }
+
+  scrollToEnquiry(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      document.querySelector('.pd-inquiry-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   sendInquiry(): void {

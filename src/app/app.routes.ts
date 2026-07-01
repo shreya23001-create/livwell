@@ -12,7 +12,7 @@ export const routes: Routes = [
       { path: 'properties', loadComponent: () => import('./public/properties/properties.component').then(m => m.PropertiesComponent) },
       { path: 'properties/:id', loadComponent: () => import('./public/property-detail/property-detail.component').then(m => m.PropertyDetailComponent) },
       { path: 'off-plan', loadComponent: () => import('./public/off-plan/off-plan.component').then(m => m.OffPlanComponent) },
-      { path: 'off-plan/:id', loadComponent: () => import('./public/off-plan-detail/off-plan-detail.component').then(m => m.OffPlanDetailComponent) },
+      { path: 'off-plan/:id', loadComponent: () => import('./public/project-detail/project-detail-public.component').then(m => m.ProjectDetailPublicComponent) },
       { path: 'projects', loadComponent: () => import('./public/projects/projects-public.component').then(m => m.ProjectsPublicComponent) },
       { path: 'projects/:id', loadComponent: () => import('./public/project-detail/project-detail-public.component').then(m => m.ProjectDetailPublicComponent) },
       { path: 'agents', loadComponent: () => import('./public/agents/agents.component').then(m => m.AgentsComponent) },

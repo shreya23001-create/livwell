@@ -7,9 +7,14 @@ interface Developer {
   slug: string;
   name: string;
   logo: string;
+  coverImage: string;
   established: number;
   projects: number;
   deliveredProjects: number;
+  units: number;
+  salesVolume: string;
+  salesValue: string;
+  capitalGain: string;
   about: string;
   nationality: string;
   featured?: boolean;
@@ -25,27 +30,64 @@ interface Developer {
 export class DevelopersComponent implements OnInit {
   private sb = inject(SupabaseService).client;
 
-  searchQuery  = signal('');
-  activeFilter = signal('All');
-  loading      = signal(true);
+  searchQuery   = signal('');
+  activeFilter  = signal('All');
+  loading       = signal(true);
   allDevelopers = signal<Developer[]>([]);
+  showSuggestions = signal(false);
+
+  suggestions = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    return this.allDevelopers()
+      .map(d => d.name)
+      .filter(n => !q || n.toLowerCase().includes(q))
+      .slice(0, 8);
+  });
+
+  selectSuggestion(name: string): void {
+    this.searchQuery.set(name);
+    this.showSuggestions.set(false);
+  }
+
+  onSearchBlur(): void {
+    // Small delay so mousedown on suggestion fires first
+    setTimeout(() => this.showSuggestions.set(false), 150);
+  }
 
   readonly filters = ['All', 'Featured', 'UAE', 'International'];
 
   async ngOnInit(): Promise<void> {
-    const { data, error } = await this.sb
-      .from('developers')
-      .select('slug,name,logo,established,projects,delivered_projects,about,nationality,featured')
-      .order('sort_order', { ascending: true });
+    const [{ data, error }, { data: projData }] = await Promise.all([
+      this.sb
+        .from('developers')
+        .select('slug,name,logo,cover_image,established,projects,delivered_projects,about,nationality,featured')
+        .order('sort_order', { ascending: true }),
+      this.sb
+        .from('projects')
+        .select('developer')
+        .eq('status', 'Published'),
+    ]);
+
+    // Build live project count per developer name
+    const countMap = new Map<string, number>();
+    for (const p of (projData ?? [])) {
+      const key = (p.developer ?? '').trim().toLowerCase();
+      countMap.set(key, (countMap.get(key) ?? 0) + 1);
+    }
 
     if (!error && data) {
       this.allDevelopers.set(data.map((d: any) => ({
         slug:              d.slug,
         name:              d.name,
         logo:              d.logo,
+        coverImage:        d.cover_image || '',
         established:       d.established,
-        projects:          d.projects,
+        projects:          countMap.get((d.name ?? '').trim().toLowerCase()) ?? d.projects ?? 0,
         deliveredProjects: d.delivered_projects,
+        units:             d.units        ?? 0,
+        salesVolume:       d.sales_volume ?? '',
+        salesValue:        d.sales_value  ?? '',
+        capitalGain:       d.capital_gain ?? '',
         about:             d.about,
         nationality:       d.nationality,
         featured:          d.featured,

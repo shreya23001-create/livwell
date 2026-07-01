@@ -77,7 +77,7 @@
     </div>
 
     <div class="op-grid">
-      <article *ngFor="let p of filteredProjects()" class="op-card" [routerLink]="['/off-plan', p.slug]">
+      <article *ngFor="let p of filteredProjects()" class="op-card" [routerLink]="['/off-plan', p.id]">
         <div class="op-card-img-wrap">
           <img [src]="p.image || '/images/dummy-image.png'" [alt]="p.title" class="op-card-img" loading="lazy"
             (error)="$any($event.target).src='/images/dummy-image.png'">

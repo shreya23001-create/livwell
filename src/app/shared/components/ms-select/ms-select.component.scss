@@ -1,0 +1,154 @@
+$green:  #1a5c3a;
+$border: #e5e7eb;
+$text:   #111827;
+$muted:  #6b7280;
+$bg:     #ffffff;
+$hover:  #f0fdf4;
+$check:  #1a5c3a;
+
+.ms-wrap {
+  position: relative;
+  width: 100%;
+  font-family: inherit;
+}
+
+// ── Trigger ──────────────────────────────────────────────
+.ms-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1.5px solid $border;
+  border-radius: 0.5rem;
+  padding: 0.42rem 0.7rem;
+  background: $bg;
+  cursor: pointer;
+  min-height: 36px;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+  &:hover { border-color: #c9cdd5; }
+
+  .ms-wrap--open & { border-color: $green; }
+}
+
+.ms-search-icon {
+  width: 14px; height: 14px; color: $muted; flex-shrink: 0;
+}
+
+.ms-trigger-text {
+  flex: 1;
+  font-size: 0.83rem;
+  color: $text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ms-trigger-placeholder { color: $muted; }
+
+.ms-clear {
+  background: none; border: none; cursor: pointer;
+  color: $muted; font-size: 1rem; line-height: 1;
+  padding: 0 2px; flex-shrink: 0;
+  &:hover { color: #ef4444; }
+}
+
+.ms-chevron {
+  width: 14px; height: 14px; color: $muted; flex-shrink: 0;
+  transition: transform 0.15s;
+  &.ms-chevron--up { transform: rotate(180deg); }
+}
+
+// ── Dropdown ─────────────────────────────────────────────
+.ms-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  z-index: 400;
+  background: $bg;
+  border: 1.5px solid $border;
+  border-radius: 0.625rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  overflow: hidden;
+}
+
+// ── Search bar ───────────────────────────────────────────
+.ms-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid $border;
+
+  svg { width: 14px; height: 14px; color: $muted; flex-shrink: 0; }
+}
+
+.ms-search {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.83rem;
+  color: $text;
+  background: transparent;
+  &::placeholder { color: $muted; }
+}
+
+.ms-search-clear {
+  background: none; border: none; cursor: pointer;
+  color: $muted; font-size: 1rem; line-height: 1; padding: 0;
+  &:hover { color: #ef4444; }
+}
+
+// ── List ─────────────────────────────────────────────────
+.ms-list {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 0.25rem 0;
+}
+
+.ms-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.875rem;
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover { background: $hover; }
+  &.ms-option--checked { background: #f0fdf4; }
+}
+
+// ── Custom checkbox ──────────────────────────────────────
+.ms-checkbox {
+  width: 16px; height: 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s, border-color 0.1s;
+  background: #fff;
+
+  svg { display: none; width: 10px; height: 10px; stroke: #fff; }
+
+  &.ms-checkbox--checked {
+    background: $check;
+    border-color: $check;
+    svg { display: block; }
+  }
+}
+
+.ms-opt-icon {
+  width: 16px; height: 16px; flex-shrink: 0; color: $green;
+  display: flex; align-items: center; justify-content: center;
+  svg { width: 100%; height: 100%; }
+}
+
+.ms-opt-label {
+  font-size: 0.85rem;
+  color: $text;
+}
+
+.ms-empty {
+  padding: 0.75rem 0.875rem;
+  font-size: 0.83rem;
+  color: $muted;
+  text-align: center;
+}

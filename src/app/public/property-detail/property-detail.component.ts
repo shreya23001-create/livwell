@@ -2,11 +2,12 @@ import { Component, OnInit, signal, computed, inject, PLATFORM_ID, HostListener 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
+import { AMENITY_ICONS } from '../../admin/master/admin-master.component';
 
 interface Property {
   id: number;
@@ -87,6 +88,14 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   isLoggedIn = this.auth.isLoggedIn;
+  masterAmenities = signal<{ name: string; icon: string }[]>([]);
+
+  getAmenityIconSvg(name: string): SafeHtml {
+    const amenity = this.masterAmenities().find(a => a.name === name);
+    const iconDef = amenity ? AMENITY_ICONS.find(i => i.key === amenity.icon) : null;
+    const svg = iconDef?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
 
   videoEmbedUrl = computed<SafeResourceUrl | null>(() => {
     const url = this.property()?.video_url;
@@ -281,6 +290,7 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.loadMasterAmenities();
     this.route.params.subscribe(async params => {
       const id = Number(params['id']);
       this.loading.set(true);
@@ -483,4 +493,10 @@ export class PropertyDetailComponent implements OnInit {
       `Spanning ${p.area_sqft.toLocaleString()} sqft with ${this.formatBeds(p.bedrooms)} and ${p.bathrooms} bathrooms.`;
   }
 
+  private async loadMasterAmenities(): Promise<void> {
+    try {
+      const { data } = await this.sb.from('master_data').select('name, color').eq('type', 'amenity');
+      if (data) this.masterAmenities.set(data.map((r: any) => ({ name: r.name, icon: r.color || 'star' })));
+    } catch { /* table may not have amenities yet */ }
+  }
 }

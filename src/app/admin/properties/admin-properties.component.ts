@@ -2,11 +2,15 @@ import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { ToastService } from '../../shared/services/toast.service';
+import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
+import { MsSelectComponent, MsOption } from '../../shared/components/ms-select/ms-select.component';
+import { AMENITY_ICONS } from '../master/admin-master.component';
 import * as XLSX from 'xlsx';
 
 export type PropStatus   = 'Draft' | 'Pending Review' | 'Published' | 'Archived' | 'Sold' | 'Rented';
@@ -51,15 +55,16 @@ const EMPTY_FORM = (): Partial<Property> => ({
 @Component({
   selector: 'app-admin-properties',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SafeUrlPipe],
+  imports: [CommonModule, FormsModule, RouterModule, SafeUrlPipe, RichEditorComponent, MsSelectComponent],
   templateUrl: './admin-properties.component.html',
   styleUrl: './admin-properties.component.scss',
 })
 export class AdminPropertiesComponent implements OnInit {
-  private sb      = inject(SupabaseService).client;
-  private auth    = inject(AuthService);
-  private dataSvc = inject(AdminDataService);
-  private toast   = inject(ToastService);
+  private sb        = inject(SupabaseService).client;
+  private auth      = inject(AuthService);
+  private dataSvc   = inject(AdminDataService);
+  private toast     = inject(ToastService);
+  private sanitizer = inject(DomSanitizer);
 
   // ── Data ──────────────────────────────────────────────
   properties  = signal<Property[]>([]);
@@ -89,7 +94,8 @@ export class AdminPropertiesComponent implements OnInit {
   uploadingImages  = signal(false);
   uploadedImages   = signal<string[]>([]);   // final public URLs (saved to DB)
   previewImages    = signal<string[]>([]);   // local blob URLs for instant preview
-  amenityInput     = signal('');
+  amenityDropdownOpen = signal(false);
+  masterAmenities  = this.dataSvc.amenities;
   uploadingVideo   = signal(false);
   videoDragOver    = signal(false);
   videoTab         = signal<'url' | 'upload'>('url');
@@ -237,7 +243,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.saveError.set('');
     this.uploadedImages.set([]);
     this.previewImages.set([]);
-    this.amenityInput.set('');
+    this.amenityDropdownOpen.set(false);
     this.locSearch.set('');
     this.commSearch.set('');
     this.projSearch.set('');
@@ -255,7 +261,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.locSearch.set(p.location ?? '');
     this.commSearch.set(p.community ?? '');
     this.projSearch.set(p.project_name ?? '');
-    this.amenityInput.set('');
+    this.amenityDropdownOpen.set(false);
     this.videoTab.set(p.video_url ? 'url' : 'url');
     this.editingId.set(p.id);
     this.modalOpen.set(true);
@@ -365,22 +371,28 @@ export class AdminPropertiesComponent implements OnInit {
     }
   }
 
-  addAmenity(): void {
-    const v = this.amenityInput().trim();
-    if (!v) return;
-    this.form.update(f => ({ ...f, amenities: [...(f.amenities ?? []), v] }));
-    this.amenityInput.set('');
+  isAmenitySelected(name: string): boolean {
+    return (this.form().amenities ?? []).includes(name);
   }
 
-  removeAmenity(i: number): void {
-    this.form.update(f => ({ ...f, amenities: (f.amenities ?? []).filter((_, idx) => idx !== i) }));
+  toggleAmenity(name: string): void {
+    this.form.update(f => {
+      const current = f.amenities ?? [];
+      return { ...f, amenities: current.includes(name) ? current.filter(x => x !== name) : [...current, name] };
+    });
+  }
+
+  getAmenityIconSvg(iconKey: string): SafeHtml {
+    const iconDef = AMENITY_ICONS.find(i => i.key === iconKey);
+    const svg = iconDef?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
   }
 
   closeModal(): void {
     this.modalOpen.set(false);
     this.previewImages.set([]);
     this.uploadedImages.set([]);
-    this.amenityInput.set('');
+    this.amenityDropdownOpen.set(false);
   }
 
   async saveProperty(): Promise<void> {
@@ -611,4 +623,24 @@ export class AdminPropertiesComponent implements OnInit {
   get typeList()     { return this.dataSvc.propTypes() as PropType[]; }
   get categoryList() { return this.dataSvc.categories() as PropCategory[]; }
   readonly furnishingList = ['Furnished', 'Unfurnished', 'Partly Furnished'];
+
+  // MsSelect option arrays
+  categoryOpts   = computed<MsOption[]>(() => this.dataSvc.categories().map(c => ({ value: c, label: c })));
+  typeOpts       = computed<MsOption[]>(() => this.dataSvc.propTypes().map(t => ({ value: t, label: t })));
+  statusOpts     = computed<MsOption[]>(() => this.dataSvc.propStatuses().map(s => ({ value: s.name, label: s.name })));
+  furnishingOpts = computed<MsOption[]>(() => this.furnishingList.map(f => ({ value: f, label: f })));
+  locationOpts   = computed<MsOption[]>(() => this.dataSvc.locations().map(l => ({ value: l, label: l })));
+  agentOpts      = computed<MsOption[]>(() => [{ value: '', label: '— Unassigned —' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
+  amenityOpts    = computed<MsOption[]>(() => this.masterAmenities().map(a => ({
+    value: a.name, label: a.name,
+    iconHtml: this.getAmenityIconSvg(a.icon),
+  })));
+
+  onCategoryChange(vals: string[])  { this.patchForm('listing_type', vals[0] ?? 'Sale'); }
+  onTypeChange(vals: string[])      { this.patchForm('type', vals[0] ?? ''); }
+  onStatusChange(vals: string[])    { this.patchForm('status', vals[0] ?? 'Draft'); }
+  onFurnishingChange(vals: string[]){ this.patchForm('furnishing', vals[0] ?? ''); }
+  onLocationChange(vals: string[])  { this.patchForm('location', vals[0] ?? ''); this.locSearch.set(vals[0] ?? ''); }
+  onAgentChange(vals: string[])     { this.patchForm('agent_name', vals[0] ?? ''); }
+  onAmenitiesChange(vals: string[]) { this.patchForm('amenities', vals); }
 }

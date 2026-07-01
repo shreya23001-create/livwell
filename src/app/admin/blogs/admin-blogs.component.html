@@ -167,14 +167,14 @@
         <!-- Excerpt -->
         <div class="blg-field" [class.error]="formErrors()['excerpt']">
           <label>Excerpt *</label>
-          <textarea rows="2" placeholder="Short summary shown in listings…" [ngModel]="form().excerpt" (ngModelChange)="form.update(f=>({...f,excerpt:$event}))"></textarea>
+          <app-rich-editor [placeholder]="'Short summary shown in listings…'" [initialValue]="form().excerpt" (valueChange)="form.update(f=>({...f,excerpt:$event}))"></app-rich-editor>
           @if (formErrors()['excerpt']) { <span class="blg-err">{{ formErrors()['excerpt'] }}</span> }
         </div>
 
         <!-- Body -->
         <div class="blg-field" [class.error]="formErrors()['body']">
           <label>Body Content *</label>
-          <textarea rows="10" placeholder="Full article content…" [ngModel]="form().body" (ngModelChange)="form.update(f=>({...f,body:$event}))"></textarea>
+          <app-rich-editor [placeholder]="'Full article content…'" [initialValue]="form().body" (valueChange)="form.update(f=>({...f,body:$event}))"></app-rich-editor>
           @if (formErrors()['body']) { <span class="blg-err">{{ formErrors()['body'] }}</span> }
         </div>
 

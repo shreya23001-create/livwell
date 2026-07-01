@@ -5,6 +5,7 @@ import { AdminDataService, CmsBanner, CmsAnnouncement, CmsPage, BannerStatus, An
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
 
 type CmsTab = 'banners' | 'featured' | 'announcements' | 'pages' | 'success-stories';
 
@@ -22,7 +23,7 @@ export interface SuccessStory {
 @Component({
   selector: 'app-admin-cms',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RichEditorComponent],
   templateUrl: './admin-cms.component.html',
   styleUrl: './admin-cms.component.scss',
 })

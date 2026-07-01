@@ -181,90 +181,51 @@
         </div>
       </div>
 
-      <!-- Row 2: Location + Community -->
+      <!-- Row 2: Location + Type + Status -->
       <div class="apr-form-row">
-        <div class="apr-form-group apr-form-group--grow">
-          <label>Location</label>
-          <div class="adm-loc-wrap">
-            <svg class="adm-loc-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input class="adm-loc-input" type="text"
-              placeholder="Search or type location…"
-              [value]="locSearch()"
-              (input)="locSearch.set($any($event.target).value); locDropdownOpen.set(true); form.update(f=>({...f,location:$any($event.target).value}))"
-              (focus)="locDropdownOpen.set(true)"
-              (blur)="locDropdownOpen.set(false)"
-              autocomplete="off">
-            <div class="adm-loc-dropdown" *ngIf="locDropdownOpen() && filteredLocs().length">
-              <div class="adm-loc-option" *ngFor="let l of filteredLocs()"
-                (mousedown)="locSearch.set(l); form.update(f=>({...f,location:l})); locDropdownOpen.set(false)">
-                {{ l }}
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="apr-form-group">
-          <label>Community</label>
-          <div class="adm-loc-wrap">
-            <svg class="adm-loc-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input class="adm-loc-input" type="text" placeholder="Search or type community…"
-              [value]="commSearch()"
-              (input)="commSearch.set($any($event.target).value); commDropdownOpen.set(true); form.update(f=>({...f,community:$any($event.target).value}))"
-              (focus)="commDropdownOpen.set(true)"
-              (blur)="commDropdownOpen.set(false)"
-              autocomplete="off">
-            <div class="adm-loc-dropdown" *ngIf="commDropdownOpen() && filteredComms().length">
-              <div class="adm-loc-option" *ngFor="let c of filteredComms()"
-                (mousedown)="commSearch.set(c); form.update(f=>({...f,community:c})); commDropdownOpen.set(false)">
-                {{ c }}
-              </div>
-            </div>
-          </div>
+          <label>Location</label>
+          <app-ms-select [options]="locationOpts()" [value]="form().location ? [form().location] : []"
+            placeholder="Search location…" [multi]="false"
+            (valueChange)="onLocationChange($event)"></app-ms-select>
         </div>
-      </div>
-
-      <!-- Row 3: Type + Status + Badge -->
-      <div class="apr-form-row">
         <div class="apr-form-group">
           <label>Type</label>
-          <div class="select-wrapper">
-            <select [ngModel]="form().type" (ngModelChange)="form.update(f=>({...f,type:$event}))">
-              <option *ngFor="let t of types" [value]="t">{{ t }}</option>
-            </select>
-            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
+          <app-ms-select [options]="typeOpts()" [value]="selectedTypes()"
+            placeholder="Select types…" [multi]="true"
+            (valueChange)="onTypesChange($event)"></app-ms-select>
         </div>
         <div class="apr-form-group">
           <label>Status</label>
-          <div class="select-wrapper">
-            <select [ngModel]="form().status" (ngModelChange)="form.update(f=>({...f,status:$event}))">
-              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-            </select>
-            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="apr-form-group">
-          <label>Badge</label>
-          <div class="select-wrapper">
-            <select [ngModel]="form().badge" (ngModelChange)="form.update(f=>({...f,badge:$event}))">
-              <option *ngFor="let b of badges" [value]="b">{{ b || 'None' }}</option>
-            </select>
-            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="apr-form-group">
-          <label>Trending Category</label>
-          <input type="text" list="trending-category-list"
-            [value]="form().trending_category"
-            (input)="form.update(f=>({...f,trending_category:$any($event.target).value}))"
-            placeholder="Select or type a category…">
-          <datalist id="trending-category-list">
-            <option *ngFor="let c of trendingCategoryOptions" [value]="c"></option>
-          </datalist>
-          <small class="apr-field-hint">Shown as a tab on the home page. Leave blank to hide from trending.</small>
+          <app-ms-select [options]="statusOpts()" [value]="form().status ? [form().status] : []"
+            placeholder="Select status…" [multi]="false"
+            (valueChange)="onStatusChange($event)"></app-ms-select>
         </div>
       </div>
 
-      <!-- Row 4: Price + Beds + Completion -->
+      <!-- Row 3: Badge + Trending Category + Developer -->
+      <div class="apr-form-row">
+        <div class="apr-form-group">
+          <label>Badge</label>
+          <app-ms-select [options]="badgeOpts()" [value]="form().badge !== undefined ? [form().badge] : []"
+            placeholder="Select badge…" [multi]="false"
+            (valueChange)="onBadgeChange($event)"></app-ms-select>
+        </div>
+        <div class="apr-form-group">
+          <label>Trending Category</label>
+          <app-ms-select [options]="trendOpts()" [value]="form().trending_category ? [form().trending_category] : []"
+            placeholder="Select category…" [multi]="false"
+            (valueChange)="onTrendChange($event)"></app-ms-select>
+        </div>
+        <div class="apr-form-group">
+          <label>Developer</label>
+          <app-ms-select [options]="developerOpts()" [value]="form().developer ? [form().developer] : []"
+            placeholder="Select developer…" [multi]="false"
+            (valueChange)="onDeveloperChange($event)"></app-ms-select>
+        </div>
+      </div>
+
+      <!-- Row 4: Price + Price Label + Beds -->
       <div class="apr-form-row">
         <div class="apr-form-group">
           <label>Price From (AED)</label>
@@ -276,7 +237,7 @@
         </div>
         <div class="apr-form-group">
           <label>Beds</label>
-          <input type="text" [value]="form().beds" (input)="form.update(f=>({...f,beds:$any($event.target).value}))" placeholder="e.g. 1 – 4 Beds">
+          <input type="text" [value]="form().beds" (input)="form.update(f=>({...f,beds:$any($event.target).value}))" placeholder="e.g. 1–4 Beds">
         </div>
       </div>
 
@@ -300,13 +261,9 @@
       <div class="apr-form-row">
         <div class="apr-form-group apr-form-group--grow">
           <label>Assign Agent</label>
-          <div class="select-wrapper">
-            <select [ngModel]="form().agent_name" (ngModelChange)="form.update(f=>({...f,agent_name:$event}))">
-              <option value="">— Unassigned —</option>
-              <option *ngFor="let a of agents()" [value]="a.name">{{ a.name }}</option>
-            </select>
-            <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5"/></svg>
-          </div>
+          <app-ms-select [options]="agentOpts()" [value]="form().agent_name ? [form().agent_name] : []"
+            placeholder="— Unassigned —" [multi]="false"
+            (valueChange)="onAgentChange($event)"></app-ms-select>
         </div>
         <div class="apr-form-group">
           <label>Floor Plan URL</label>
@@ -317,7 +274,7 @@
       <!-- Description -->
       <div class="apr-form-group">
         <label>Description</label>
-        <textarea rows="3" [value]="form().description" (input)="form.update(f=>({...f,description:$any($event.target).value}))" placeholder="Project overview…"></textarea>
+        <app-rich-editor [placeholder]="'Project overview…'" [initialValue]="form().description" (valueChange)="form.update(f=>({...f,description:$event}))"></app-rich-editor>
       </div>
 
       <!-- Flags -->
@@ -405,15 +362,13 @@
       <!-- Amenities -->
       <div class="apr-form-group">
         <label>Amenities</label>
-        <div class="apr-tag-input">
-          <input type="text" [value]="amenityInput()" (input)="amenityInput.set($any($event.target).value)" placeholder="e.g. Pool" (keydown.enter)="addAmenity()">
-          <button type="button" class="apr-btn apr-btn--sm" (click)="addAmenity()">Add</button>
-        </div>
-        <div class="apr-tags" *ngIf="form().amenities?.length">
-          <span *ngFor="let a of form().amenities; let i = index" class="apr-tag-item">
-            {{ a }} <button (click)="removeAmenity(i)">×</button>
-          </span>
-        </div>
+        @if (masterAmenities().length === 0) {
+          <p class="apr-hint">No amenities configured. Add them in Master Data → Amenities.</p>
+        } @else {
+          <app-ms-select [options]="amenityOpts()" [value]="form().amenities ?? []"
+            placeholder="Select amenities…" [multi]="true"
+            (valueChange)="onAmenitiesChange($event)"></app-ms-select>
+        }
       </div>
 
     </div>

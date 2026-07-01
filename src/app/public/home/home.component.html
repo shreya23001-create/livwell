@@ -951,9 +951,7 @@
         <div class="testimonial-stars">
           <span *ngFor="let s of getStars(testimonials()[activeTestimonial()].rating)">★</span>
         </div>
-        <blockquote class="testimonial-text">
-          "{{ testimonials()[activeTestimonial()].text }}"
-        </blockquote>
+        <blockquote class="testimonial-text" [innerHTML]="testimonials()[activeTestimonial()].text"></blockquote>
         <div class="testimonial-author">
           @if (testimonials()[activeTestimonial()].avatar) {
             <img [src]="testimonials()[activeTestimonial()].avatar" [alt]="testimonials()[activeTestimonial()].name" class="testimonial-avatar">

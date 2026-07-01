@@ -36,12 +36,8 @@
   <!-- Body -->
   <div class="container-custom bd-layout">
     <article class="bd-article">
-      <p class="bd-excerpt">{{ post()!.excerpt }}</p>
-      <div class="bd-body">
-        @for (para of paragraphs; track $index) {
-          <p>{{ para }}</p>
-        }
-      </div>
+      <div class="bd-excerpt" [innerHTML]="post()!.excerpt"></div>
+      <div class="bd-body" [innerHTML]="post()!.body"></div>
     </article>
 
     <!-- Sidebar -->

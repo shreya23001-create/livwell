@@ -8,6 +8,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { EmailService } from '../../shared/services/email.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
 
 export type { LeadStatus, LeadSource, LeadCategory, Lead };
 
@@ -22,7 +23,7 @@ const EMPTY_FORM = (): Partial<Lead> => ({
 @Component({
   selector: 'app-admin-leads',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RichEditorComponent],
   templateUrl: './admin-leads.component.html',
   styleUrl: './admin-leads.component.scss',
 })

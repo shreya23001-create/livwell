@@ -384,8 +384,7 @@
       </div>
       <div class="form-field form-field--full">
         <label>Notes</label>
-        <textarea rows="3" [value]="form()['notes']" (input)="updateForm({notes: $any($event.target).value})"
-          placeholder="Any additional notes…"></textarea>
+        <app-rich-editor [placeholder]="'Any additional notes…'" [initialValue]="form()['notes'] || ''" (valueChange)="updateForm({notes: $event})"></app-rich-editor>
       </div>
     </div>
     <div class="modal-footer">

@@ -172,7 +172,7 @@
       <!-- Description / Overview -->
       <div class="brd-section" *ngIf="p.description">
         <h2 class="brd-section-title">{{ p.title }} Overview</h2>
-        <div class="brd-overview" [class.truncated]="!overviewExpanded()">{{ p.description }}</div>
+        <div class="brd-overview" [class.truncated]="!overviewExpanded()" [innerHTML]="p.description"></div>
         <button class="brd-read-more" (click)="overviewExpanded.set(!overviewExpanded())">
           {{ overviewExpanded() ? 'Show Less ↑' : 'Read More ↓' }}
         </button>

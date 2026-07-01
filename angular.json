@@ -39,7 +39,8 @@
               ]
             },
             "allowedCommonJsDependencies": [
-              "xlsx"
+              "xlsx",
+              "quill"
             ]
           },
           "configurations": {

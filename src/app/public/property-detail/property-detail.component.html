@@ -150,7 +150,7 @@
       <div class="pd-section">
         <h2 class="pd-section-title">About This Property</h2>
         <div class="pd-desc" [class.expanded]="descExpanded()">
-          <p *ngFor="let para of getDescription(p).split('\n\n')">{{ para }}</p>
+          <div [innerHTML]="getDescription(p)"></div>
         </div>
         <button class="pd-read-more-btn" (click)="descExpanded.set(!descExpanded())">
           {{ descExpanded() ? 'Show Less ↑' : 'Read More ↓' }}
@@ -213,9 +213,7 @@
         <h2 class="pd-section-title">Amenities & Features</h2>
         <div class="pd-amenities-grid">
           <div *ngFor="let a of p.amenities" class="pd-amenity-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-            </svg>
+            <span class="pd-amenity-icon" [innerHTML]="getAmenityIconSvg(a)"></span>
             {{ a }}
           </div>
         </div>

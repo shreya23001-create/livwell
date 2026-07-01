@@ -224,8 +224,7 @@
           </div>
           <div class="pform-field">
             <label>Body (optional)</label>
-            <textarea rows="4" [ngModel]="pageForm().body"
-              (ngModelChange)="pageForm.update(f => ({...f, body: $event}))"></textarea>
+            <app-rich-editor [placeholder]="'Page body content…'" [initialValue]="pageForm().body || ''" (valueChange)="pageForm.update(f => ({...f, body: $event}))"></app-rich-editor>
           </div>
           <div class="pform-actions">
             <button class="btn-ghost" (click)="editingPageId.set(null)">Cancel</button>
@@ -313,7 +312,7 @@
           </div>
           <div class="form-field" [class.has-error]="storyErrors()['text']">
             <label>Story Text *</label>
-            <textarea rows="4" placeholder="What did the client say…" [ngModel]="storyForm().text" (ngModelChange)="storyForm.update(f=>({...f,text:$event}))"></textarea>
+            <app-rich-editor [placeholder]="'What did the client say…'" [initialValue]="storyForm().text" (valueChange)="storyForm.update(f=>({...f,text:$event}))"></app-rich-editor>
             @if (storyErrors()['text']) { <span class="field-error">{{ storyErrors()['text'] }}</span> }
           </div>
           <div class="form-row">
@@ -513,8 +512,7 @@
       <div class="form-row">
         <div class="form-field form-field--full" [class.has-error]="annErrors()['body']">
           <label>Body</label>
-          <textarea rows="3" [ngModel]="annForm().body" (ngModelChange)="annForm.update(f => ({...f, body: $event}))"
-            placeholder="Announcement message…"></textarea>
+          <app-rich-editor [placeholder]="'Announcement message…'" [initialValue]="annForm().body || ''" (valueChange)="annForm.update(f => ({...f, body: $event}))"></app-rich-editor>
           @if (annErrors()['body']) { <span class="field-error">{{ annErrors()['body'] }}</span> }
         </div>
       </div>

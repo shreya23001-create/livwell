@@ -512,8 +512,13 @@ $amber: #d97706;
   }
 
   &--view {
-    color: #10b981; text-decoration: none;
-    &:hover { background: #ecfdf5; border-color: #10b981; }
+    color: #10b981;
+    text-decoration: none;
+
+    &:hover {
+      background: #ecfdf5;
+      border-color: #10b981;
+    }
   }
 
   &--edit {
@@ -1148,7 +1153,9 @@ $amber: #d97706;
     padding: 0;
     opacity: 0.6;
 
-    &:hover { opacity: 1; }
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 
@@ -1187,45 +1194,269 @@ $amber: #d97706;
 
 // ── Video Tour ────────────────────────────────────────────
 .prop-video-tabs {
-  display: flex; gap: 0; margin-bottom: 0.625rem;
-  border: 1px solid $border; border-radius: 0.5rem; overflow: hidden; width: fit-content;
+  display: flex;
+  gap: 0;
+  margin-bottom: 0.625rem;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: fit-content;
 }
+
 .prop-video-tab {
-  padding: 0.35rem 1rem; font-size: 0.8rem; font-weight: 600; cursor: pointer;
-  background: #fff; border: none; color: $muted; transition: background 0.15s, color 0.15s;
-  &.active { background: $accent; color: #fff; }
-  &:not(.active):hover { background: $light; }
-}
-.prop-video-drop {
-  border: 2px dashed $border; border-radius: 0.625rem; padding: 2rem 1rem;
-  text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  padding: 0.35rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+  border: none;
   color: $muted;
-  svg { margin: 0 auto 0.5rem; display: block; color: #9ca3af; }
-  &--over { border-color: $accent; background: rgba($accent, 0.04); }
-  &:hover { border-color: #9ca3af; }
+  transition: background 0.15s, color 0.15s;
+
+  &.active {
+    background: $accent;
+    color: #fff;
+  }
+
+  &:not(.active):hover {
+    background: $light;
+  }
 }
-.prop-video-drop-label { font-size: 0.85rem; font-weight: 600; color: $text; margin: 0 0 0.25rem; }
-.prop-video-drop-hint  { font-size: 0.75rem; color: $muted; margin: 0; }
-.prop-video-uploading  { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.85rem; }
+
+.prop-video-drop {
+  border: 2px dashed $border;
+  border-radius: 0.625rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  color: $muted;
+
+  svg {
+    margin: 0 auto 0.5rem;
+    display: block;
+    color: #9ca3af;
+  }
+
+  &--over {
+    border-color: $accent;
+    background: rgba($accent, 0.04);
+  }
+
+  &:hover {
+    border-color: #9ca3af;
+  }
+}
+
+.prop-video-drop-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text;
+  margin: 0 0 0.25rem;
+}
+
+.prop-video-drop-hint {
+  font-size: 0.75rem;
+  color: $muted;
+  margin: 0;
+}
+
+.prop-video-uploading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
 .prop-video-uploaded {
-  display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.875rem;
-  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem;
-  svg { color: #16a34a; flex-shrink: 0; }
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.875rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.5rem;
+
+  svg {
+    color: #16a34a;
+    flex-shrink: 0;
+  }
 }
-.prop-video-url-text { font-size: 0.78rem; color: $text; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.prop-video-url-text {
+  font-size: 0.78rem;
+  color: $text;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .prop-video-remove {
-  background: none; border: none; cursor: pointer; color: $muted; font-size: 0.9rem; line-height: 1;
-  flex-shrink: 0; padding: 0 0.25rem;
-  &:hover { color: $red; }
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $muted;
+  font-size: 0.9rem;
+  line-height: 1;
+  flex-shrink: 0;
+  padding: 0 0.25rem;
+
+  &:hover {
+    color: $red;
+  }
 }
+
 .prop-btn-spinner {
-  display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
-  border-top-color: $accent; border-radius: 50%; animation: prop-spin 0.7s linear infinite;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: prop-spin 0.7s linear infinite;
 }
-@keyframes prop-spin { to { transform: rotate(360deg); } }
+
+@keyframes prop-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Location search dropdown */
-.adm-loc-wrap { position: relative; display: flex; align-items: center; width: 100%; }
-.adm-loc-icon { position: absolute; left: 0.75rem; color: #9ca3af; pointer-events: none; flex-shrink: 0; }
-.adm-loc-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.25rem !important; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; outline: none; cursor: text; &:focus { border-color: #1a5c3a; } }
-.adm-loc-dropdown { position: absolute; top: calc(100% + 3px); left: 0; right: 0; background: #fff; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 200; max-height: 200px; overflow-y: auto; }
-.adm-loc-option { padding: 0.55rem 0.875rem; font-size: 0.875rem; color: #374151; cursor: pointer; &:hover { background: #f0fdf4; color: #1a5c3a; } }
+.adm-loc-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.adm-loc-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #9ca3af;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.adm-loc-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.25rem !important;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  outline: none;
+  cursor: text;
+
+  &:focus {
+    border-color: #1a5c3a;
+  }
+}
+
+.adm-loc-dropdown {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.adm-loc-option {
+  padding: 0.55rem 0.875rem;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+
+  &:hover {
+    background: #f0fdf4;
+    color: #1a5c3a;
+  }
+}
+
+// ── Multiselect dropdown (amenities) ──
+$green-prop: #1a5c3a;
+$border-prop: #e5e7eb;
+$text-prop: #374151;
+$muted-prop: #9ca3af;
+
+.apr-ms-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1.5px solid $border-prop;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.83rem;
+  color: $text-prop;
+  background: #fff;
+  cursor: pointer;
+  min-height: 36px;
+  box-sizing: border-box;
+}
+
+.apr-ms-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: $muted-prop;
+}
+
+.apr-ms-dropdown {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  z-index: 300;
+  background: #fff;
+  border: 1.5px solid $border-prop;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.apr-ms-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.875rem;
+  font-size: 0.85rem;
+  color: $text-prop;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: $green-prop;
+  }
+}
+
+.apr-hint {
+  font-size: 0.75rem;
+  color: $muted-prop;
+  margin-top: 0.3rem;
+  display: block;
+}
+
+.apr-ms-amenity-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #1a5c3a;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}

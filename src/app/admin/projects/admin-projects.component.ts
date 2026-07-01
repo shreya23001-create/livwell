@@ -1,9 +1,13 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
+import { MsSelectComponent, MsOption } from '../../shared/components/ms-select/ms-select.component';
+import { AMENITY_ICONS } from '../master/admin-master.component';
 import * as XLSX from 'xlsx';
 
 export interface Project {
@@ -52,17 +56,19 @@ const BLANK: Project = {
 @Component({
   selector: 'app-admin-projects',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RichEditorComponent, MsSelectComponent],
   templateUrl: './admin-projects.component.html',
   styleUrl: './admin-projects.component.scss',
 })
 export class AdminProjectsComponent implements OnInit {
-  private sb      = inject(SupabaseService).client;
-  public  auth    = inject(AuthService);
-  private dataSvc = inject(AdminDataService);
+  private sb        = inject(SupabaseService).client;
+  public  auth      = inject(AuthService);
+  private dataSvc   = inject(AdminDataService);
+  private sanitizer = inject(DomSanitizer);
 
   projects     = signal<Project[]>([]);
   agents       = signal<{ name: string }[]>([]);
+  developers   = signal<{ name: string }[]>([]);
   loading      = signal(true);
   saving       = signal(false);
   importing    = signal(false);
@@ -74,7 +80,7 @@ export class AdminProjectsComponent implements OnInit {
   showModal       = signal(false);
   editMode        = signal(false);
   form            = signal<Project>({ ...BLANK });
-  amenityInput    = signal('');
+  amenityDropdownOpen = signal(false);
   locSearch       = signal('');
   locDropdownOpen = signal(false);
   filteredLocs    = computed(() => {
@@ -94,6 +100,62 @@ export class AdminProjectsComponent implements OnInit {
   uploadingBrandLogo = signal(false);
 
   readonly types    = ['Apartment','Villa','Townhouse','Penthouse','Home','Mixed','Duplex'];
+
+  selectedTypes      = signal<string[]>([]);
+  typeDropdownOpen   = signal(false);
+  trendDropdownOpen  = signal(false);
+
+  masterAmenities = this.dataSvc.amenities;
+
+  // MsSelect option arrays
+  locationOpts  = computed<MsOption[]>(() => this.dataSvc.locations().map(l => ({ value: l, label: l })));
+  typeOpts      = computed<MsOption[]>(() => this.types.map(t => ({ value: t, label: t })));
+  statusOpts    = computed<MsOption[]>(() => this.statuses.map(s => ({ value: s, label: s })));
+  badgeOpts     = computed<MsOption[]>(() => this.badges.map(b => ({ value: b, label: b || 'None' })));
+  trendOpts     = computed<MsOption[]>(() => [{ value: '', label: '— None —' }, ...this.dataSvc.trendingTabs().map(t => ({ value: t, label: t }))]);
+  developerOpts = computed<MsOption[]>(() => [{ value: '', label: '— Select Developer —' }, ...this.developers().map(d => ({ value: d.name, label: d.name }))]);
+  agentOpts     = computed<MsOption[]>(() => [{ value: '', label: '— Unassigned —' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
+  amenityOpts   = computed<MsOption[]>(() => this.masterAmenities().map(a => ({
+    value: a.name, label: a.name,
+    iconHtml: this.getAmenityIconSvg(a.icon),
+  })));
+
+  onLocationChange(vals: string[])       { this.form.update(f => ({ ...f, location: vals[0] ?? '' })); }
+  onStatusChange(vals: string[])         { this.form.update(f => ({ ...f, status: (vals[0] ?? 'Draft') as any })); }
+  onBadgeChange(vals: string[])          { this.form.update(f => ({ ...f, badge: vals[0] ?? '' })); }
+  onTrendChange(vals: string[])          { this.form.update(f => ({ ...f, trending_category: vals[0] ?? '' })); }
+  onDeveloperChange(vals: string[])      { this.form.update(f => ({ ...f, developer: vals[0] ?? '' })); }
+  onAgentChange(vals: string[])          { this.form.update(f => ({ ...f, agent_name: vals[0] ?? '' })); }
+  onTypesChange(vals: string[])          { this.selectedTypes.set(vals); this.form.update(f => ({ ...f, type: vals.join(',') })); }
+  onAmenitiesChange(vals: string[])      { this.form.update(f => ({ ...f, amenities: vals })); }
+
+  isTypeSelected(t: string): boolean {
+    return this.selectedTypes().includes(t);
+  }
+
+  toggleType(t: string): void {
+    this.selectedTypes.update(arr =>
+      arr.includes(t) ? arr.filter(x => x !== t) : [...arr, t]
+    );
+    this.form.update(f => ({ ...f, type: this.selectedTypes().join(',') }));
+  }
+
+  isAmenitySelected(name: string): boolean {
+    return (this.form().amenities ?? []).includes(name);
+  }
+
+  toggleAmenity(name: string): void {
+    this.form.update(f => {
+      const current = f.amenities ?? [];
+      return { ...f, amenities: current.includes(name) ? current.filter(x => x !== name) : [...current, name] };
+    });
+  }
+
+  getAmenityIconSvg(iconKey: string): SafeHtml {
+    const iconDef = AMENITY_ICONS.find(i => i.key === iconKey);
+    const svg = iconDef?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
   readonly statuses = ['Draft','Published','Archived'];
   readonly badges   = ['','New Launch','Featured','Hot','Exclusive','Trending','Luxury','Ultra Luxury','Limited Units'];
   readonly trendingCategoryOptions = ['Villas','Flats','Luxury','Apartments','Townhouses','Penthouses','Off-Plan'];
@@ -142,7 +204,7 @@ export class AdminProjectsComponent implements OnInit {
 
   async ngOnInit() {
     await this.auth.waitForSession();
-    await Promise.all([this.loadProjects(), this.loadAgents()]);
+    await Promise.all([this.loadProjects(), this.loadAgents(), this.loadDevelopers()]);
   }
 
   async loadAgents(): Promise<void> {
@@ -152,6 +214,14 @@ export class AdminProjectsComponent implements OnInit {
       .eq('role', 'agent')
       .order('name');
     if (data) this.agents.set(data.map((a: any) => ({ name: a.name })));
+  }
+
+  async loadDevelopers(): Promise<void> {
+    const { data } = await this.sb
+      .from('developers')
+      .select('name')
+      .order('name');
+    if (data) this.developers.set(data.map((d: any) => ({ name: d.name })));
   }
 
   async loadProjects() {
@@ -165,22 +235,28 @@ export class AdminProjectsComponent implements OnInit {
 
   openAdd() {
     this.form.set({ ...BLANK });
-    this.amenityInput.set('');
     this.locSearch.set('');
     this.commSearch.set('');
     this.uploadedImages.set([]);
     this.previewImages.set([]);
+    this.selectedTypes.set([]);
+    this.typeDropdownOpen.set(false);
+    this.trendDropdownOpen.set(false);
+    this.amenityDropdownOpen.set(false);
     this.editMode.set(false);
     this.showModal.set(true);
   }
 
   openEdit(p: Project) {
     this.form.set({ ...p });
-    this.amenityInput.set('');
     this.locSearch.set(p.location ?? '');
     this.commSearch.set(p.community ?? '');
     this.uploadedImages.set(p.images ?? []);
     this.previewImages.set(p.images ?? []);
+    this.selectedTypes.set(p.type ? p.type.split(',').map(t => t.trim()).filter(Boolean) : []);
+    this.typeDropdownOpen.set(false);
+    this.trendDropdownOpen.set(false);
+    this.amenityDropdownOpen.set(false);
     this.editMode.set(true);
     this.showModal.set(true);
   }
@@ -189,17 +265,6 @@ export class AdminProjectsComponent implements OnInit {
     this.showModal.set(false);
     this.previewImages.set([]);
     this.uploadedImages.set([]);
-  }
-
-  addAmenity() {
-    const v = this.amenityInput().trim();
-    if (!v) return;
-    this.form.update(f => ({ ...f, amenities: [...(f.amenities ?? []), v] }));
-    this.amenityInput.set('');
-  }
-
-  removeAmenity(i: number) {
-    this.form.update(f => ({ ...f, amenities: f.amenities.filter((_, idx) => idx !== i) }));
   }
 
   onFileChange(event: Event): void {

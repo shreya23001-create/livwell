@@ -70,12 +70,14 @@ export interface Lead {
 }
 
 // ── Master Data ───────────────────────────────────────────
-export interface MasterStatus { name: string; color: string; }
+export interface MasterStatus  { name: string; color: string; }
+export interface MasterAmenity { name: string; icon: string; }
 
 @Injectable({ providedIn: 'root' })
 export class AdminDataService {
 
   // ── Master Data Signals ───────────────────────────────
+  readonly amenities    = signal<MasterAmenity[]>([]);
   readonly categories   = signal<string[]>(['Sale', 'Rent', 'Off-Plan']);
   readonly propTypes    = signal<string[]>(['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio', 'Office', 'Shop', 'Warehouse', 'Plot']);
   readonly trendingTabs = signal<string[]>(['Villas', 'Luxury', 'Flats']);
@@ -140,11 +142,13 @@ export class AdminDataService {
         if (dbLocations.length) this.locations.set(dbLocations);
         const dbCommunities = data.filter((r: any) => r.type === 'community').map((r: any) => r.name);
         if (dbCommunities.length) this.communities.set(dbCommunities);
+        const dbAmenities = data.filter((r: any) => r.type === 'amenity').map((r: any) => ({ name: r.name, icon: r.color || 'star' }));
+        if (dbAmenities.length) this.amenities.set(dbAmenities);
       }
     } catch { /* table not created yet — defaults remain */ }
   }
 
-  async addMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location' | 'community', name: string, color?: string): Promise<string | null> {
+  async addMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location' | 'community' | 'amenity', name: string, color?: string): Promise<string | null> {
     const order = type === 'category'
       ? this.categories().length + 1
       : type === 'property_type'
@@ -155,19 +159,22 @@ export class AdminDataService {
             ? this.locations().length + 1
             : type === 'community'
               ? this.communities().length + 1
-              : this.propStatuses().length + 1;
+              : type === 'amenity'
+                ? this.amenities().length + 1
+                : this.propStatuses().length + 1;
     const { error } = await this.sb.from('master_data').insert({ type, name, color: color || null, sort_order: order });
     if (error) return error.message;
     await this.loadMasterData();
     return null;
   }
 
-  async removeMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location' | 'community', name: string): Promise<string | null> {
+  async removeMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location' | 'community' | 'amenity', name: string): Promise<string | null> {
     if (type === 'category')      this.categories.update(l => l.filter(x => x !== name));
     if (type === 'property_type') this.propTypes.update(l => l.filter(x => x !== name));
     if (type === 'trending_tab')  this.trendingTabs.update(l => l.filter(x => x !== name));
     if (type === 'location')      this.locations.update(l => l.filter(x => x !== name));
     if (type === 'community')     this.communities.update(l => l.filter(x => x !== name));
+    if (type === 'amenity')       this.amenities.update(l => l.filter(x => x.name !== name));
     if (type === 'status')        this.propStatuses.update(l => l.filter(x => x.name !== name));
 
     const { error } = await this.sb.from('master_data').delete().eq('type', type).eq('name', name);

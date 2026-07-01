@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
 
 export interface BlogPost {
   id?: number;
@@ -32,7 +33,7 @@ const CATEGORIES = ['Market Insights', 'Investment', 'Lifestyle', 'Regulations',
 @Component({
   selector: 'app-admin-blogs',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RichEditorComponent],
   templateUrl: './admin-blogs.component.html',
   styleUrl: './admin-blogs.component.scss',
 })

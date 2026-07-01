@@ -358,34 +358,15 @@
     <div class="prop-form-row">
       <div class="prop-form-field">
         <label class="prop-form-label">Category *</label>
-
-        <div class="select-wrapper">
-          <select class="prop-form-input custom-select" (change)="patchForm('listing_type', $any($event.target).value)">
-            <option *ngFor="let c of categoryList" [value]="c" [selected]="form()['listing_type'] === c">
-              {{ c }}
-            </option>
-          </select>
-
-          <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
-          </svg>
-        </div>
+        <app-ms-select [options]="categoryOpts()" [value]="form()['listing_type'] ? [form()['listing_type']!] : []"
+          placeholder="Select category…" [multi]="false"
+          (valueChange)="onCategoryChange($event)"></app-ms-select>
       </div>
-
       <div class="prop-form-field">
         <label class="prop-form-label">Type *</label>
-
-        <div class="select-wrapper">
-          <select class="prop-form-input custom-select" (change)="patchForm('type', $any($event.target).value)">
-            <option *ngFor="let t of typeList" [value]="t" [selected]="form()['type'] === t">
-              {{ t }}
-            </option>
-          </select>
-
-          <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
-          </svg>
-        </div>
+        <app-ms-select [options]="typeOpts()" [value]="form()['type'] ? [form()['type']!] : []"
+          placeholder="Select type…" [multi]="false"
+          (valueChange)="onTypeChange($event)"></app-ms-select>
       </div>
     </div>
 
@@ -399,14 +380,9 @@
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Status</label>
-        <div class="select-wrapper">
-          <select class="prop-form-input" (change)="patchForm('status', $any($event.target).value)">
-            <option *ngFor="let s of statusList" [value]="s" [selected]="form()['status'] === s">{{ s }}</option>
-          </select>
-          <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
-          </svg>
-        </div>
+        <app-ms-select [options]="statusOpts()" [value]="form()['status'] ? [form()['status']!] : []"
+          placeholder="Select status…" [multi]="false"
+          (valueChange)="onStatusChange($event)"></app-ms-select>
       </div>
     </div>
 
@@ -432,26 +408,13 @@
       </div>
     </div>
 
-    <!-- Location + Community -->
+    <!-- Location + Project -->
     <div class="prop-form-row">
       <div class="prop-form-field" [class.has-error]="formErrors()['location']">
         <label class="prop-form-label">Location *</label>
-        <div class="adm-loc-wrap">
-          <svg class="adm-loc-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input class="prop-form-input adm-loc-input" type="text"
-            placeholder="Search or type location…"
-            [value]="locSearch()"
-            (input)="locSearch.set($any($event.target).value); locDropdownOpen.set(true); patchForm('location', $any($event.target).value)"
-            (focus)="locDropdownOpen.set(true)"
-            (blur)="locDropdownOpen.set(false)"
-            autocomplete="off">
-          <div class="adm-loc-dropdown" *ngIf="locDropdownOpen() && filteredLocs().length">
-            <div class="adm-loc-option" *ngFor="let l of filteredLocs()"
-              (mousedown)="locSearch.set(l); patchForm('location', l); locDropdownOpen.set(false)">
-              {{ l }}
-            </div>
-          </div>
-        </div>
+        <app-ms-select [options]="locationOpts()" [value]="form()['location'] ? [form()['location']!] : []"
+          placeholder="Search location…" [multi]="false"
+          (valueChange)="onLocationChange($event)"></app-ms-select>
         <span *ngIf="formErrors()['location']" class="prop-form-error">{{ formErrors()['location'] }}</span>
       </div>
       <div class="prop-form-field">
@@ -486,39 +449,22 @@
     <div class="prop-form-row">
       <div class="prop-form-field">
         <label class="prop-form-label">Furnishing</label>
-        <div class="select-wrapper">
-          <select class="prop-form-input" (change)="patchForm('furnishing', $any($event.target).value)">
-            <option *ngFor="let f of furnishingList" [value]="f" [selected]="form()['furnishing'] === f">{{ f }}
-            </option>
-          </select>
-          <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
-          </svg>
-        </div>
-
+        <app-ms-select [options]="furnishingOpts()" [value]="form()['furnishing'] ? [form()['furnishing']!] : []"
+          placeholder="Select furnishing…" [multi]="false"
+          (valueChange)="onFurnishingChange($event)"></app-ms-select>
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Assign Agent</label>
-        <div class="select-wrapper">
-          <select class="prop-form-input" (change)="patchForm('agent_name', $any($event.target).value || '')">
-            <option value="" [selected]="!form()['agent_name']">— Unassigned —</option>
-            <option *ngFor="let a of agents()" [value]="a.name" [selected]="form()['agent_name'] === a.name">{{ a.name
-              }}
-            </option>
-          </select>
-          <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
-          </svg>
-        </div>
-
+        <app-ms-select [options]="agentOpts()" [value]="form()['agent_name'] ? [form()['agent_name']!] : []"
+          placeholder="— Unassigned —" [multi]="false"
+          (valueChange)="onAgentChange($event)"></app-ms-select>
       </div>
     </div>
 
     <!-- Description -->
     <div class="prop-form-field">
       <label class="prop-form-label">Description</label>
-      <textarea class="prop-form-input prop-form-textarea" rows="4" placeholder="Property description…"
-        [value]="form()['description'] || ''" (input)="patchForm('description', $any($event.target).value)"></textarea>
+      <app-rich-editor [placeholder]="'Property description…'" [initialValue]="form()['description'] || ''" (valueChange)="patchForm('description', $event)"></app-rich-editor>
     </div>
 
     <!-- Image Upload -->
@@ -564,17 +510,13 @@
     <!-- Amenities -->
     <div class="prop-form-field">
       <label class="prop-form-label">Amenities</label>
-      <div class="apr-tag-input">
-        <input class="prop-form-input" type="text" [value]="amenityInput()"
-          (input)="amenityInput.set($any($event.target).value)"
-          placeholder="e.g. Pool" (keydown.enter)="addAmenity(); $event.preventDefault()">
-        <button type="button" class="prop-btn prop-btn--ghost prop-btn--sm" (click)="addAmenity()">Add</button>
-      </div>
-      <div class="apr-tags" *ngIf="form()['amenities']?.length">
-        <span *ngFor="let a of form()['amenities']; let i = index" class="apr-tag-item">
-          {{ a }} <button type="button" (click)="removeAmenity(i)">×</button>
-        </span>
-      </div>
+      @if (masterAmenities().length === 0) {
+        <p class="apr-hint">No amenities configured. Add them in Master Data → Amenities.</p>
+      } @else {
+        <app-ms-select [options]="amenityOpts()" [value]="form()['amenities'] ?? []"
+          placeholder="Select amenities…" [multi]="true"
+          (valueChange)="onAmenitiesChange($event)"></app-ms-select>
+      }
     </div>
 
     <!-- Video Tour -->

@@ -30,9 +30,9 @@
       <div class="master-stat-val">{{ counts().locations }}</div>
       <div class="master-stat-lbl">Locations</div>
     </div>
-    <div class="master-stat" [class.active]="activeTab()==='communities'" (click)="activeTab.set('communities')">
-      <div class="master-stat-val">{{ counts().communities }}</div>
-      <div class="master-stat-lbl">Community</div>
+    <div class="master-stat" [class.active]="activeTab()==='amenities'" (click)="activeTab.set('amenities')">
+      <div class="master-stat-val">{{ counts().amenities }}</div>
+      <div class="master-stat-lbl">Amenities</div>
     </div>
   </div>
 
@@ -43,7 +43,7 @@
     <button class="master-tab" [class.active]="activeTab()==='statuses'"       (click)="activeTab.set('statuses')">Statuses</button>
     <button class="master-tab" [class.active]="activeTab()==='trending-tabs'"  (click)="activeTab.set('trending-tabs')">Trending Tabs</button>
     <button class="master-tab" [class.active]="activeTab()==='locations'"      (click)="activeTab.set('locations')">Locations</button>
-    <button class="master-tab" [class.active]="activeTab()==='communities'"    (click)="activeTab.set('communities')">Community</button>
+    <button class="master-tab" [class.active]="activeTab()==='amenities'"     (click)="activeTab.set('amenities')">Amenities</button>
   </div>
 
   <!-- ══ CATEGORIES ══════════════════════════════════════ -->
@@ -265,64 +265,48 @@
     </div>
   }
 
-  <!-- ══ COMMUNITIES / DEVELOPERS ══════════════════════ -->
-  @if (activeTab() === 'communities') {
+  <!-- ══ AMENITIES ════════════════════════════════════════ -->
+  @if (activeTab() === 'amenities') {
     <div class="master-card">
       <div class="master-card-header">
-        <div class="master-card-header-row">
-          <div>
-            <h2 class="master-card-title">Community</h2>
-            <p class="master-card-sub">Community names shown in the dropdown when adding/editing projects and properties.</p>
-          </div>
-          <div class="master-loc-actions">
-            <button class="master-btn master-btn--ghost" (click)="downloadSampleCommunitiesExcel()" title="Download sample">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-              Sample
-            </button>
-            <label class="master-btn master-btn--ghost" [class.master-btn--loading]="importingCommunity()" title="Import from Excel">
-              <input type="file" accept=".xlsx,.xls,.csv" (change)="importCommunitiesExcel($event)" style="display:none" [disabled]="importingCommunity()">
-              @if (importingCommunity()) { Importing… } @else {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
-                Import Excel
-              }
-            </label>
-            <button class="master-btn master-btn--ghost" (click)="exportCommunitiesExcel()" [disabled]="communities().length === 0" title="Export to Excel">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-              Export Excel
-            </button>
-          </div>
-        </div>
+        <h2 class="master-card-title">Amenities</h2>
+        <p class="master-card-sub">Amenities appear with their icons on property and project listings. Pick an icon from the list.</p>
       </div>
 
-      @if (communityError()) {
-        <p class="master-error">{{ communityError() }}</p>
-      }
-
-      <div class="master-add-row">
-        <input class="master-input" type="text" placeholder="e.g. Sobha Realty"
-               [ngModel]="newCommunity()" (ngModelChange)="newCommunity.set($event)"
-               (keyup.enter)="addCommunity()">
-        <button class="master-btn master-btn--primary" (click)="addCommunity()" [disabled]="saving()">
+      <div class="master-add-row master-amenity-add-row">
+        <input class="master-input" type="text" placeholder="e.g. Rooftop Terrace"
+               [ngModel]="newAmenityName()" (ngModelChange)="newAmenityName.set($event)"
+               (keyup.enter)="addAmenity()">
+        <div class="master-amenity-icon-picker">
+          <label class="master-color-lbl">Icon</label>
+          <select class="master-input master-amenity-select"
+                  [ngModel]="newAmenityIcon()" (ngModelChange)="newAmenityIcon.set($event)">
+            @for (opt of amenityIconOptions; track opt.key) {
+              <option [value]="opt.key">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <button class="master-btn master-btn--primary" (click)="addAmenity()" [disabled]="saving()">
           <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Community
+          Add Amenity
         </button>
       </div>
-
-      <input class="master-input master-loc-search" type="text" placeholder="Search communities…"
-             [ngModel]="communitySearch()" (ngModelChange)="communitySearch.set($event)">
+      @if (amenityError()) {
+        <p class="master-error">{{ amenityError() }}</p>
+      }
 
       <div class="master-list master-list--grid">
-        @for (c of filteredCommunities(); track c) {
+        @for (a of amenities(); track a.name) {
           <div class="master-item">
-            <svg class="master-item-pin" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21"/></svg>
-            <span class="master-item-name">{{ c }}</span>
-            <button class="master-item-del" (click)="removeCommunity(c)" title="Remove">
+            <span class="master-amenity-icon" [innerHTML]="getAmenityIconSvg(a.icon)"></span>
+            <span class="master-item-name">{{ a.name }}</span>
+            <button class="master-item-del" (click)="removeAmenity(a.name)" title="Remove">
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
             </button>
           </div>
         }
-        @if (filteredCommunities().length === 0) {
-          <p class="master-empty">No communities found.</p>
+        @if (amenities().length === 0) {
+          <p class="master-empty">No amenities yet. Add one above.</p>
         }
       </div>
     </div>

@@ -118,11 +118,16 @@ export class DeveloperDetailComponent implements OnInit {
       .from('projects')
       .select('id,title,location,community,type,price_from,price_label,beds,area_sqft,images,completion_date,badge,is_featured')
       .eq('status', 'Published')
-      .ilike('developer', data.name)
+      .ilike('developer', `%${data.name}%`)
       .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false });
 
-    this.allProjects.set((projs ?? []) as Project[]);
+    const mapped = (projs ?? []).map((p: any) => {
+      const all = (p.images ?? []).filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image'));
+      p.images = [...all.filter((u: string) => !u.includes('/images/')), ...all.filter((u: string) => u.includes('/images/'))];
+      return p;
+    });
+    this.allProjects.set(mapped as Project[]);
     this.loading.set(false);
   }
 
@@ -138,6 +143,7 @@ export class DeveloperDetailComponent implements OnInit {
   }
 
   coverImage(p: Project): string {
-    return p.images?.[0] ?? '/images/dummy-image.png';
+    const real = (p.images ?? []).find(u => u && !u.includes('unsplash.com') && !u.includes('dummy-image'));
+    return real ?? p.images?.[0] ?? '/images/dummy-image.png';
   }
 }

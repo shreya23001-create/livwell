@@ -279,12 +279,27 @@
                (keyup.enter)="addAmenity()">
         <div class="master-amenity-icon-picker">
           <label class="master-color-lbl">Icon</label>
-          <select class="master-input master-amenity-select"
-                  [ngModel]="newAmenityIcon()" (ngModelChange)="newAmenityIcon.set($event)">
-            @for (opt of amenityIconOptions; track opt.key) {
-              <option [value]="opt.key">{{ opt.label }}</option>
+          <div class="master-icon-trigger" (click)="showIconPicker.set(!showIconPicker())">
+            @if (newAmenityIcon()) {
+              <span class="master-amenity-icon" [innerHTML]="safeSvg(getAmenityIconSvg(newAmenityIcon()))"></span>
+              <span class="master-icon-trigger__label">{{ getAmenityIconLabel(newAmenityIcon()) }}</span>
+            } @else {
+              <span class="master-icon-trigger__placeholder">Select Icon</span>
             }
-          </select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+          @if (showIconPicker()) {
+            <div class="master-icon-grid">
+              @for (opt of amenityIconOptions; track opt.key) {
+                <button type="button" class="master-icon-cell"
+                  [class.master-icon-cell--active]="newAmenityIcon() === opt.key"
+                  [title]="opt.label"
+                  (click)="newAmenityIcon.set(opt.key); showIconPicker.set(false)">
+                  <span [innerHTML]="safeSvg(opt.svg)"></span>
+                </button>
+              }
+            </div>
+          }
         </div>
         <button class="master-btn master-btn--primary" (click)="addAmenity()" [disabled]="saving()">
           <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
@@ -298,7 +313,7 @@
       <div class="master-list master-list--grid">
         @for (a of amenities(); track a.name) {
           <div class="master-item">
-            <span class="master-amenity-icon" [innerHTML]="getAmenityIconSvg(a.icon)"></span>
+            <span class="master-amenity-icon" [innerHTML]="safeSvg(getAmenityIconSvg(a.icon))"></span>
             <span class="master-item-name">{{ a.name }}</span>
             <button class="master-item-del" (click)="removeAmenity(a.name)" title="Remove">
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>

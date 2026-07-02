@@ -93,7 +93,8 @@ export class OffPlanComponent implements OnInit {
   }
 
   private mapRow(r: any): OffPlanProject {
-    const imgs: string[] = (r.images ?? []).filter((u: string) => u && !u.includes('unsplash.com'));
+    const all: string[] = (r.images ?? []).filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image'));
+    const imgs: string[] = [...all.filter((u: string) => !u.includes('/images/')), ...all.filter((u: string) => u.includes('/images/'))];
     return {
       id:             r.id,
       slug:           String(r.id),

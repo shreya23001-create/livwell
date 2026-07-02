@@ -59,7 +59,7 @@ export class BrandedResidencesComponent implements OnInit {
       this.dbError.set(error.message);
     }
     const residences = (data as BrandedResidence[]) ?? [];
-    residences.forEach((r: any) => { r.images = (r.images ?? []).filter((u: string) => u && !u.includes('unsplash.com')); });
+    residences.forEach((r: any) => { const clean = (r.images ?? []).filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); r.images = [...clean.filter((u: string) => !u.includes('/images/')), ...clean.filter((u: string) => u.includes('/images/'))]; });
     this.allResidences.set(residences);
     this.loading.set(false);
   }

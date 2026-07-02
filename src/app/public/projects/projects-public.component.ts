@@ -114,7 +114,10 @@ export class ProjectsPublicComponent implements OnInit {
       .order('created_at',  { ascending: false });
 
     const projects = (data as Project[]) ?? [];
-    projects.forEach(p => { p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com')); });
+    projects.forEach(p => {
+      const all = (p.images ?? []).filter(u => u && !u.includes('unsplash.com') && !u.includes('dummy-image'));
+      p.images = [...all.filter(u => !u.includes('/images/')), ...all.filter(u => u.includes('/images/'))];
+    });
     this.allProjects.set(projects);
     this.loading.set(false);
   }

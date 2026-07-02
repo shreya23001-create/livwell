@@ -406,7 +406,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
         Warehouse: WAREHOUSE_FEATURES,
         Plot:      PLOT_FEATURES,
       };
-      const imgs: string[] = Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []);
+      const raw: string[] = Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []); const clean = raw.filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); const imgs: string[] = [...clean.filter((u: string) => !u.includes('/images/')), ...clean.filter((u: string) => u.includes('/images/'))];
       const priceNum = typeof p.price === 'number' ? p.price : parseFloat(String(p.price).replace(/[^0-9.]/g, ''));
       const areaNum  = typeof p.area_sqft === 'number' ? p.area_sqft : parseFloat(String(p.area_sqft ?? '0'));
       const ppsf     = areaNum > 0 ? Math.round(priceNum / areaNum) : 0;

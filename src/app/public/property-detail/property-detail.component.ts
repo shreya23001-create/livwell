@@ -7,7 +7,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
-import { AMENITY_ICONS } from '../../admin/master/admin-master.component';
+import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 
 interface Property {
   id: number;
@@ -448,7 +448,7 @@ export class PropertyDetailComponent implements OnInit {
     address:      p.address      || '',
     description:  p.description  || '',
     furnishing:   p.furnishing   || '',
-    images:       Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? JSON.parse(p.images) : []),
+    images:       (() => { const raw: string[] = Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? JSON.parse(p.images) : []); const clean = raw.filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); const real = clean.filter((u: string) => !u.includes('/images/')); const local = clean.filter((u: string) => u.includes('/images/')); return [...real, ...local]; })(),
     is_featured:  p.is_featured  || false,
     agent_name:   ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
     created_at:   p.created_at   || '',

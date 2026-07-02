@@ -40,8 +40,7 @@ export class DevelopersComponent implements OnInit {
     const q = this.searchQuery().toLowerCase().trim();
     return this.allDevelopers()
       .map(d => d.name)
-      .filter(n => !q || n.toLowerCase().includes(q))
-      .slice(0, 8);
+      .filter(n => !q || n.toLowerCase().includes(q));
   });
 
   selectSuggestion(name: string): void {
@@ -68,12 +67,13 @@ export class DevelopersComponent implements OnInit {
         .eq('status', 'Published'),
     ]);
 
-    // Build live project count per developer name
-    const countMap = new Map<string, number>();
-    for (const p of (projData ?? [])) {
-      const key = (p.developer ?? '').trim().toLowerCase();
-      countMap.set(key, (countMap.get(key) ?? 0) + 1);
-    }
+    // Build live project count — partial match so "Meraas" matches "Meraas Properties"
+    const projList: string[] = (projData ?? []).map((p: any) => (p.developer ?? '').trim().toLowerCase());
+
+    const liveCount = (name: string): number => {
+      const n = name.trim().toLowerCase();
+      return projList.filter(dev => dev.includes(n) || n.includes(dev)).length;
+    };
 
     if (!error && data) {
       this.allDevelopers.set(data.map((d: any) => ({
@@ -82,7 +82,7 @@ export class DevelopersComponent implements OnInit {
         logo:              d.logo,
         coverImage:        d.cover_image || '',
         established:       d.established,
-        projects:          countMap.get((d.name ?? '').trim().toLowerCase()) ?? d.projects ?? 0,
+        projects:          liveCount(d.name ?? ''),
         deliveredProjects: d.delivered_projects,
         units:             d.units        ?? 0,
         salesVolume:       d.sales_volume ?? '',

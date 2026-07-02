@@ -8,7 +8,7 @@ import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
-import { AMENITY_ICONS } from '../../admin/master/admin-master.component';
+import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 
 interface Project {
   id: number;
@@ -202,7 +202,11 @@ export class ProjectDetailPublicComponent implements OnInit {
 
     if (data) {
       const p = data as Project;
-      p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com'));
+      p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com') && !u.includes('dummy-image'));
+      // Put real uploaded images first, placeholder fallback last
+      const real = p.images.filter(u => !u.includes('/images/'));
+      const local = p.images.filter(u => u.includes('/images/'));
+      p.images = [...real, ...local];
       this.project.set(p);
       this.geocodeAndSetMap(data as Project);
       const userId = this.auth.currentUser()?.id;

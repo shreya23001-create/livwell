@@ -210,7 +210,7 @@ export class LuxuryPropertiesForSaleComponent implements OnInit {
       const areaNum   = typeof p.area_sqft === 'number' ? p.area_sqft : parseFloat(String(p.area_sqft ?? '0'));
       const ppsf      = areaNum > 0 ? Math.round(priceNum / areaNum) : 0;
       const isRent    = (p.listing_type ?? '').toLowerCase() === 'rent';
-      const imgs: string[] = Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []);
+      const raw: string[] = Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []); const clean = raw.filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); const imgs: string[] = [...clean.filter((u: string) => !u.includes('/images/')), ...clean.filter((u: string) => u.includes('/images/'))];
       const bedsRaw   = p.bedrooms;
       const bedsVal: number | 'Studio' = bedsRaw === 0 || String(bedsRaw).toLowerCase() === 'studio' ? 'Studio' : (Number(bedsRaw) || 0);
       const agentInfo = agentMap[p.agent_name] ?? { phone: '', email: '', avatar: '' };
@@ -237,7 +237,7 @@ export class LuxuryPropertiesForSaleComponent implements OnInit {
         baths:        Number(p.bathrooms) || 0,
         area:         areaNum,
         areaDisplay:  areaNum > 0 ? `${areaNum.toLocaleString()} sqft` : '',
-        image:        imgs[0] ?? 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900&q=85',
+        image:        imgs[0] ?? '/images/dummy-image.png',
         furnished:    furnishingLower === 'furnished',
         forRent:      isRent,
         agent: {

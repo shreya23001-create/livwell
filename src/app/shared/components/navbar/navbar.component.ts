@@ -116,11 +116,27 @@ export class NavbarComponent implements OnInit {
     this.isScrolled.set(window.scrollY > 50);
   }
 
+  mobileOpenSection = signal<string | null>(null);
+
   toggleMobileMenu(): void {
-    this.mobileMenuOpen.update(v => !v);
+    const next = !this.mobileMenuOpen();
+    this.mobileMenuOpen.set(next);
+    // Lock/unlock body scroll
+    if (next) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      this.mobileOpenSection.set(null);
+    }
   }
 
   closeMobileMenu(): void {
     this.mobileMenuOpen.set(false);
+    document.body.style.overflow = '';
+    this.mobileOpenSection.set(null);
+  }
+
+  toggleSection(key: string): void {
+    this.mobileOpenSection.update(v => v === key ? null : key);
   }
 }

@@ -68,7 +68,7 @@ export class LuxuryProjectsComponent implements OnInit {
 
     const { data } = await query.order('is_ultra_luxury', { ascending: false }).order('created_at', { ascending: false });
     const projects = (data as Project[]) ?? [];
-    projects.forEach(p => { p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com')); });
+    projects.forEach(p => { const clean = (p.images ?? []).filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); p.images = [...clean.filter((u: string) => !u.includes('/images/')), ...clean.filter((u: string) => u.includes('/images/'))]; });
     this.projects.set(projects);
     this.loading.set(false);
   }

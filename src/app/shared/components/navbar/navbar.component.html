@@ -313,28 +313,148 @@
 
   </div>
 
-  <!-- Mobile Menu -->
-  <div class="mobile-menu" [class.open]="mobileMenuOpen()">
-    <ul>
-      <li><a routerLink="/off-plan" (click)="closeMobileMenu()">New Projects</a></li>
-      <li><a routerLink="/properties" [queryParams]="{status:'Sale'}" (click)="closeMobileMenu()">Buy</a></li>
-      <li><a routerLink="/properties" [queryParams]="{status:'Rent'}" (click)="closeMobileMenu()">Rent</a></li>
-      <li><a routerLink="/properties" [queryParams]="{type:'Penthouse'}" (click)="closeMobileMenu()">Luxe</a></li>
-      <li><a routerLink="/contact" (click)="closeMobileMenu()">Sell</a></li>
-      <!-- <li><a routerLink="/services" (click)="closeMobileMenu()">Services</a></li> -->
-      <li><a routerLink="/agents" (click)="closeMobileMenu()">Agents</a></li>
-      <!-- <li><a routerLink="/guides" (click)="closeMobileMenu()">News & Trends</a></li> -->
-      <li><a routerLink="/about" (click)="closeMobileMenu()">About Us</a></li>
-      <li><a routerLink="/contact" (click)="closeMobileMenu()">Contact</a></li>
-    </ul>
-    <div class="mobile-actions">
-      @if (!auth.isLoggedIn()) {
-      <a routerLink="/contact" class="btn-valuation" (click)="closeMobileMenu()">Free Valuation</a>
-      <a routerLink="/auth" class="btn-outline" (click)="closeMobileMenu()">Sign In</a>
+  <!-- Mobile Drawer Overlay -->
+  <div class="mob-overlay" [class.open]="mobileMenuOpen()" (click)="closeMobileMenu()"></div>
+
+  <!-- Mobile Drawer -->
+  <div class="mob-drawer" [class.open]="mobileMenuOpen()">
+
+    <!-- Drawer header -->
+    <div class="mob-drawer-head">
+      <a routerLink="/" class="mob-drawer-logo" (click)="closeMobileMenu()">
+        <img src="images/livwell fav logo.png" alt="Livwell" class="mob-logo-img">
+      </a>
+      <button class="mob-close-btn" (click)="closeMobileMenu()" aria-label="Close menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Drawer body -->
+    <nav class="mob-nav">
+
+      <!-- Projects -->
+      <a routerLink="/projects" class="mob-nav-link" (click)="closeMobileMenu()">
+        Projects
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <!-- Buy -->
+      <div class="mob-section">
+        <button class="mob-section-btn" (click)="toggleSection('buy')" [class.open]="mobileOpenSection() === 'buy'">
+          Buy
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="mob-section-body" [class.open]="mobileOpenSection() === 'buy'">
+          <a routerLink="/properties" [queryParams]="{type:'Apartment',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Apartments for Sale</a>
+          <a routerLink="/properties" [queryParams]="{type:'Villa',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Villas for Sale</a>
+          <a routerLink="/properties" [queryParams]="{type:'Townhouse',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Townhouses for Sale</a>
+          <a routerLink="/properties" [queryParams]="{type:'Plot',status:'Sale',plotType:'Residential'}" class="mob-sub-link" (click)="closeMobileMenu()">Residential Plots</a>
+          <a routerLink="/properties" [queryParams]="{status:'Sale'}" class="mob-sub-link mob-sub-link--all" (click)="closeMobileMenu()">All Properties for Sale →</a>
+        </div>
+      </div>
+
+      <!-- Rent -->
+      <div class="mob-section">
+        <button class="mob-section-btn" (click)="toggleSection('rent')" [class.open]="mobileOpenSection() === 'rent'">
+          Rent
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="mob-section-body" [class.open]="mobileOpenSection() === 'rent'">
+          <a routerLink="/properties" [queryParams]="{type:'Apartment',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Apartments for Rent</a>
+          <a routerLink="/properties" [queryParams]="{type:'Villa',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Villas for Rent</a>
+          <a routerLink="/properties" [queryParams]="{type:'Townhouse',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Townhouses for Rent</a>
+          <a routerLink="/properties" [queryParams]="{status:'Rent'}" class="mob-sub-link mob-sub-link--all" (click)="closeMobileMenu()">All Properties for Rent →</a>
+        </div>
+      </div>
+
+      <!-- Luxe -->
+      <div class="mob-section">
+        <button class="mob-section-btn" (click)="toggleSection('luxe')" [class.open]="mobileOpenSection() === 'luxe'">
+          Luxe
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="mob-section-body" [class.open]="mobileOpenSection() === 'luxe'">
+          <a routerLink="/luxury-projects" class="mob-sub-link" (click)="closeMobileMenu()">Luxury Projects</a>
+          <a routerLink="/ultra-luxury-projects" class="mob-sub-link" (click)="closeMobileMenu()">Ultra Luxury Projects</a>
+          <a routerLink="/branded-residences" class="mob-sub-link" (click)="closeMobileMenu()">Branded Residences</a>
+          <a routerLink="/luxury-properties-for-sale" class="mob-sub-link" (click)="closeMobileMenu()">Luxury Properties</a>
+        </div>
+      </div>
+
+      <!-- Commercial -->
+      <div class="mob-section">
+        <button class="mob-section-btn" (click)="toggleSection('commercial')" [class.open]="mobileOpenSection() === 'commercial'">
+          Commercial
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="mob-section-body" [class.open]="mobileOpenSection() === 'commercial'">
+          <a routerLink="/commercial" [queryParams]="{type:'Office',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Offices for Sale</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Office',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Offices for Rent</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Shop',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Shops for Sale</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Shop',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Shops for Rent</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Plot',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Plots for Sale</a>
+        </div>
+      </div>
+
+      <!-- About -->
+      <a routerLink="/about" class="mob-nav-link" (click)="closeMobileMenu()">
+        About Us
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <!-- Explore -->
+      <div class="mob-section">
+        <button class="mob-section-btn" (click)="toggleSection('explore')" [class.open]="mobileOpenSection() === 'explore'">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="mob-section-body" [class.open]="mobileOpenSection() === 'explore'">
+          <a routerLink="/areas" class="mob-sub-link" (click)="closeMobileMenu()">Areas</a>
+          <a routerLink="/developers" class="mob-sub-link" (click)="closeMobileMenu()">Developers</a>
+        </div>
+      </div>
+
+      <!-- More -->
+      <div class="mob-section">
+        <button class="mob-section-btn" (click)="toggleSection('more')" [class.open]="mobileOpenSection() === 'more'">
+          More
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="mob-section-body" [class.open]="mobileOpenSection() === 'more'">
+          <a routerLink="/news" class="mob-sub-link" (click)="closeMobileMenu()">News</a>
+          <a routerLink="/careers" class="mob-sub-link" (click)="closeMobileMenu()">Careers</a>
+          <a routerLink="/faq" class="mob-sub-link" (click)="closeMobileMenu()">FAQs</a>
+          <a routerLink="/why-invest" class="mob-sub-link" (click)="closeMobileMenu()">Why Invest in Dubai?</a>
+          <a routerLink="/contact" class="mob-sub-link" (click)="closeMobileMenu()">Contact Us</a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Drawer footer -->
+    <div class="mob-drawer-footer">
+      @if (auth.isLoggedIn()) {
+        <div class="mob-user-row">
+          <div class="mob-user-avatar">{{ auth.currentUser()?.name?.charAt(0)?.toUpperCase() }}</div>
+          <div class="mob-user-info">
+            <span class="mob-user-name">{{ auth.currentUser()?.name }}</span>
+            <span class="mob-user-email">{{ auth.currentUser()?.email }}</span>
+          </div>
+        </div>
+        @if (auth.isAdmin()) {
+          <a routerLink="/admin/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">Admin Dashboard</a>
+        } @else if (auth.isAgent()) {
+          <a routerLink="/agent/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">Agent Dashboard</a>
+        } @else {
+          <a routerLink="/my/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">My Dashboard</a>
+        }
+        <button class="mob-footer-btn mob-footer-btn--danger" (click)="auth.logout(); closeMobileMenu()">Logout</button>
       } @else {
-      <button class="btn-outline" (click)="auth.logout()">Logout</button>
+        <a routerLink="/customer" class="mob-footer-btn mob-footer-btn--primary" (click)="closeMobileMenu()">Sign In</a>
+        <a routerLink="/" fragment="business-associates" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">Our Business Associates</a>
       }
     </div>
+
   </div>
 </nav>
 

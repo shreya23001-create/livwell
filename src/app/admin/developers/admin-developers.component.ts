@@ -77,12 +77,20 @@ export class AdminDevelopersComponent implements OnInit {
 
   private async load(): Promise<void> {
     this.loading.set(true);
-    const { data, error } = await this.sb
-      .from('developers')
-      .select('*')
-      .order('sort_order', { ascending: true });
+    const [{ data, error }, { data: projData }] = await Promise.all([
+      this.sb.from('developers').select('*').order('sort_order', { ascending: true }),
+      this.sb.from('projects').select('developer').eq('status', 'Published'),
+    ]);
+
+    const projList: string[] = (projData ?? []).map((p: any) => (p.developer ?? '').trim().toLowerCase());
+    const liveCount = (name: string): number => {
+      const n = name.trim().toLowerCase();
+      return projList.filter(dev => dev.includes(n) || n.includes(dev)).length;
+    };
+
     if (!error && data) this.developers.set(data.map((d: any) => ({
       ...d,
+      projects:     liveCount(d.name ?? ''),
       units:        d.units        ?? 0,
       sales_volume: d.sales_volume ?? '',
       sales_value:  d.sales_value  ?? '',

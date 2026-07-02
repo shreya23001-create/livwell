@@ -10,7 +10,7 @@ import { SafeUrlPipe } from '../../shared/pipes/safe-url.pipe';
 import { ToastService } from '../../shared/services/toast.service';
 import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
 import { MsSelectComponent, MsOption } from '../../shared/components/ms-select/ms-select.component';
-import { AMENITY_ICONS } from '../master/admin-master.component';
+import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 import * as XLSX from 'xlsx';
 
 export type PropStatus   = 'Draft' | 'Pending Review' | 'Published' | 'Archived' | 'Sold' | 'Rented';

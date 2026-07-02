@@ -1,0 +1,167 @@
+﻿<div class="nd-page">
+
+  @if (loading()) {
+    <div class="nd-loading-wrap">
+      <div class="nd-skeleton nd-skeleton-hero"></div>
+      <div class="nd-container nd-layout">
+        <div class="nd-main">
+          <div class="nd-skeleton nd-skeleton-title"></div>
+          <div class="nd-skeleton nd-skeleton-body"></div>
+        </div>
+        <aside class="nd-sidebar"></aside>
+      </div>
+    </div>
+  } @else if (notFound()) {
+    <div class="nd-not-found">
+      <h2>Article not found</h2>
+      <p>The article you are looking for may have been removed or is unavailable.</p>
+      <a routerLink="/news" class="nd-back-btn">&#x2190; Back to News</a>
+    </div>
+  } @else if (post()) {
+
+    <!-- Hero image -->
+    @if (post()!.image) {
+      <div class="nd-hero">
+        <img [src]="post()!.image" [alt]="post()!.title" class="nd-hero-img">
+        <div class="nd-hero-overlay"></div>
+        <div class="nd-hero-content">
+          <div class="nd-container">
+            <span class="nd-hero-cat">{{ post()!.category }}</span>
+            <h1 class="nd-hero-title">{{ post()!.title }}</h1>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- No image: plain header -->
+      <div class="nd-plain-header">
+        <div class="nd-container">
+          <div class="nd-breadcrumb">
+            <a routerLink="/" class="nd-bc-link">Home</a>
+            <span class="nd-bc-sep">&#x203A;</span>
+            <a routerLink="/news" class="nd-bc-link">News</a>
+            <span class="nd-bc-sep">&#x203A;</span>
+            <span class="nd-bc-current">{{ post()!.title }}</span>
+          </div>
+          <span class="nd-plain-cat">{{ post()!.category }}</span>
+          <h1 class="nd-plain-title">{{ post()!.title }}</h1>
+        </div>
+      </div>
+    }
+
+    <div class="nd-container nd-layout">
+
+      <!-- LEFT: Article body -->
+      <div class="nd-main">
+
+        <!-- Breadcrumb (only when hero image is shown) -->
+        @if (post()!.image) {
+          <div class="nd-breadcrumb nd-breadcrumb-below">
+            <a routerLink="/" class="nd-bc-link">Home</a>
+            <span class="nd-bc-sep">&#x203A;</span>
+            <a routerLink="/news" class="nd-bc-link">News</a>
+            <span class="nd-bc-sep">&#x203A;</span>
+            <span class="nd-bc-current">{{ post()!.title }}</span>
+          </div>
+        }
+
+        <!-- Author + meta -->
+        <div class="nd-meta-bar">
+          <span class="nd-meta-avatar">{{ authorInitial(post()!.author) }}</span>
+          <div class="nd-meta-info">
+            <span class="nd-meta-author">{{ post()!.author }}</span>
+            <span class="nd-meta-date">
+              {{ formatDate(post()!.published_at) }}
+              @if (post()!.read_time) { <span>&#x00B7;</span> {{ post()!.read_time }} }
+            </span>
+          </div>
+          <a routerLink="/news" class="nd-back-link">&#x2190; All Articles</a>
+        </div>
+
+        <!-- Excerpt -->
+        @if (post()!.excerpt) {
+          <p class="nd-excerpt">{{ post()!.excerpt }}</p>
+        }
+
+        <!-- Body -->
+        <div class="nd-body" [innerHTML]="safeBody"></div>
+
+        <!-- Tags / category -->
+        <div class="nd-tags">
+          <span class="nd-tag">{{ post()!.category }}</span>
+        </div>
+
+        <!-- Author block -->
+        <div class="nd-author-block">
+          <span class="nd-author-block-avatar">{{ authorInitial(post()!.author) }}</span>
+          <div class="nd-author-block-info">
+            <span class="nd-author-block-name">{{ post()!.author }}</span>
+            <span class="nd-author-block-label">Author</span>
+          </div>
+        </div>
+
+        <!-- Related articles -->
+        @if (related().length > 0) {
+          <div class="nd-related">
+            <h3 class="nd-related-heading">You May Also Like</h3>
+            <div class="nd-related-grid">
+              @for (r of related(); track r.id) {
+                <a [routerLink]="['/news', r.slug]" class="nd-related-card">
+                  @if (r.image) {
+                    <img [src]="r.image" [alt]="r.title" class="nd-related-img">
+                  } @else {
+                    <div class="nd-related-img nd-related-img-placeholder"></div>
+                  }
+                  <div class="nd-related-body">
+                    <span class="nd-related-cat">{{ r.category }}</span>
+                    <span class="nd-related-title">{{ r.title }}</span>
+                    <span class="nd-related-date">{{ formatDate(r.published_at) }}</span>
+                  </div>
+                </a>
+              }
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <!-- RIGHT: Sidebar -->
+      <aside class="nd-sidebar">
+
+        <!-- Featured Posts -->
+        @if (featured().length > 0) {
+          <div class="nd-sidebar-card">
+            <h3 class="nd-sidebar-heading">Featured Posts</h3>
+            <div class="nd-sidebar-list">
+              @for (p of featured(); track p.id) {
+                <a [routerLink]="['/news', p.slug]" class="nd-sidebar-item">
+                  @if (p.image) {
+                    <img [src]="p.image" [alt]="p.title" class="nd-sidebar-thumb">
+                  } @else {
+                    <div class="nd-sidebar-thumb nd-sidebar-thumb-placeholder"></div>
+                  }
+                  <div class="nd-sidebar-item-info">
+                    <span class="nd-sidebar-item-title">{{ p.title }}</span>
+                    <span class="nd-sidebar-item-date">{{ formatDate(p.published_at) }}</span>
+                  </div>
+                </a>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Back to news -->
+        <a routerLink="/news" class="nd-sidebar-back-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to All Articles
+        </a>
+
+      </aside>
+
+    </div>
+
+  }
+
+  <app-newsletter-section></app-newsletter-section>
+  <app-seo-links-section></app-seo-links-section>
+
+</div>

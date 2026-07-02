@@ -7,7 +7,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
 import { MsSelectComponent, MsOption } from '../../shared/components/ms-select/ms-select.component';
-import { AMENITY_ICONS } from '../master/admin-master.component';
+import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 import * as XLSX from 'xlsx';
 
 export interface Project {

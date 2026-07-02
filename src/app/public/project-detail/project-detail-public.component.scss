@@ -635,24 +635,8 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   &__amount   { font-size: 1.75rem; font-weight: 800; color: $dark; line-height: 1; }
   &__label    { font-size: 0.8rem; color: $text2; }
 }
-.pd-pc-discover {
-  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-  width: 100%; padding: 0.75rem; margin-top: 0.5rem;
-  background: #2563eb; color: #fff;
-  border: none; border-radius: 0.625rem;
-  font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em;
-  cursor: pointer; transition: background 0.2s;
-  &:hover { background: #1d4ed8; }
-}
-.pd-pc-brochure {
-  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-  width: 100%; padding: 0.7rem;
-  background: #fff; border: 1.5px solid $border;
-  border-radius: 0.625rem; color: $dark;
-  font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em;
-  text-decoration: none; transition: border-color 0.2s, background 0.2s;
-  &:hover { border-color: $dark; background: #f9fafb; }
-}
+.pd-pc-discover { display: none; }
+.pd-pc-brochure { display: none; }
 
 /* ── Expert photo cards ──────────────────────────── */
 .pd-expert-cards {

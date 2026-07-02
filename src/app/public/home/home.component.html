@@ -324,9 +324,13 @@
 
     <!-- Header row -->
     <div class="lp-header">
-      <h2 class="lp-title">Latest Launched Projects in Dubai</h2>
+      <h2 class="lp-title">
+        <span class="lp-title-full">Latest Launched Projects in Dubai</span>
+        <span class="lp-title-short">Latest Projects</span>
+      </h2>
       <a routerLink="/off-plan" class="lp-view-all">
-        VIEW ALL PROJECTS
+        <span class="lp-view-all-text">VIEW ALL PROJECTS</span>
+        <span class="lp-view-all-text-short">View All</span>
         <span class="lp-view-all-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M7 17L17 7M17 7H7M17 7v10" />
@@ -405,7 +409,8 @@
     <div class="teams-header">
       <h2 class="guides-title">Our Business Associates</h2>
       <a routerLink="/agents" class="lp-view-all">
-        VIEW ALL TEAMS
+        <span class="lp-view-all-text">VIEW ALL TEAMS</span>
+        <span class="lp-view-all-text-short">View All</span>
         <span class="lp-view-all-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M7 17L17 7M17 7H7M17 7v10" />
@@ -425,7 +430,7 @@
 
       <!-- Right: infinite carousel -->
       <div class="teams-cards-wrap">
-        <div class="teams-carousel-viewport">
+        <div class="teams-carousel-viewport" #teamsTrack>
           <div class="teams-carousel-track">
             <!-- Original set -->
             <ng-container *ngFor="let agent of teamAreas()[activeTeam()]?.agents">
@@ -474,6 +479,19 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="teams-nav lp-nav">
+      <button class="lp-nav-btn" (click)="scrollTeams(-1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <button class="lp-nav-btn" (click)="scrollTeams(1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
   </div>
 </section>
@@ -572,7 +590,8 @@
       <p class="section-desc">Handpicked luxury properties across the UAE's most prestigious communities</p>
     </div>
 
-    <div class="properties-grid">
+    <div class="fp-track-wrap">
+      <div class="properties-grid" #featPropTrack>
       <a *ngFor="let property of featuredPropertiesLive(); let i = index" [routerLink]="['/properties', property.id]"
         class="property-card">
 
@@ -623,6 +642,20 @@
         </div>
       </a>
     </div>
+    </div>
+
+    <div class="fp-nav lp-nav">
+      <button class="lp-nav-btn" (click)="scrollFeaturedProperties(-1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <button class="lp-nav-btn" (click)="scrollFeaturedProperties(1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
 
     <div class="text-center mt-12 animate-on-scroll">
       <a routerLink="/properties" class="btn-primary">
@@ -647,7 +680,8 @@
       <p class="section-desc">Invest early in Dubai's most anticipated developments and secure the best prices</p>
     </div>
 
-    <div class="offplan-grid">
+    <div class="offplan-track-wrap">
+    <div class="offplan-grid" #offplanTrack>
       <div *ngFor="let project of offPlanProjects(); let i = index" class="offplan-card">
         <div class="offplan-img-wrap">
           <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy"
@@ -709,6 +743,20 @@
           </div>
         </div>
       </div>
+    </div>
+    </div>
+
+    <div class="offplan-nav lp-nav">
+      <button class="lp-nav-btn" (click)="scrollOffplan(-1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <button class="lp-nav-btn" (click)="scrollOffplan(1)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
 
     <div class="offplan-cta-banner animate-on-scroll">
@@ -897,7 +945,9 @@
       <p class="section-desc">Experienced professionals dedicated to finding your ideal property</p>
     </div>
 
+    <div class="agents-carousel-wrap">
     <div class="agents-grid">
+      <!-- Original set -->
       <div *ngFor="let agent of displayedAgents(); let i = index" class="agent-card animate-on-scroll"
         [class]="'delay-' + (i * 100 + 100)">
         <div class="agent-avatar-wrap">
@@ -927,6 +977,17 @@
           </a>
         </div>
       </div>
+      <!-- Duplicate set for seamless loop on mobile -->
+      <div *ngFor="let agent of displayedAgents()" class="agent-card" aria-hidden="true">
+        <div class="agent-avatar-wrap">
+          <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
+          <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">{{ initials(agent.name) }}</div>
+          <div class="agent-rating">★ 5.0</div>
+        </div>
+        <h3 class="agent-name">{{ agent.name }}</h3>
+        <p class="agent-role">{{ agent.role }}</p>
+      </div>
+    </div>
     </div>
 
     <div class="text-center mt-12 animate-on-scroll">

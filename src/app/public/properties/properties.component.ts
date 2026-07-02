@@ -49,7 +49,7 @@ export class PropertiesComponent implements OnInit {
 
   // ── View State ──────────────────────────────────────────────
   viewMode = signal<'grid' | 'list' | 'map'>('grid');
-  showFilters = signal(true);
+  showFilters = signal(typeof window !== 'undefined' ? window.innerWidth > 768 : true);
   isLoading = signal(false);
   currentPage = signal(1);
   pageSize = 9;
@@ -517,7 +517,7 @@ export class PropertiesComponent implements OnInit {
           isOffPlan:    p.listing_type === 'Off-Plan',
           furnished:    p.furnishing   ?? 'Unfurnished',
           badge:        p.is_featured  ? 'Featured' : undefined,
-          images:       (() => { const raw = Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? (() => { try { return JSON.parse(p.images); } catch { return []; } })() : []); const imgs = raw.filter((u: string) => u && !u.includes('unsplash.com')); return imgs.length ? imgs : ['/images/dummy-image.png']; })(),
+          images:       (() => { const raw = Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? (() => { try { return JSON.parse(p.images); } catch { return []; } })() : []); const clean = raw.filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); const real = clean.filter((u: string) => !u.includes('/images/')); const local = clean.filter((u: string) => u.includes('/images/')); return [...real, ...local]; })(),
           amenities:    p.amenities    ?? [],
           views:        p.views        ?? 0,
           postedDate:   p.created_at?.slice(0, 10) ?? '',

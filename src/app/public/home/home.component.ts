@@ -217,7 +217,7 @@ export class HomeComponent implements OnInit {
   searchTabs = [
     { value: 'buy', label: 'Buy' },
     { value: 'rent', label: 'Rent' },
-    { value: 'new-projects', label: 'New Projects' },
+    { value: 'new-projects', label: 'Projects' },
   ];
   activeTestimonial = signal(0);
   activeSlide = signal(0);
@@ -533,6 +533,9 @@ export class HomeComponent implements OnInit {
   @ViewChildren('animateEl') animateEls!: QueryList<ElementRef>;
   @ViewChild('lpTrack') lpTrack!: ElementRef<HTMLElement>;
   @ViewChild('trendingTrack') trendingTrack!: ElementRef<HTMLElement>;
+  @ViewChild('featPropTrack') featPropTrack!: ElementRef<HTMLElement>;
+  @ViewChild('offplanTrack') offplanTrack!: ElementRef<HTMLElement>;
+  @ViewChild('teamsTrack') teamsTrack!: ElementRef<HTMLElement>;
 
   latestProjects = computed<HomeProject[]>(() => {
     const live = this.latestProjectsLive();
@@ -664,7 +667,26 @@ export class HomeComponent implements OnInit {
 
   scrollTrending(dir: 1 | -1): void {
     const track = this.trendingTrack?.nativeElement;
-    if (track) track.scrollBy({ left: dir * 320, behavior: 'smooth' });
+    if (!track) return;
+    const cardWidth = track.querySelector('.trending-card')?.clientWidth ?? 320;
+    track.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
+  }
+
+  scrollTeams(dir: 1 | -1): void {
+    const viewport = this.teamsTrack?.nativeElement;
+    if (viewport) viewport.scrollBy({ left: dir * viewport.offsetWidth, behavior: 'smooth' });
+  }
+
+  scrollOffplan(dir: 1 | -1): void {
+    const track = this.offplanTrack?.nativeElement;
+    if (track) track.scrollBy({ left: dir * 280, behavior: 'smooth' });
+  }
+
+  scrollFeaturedProperties(dir: 1 | -1): void {
+    const track = this.featPropTrack?.nativeElement;
+    if (!track) return;
+    const cardWidth = track.querySelector('.property-card')?.clientWidth ?? track.offsetWidth;
+    track.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
   }
 
   scrollLatestProjects(dir: 1 | -1): void {

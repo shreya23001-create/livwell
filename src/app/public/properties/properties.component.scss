@@ -184,6 +184,32 @@
   border-bottom: 1px solid #f1f5f9;
 }
 
+.sidebar-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-close-btn {
+  display: none;
+  width: 32px;
+  height: 32px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  color: #6b7280;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  svg { width: 16px; height: 16px; }
+  &:hover { background: #e5e7eb; color: #374151; }
+}
+
+@media (max-width: 768px) {
+  .sidebar-close-btn { display: flex; }
+}
+
 .sidebar-title {
   display: flex;
   align-items: center;
@@ -1627,6 +1653,20 @@
 }
 
 /* =====================================================
+   MOBILE FILTER BACKDROP
+   ===================================================== */
+.mobile-filter-backdrop {
+  display: none;
+}
+
+/* =====================================================
+   MOBILE BOTTOM BAR
+   ===================================================== */
+.mobile-bottom-bar {
+  display: none;
+}
+
+/* =====================================================
    RESPONSIVE
    ===================================================== */
 @media (max-width: 1280px) {
@@ -1649,19 +1689,179 @@
 }
 
 @media (max-width: 768px) {
-  .props-hero { height: 260px; }
+  /* ── Mobile overlay sidebar ── */
+  .mobile-filter-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 299;
+    backdrop-filter: blur(2px);
+  }
+
+  /* Layout: always single column on mobile — sidebar is out of flow */
+  .props-layout,
+  .props-layout.filters-hidden {
+    display: block;
+    margin-top: 0;
+  }
+
+  .props-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 88vw !important;
+    max-width: 320px;
+    height: 100dvh !important;
+    z-index: 300;
+    border-right: 1px solid #e5e7eb !important;
+    border-bottom: none !important;
+    overflow-y: auto;
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+
+    &.collapsed {
+      transform: translateX(-110%);
+      width: 88vw !important;
+      padding: 1.5rem !important;
+    }
+  }
+
+  /* ── Toolbar compact ── */
+  .props-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.625rem;
+    margin-bottom: 0.75rem;
+  }
+  .toolbar-left { gap: 0.5rem; }
+  .toolbar-right { gap: 0.375rem; }
+  .filter-toggle-btn { display: none; }
+  .results-count { font-size: 0.8rem; }
+  .sort-wrap { display: none; }
+  .view-toggle { padding: 0.2rem; }
+  .view-btn { width: 30px; height: 30px; svg { width: 16px; height: 16px; } }
+
+  /* ── Grid: single column ── */
+  .props-hero { height: 200px; }
   .props-quick-search { flex-direction: column; }
-  .props-grid { grid-template-columns: 1fr; }
-  .prop-list-card { grid-template-columns: 1fr; }
-  .plc-img-wrap { height: 200px; }
-  .props-toolbar { flex-direction: column; align-items: stretch; gap: 0.75rem; }
-  .toolbar-left, .toolbar-right { justify-content: space-between; }
+  .props-main { padding: 1rem 0.875rem; padding-bottom: 5rem; }
+  .props-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* ── Grid card: taller image ── */
+  .prop-img-wrap { aspect-ratio: 16/9; }
+  .prop-body { padding: 0.75rem 0.875rem 0.5rem; }
+  .prop-price { font-size: 1.15rem; }
+  .prop-title { font-size: 0.875rem; }
+  .prop-footer { padding: 0.5rem 0.875rem 0.625rem; }
+  .prop-agent-name { max-width: 70px; }
+
+  /* ── Contact buttons: show only icons on mobile ── */
+  .prop-contact-btn span { display: none; }
+  .prop-contact-btn {
+    padding: 0.45rem;
+    min-width: 34px;
+    min-height: 34px;
+    justify-content: center;
+    svg { width: 16px; height: 16px; }
+  }
+
+  /* ── List card: stack image above body ── */
+  .plc-link { grid-template-columns: 1fr; }
+  .plc-img-wrap { height: 210px; min-height: 210px; }
+  .plc-body { padding: 1rem; }
+  .plc-price { font-size: 1.2rem; }
+  .plc-top { flex-direction: column; gap: 0.5rem; }
+  .plc-type-wrap { flex-wrap: wrap; }
+  .plc-footer { flex-direction: column; align-items: flex-start; gap: 0.625rem; }
+  .plc-footer .prop-agent { width: 100%; }
+  .plc-footer .prop-contact-btns { width: 100%; justify-content: flex-start; }
+  .plc-footer .prop-contact-btn span { display: inline; }
+  .plc-footer .prop-contact-btn {
+    flex: 1; justify-content: center; padding: 0.5rem 0.5rem;
+    svg { width: 15px; height: 15px; }
+  }
+
+  /* ── Pagination ── */
+  .pg-numbers { gap: 0.2rem; }
+  .pg-num { min-width: 32px; height: 32px; font-size: 0.775rem; }
+  .pg-btn { padding: 0.4rem 0.75rem; font-size: 0.775rem; }
+
+  /* ── Mobile bottom bar ── */
+  .mobile-bottom-bar {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    z-index: 200;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+  }
+
+  .mbb-filter-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a5c3a;
+    cursor: pointer;
+    height: 100%;
+    svg { width: 18px; height: 18px; }
+  }
+
+  .mbb-divider {
+    width: 1px;
+    height: 28px;
+    background: #e5e7eb;
+    flex-shrink: 0;
+  }
+
+  .mbb-sort-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0 0.75rem;
+    svg { width: 16px; height: 16px; color: #6b7280; flex-shrink: 0; }
+  }
+
+  .mbb-sort-select {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    max-width: 160px;
+  }
 }
 
 @media (max-width: 480px) {
-  .props-hero-title { font-size: 1.5rem; }
-  .beds-grid { grid-template-columns: repeat(3, 1fr); }
-  .props-main { padding: 1rem; }
+  .props-hero { height: 160px; }
+  .props-hero-title { font-size: 1.4rem; }
+  .props-hero-sub { font-size: 0.85rem; }
+  .beds-grid { grid-template-columns: repeat(4, 1fr); }
+  .props-main { padding: 0.875rem 0.75rem; padding-bottom: 5rem; }
+  .prop-img-wrap { aspect-ratio: 16/9; }
+  .active-filters { gap: 0.375rem; }
+  .filter-chip { font-size: 0.725rem; padding: 0.3rem 0.625rem; }
 }
 
 /* =====================================================

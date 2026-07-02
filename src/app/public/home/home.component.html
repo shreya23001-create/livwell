@@ -977,8 +977,8 @@
           </a>
         </div>
       </div>
-      <!-- Duplicate set for seamless loop on mobile -->
-      <div *ngFor="let agent of displayedAgents()" class="agent-card" aria-hidden="true">
+      <!-- Duplicate set for seamless loop on mobile only -->
+      <div *ngFor="let agent of displayedAgents()" class="agent-card agent-card-duplicate" aria-hidden="true">
         <div class="agent-avatar-wrap">
           <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
           <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">{{ initials(agent.name) }}</div>

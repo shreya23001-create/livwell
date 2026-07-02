@@ -2598,6 +2598,10 @@ $gold-light: #e8c870;
   gap: 1.5rem;
 }
 
+.agent-card-duplicate {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .agents-carousel-wrap {
     overflow: hidden;
@@ -2618,6 +2622,12 @@ $gold-light: #e8c870;
   @keyframes agents-scroll {
     0%   { transform: translateX(0); }
     100% { transform: translateX(-50%); }
+  }
+
+  .agent-card-duplicate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .agent-card {

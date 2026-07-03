@@ -244,3 +244,62 @@ $white:  #fff;
   padding: 0.5rem 1.25rem; background: $dark; color: $white;
   font-size: 0.84rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer;
 }
+
+// ── Responsive ────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .dd-container { padding: 0 1rem; }
+
+  // Breadcrumb — truncate developer name
+  .dd-breadcrumb .dd-container { font-size: 0.72rem; gap: 0.25rem; flex-wrap: wrap; }
+  .dd-bc-current {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;
+    display: inline-block;
+  }
+
+  // Info card
+  .dd-info-card {
+    flex-direction: column;
+    margin: 1rem 0 1rem;
+
+    &__logo-panel {
+      width: 100%; border-right: none; border-bottom: 1px solid $border;
+      padding: 1.25rem; min-height: 100px;
+    }
+    &__logo      { max-width: 100px; max-height: 70px; }
+    &__text      { padding: 1.25rem; }
+    &__name      { font-size: 1.25rem; }
+    &__about p   { font-size: 0.82rem; }
+  }
+
+  // Filter bar — stack vertically
+  .dd-filters {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .dd-filter-search     { width: 100%; min-width: unset; }
+  .dd-filter-select-wrap { width: 100%; min-width: unset; }
+  .dd-filter-select     { width: 100%; }
+  .dd-filter-input      { width: 100%; }
+
+  .dd-filter-btn {
+    width: 100%;
+    justify-content: center;
+    height: 40px;
+  }
+
+  // Projects grid — single column
+  .dd-proj-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  .dd-proj-card {
+    &__name  { font-size: 0.95rem; }
+    &__price { font-size: 1rem; }
+  }
+
+  .dd-projects-section { padding-bottom: 2.5rem; }
+}
+
+@media (max-width: 480px) {
+  .dd-info-card__name { font-size: 1.1rem; }
+}

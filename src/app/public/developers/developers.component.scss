@@ -190,3 +190,55 @@ $white:  #fff;
   font-size: 0.85rem; font-weight: 600; border: none;
   border-radius: 8px; cursor: pointer;
 }
+
+// ── Responsive ────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .dev-container { padding: 0 1rem; }
+
+  .dev-header {
+    padding: 2rem 0 1.5rem;
+    &__title { font-size: 1.3rem; }
+    &__desc { font-size: 0.85rem; }
+    &__sub { font-size: 0.82rem; }
+  }
+
+  .dev-search-wrap { max-width: 100%; }
+
+  .dev-list { padding: 1.25rem 0 3rem; }
+
+  .dev-row {
+    padding: 1.25rem;
+    gap: 1rem;
+    flex-direction: column;
+
+    &__logo-box { width: 80px; height: 80px; }
+    &__logo     { max-width: 56px; max-height: 48px; }
+
+    &__logo-col {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    &__name  { font-size: 1.05rem; }
+    &__about { font-size: 0.82rem; -webkit-line-clamp: 2; }
+
+    &__stats { gap: 0.5rem; }
+  }
+
+  .dev-stat-box {
+    min-width: 0;
+    flex: 1 1 calc(50% - 0.25rem);
+    padding: 0.625rem 0.75rem;
+
+    &__icon { width: 30px; height: 30px; svg { width: 14px; height: 14px; } }
+    &__lbl  { font-size: 0.65rem; }
+    &__val  { font-size: 1rem; }
+  }
+}
+
+@media (max-width: 480px) {
+  .dev-stat-box {
+    flex: 1 1 calc(50% - 0.25rem);
+  }
+}

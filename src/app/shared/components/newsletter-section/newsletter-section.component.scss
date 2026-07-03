@@ -264,4 +264,33 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 2rem;
+
+  @media (max-width: 768px) {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .newsletter-section { padding: 1.25rem 0; }
+
+  .nl-title { font-size: 1.4rem; }
+
+  .nl-desc { font-size: 0.875rem; }
+
+  .nl-perks {
+    gap: 0.75rem 1rem;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .nl-perk { font-size: 0.75rem; }
+
+  .nl-social-proof { flex-direction: column; gap: 0.5rem; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .newsletter-card { border-radius: 1.25rem; padding: 2rem 1rem; }
+  .nl-icon-wrap { width: 52px; height: 52px; margin-bottom: 1.25rem; }
+  .nl-title { font-size: 1.25rem; }
+  .nl-desc { font-size: 0.82rem; line-height: 1.7; }
 }

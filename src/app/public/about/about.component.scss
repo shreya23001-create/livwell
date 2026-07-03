@@ -591,23 +591,100 @@ $bg-light:    #f9fafb;
   .ab-ceo-image-wrapper { align-items: center; }
   .ab-ceo-image-circle { width: 260px; height: 260px; }
   .ab-ceo-title { border-left: none; padding-left: 0; text-align: center; }
-  .ab-ceo-highlights { justify-content: center; }
+  .ab-ceo-highlights { justify-content: center; flex-direction: row; flex-wrap: wrap; }
   .ab-ceo-quote { text-align: left; }
 }
 
 @media (max-width: 768px) {
-  .ab-hero { height: 380px; }
-  .ab-intro-body-grid { grid-template-columns: 1fr; gap: 1.25rem; }
-  .ab-vm-grid { grid-template-columns: 1fr; }
-}
+  .ab-container { padding: 0 1rem; }
 
-@media (max-width: 640px) {
-  .ab-features-grid { grid-template-columns: 1fr; }
-  .ab-values-grid   { grid-template-columns: 1fr; }
+  .ab-hero {
+    height: 320px;
+    align-items: flex-end;
+  }
+  .ab-hero-content { padding-bottom: 2rem; }
+  .ab-hero-title { font-size: 2rem; }
+  .ab-hero-sub { font-size: 0.9rem; }
+
+  .ab-ceo-section { padding: 3rem 0; }
+  .ab-ceo-grid { gap: 2rem; text-align: left; }
+  .ab-ceo-image-circle { width: 180px; height: 180px; }
+  .ab-ceo-name { font-size: 1.75rem; }
+  .ab-ceo-title { text-align: left; border-left: 3px solid $gold; padding-left: 1rem; }
+  .ab-ceo-description { font-size: 0.875rem; text-align: left; }
+  .ab-ceo-highlights {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-start;
+  }
+  .ab-highlight-item {
+    font-size: 0.72rem;
+    padding: 0.35rem 0.75rem;
+    white-space: nowrap;
+  }
+  .ab-ceo-quote { text-align: left; font-size: 0.875rem; padding: 1rem 1.25rem; }
+
+  .ab-intro-section { padding: 3rem 0 2.5rem; }
+  .ab-intro-body-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .ab-intro-body { font-size: 0.9rem; }
+
+  .ab-vm-section { padding: 0 0 3rem; }
+  .ab-vm-grid { grid-template-columns: 1fr; }
+  .ab-vm-card { padding: 1.75rem 1.5rem; }
+
+  .ab-tagline-section { padding: 3.5rem 0; }
+  .ab-tagline-title { font-size: 1.5rem; }
+  .ab-tagline-body { font-size: 0.875rem; margin-bottom: 2rem; }
+  .ab-features-grid { grid-template-columns: repeat(2, 1fr); gap: 0.875rem; }
+  .ab-feature-card { padding: 1.25rem 1rem; }
+  .ab-feature-icon { width: 40px; height: 40px; margin-bottom: 0.875rem; }
+  .ab-feature-title { font-size: 0.875rem; }
+  .ab-feature-body { font-size: 0.8rem; }
+
+  .ab-stats-section { padding: 2.5rem 0; }
+  .ab-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0; }
   .ab-stat-card {
     border-right: none;
     border-bottom: 1px solid rgba(255,255,255,0.15);
-    &:last-child { border-bottom: none; }
+    padding: 1.25rem 0.75rem;
+    &:nth-child(odd)  { border-right: 1px solid rgba(255,255,255,0.15); }
+    &:last-child      { border-bottom: none; }
+    &:nth-last-child(2):nth-child(odd) { border-bottom: none; }
   }
-  .ab-ceo-image-circle { width: 220px; height: 220px; }
+  .ab-stat-value { font-size: 1.75rem; }
+  .ab-stat-label { font-size: 0.78rem; }
+
+  .ab-values-section { padding: 3.5rem 0; }
+  .ab-values-grid { grid-template-columns: repeat(2, 1fr); gap: 0.875rem; }
+  .ab-value-card { padding: 1.25rem; }
+  .ab-value-icon { width: 40px; height: 40px; margin-bottom: 0.875rem; }
+  .ab-value-title { font-size: 0.9rem; }
+  .ab-value-body { font-size: 0.78rem; }
+
+  .ab-promises-section { padding: 3rem 0; }
+  .ab-promises-grid { gap: 2rem; }
+  .ab-promises-title { font-size: 1.4rem; }
+  .ab-promises-intro { font-size: 0.875rem; margin-bottom: 1.5rem; }
+  .ab-promise-item { font-size: 0.875rem; padding: 0.875rem 0; gap: 0.75rem; }
+}
+
+@media (max-width: 480px) {
+  .ab-hero { height: 280px; }
+  .ab-hero-title { font-size: 1.6rem; }
+  .ab-hero-sub { font-size: 0.825rem; }
+
+  .ab-ceo-image-circle { width: 180px; height: 180px; }
+  .ab-ceo-name { font-size: 1.5rem; }
+
+  .ab-features-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .ab-feature-card { padding: 1rem 0.875rem; }
+
+  .ab-values-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .ab-value-card { padding: 1rem 0.875rem; }
+
+  .ab-stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .ab-tagline-title { font-size: 1.3rem; }
 }

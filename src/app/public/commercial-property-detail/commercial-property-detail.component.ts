@@ -3,12 +3,14 @@ import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
+import { AdminDataService } from '../../shared/services/admin-data.service';
+import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 
 interface CommercialDetail {
   id: number;
@@ -323,6 +325,30 @@ export class CommercialPropertyDetailComponent implements OnInit {
   private auth       = inject(AuthService);
   private emailSvc   = inject(EmailService);
   private platformId = inject(PLATFORM_ID);
+  private dataSvc    = inject(AdminDataService);
+
+  readonly masterAmenities = this.dataSvc.amenities;
+
+  // Fallback checkmark SVG used when no master icon is found
+  private readonly CHECKMARK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
+
+  getFeatureIcon(featureLabel: string): SafeHtml {
+    const label = featureLabel.toLowerCase();
+
+    // 1. Match against master amenities (admin-configured icon key)
+    const masterMatch = this.masterAmenities().find(a => a.name.toLowerCase() === label);
+    if (masterMatch?.icon) {
+      const svg = AMENITY_ICONS.find(i => i.key === masterMatch.icon)?.svg;
+      if (svg) return this.sanitizer.bypassSecurityTrustHtml(svg);
+    }
+
+    // 2. Fallback: match directly against AMENITY_ICONS label
+    const iconMatch = AMENITY_ICONS.find(i => i.label.toLowerCase() === label);
+    if (iconMatch) return this.sanitizer.bypassSecurityTrustHtml(iconMatch.svg);
+
+    // 3. Default checkmark
+    return this.sanitizer.bypassSecurityTrustHtml(this.CHECKMARK_SVG);
+  }
 
   isLoggedIn = this.auth.isLoggedIn;
 

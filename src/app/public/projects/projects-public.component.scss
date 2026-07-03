@@ -97,3 +97,81 @@ $white:  #fff;
 .prj-pg-numbers { display: flex; align-items: center; gap: .35rem; }
 .prj-pg-num { width: 2.25rem; height: 2.25rem; border: 1px solid $border; border-radius: .5rem; background: $white; color: $text; font-size: .85rem; font-weight: 500; cursor: pointer; transition: background .15s, border-color .15s; &.active { background: $green; color: $white; border-color: $green; font-weight: 700; } &.ellipsis { border: none; background: none; cursor: default; } &:hover:not(.active):not(.ellipsis):not(:disabled) { background: $bg; border-color: $green; } }
 .prj-page-info { text-align: center; font-size: .82rem; color: $muted; margin-bottom: 2rem; }
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .prj-hero {
+    min-height: 320px;
+    padding: 6rem 0 2.5rem;
+  }
+
+  .prj-hero-content { padding: 0 1rem; }
+
+  .prj-search-bar {
+    flex-direction: column;
+    gap: .625rem;
+    padding: .875rem 1rem;
+    border-radius: .75rem;
+  }
+
+  .prj-search-input-wrap { min-width: unset; width: 100%; }
+
+  .prj-search-select { width: 100%; }
+
+  .prj-stats-strip { padding: 1rem 0; }
+
+  .prj-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: .75rem;
+    padding: 0 1rem;
+  }
+
+  .prj-stat-value { font-size: 1.25rem; }
+
+  .prj-section { padding: 2rem 0; }
+
+  .container-custom { padding: 0 1rem; }
+
+  .prj-section-header {
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: nowrap;
+  }
+
+  .prj-section-title { font-size: 1.1rem; }
+
+  .prj-sort-select { font-size: .78rem; padding: .375rem .5rem; }
+
+  .prj-grid { gap: 1rem; }
+
+  .prj-card-img-wrap { height: 180px; }
+
+  .prj-card-body { padding: .875rem; gap: .3rem; }
+
+  .prj-card-title { font-size: .95rem; }
+
+  .prj-faq-section { padding: 2rem 0; }
+
+  .prj-faq-title { font-size: 1.2rem; }
+
+  .prj-faq-q { padding: .875rem 1rem; font-size: .875rem; }
+
+  .prj-faq-a { padding: 0 1rem .875rem; }
+
+  .prj-pagination { gap: .35rem; margin: 1.5rem 0 .5rem; }
+
+  .prj-pg-btn { padding: .45rem .75rem; font-size: .8rem; }
+
+  .prj-pg-num { width: 2rem; height: 2rem; font-size: .8rem; }
+}
+
+@media (max-width: 480px) {
+  .prj-hero { min-height: 280px; padding: 5.5rem 0 2rem; }
+  .prj-hero-content { padding: 0 .875rem; }
+  .prj-stats-grid { grid-template-columns: repeat(2, 1fr); gap: .625rem; padding: 0 .875rem; }
+  .container-custom { padding: 0 .875rem; }
+  .prj-card-img-wrap { height: 160px; }
+  .prj-pg-numbers { gap: .2rem; }
+}

@@ -258,7 +258,11 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   display: flex; align-items: center; gap: 0.5rem;
   font-size: 0.85rem; color: #374151;
   background: #f8fafc; border-radius: 0.5rem; padding: 0.6rem 0.875rem;
-  svg { width: 15px; height: 15px; color: #059669; flex-shrink: 0; }
+}
+.pd-amenity-icon {
+  display: flex; align-items: center; flex-shrink: 0;
+  color: #059669;
+  ::ng-deep svg { width: 16px; height: 16px; flex-shrink: 0; }
 }
 
 /* Map */
@@ -474,15 +478,42 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   .pd-right { position: static; max-height: none; overflow: visible; }
 }
 @media (max-width: 768px) {
-  .pd-title-row { flex-direction: column; gap: 0.5rem; }
+  .pd-wrap { padding: 0 1rem; }
+
+  .pd-breadcrumb { font-size: 0.72rem; gap: 0.25rem; flex-wrap: wrap; }
+  .pd-bc-current { max-width: 140px; }
+
+  .pd-title-hero { padding: 1rem 0 0.875rem; margin-bottom: 1rem; }
+  .pd-title { font-size: 1.2rem; }
+  .pd-location-line { font-size: 0.8rem; }
+
+  .pd-title-row { flex-direction: column; gap: 0.5rem; padding-bottom: 1rem; margin-bottom: 1rem; }
   .pd-ref-right { text-align: left; }
-  .pd-specs-bar { flex-direction: column; gap: 0; }
-  .pd-spec-divider { width: 100%; height: 1px; }
-  .pd-spec-item { width: 100%; }
+  .pd-price { font-size: 1.5rem; }
+
+  .pd-specs-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .pd-spec-divider { display: none; }
+  .pd-spec-item {
+    width: 100%;
+    border-bottom: 1px solid $border;
+    &:nth-child(odd) { border-right: 1px solid $border; }
+  }
+
   .pd-amenities-grid { grid-template-columns: repeat(2, 1fr); }
   .pd-details-grid { grid-template-columns: 1fr; }
+
+  .pd-layout { padding-top: 1.25rem; padding-bottom: 3rem; gap: 1.5rem; }
+
+  .pd-section { margin-bottom: 1.75rem; padding-bottom: 1.75rem; }
+  .pd-section-title { font-size: 1.1rem; margin-bottom: 0.875rem; }
+
+  .pd-map-wrap { height: 240px; }
 }
 @media (max-width: 480px) {
-  .pd-amenities-grid { grid-template-columns: 1fr; }
+  .pd-amenities-grid { grid-template-columns: repeat(2, 1fr); }
   .pd-contact-btns { grid-template-columns: 1fr 1fr; }
 }

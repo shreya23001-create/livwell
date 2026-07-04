@@ -99,7 +99,7 @@ export class AdminProjectsComponent implements OnInit {
   previewImages      = signal<string[]>([]);
   uploadingBrandLogo = signal(false);
 
-  readonly types    = ['Apartment','Villa','Townhouse','Penthouse','Home','Mixed','Duplex'];
+  readonly masterPropTypes = this.dataSvc.propTypes;
 
   selectedTypes      = signal<string[]>([]);
   typeDropdownOpen   = signal(false);
@@ -109,7 +109,7 @@ export class AdminProjectsComponent implements OnInit {
 
   // MsSelect option arrays
   locationOpts  = computed<MsOption[]>(() => this.dataSvc.locations().map(l => ({ value: l, label: l })));
-  typeOpts      = computed<MsOption[]>(() => this.types.map(t => ({ value: t, label: t })));
+  typeOpts      = computed<MsOption[]>(() => this.masterPropTypes().map(t => ({ value: t, label: t })));
   statusOpts    = computed<MsOption[]>(() => this.statuses.map(s => ({ value: s, label: s })));
   badgeOpts     = computed<MsOption[]>(() => this.badges.map(b => ({ value: b, label: b || 'None' })));
   trendOpts     = computed<MsOption[]>(() => [{ value: '', label: '— None —' }, ...this.dataSvc.trendingTabs().map(t => ({ value: t, label: t }))]);

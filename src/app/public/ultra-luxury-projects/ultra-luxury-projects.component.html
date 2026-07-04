@@ -16,17 +16,90 @@
     </div>
   </div>
 
+  <!-- ── Filter Bar ────────────────────────────────────────── -->
+  <div class="ulxp-filter-bar">
+    <div class="ulxp-filter-inner">
+
+      <!-- Search -->
+      <div class="ulxp-filter-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
+        <input class="ulxp-filter-search-input" placeholder="Search area, community or project…"
+          [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)" />
+      </div>
+
+      <div class="ulxp-filter-divider"></div>
+
+      <!-- Property Type -->
+      <div class="ulxp-filter-drop-wrap" [class.open]="typeDropOpen()">
+        <button class="ulxp-filter-btn" (click)="toggleDrop('type')">
+          <span>{{ filterType() || 'Property Type' }}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="ulxp-drop-panel" *ngIf="typeDropOpen()">
+          <div class="ulxp-drop-label">PROPERTY TYPE</div>
+          <button class="ulxp-drop-opt" [class.active]="filterType() === ''" (click)="selectType('')">All Types</button>
+          <button *ngFor="let t of typeOptions()" class="ulxp-drop-opt" [class.active]="filterType() === t" (click)="selectType(t)">{{ t }}</button>
+        </div>
+      </div>
+
+      <div class="ulxp-filter-divider"></div>
+
+      <!-- Beds -->
+      <div class="ulxp-filter-drop-wrap" [class.open]="bedsDropOpen()">
+        <button class="ulxp-filter-btn" (click)="toggleDrop('beds')">
+          <span>{{ filterBeds() ? filterBeds() + ' Bed' + (filterBeds() === '1' ? '' : 's') : 'Beds' }}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="ulxp-drop-panel" *ngIf="bedsDropOpen()">
+          <div class="ulxp-drop-label">BEDROOMS</div>
+          <button class="ulxp-drop-opt" [class.active]="filterBeds() === ''" (click)="selectBeds('')">Any</button>
+          <button *ngFor="let b of bedOptions" class="ulxp-drop-opt" [class.active]="filterBeds() === b" (click)="selectBeds(b)">{{ b === 'Studio' ? 'Studio' : b + ' Bedroom' + (b === '1' ? '' : 's') }}</button>
+        </div>
+      </div>
+
+      <div class="ulxp-filter-divider"></div>
+
+      <!-- Price -->
+      <div class="ulxp-filter-drop-wrap" [class.open]="priceDropOpen()">
+        <button class="ulxp-filter-btn" (click)="toggleDrop('price')">
+          <span>{{ selectedPriceLabel() }}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="ulxp-drop-panel" *ngIf="priceDropOpen()">
+          <div class="ulxp-drop-label">PRICE RANGE</div>
+          <button *ngFor="let r of priceRanges" class="ulxp-drop-opt"
+            [class.active]="filterPriceMin() === r.min && filterPriceMax() === r.max"
+            (click)="selectPrice(r)">{{ r.label }}</button>
+        </div>
+      </div>
+
+      <div class="ulxp-filter-divider"></div>
+
+      <!-- Clear -->
+      <button *ngIf="activeFiltersCount() > 0" class="ulxp-filter-clear" (click)="clearFilters()">
+        Clear <span class="ulxp-filter-badge">{{ activeFiltersCount() }}</span>
+      </button>
+
+      <!-- Search button -->
+      <button class="ulxp-filter-search-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
+        Search
+      </button>
+
+    </div>
+  </div>
+
   <!-- Loading -->
   <div *ngIf="loading()" class="lxp-loading"><div class="lxp-spin"></div></div>
 
   <!-- ── Project Cards ───────────────────────────────────── -->
   <div class="lxp-list" *ngIf="!loading()">
 
-    <div *ngIf="projects().length === 0" class="lxp-empty">
-      No ultra luxury projects are currently published.
+    <div *ngIf="filteredProjects().length === 0" class="lxp-empty">
+      No ultra luxury projects match your filters.
     </div>
 
-    <div *ngFor="let p of projects()" class="lxp-card">
+    <div *ngFor="let p of filteredProjects()" class="lxp-card">
 
       <!-- Image -->
       <div class="lxp-card-img-wrap">

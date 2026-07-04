@@ -1,0 +1,256 @@
+<div class="ac-page">
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <div class="ac-header">
+    <div>
+      <h1 class="ac-title">Careers</h1>
+      <p class="ac-subtitle">Manage job posts and review applications</p>
+    </div>
+    <button class="btn-primary" (click)="openAddJob()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+      Add Job Post
+    </button>
+  </div>
+
+  <!-- ── Tabs ─────────────────────────────────────────── -->
+  <div class="ac-tabs">
+    <button class="ac-tab" [class.active]="activeTab() === 'applications'" (click)="activeTab.set('applications')">
+      Applications
+      <span class="ac-tab-badge">{{ applications().length }}</span>
+    </button>
+    <button class="ac-tab" [class.active]="activeTab() === 'jobs'" (click)="activeTab.set('jobs')">
+      Job Posts
+      <span class="ac-tab-badge">{{ jobs().length }}</span>
+    </button>
+  </div>
+
+  <!-- ── Loading ───────────────────────────────────────── -->
+  <div *ngIf="loading()" class="ac-loading">
+    <div class="ac-spinner"></div>
+  </div>
+
+  <ng-container *ngIf="!loading()">
+
+    <!-- ═══ APPLICATIONS TAB ════════════════════════════ -->
+    <div *ngIf="activeTab() === 'applications'">
+
+      <!-- Filters -->
+      <div class="ac-filters">
+        <div class="ac-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="ac-search-input" placeholder="Search name or email…" [value]="searchApps()" (input)="searchApps.set($any($event.target).value)" />
+        </div>
+        <select class="ac-select" [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
+          <option value="">All Statuses</option>
+          <option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</option>
+        </select>
+        <select class="ac-select" [value]="filterJob()" (change)="filterJob.set($any($event.target).value)">
+          <option value="">All Jobs</option>
+          <option *ngFor="let j of jobs()" [value]="j.id">{{ j.title }}</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="ac-table-wrap">
+        <table class="ac-table">
+          <thead>
+            <tr>
+              <th>Applicant</th>
+              <th>Job</th>
+              <th>Resume</th>
+              <th>Applied</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let app of filteredApps()" (click)="openApp(app)" class="ac-row">
+              <td>
+                <div class="ac-applicant">
+                  <div class="ac-avatar">{{ app.name.charAt(0).toUpperCase() }}</div>
+                  <div>
+                    <div class="ac-name">{{ app.name }}</div>
+                    <div class="ac-email">{{ app.email }}</div>
+                    <div class="ac-phone">{{ app.phone }}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="ac-job-tag">{{ app.job_title }}</span></td>
+              <td>
+                <a *ngIf="app.resume_url" [href]="app.resume_url" target="_blank" rel="noopener" class="ac-resume-link" (click)="$event.stopPropagation()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                  {{ app.resume_name || 'View Resume' }}
+                </a>
+                <span *ngIf="!app.resume_url" class="ac-no-resume">—</span>
+              </td>
+              <td class="ac-date">{{ formatDate(app.created_at) }}</td>
+              <td (click)="$event.stopPropagation()">
+                <select class="ac-status-sel" [value]="app.status" [style.border-color]="statusColors[app.status]"
+                  (change)="updateStatus(app, $any($event.target).value)">
+                  <option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</option>
+                </select>
+              </td>
+              <td (click)="$event.stopPropagation()">
+                <button class="ac-del-btn" (click)="deleteApp(app)" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredApps().length === 0">
+              <td colspan="6" class="ac-empty">No applications found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ JOB POSTS TAB ════════════════════════════════ -->
+    <div *ngIf="activeTab() === 'jobs'">
+      <div class="ac-jobs-grid">
+        <div *ngFor="let job of jobs()" class="ac-job-card" [class.ac-job-card--inactive]="!job.is_active">
+          <div class="ac-job-card-header">
+            <span class="ac-job-card-tag">{{ job.tag }}</span>
+            <div class="ac-job-card-actions">
+              <button class="ac-icon-btn" (click)="openEditJob(job)" title="Edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
+              </button>
+              <button class="ac-icon-btn ac-icon-btn--danger" (click)="deleteJob(job)" title="Delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+              </button>
+            </div>
+          </div>
+          <h3 class="ac-job-card-title">{{ job.title }}</h3>
+          <div class="ac-job-card-meta">
+            <span>{{ job.type }}</span>
+            <span>{{ job.location }}</span>
+            <span>{{ formatDate(job.created_at) }}</span>
+          </div>
+          <p *ngIf="job.description" class="ac-job-card-desc">{{ job.description }}</p>
+          <div class="ac-job-card-footer">
+            <span class="ac-app-count">
+              {{ appCount(job.id) }} application(s)
+            </span>
+            <button class="ac-toggle-btn" [class.active]="job.is_active" (click)="toggleJobActive(job)">
+              {{ job.is_active ? 'Active' : 'Inactive' }}
+            </button>
+          </div>
+        </div>
+        <div *ngIf="jobs().length === 0" class="ac-empty-jobs">
+          No job posts yet. Click "Add Job Post" to create one.
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>
+
+<!-- ── Job Form Modal ──────────────────────────────────── -->
+<div *ngIf="jobModalOpen()" class="ac-modal-overlay" (click)="closeJobModal()">
+  <div class="ac-modal" (click)="$event.stopPropagation()">
+    <div class="ac-modal-header">
+      <h2 class="ac-modal-title">{{ editingJobId() ? 'Edit Job Post' : 'New Job Post' }}</h2>
+      <button class="ac-modal-close" (click)="closeJobModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="ac-modal-body">
+      <div class="ac-form-row">
+        <div class="ac-field">
+          <label class="ac-label">Job Title *</label>
+          <input class="ac-input" [value]="jobForm().title" (input)="patchJob('title', $any($event.target).value)" placeholder="e.g. Property Advisor" />
+        </div>
+        <div class="ac-field">
+          <label class="ac-label">Tag / Department</label>
+          <input class="ac-input" [value]="jobForm().tag" (input)="patchJob('tag', $any($event.target).value)" placeholder="e.g. Sales" />
+        </div>
+      </div>
+      <div class="ac-form-row">
+        <div class="ac-field">
+          <label class="ac-label">Type</label>
+          <select class="ac-input" [value]="jobForm().type" (change)="patchJob('type', $any($event.target).value)">
+            <option>Full Time</option>
+            <option>Part Time</option>
+            <option>Contract</option>
+            <option>Internship</option>
+          </select>
+        </div>
+        <div class="ac-field">
+          <label class="ac-label">Location</label>
+          <input class="ac-input" [value]="jobForm().location" (input)="patchJob('location', $any($event.target).value)" placeholder="e.g. Dubai, UAE" />
+        </div>
+      </div>
+      <div class="ac-field">
+        <label class="ac-label">Description</label>
+        <textarea class="ac-textarea" rows="4" [value]="jobForm().description || ''"
+          (input)="patchJob('description', $any($event.target).value)"
+          placeholder="Role overview, responsibilities, requirements…"></textarea>
+      </div>
+      <div class="ac-field ac-field--checkbox">
+        <input type="checkbox" id="jobActive" class="ac-checkbox" [checked]="jobForm().is_active" (change)="patchJob('is_active', $any($event.target).checked)" />
+        <label for="jobActive" class="ac-checkbox-label">Active (visible on careers page)</label>
+      </div>
+    </div>
+    <div class="ac-modal-footer">
+      <button class="btn-ghost" (click)="closeJobModal()">Cancel</button>
+      <button class="btn-primary" (click)="saveJob()" [disabled]="savingJob()">
+        {{ savingJob() ? 'Saving…' : (editingJobId() ? 'Update' : 'Post Job') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Application Detail Modal ───────────────────────── -->
+<div *ngIf="selectedApp()" class="ac-modal-overlay" (click)="closeApp()">
+  <div class="ac-modal ac-modal--app" (click)="$event.stopPropagation()">
+    <div class="ac-modal-header">
+      <h2 class="ac-modal-title">Application Detail</h2>
+      <button class="ac-modal-close" (click)="closeApp()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="ac-modal-body" *ngIf="selectedApp() as app">
+      <div class="ac-app-detail-grid">
+        <div class="ac-app-detail-item">
+          <div class="ac-app-detail-label">Full Name</div>
+          <div class="ac-app-detail-val">{{ app.name }}</div>
+        </div>
+        <div class="ac-app-detail-item">
+          <div class="ac-app-detail-label">Email</div>
+          <div class="ac-app-detail-val"><a [href]="'mailto:' + app.email" class="ac-link">{{ app.email }}</a></div>
+        </div>
+        <div class="ac-app-detail-item">
+          <div class="ac-app-detail-label">Phone</div>
+          <div class="ac-app-detail-val"><a [href]="'tel:' + app.phone" class="ac-link">{{ app.phone }}</a></div>
+        </div>
+        <div class="ac-app-detail-item">
+          <div class="ac-app-detail-label">Applied For</div>
+          <div class="ac-app-detail-val">{{ app.job_title }}</div>
+        </div>
+        <div class="ac-app-detail-item">
+          <div class="ac-app-detail-label">Applied On</div>
+          <div class="ac-app-detail-val">{{ formatDate(app.created_at) }}</div>
+        </div>
+        <div class="ac-app-detail-item">
+          <div class="ac-app-detail-label">Status</div>
+          <div class="ac-app-detail-val">
+            <select class="ac-status-sel" [value]="app.status" [style.border-color]="statusColors[app.status]"
+              (change)="updateStatus(app, $any($event.target).value)">
+              <option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="ac-resume-section" *ngIf="app.resume_url">
+        <div class="ac-app-detail-label">Resume</div>
+        <a [href]="app.resume_url" target="_blank" rel="noopener" class="ac-resume-download">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+          {{ app.resume_name || 'Download Resume' }}
+        </a>
+      </div>
+    </div>
+    <div class="ac-modal-footer">
+      <button class="btn-ghost" (click)="closeApp()">Close</button>
+      <button class="btn-danger" (click)="deleteApp(selectedApp()!)">Delete Application</button>
+    </div>
+  </div>
+</div>

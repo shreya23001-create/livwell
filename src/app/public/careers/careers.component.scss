@@ -470,6 +470,258 @@ $radius: 10px;
   font-family: Georgia, 'Times New Roman', serif;
 }
 
+// ── Job loading ───────────────────────────────────────────
+.careers-jobs-loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+.careers-jobs-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid $border;
+  border-top-color: $green;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.careers-job-desc {
+  font-size: 0.82rem;
+  color: $muted;
+  line-height: 1.6;
+  margin: 0.5rem 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.careers-no-jobs {
+  text-align: center;
+  color: $muted;
+  font-size: 0.9rem;
+  padding: 3rem 0;
+}
+
+// ── Apply Modal ───────────────────────────────────────────
+.cj-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(2px);
+}
+
+.cj-modal {
+  background: $white;
+  border-radius: 1.25rem;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+}
+
+.cj-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid $border;
+  position: sticky;
+  top: 0;
+  background: $white;
+  z-index: 1;
+}
+
+.cj-modal-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $gold;
+  margin-bottom: 0.2rem;
+}
+
+.cj-modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: $text;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cj-modal-close {
+  width: 34px; height: 34px;
+  border-radius: 0.5rem;
+  background: $bg;
+  border: 1px solid $border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $muted;
+  flex-shrink: 0;
+  margin-left: 1rem;
+  svg { width: 16px; height: 16px; }
+  &:hover { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+}
+
+// ── Form ─────────────────────────────────────────────────
+.cj-form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cj-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.cj-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.cj-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $text;
+}
+
+.cj-label-hint {
+  font-weight: 400;
+  color: $muted;
+  font-size: 0.75rem;
+}
+
+.cj-input {
+  padding: 0.7rem 0.875rem;
+  border: 1.5px solid $border;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: $text;
+  background: $white;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.18s;
+  &::placeholder { color: #adb5bd; }
+  &:focus { border-color: $green; }
+}
+
+.cj-input-error { border-color: #dc2626 !important; }
+.cj-error { font-size: 0.75rem; color: #dc2626; }
+
+// ── File upload ───────────────────────────────────────────
+.cj-file-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 2px dashed $border;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.18s;
+  color: $muted;
+  font-size: 0.875rem;
+
+  svg { width: 32px; height: 32px; }
+
+  &:hover { border-color: $green; color: $green; background: rgba($green, 0.03); }
+
+  &--filled {
+    border-color: $green;
+    background: rgba($green, 0.04);
+    color: $green;
+  }
+}
+
+.cj-file-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+// ── Submit button ─────────────────────────────────────────
+.cj-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem;
+  background: $green;
+  color: $white;
+  border: none;
+  border-radius: 0.625rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 0.25rem;
+
+  &:hover:not(:disabled) { background: $green2; }
+  &:disabled { opacity: 0.65; cursor: not-allowed; }
+}
+
+.cj-spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba($white, 0.4);
+  border-top-color: $white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+// ── Success state ─────────────────────────────────────────
+.cj-success {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.cj-success-icon {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: rgba($green, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  color: $green;
+  svg { width: 28px; height: 28px; }
+}
+
+.cj-success-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: $text;
+  margin: 0 0 0.625rem;
+}
+
+.cj-success-body {
+  font-size: 0.9rem;
+  color: $muted;
+  line-height: 1.65;
+  margin: 0 0 1.75rem;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .careers-cta-sub {
   font-size: 0.9rem;
   opacity: 0.85;

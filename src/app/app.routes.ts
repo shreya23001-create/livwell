@@ -105,6 +105,7 @@ export const routes: Routes = [
           { path: 'audit-logs', loadComponent: () => import('./admin/audit-logs/admin-audit-logs.component').then(m => m.AdminAuditLogsComponent) },
           { path: 'master', loadComponent: () => import('./admin/master/admin-master.component').then(m => m.AdminMasterComponent) },
           { path: 'profile', loadComponent: () => import('./admin/profile/admin-profile.component').then(m => m.AdminProfileComponent) },
+          { path: 'careers', loadComponent: () => import('./admin/careers/admin-careers.component').then(m => m.AdminCareersComponent) },
           { path: 'templates', loadComponent: () => import('./admin/templates/admin-templates.component').then(m => m.AdminTemplatesComponent) },
           { path: 'developers', loadComponent: () => import('./admin/developers/admin-developers.component').then(m => m.AdminDevelopersComponent) },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

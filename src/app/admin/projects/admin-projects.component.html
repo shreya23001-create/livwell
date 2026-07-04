@@ -62,7 +62,7 @@
     <div class="select-wrapper">
       <select [value]="filterType()" (change)="setFilter('filterType', $any($event.target).value)">
         <option value="">All Types</option>
-        <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+        <option *ngFor="let t of masterPropTypes()" [value]="t">{{ t }}</option>
       </select>
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
     </div>

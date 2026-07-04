@@ -319,182 +319,101 @@ $pill-bg:    #f3f4f6;
   position: sticky;
   top: 68px;
   z-index: 100;
-  background: #fff;
+  background: $bg;
   border-bottom: 1px solid $border;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 0.875rem 1.5rem;
 }
 
 .lxp-filter-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
   display: flex;
   align-items: center;
-  height: 64px;
   gap: 0;
+  background: #fff;
+  border: 1.5px solid $border;
+  border-radius: 0.625rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: visible;
+  height: 52px;
 }
 
-// Search field
 .lxp-filter-search {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 0;
-  padding-right: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  flex: 1; min-width: 0; padding: 0 1rem; height: 100%;
   svg { width: 16px; height: 16px; color: $muted; flex-shrink: 0; }
 }
 .lxp-filter-search-input {
-  border: none;
-  outline: none;
-  font-size: 0.875rem;
-  color: $text;
-  width: 100%;
-  background: transparent;
+  border: none; outline: none; font-size: 0.875rem;
+  color: $text; width: 100%; background: transparent;
   &::placeholder { color: $muted; }
 }
 
-// Divider
-.lxp-filter-divider {
-  width: 1px;
-  height: 28px;
-  background: $border;
-  flex-shrink: 0;
-}
+.lxp-filter-divider { width: 1px; height: 28px; background: $border; flex-shrink: 0; }
 
-// Dropdown trigger buttons
-.lxp-filter-drop-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
+.lxp-filter-drop-wrap { position: relative; flex-shrink: 0; height: 100%; display: flex; align-items: center; }
 
 .lxp-filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0 1rem;
-  height: 64px;
-  border: none;
-  background: none;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: $text;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s;
-  svg { width: 14px; height: 14px; color: $muted; transition: transform 0.2s; }
-
+  display: flex; align-items: center; gap: 0.375rem;
+  padding: 0 1rem; height: 100%;
+  border: none; background: none;
+  font-size: 0.875rem; font-weight: 600; color: $text;
+  cursor: pointer; white-space: nowrap; transition: background 0.15s;
+  svg { width: 14px; height: 14px; color: $muted; transition: transform 0.2s; flex-shrink: 0; }
   &:hover { background: $bg; }
   .open & svg { transform: rotate(180deg); }
 }
 
-// Dropdown panels
 .lxp-drop-panel {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  background: #fff;
-  border: 1px solid $border;
-  border-radius: 0.75rem;
+  position: absolute; top: calc(100% + 6px); left: 0;
+  background: #fff; border: 1px solid $border; border-radius: 0.75rem;
   box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  min-width: 200px;
-  padding: 0.5rem 0;
-  z-index: 200;
+  min-width: 210px; padding: 0.5rem 0; z-index: 200;
 }
-
 .lxp-drop-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: $muted;
-  padding: 0.5rem 1rem 0.375rem;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+  color: $muted; padding: 0.625rem 1rem 0.375rem;
 }
-
 .lxp-drop-opt {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 0.55rem 1rem;
-  border: none;
-  background: none;
-  font-size: 0.875rem;
-  color: $text;
-  cursor: pointer;
-  transition: background 0.12s;
-
+  display: block; width: 100%; text-align: left;
+  padding: 0.55rem 1rem; border: none; background: none;
+  font-size: 0.875rem; color: $text; cursor: pointer; transition: background 0.12s;
   &:hover  { background: $bg; }
-  &.active { background: rgba($gold, 0.1); color: darken($gold, 10%); font-weight: 600; }
+  &.active { background: rgba($gold, 0.1); color: #a07830; font-weight: 600; }
 }
 
-// Clear button
 .lxp-filter-clear {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0 0.875rem;
-  height: 64px;
-  border: none;
-  background: none;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: $muted;
-  cursor: pointer;
-  white-space: nowrap;
+  display: flex; align-items: center; gap: 0.375rem;
+  padding: 0 0.75rem; height: 100%;
+  border: none; background: none;
+  font-size: 0.78rem; font-weight: 600; color: $muted;
+  cursor: pointer; white-space: nowrap;
   &:hover { color: $text; }
 }
-
 .lxp-filter-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: $green;
-  color: #fff;
-  font-size: 0.65rem;
-  font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 17px; height: 17px; border-radius: 50%;
+  background: $green; color: #fff; font-size: 0.62rem; font-weight: 700;
 }
 
-// Search button
 .lxp-filter-search-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: 0.5rem;
-  padding: 0 1.25rem;
-  height: 40px;
-  background: $green;
-  color: #fff;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: background 0.15s;
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0 1.25rem; height: 52px;
+  background: $green; color: #fff; border: none;
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-size: 0.875rem; font-weight: 700; cursor: pointer;
+  white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
   svg { width: 15px; height: 15px; }
   &:hover { background: #145030; }
 }
 
-// ── Responsive filter bar ─────────────────────────────────
-@media (max-width: 768px) {
-  .lxp-filter-inner {
-    height: auto;
-    flex-wrap: wrap;
-    padding: 0.75rem 1rem;
-    gap: 0.5rem;
-  }
-  .lxp-filter-search {
-    flex: 1 1 100%;
-    border: 1.5px solid $border;
-    border-radius: 0.5rem;
-    padding: 0.5rem 0.75rem;
-  }
+@media (max-width: 900px) {
+  .lxp-filter-bar { padding: 0.75rem 1rem; }
+  .lxp-filter-inner { height: auto; flex-wrap: wrap; padding: 0.5rem; gap: 0.375rem; }
+  .lxp-filter-search { flex: 1 1 100%; padding: 0.4rem 0.5rem; height: 38px; border-bottom: 1px solid $border; }
   .lxp-filter-divider { display: none; }
-  .lxp-filter-btn { height: 38px; padding: 0 0.75rem; border: 1.5px solid $border; border-radius: 0.5rem; }
-  .lxp-drop-panel { left: 0; right: auto; }
-  .lxp-filter-search-btn { height: 38px; flex: 1; justify-content: center; margin-left: 0; }
-  .lxp-filter-clear { height: 38px; padding: 0 0.75rem; }
+  .lxp-filter-drop-wrap { height: 36px; }
+  .lxp-filter-btn { height: 36px; padding: 0 0.75rem; border: 1px solid $border; border-radius: 0.375rem; font-size: 0.82rem; }
+  .lxp-filter-search-btn { height: 36px; flex: 1; justify-content: center; border-radius: 0.375rem; }
+  .lxp-filter-clear { height: 36px; }
 }

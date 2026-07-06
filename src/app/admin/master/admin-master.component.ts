@@ -1,14 +1,16 @@
-import { Component, signal, computed, inject, HostListener } from '@angular/core';
+import { Component, signal, computed, inject, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
+import { ToastService } from '../../shared/services/toast.service';
 import * as XLSX from 'xlsx';
 import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 
 export { AMENITY_ICONS };
 
-type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' | 'locations' | 'communities' | 'amenities';
+type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' | 'locations' | 'communities' | 'amenities' | 'partner-logos';
 
 
 
@@ -19,12 +21,18 @@ type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' 
   templateUrl: './admin-master.component.html',
   styleUrl:    './admin-master.component.scss',
 })
-export class AdminMasterComponent {
+export class AdminMasterComponent implements OnInit {
   private dataSvc   = inject(AdminDataService);
   private sanitizer = inject(DomSanitizer);
+  private sb        = inject(SupabaseService).client;
+  private toast     = inject(ToastService);
 
   safeSvg(svg: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
+
+  async ngOnInit(): Promise<void> {
+    await this.loadPartnerLogos();
   }
 
   activeTab = signal<MasterTab>('categories');
@@ -71,6 +79,22 @@ export class AdminMasterComponent {
   }
   amenityError     = signal('');
   saving           = signal(false);
+
+  // Partner logos
+  partnerLogos     = signal<{ url: string; name: string }[]>([]);
+  plDragOver       = signal(false);
+  plUploading      = signal(false);
+  plSaving         = signal(false);
+  partnerLogoError = signal('');
+
+  readonly presetLogos = [
+    { name: 'Emaar',            url: 'images/emaar.png' },
+    { name: 'Binghatti',        url: 'images/binghatti.png' },
+    { name: 'Dubai Properties', url: 'images/dubai_property.png' },
+    { name: 'DAMAC',            url: 'images/damac.png' },
+    { name: 'Meraas',           url: 'images/meraas.png' },
+    { name: 'Azizi',            url: 'images/azizi.png' },
+  ];
 
   filteredLocations = computed(() => {
     const q = this.locationSearch().toLowerCase();
@@ -288,6 +312,79 @@ export class AdminMasterComponent {
   async removeAmenity(name: string): Promise<void> {
     const err = await this.dataSvc.removeMasterItem('amenity', name);
     if (err) this.amenityError.set('Delete failed: ' + err);
+  }
+
+  // ── Partner Logos ──────────────────────────────────────────────
+  private async loadPartnerLogos(): Promise<void> {
+    const { data } = await this.sb
+      .from('site_settings').select('value').eq('key', 'partner_logos').maybeSingle();
+    if (data?.value) {
+      try { this.partnerLogos.set(JSON.parse(data.value)); } catch {}
+    }
+  }
+
+  onPartnerLogoDrop(e: DragEvent): void {
+    e.preventDefault();
+    this.plDragOver.set(false);
+    const file = e.dataTransfer?.files?.[0];
+    if (file) this.uploadPartnerLogo(file);
+  }
+
+  onPartnerLogoFile(e: Event): void {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) this.uploadPartnerLogo(file);
+    (e.target as HTMLInputElement).value = '';
+  }
+
+  private async uploadPartnerLogo(file: File): Promise<void> {
+    if (!file.type.startsWith('image/')) { this.partnerLogoError.set('Please select an image file.'); return; }
+    if (file.size > 5 * 1024 * 1024)    { this.partnerLogoError.set('Image must be under 5 MB.'); return; }
+    this.partnerLogoError.set('');
+    this.plUploading.set(true);
+    const ext  = file.name.split('.').pop();
+    const path = `partners/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { data, error } = await this.sb.storage.from('imagesFolder').upload(path, file, { upsert: true });
+    if (error) { this.partnerLogoError.set('Upload failed: ' + error.message); this.plUploading.set(false); return; }
+    const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
+    const name = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+    this.partnerLogos.update(list => [...list, { url: pub.publicUrl, name }]);
+    this.plUploading.set(false);
+  }
+
+  addPresetLogo(preset: { url: string; name: string }): void {
+    if (this.partnerLogos().some(l => l.url === preset.url)) {
+      this.partnerLogoError.set(`"${preset.name}" is already in the list.`);
+      return;
+    }
+    this.partnerLogoError.set('');
+    this.partnerLogos.update(list => [...list, { ...preset }]);
+  }
+
+  updatePartnerLogoName(index: number, name: string): void {
+    this.partnerLogos.update(list => list.map((l, i) => i === index ? { ...l, name } : l));
+  }
+
+  removePartnerLogo(index: number): void {
+    this.partnerLogos.update(list => list.filter((_, i) => i !== index));
+  }
+
+  movePartnerLogo(index: number, dir: -1 | 1): void {
+    const list   = [...this.partnerLogos()];
+    const target = index + dir;
+    if (target < 0 || target >= list.length) return;
+    [list[index], list[target]] = [list[target], list[index]];
+    this.partnerLogos.set(list);
+  }
+
+  async savePartnerLogos(): Promise<void> {
+    this.plSaving.set(true);
+    const value = JSON.stringify(this.partnerLogos());
+    const { error } = await this.sb
+      .from('site_settings')
+      .upsert({ key: 'partner_logos', value }, { onConflict: 'key' });
+    if (error) this.toast.error(error.message);
+    else this.toast.success('Partner logos saved.');
+    this.plSaving.set(false);
   }
 
   async importCommunitiesExcel(event: Event): Promise<void> {

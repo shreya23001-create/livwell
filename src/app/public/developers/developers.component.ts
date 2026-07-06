@@ -16,6 +16,7 @@ interface Developer {
   salesValue: string;
   capitalGain: string;
   about: string;
+  aboutText: string;
   nationality: string;
   featured?: boolean;
 }
@@ -76,22 +77,27 @@ export class DevelopersComponent implements OnInit {
     };
 
     if (!error && data) {
-      this.allDevelopers.set(data.map((d: any) => ({
-        slug:              d.slug,
-        name:              d.name,
-        logo:              d.logo,
-        coverImage:        d.cover_image || '',
-        established:       d.established,
-        projects:          liveCount(d.name ?? ''),
-        deliveredProjects: d.delivered_projects,
-        units:             d.units        ?? 0,
-        salesVolume:       d.sales_volume ?? '',
-        salesValue:        d.sales_value  ?? '',
-        capitalGain:       d.capital_gain ?? '',
-        about:             d.about,
-        nationality:       d.nationality,
-        featured:          d.featured,
-      })));
+      this.allDevelopers.set(data.map((d: any) => {
+        const raw = d.about ?? '';
+        const plain = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        return {
+          slug:              d.slug,
+          name:              d.name,
+          logo:              d.logo,
+          coverImage:        d.cover_image || '',
+          established:       d.established,
+          projects:          liveCount(d.name ?? ''),
+          deliveredProjects: d.delivered_projects,
+          units:             d.units        ?? 0,
+          salesVolume:       d.sales_volume ?? '',
+          salesValue:        d.sales_value  ?? '',
+          capitalGain:       d.capital_gain ?? '',
+          about:             raw,
+          aboutText:         plain,
+          nationality:       d.nationality,
+          featured:          d.featured,
+        };
+      }));
     }
     this.loading.set(false);
   }
@@ -103,7 +109,7 @@ export class DevelopersComponent implements OnInit {
     if (f === 'Featured')      list = list.filter(d => d.featured);
     else if (f === 'UAE')       list = list.filter(d => d.nationality === 'UAE');
     else if (f === 'International') list = list.filter(d => d.nationality === 'International');
-    if (q) list = list.filter(d => d.name.toLowerCase().includes(q) || d.about.toLowerCase().includes(q));
+    if (q) list = list.filter(d => d.name.toLowerCase().includes(q) || d.aboutText.toLowerCase().includes(q));
     return list;
   });
 

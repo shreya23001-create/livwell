@@ -61,7 +61,7 @@
             <h2 class="dev-row__name">{{ d.name }}</h2>
             <span *ngIf="d.featured" class="dev-row__feat">Featured</span>
           </div>
-          <p class="dev-row__about">{{ d.about }}</p>
+          <p class="dev-row__about" [innerHTML]="d.aboutText"></p>
 
           <!-- Stats boxes -->
           <div class="dev-row__stats">

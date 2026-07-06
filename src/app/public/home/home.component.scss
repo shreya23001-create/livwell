@@ -17,6 +17,14 @@ $gold-light: #e8c870;
   @media (max-width: 600px) {
     min-height: 580px;
   }
+
+  @media (max-width: 480px) {
+    min-height: 540px;
+  }
+
+  @media (max-width: 380px) {
+    min-height: 520px;
+  }
 }
 
 /* ── Background slides ────────────────────────── */
@@ -161,10 +169,22 @@ $gold-light: #e8c870;
   padding: 0 1.5rem;
   text-align: center;
 
+  @media (max-width: 768px) {
+    top: 46%;
+    transform: translate(-50%, -50%);
+  }
+
   @media (max-width: 600px) {
-    top: 48%;
+    top: 44%;
+    transform: translate(-50%, -50%);
     gap: 1rem;
     padding: 0 1rem;
+  }
+
+  @media (max-width: 480px) {
+    top: 48%;
+    transform: translate(-50%, -50%);
+    gap: 0.75rem;
   }
 }
 
@@ -471,6 +491,10 @@ $gold-light: #e8c870;
     overflow: hidden;
     max-height: 2rem;
   }
+
+  @media (max-width: 400px) {
+    display: none;
+  }
 }
 
 .hero-chip-label {
@@ -526,6 +550,10 @@ $gold-light: #e8c870;
 
   @media (max-width: 520px) {
     padding: 0 1rem 1rem;
+  }
+
+  @media (max-width: 480px) {
+    display: none;
   }
 }
 

@@ -193,6 +193,78 @@ $bg:     #f9fafb;
   input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: $green; }
 }
 
+// Partner logos section
+.adv-partner-section {
+  margin-top: 2.5rem;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.adv-partner-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.adv-partner-title { font-size: 1.1rem; font-weight: 700; color: $text; margin: 0 0 .2rem; }
+.adv-partner-sub   { font-size: .8rem; color: $muted; margin: 0; }
+
+.adv-partner-empty {
+  text-align: center; padding: 2rem; color: $muted; font-size: .875rem;
+  border: 2px dashed $border; border-radius: 8px;
+}
+
+.adv-partner-grid {
+  display: flex; flex-wrap: wrap; gap: 1rem;
+}
+
+.adv-partner-card {
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  background: $bg; border: 1px solid $border; border-radius: 10px;
+  padding: .875rem; width: 160px;
+
+  &__img {
+    width: 120px; height: 60px; display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid $border; border-radius: 6px; overflow: hidden;
+    img { max-width: 100%; max-height: 100%; object-fit: contain; filter: grayscale(1); }
+  }
+
+  &__name { width: 100%; }
+  &__actions { display: flex; gap: .375rem; }
+}
+
+.adv-partner-name-input {
+  border: 1px solid $border; border-radius: 6px; padding: .3rem .5rem;
+  font-size: .75rem; width: 100%; box-sizing: border-box; outline: none;
+  &:focus { border-color: $green; }
+}
+
+.adv-partner-move {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border: 1px solid $border; border-radius: 6px;
+  background: #fff; cursor: pointer; color: $muted; transition: all .15s;
+  &:hover:not(:disabled) { border-color: $green; color: $green; }
+  &:disabled { opacity: .35; cursor: not-allowed; }
+}
+
+.adv-partner-remove {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border: 1px solid $border; border-radius: 6px;
+  background: #fff; cursor: pointer; color: $muted; transition: all .15s;
+  &:hover { border-color: $red; color: $red; }
+}
+
+.adv-partner-footer {
+  display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem;
+  padding-top: 1rem; border-top: 1px solid $border;
+}
+
+.adv-partner-uploading {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .8rem; color: $muted;
+}
+
 // Delete confirm
 .adv-confirm {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);

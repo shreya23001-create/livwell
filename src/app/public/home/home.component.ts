@@ -256,6 +256,7 @@ export class HomeComponent implements OnInit {
   trendingProjectsDb     = signal<TrendingProject[]>([]);
   topAgentsLive          = signal<HomeAgent[]>([]);
   propertyCounts         = signal<Record<string, number>>({});
+  partnerLogos           = signal<{ url: string; name: string }[]>([]);
 
   displayedAgents = computed(() => this.topAgentsLive().length ? this.topAgentsLive() : this.topAgents);
 
@@ -270,6 +271,7 @@ export class HomeComponent implements OnInit {
       this.loadLocations(),
       this.loadSuccessStories(),
       this.loadBlogPosts(),
+      this.loadPartnerLogos(),
     ]);
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => this.setupScrollAnimations(), 50);
@@ -557,6 +559,17 @@ export class HomeComponent implements OnInit {
         this.activeTrendingTab.set(tabs[0]);
       }
     });
+  }
+
+  private async loadPartnerLogos(): Promise<void> {
+    const { data } = await this.sb
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'partner_logos')
+      .maybeSingle();
+    if (data?.value) {
+      try { this.partnerLogos.set(JSON.parse(data.value)); } catch {}
+    }
   }
 
   private slideInterval: ReturnType<typeof setInterval> | null = null;

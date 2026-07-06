@@ -292,24 +292,21 @@
     <div class="container-custom">
       <h3 class="trust-dev-heading">Trusted Partner of the Most Prominent Developers</h3>
       <div class="trust-dev-logos">
-        <div class="dev-logo-box">
-          <img src="images/emaar.png" alt="Emaar" class="dev-logo-img">
-        </div>
-        <div class="dev-logo-box">
-          <img src="images/binghatti.png" alt="Binghatti" class="dev-logo-img">
-        </div>
-        <div class="dev-logo-box">
-          <img src="images/dubai_property.png" alt="Dubai Properties" class="dev-logo-img">
-        </div>
-        <div class="dev-logo-box">
-          <img src="images/damac.png" alt="DAMAC" class="dev-logo-img">
-        </div>
-        <div class="dev-logo-box">
-          <img src="images/meraas.png" alt="Meraas" class="dev-logo-img">
-        </div>
-        <div class="dev-logo-box">
-          <img src="images/azizi.png" alt="Azizi" class="dev-logo-img">
-        </div>
+        <!-- Dynamic logos from admin -->
+        <ng-container *ngIf="partnerLogos().length > 0">
+          <div *ngFor="let logo of partnerLogos()" class="dev-logo-box">
+            <img [src]="logo.url" [alt]="logo.name" class="dev-logo-img">
+          </div>
+        </ng-container>
+        <!-- Fallback hardcoded logos -->
+        <ng-container *ngIf="partnerLogos().length === 0">
+          <div class="dev-logo-box"><img src="images/emaar.png" alt="Emaar" class="dev-logo-img"></div>
+          <div class="dev-logo-box"><img src="images/binghatti.png" alt="Binghatti" class="dev-logo-img"></div>
+          <div class="dev-logo-box"><img src="images/dubai_property.png" alt="Dubai Properties" class="dev-logo-img"></div>
+          <div class="dev-logo-box"><img src="images/damac.png" alt="DAMAC" class="dev-logo-img"></div>
+          <div class="dev-logo-box"><img src="images/meraas.png" alt="Meraas" class="dev-logo-img"></div>
+          <div class="dev-logo-box"><img src="images/azizi.png" alt="Azizi" class="dev-logo-img"></div>
+        </ng-container>
       </div>
     </div>
   </div>

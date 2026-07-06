@@ -1,0 +1,149 @@
+<div class="afaq-page">
+
+  <!-- Header -->
+  <div class="afaq-header">
+    <div>
+      <h1 class="afaq-header__title">FAQs</h1>
+      <p class="afaq-header__sub">{{ faqs().length }} questions · {{ faqs().filter(f => f.is_active).length }} active</p>
+    </div>
+    <div style="display:flex;gap:.5rem;align-items:center;">
+      <button class="afaq-btn afaq-btn--ghost" (click)="seedDefaults()" [disabled]="saving() || faqs().length > 0"
+        title="{{ faqs().length > 0 ? 'Seed is only available when table is empty' : 'Seed 20 default FAQs' }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Seed Defaults
+      </button>
+      <button class="afaq-btn afaq-btn--primary" (click)="openAdd()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Add FAQ
+      </button>
+    </div>
+  </div>
+
+  <!-- Category tabs + search -->
+  <div class="afaq-toolbar">
+    <div class="afaq-cats">
+      <button *ngFor="let c of categories" class="afaq-cat-btn"
+        [class.active]="filterCat() === c"
+        (click)="filterCat.set(c)">
+        {{ c }} <span class="afaq-cat-count">{{ counts()[c] ?? 0 }}</span>
+      </button>
+    </div>
+    <div class="afaq-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search FAQs…" [value]="search()" (input)="search.set($any($event.target).value)" class="afaq-search__input" />
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="afaq-loading" *ngIf="loading()">
+    <div class="afaq-spinner"></div>
+  </div>
+
+  <!-- FAQ list -->
+  <div class="afaq-list" *ngIf="!loading()">
+
+    <div *ngIf="filtered().length === 0" class="afaq-empty">
+      No FAQs match your filters.
+    </div>
+
+    <div *ngFor="let f of filtered()" class="afaq-row" [class.afaq-row--inactive]="!f.is_active">
+
+      <div class="afaq-row__left">
+        <div class="afaq-row__top" (click)="toggleExpand(f.id!)">
+          <span class="afaq-cat-badge">{{ f.category }}</span>
+          <p class="afaq-row__q">{{ f.question }}</p>
+          <svg class="afaq-row__chevron" [class.open]="expandedId() === f.id"
+               width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+          </svg>
+        </div>
+        <div class="afaq-row__answer" *ngIf="expandedId() === f.id">
+          {{ f.answer }}
+        </div>
+      </div>
+
+      <div class="afaq-row__actions">
+        <button class="afaq-toggle" [class.afaq-toggle--on]="f.is_active"
+          (click)="toggleActive(f)" [title]="f.is_active ? 'Deactivate' : 'Activate'">
+          <span class="afaq-toggle__dot"></span>
+        </button>
+        <button class="afaq-icon-btn afaq-icon-btn--edit" (click)="openEdit(f)" title="Edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="afaq-icon-btn afaq-icon-btn--del" (click)="confirmDelete(f)" title="Delete">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Add / Edit Modal ── -->
+<div class="afaq-overlay" *ngIf="modalOpen()" (click)="closeModal()"></div>
+<div class="afaq-modal" *ngIf="modalOpen()">
+  <div class="afaq-modal__head">
+    <h2>{{ editingId() ? 'Edit FAQ' : 'Add FAQ' }}</h2>
+    <button class="afaq-modal__close" (click)="closeModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="afaq-modal__body">
+
+    <div class="afaq-field">
+      <label>Category</label>
+      <select [value]="form().category" (change)="patch('category', $any($event.target).value)">
+        <option *ngFor="let c of formCategories" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+
+    <div class="afaq-field">
+      <label>Question *</label>
+      <input type="text" [value]="form().question"
+        (input)="patch('question', $any($event.target).value)"
+        placeholder="e.g. Can foreigners buy property in Dubai?" />
+    </div>
+
+    <div class="afaq-field">
+      <label>Answer *</label>
+      <textarea rows="6" [value]="form().answer"
+        (input)="patch('answer', $any($event.target).value)"
+        placeholder="Write the full answer here…"></textarea>
+    </div>
+
+    <div class="afaq-field-row">
+      <div class="afaq-field">
+        <label>Sort Order</label>
+        <input type="number" [value]="form().sort_order"
+          (input)="patch('sort_order', +$any($event.target).value)" placeholder="0" />
+      </div>
+      <div class="afaq-field afaq-field--checkbox">
+        <label>
+          <input type="checkbox" [checked]="form().is_active"
+            (change)="patch('is_active', $any($event.target).checked)" />
+          Active (show on website)
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="afaq-modal__foot">
+    <button class="afaq-btn afaq-btn--ghost" (click)="closeModal()">Cancel</button>
+    <button class="afaq-btn afaq-btn--primary" (click)="save()" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : (editingId() ? 'Update FAQ' : 'Add FAQ') }}
+    </button>
+  </div>
+</div>
+
+<!-- ── Delete confirm ── -->
+<div class="afaq-overlay" *ngIf="deleteTarget()" (click)="cancelDelete()"></div>
+<div class="afaq-confirm" *ngIf="deleteTarget()">
+  <p>Delete this FAQ?<br><strong>{{ deleteTarget()?.question }}</strong></p>
+  <div class="afaq-confirm__btns">
+    <button class="afaq-btn afaq-btn--ghost" (click)="cancelDelete()">Cancel</button>
+    <button class="afaq-btn afaq-btn--danger" (click)="doDelete()">Delete</button>
+  </div>
+</div>

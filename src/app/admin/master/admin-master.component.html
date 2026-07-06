@@ -34,6 +34,10 @@
       <div class="master-stat-val">{{ counts().amenities }}</div>
       <div class="master-stat-lbl">Amenities</div>
     </div>
+    <div class="master-stat" [class.active]="activeTab()==='partner-logos'" (click)="activeTab.set('partner-logos')">
+      <div class="master-stat-val">{{ partnerLogos().length }}</div>
+      <div class="master-stat-lbl">Partner Logos</div>
+    </div>
   </div>
 
   <!-- ── Tabs ── -->
@@ -43,7 +47,8 @@
     <button class="master-tab" [class.active]="activeTab()==='statuses'"       (click)="activeTab.set('statuses')">Statuses</button>
     <button class="master-tab" [class.active]="activeTab()==='trending-tabs'"  (click)="activeTab.set('trending-tabs')">Trending Tabs</button>
     <button class="master-tab" [class.active]="activeTab()==='locations'"      (click)="activeTab.set('locations')">Locations</button>
-    <button class="master-tab" [class.active]="activeTab()==='amenities'"     (click)="activeTab.set('amenities')">Amenities</button>
+    <button class="master-tab" [class.active]="activeTab()==='amenities'"      (click)="activeTab.set('amenities')">Amenities</button>
+    <button class="master-tab" [class.active]="activeTab()==='partner-logos'"  (click)="activeTab.set('partner-logos')">Partner Logos</button>
   </div>
 
   <!-- ══ CATEGORIES ══════════════════════════════════════ -->
@@ -324,6 +329,82 @@
           <p class="master-empty">No amenities yet. Add one above.</p>
         }
       </div>
+    </div>
+  }
+
+  <!-- ══ PARTNER LOGOS ═══════════════════════════════════ -->
+  @if (activeTab() === 'partner-logos') {
+    <div class="master-card">
+      <div class="master-card-header">
+        <h2 class="master-card-title">Partner Logos</h2>
+        <p class="master-card-sub">Logos shown in the "Trusted Partner" strip on the home page. Drag &amp; drop or click to upload — one image at a time.</p>
+      </div>
+
+      <!-- Upload zone -->
+      <input #plInput type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" style="display:none" (change)="onPartnerLogoFile($event)" />
+      <div class="master-pl-dropzone"
+           [class.over]="plDragOver()"
+           (click)="plInput.click()"
+           (dragover)="$event.preventDefault(); plDragOver.set(true)"
+           (dragleave)="plDragOver.set(false)"
+           (drop)="onPartnerLogoDrop($event)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>{{ plUploading() ? 'Uploading…' : 'Click or drag an image to upload' }}</span>
+        <span class="master-pl-hint">PNG, SVG, JPG, WebP · 1 image at a time · max 5 MB</span>
+      </div>
+
+      <!-- Preset logos from /images folder -->
+      <div class="master-pl-preset-head">
+        <span>Or pick from existing images:</span>
+      </div>
+      <div class="master-pl-presets">
+        @for (p of presetLogos; track p.name) {
+          <button class="master-pl-preset" (click)="addPresetLogo(p)" [title]="'Add ' + p.name">
+            <img [src]="p.url" [alt]="p.name">
+            <span>{{ p.name }}</span>
+          </button>
+        }
+      </div>
+
+      @if (partnerLogoError()) {
+        <p class="master-error">{{ partnerLogoError() }}</p>
+      }
+
+      <!-- Current logos grid -->
+      <div class="master-pl-grid" *ngIf="partnerLogos().length > 0">
+        @for (logo of partnerLogos(); track logo.url; let i = $index) {
+          <div class="master-pl-card">
+            <div class="master-pl-card__img">
+              <img [src]="logo.url" [alt]="logo.name">
+            </div>
+            <input class="master-pl-name" type="text" [value]="logo.name"
+              (input)="updatePartnerLogoName(i, $any($event.target).value)" placeholder="Logo name" />
+            <div class="master-pl-card__actions">
+              <button class="master-pl-move" (click)="movePartnerLogo(i, -1)" [disabled]="i === 0" title="Move left">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button class="master-pl-move" (click)="movePartnerLogo(i, 1)" [disabled]="i === partnerLogos().length - 1" title="Move right">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button class="master-pl-del" (click)="removePartnerLogo(i)" title="Remove">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+      @if (partnerLogos().length === 0) {
+        <p class="master-empty" style="margin-top:1rem">No partner logos yet. Upload one or pick from the presets above.</p>
+      }
+
+      <!-- Save -->
+      <div class="master-pl-footer" *ngIf="partnerLogos().length > 0">
+        <button class="master-btn master-btn--primary" (click)="savePartnerLogos()" [disabled]="plSaving()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          {{ plSaving() ? 'Saving…' : 'Save Changes' }}
+        </button>
+      </div>
+
     </div>
   }
 

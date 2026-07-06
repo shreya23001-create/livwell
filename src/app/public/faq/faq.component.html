@@ -33,7 +33,7 @@
             <img [src]="faq.avatar" [alt]="faq.author" class="faq-avatar">
             <div class="faq-q-info">
               <div class="faq-question">{{ faq.question }}</div>
-              <div class="faq-meta">{{ faq.date }}</div>
+              <div class="faq-meta" *ngIf="faq.date">{{ faq.date }}</div>
             </div>
           </div>
           <div class="faq-toggle-btn" [class.open]="openId() === faq.id">

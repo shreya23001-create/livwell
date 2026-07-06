@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { toProjectSlug } from '../../shared/utils/slug';
 
 interface TrackedProp {
   id: number;
@@ -164,7 +165,7 @@ interface TrackedProject {
                     <td><span class="vt-tag">{{ p.type || 'Residential' }}</span></td>
                     <td><span class="vt-tag vt-tag--project">{{ p.badge || 'Off-Plan' }}</span></td>
                     <td class="vt-num vt-price">{{ p.priceLabel }}</td>
-                    <td><a [routerLink]="['/projects', p.id]" class="vt-view">View →</a></td>
+                    <td><a [routerLink]="['/projects', projectSlug(p.title, p.id)]" class="vt-view">View →</a></td>
                   </tr>
                 }
               </tbody>
@@ -327,5 +328,9 @@ export class CustomerValueTrackerComponent implements OnInit {
       badge:      p.badge      || 'Off-Plan',
       image:      (p.images && p.images[0]) || '/images/dummy-image.png',
     })) as TrackedProject[]);
+  }
+
+  projectSlug(title: string, id: number): string {
+    return toProjectSlug(title, id);
   }
 }

@@ -6,6 +6,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { toProjectSlug } from '../../shared/utils/slug';
 
 interface Property {
   id: number;
@@ -30,6 +31,7 @@ interface HomeProject {
   paymentPlan: string;
   badge: boolean;
   image: string;
+  slug: string;
 }
 
 interface OffPlanCard {
@@ -43,6 +45,7 @@ interface OffPlanCard {
   roi: string;
   image: string;
   badge: string;
+  slug: string;
 }
 
 interface TrendingProject {
@@ -53,6 +56,7 @@ interface TrendingProject {
   badge: string;
   type: string;
   image: string;
+  slug: string;
 }
 
 interface HomeAgent {
@@ -179,7 +183,7 @@ export class HomeComponent implements OnInit {
     if (item.type === 'property' && item.id) {
       this.router.navigate(['/properties', item.id]);
     } else if (item.type === 'project' && item.id) {
-      this.router.navigate(['/projects', item.id]);
+      this.router.navigate(['/projects', toProjectSlug(item.label, item.id)]);
     } else {
       // location — route depends on active tab
       if (tab === 'new-projects') {
@@ -351,6 +355,7 @@ export class HomeComponent implements OnInit {
         paymentPlan:  p.payment_plan ?? '',
         badge:        !!p.is_featured,
         image:        (p.images && p.images[0]) || '/images/dummy-image.png',
+        slug:         toProjectSlug(p.title ?? '', p.id),
       })));
     }
   }
@@ -384,6 +389,7 @@ export class HomeComponent implements OnInit {
         type:         p.type ?? 'Apartments',
         roi:          '',
         image:        (p.images && p.images[0]) || '/images/dummy-image.png',
+        slug:         toProjectSlug(p.title ?? '', p.id),
         badge:        p.badge || 'New Launch',
       })));
     }
@@ -414,6 +420,7 @@ export class HomeComponent implements OnInit {
             badge:     p.badge || 'New Launch',
             type:      (p.trending_category ?? '').trim(),
             image:     (p.images && p.images[0]) || '/images/dummy-image.png',
+            slug:      toProjectSlug(p.title ?? '', p.id),
           };
         });
 
@@ -526,9 +533,9 @@ export class HomeComponent implements OnInit {
     const live = this.offPlanProjectsLive();
     if (live.length) return live;
     return [
-      { id: 1, name: 'Creek Horizon Residences', developer: 'Emaar Properties', location: 'Dubai Creek Harbour', startingPrice: 'AED 1,250,000', completion: 'Q4 2027', type: 'Apartments', roi: '8.5% est. ROI', image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80', badge: 'New Launch' },
-      { id: 2, name: 'Palm Vista Villas', developer: 'Nakheel', location: 'Palm Jebel Ali, Dubai', startingPrice: 'AED 6,800,000', completion: 'Q2 2026', type: 'Villas', roi: '7.2% est. ROI', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80', badge: 'Selling Fast' },
-      { id: 3, name: 'Skyline Towers', developer: 'DAMAC Properties', location: 'Business Bay, Dubai', startingPrice: 'AED 890,000', completion: 'Q1 2028', type: 'Apartments', roi: '9.1% est. ROI', image: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=800&q=80', badge: 'Early Bird' },
+      { id: 1, name: 'Creek Horizon Residences', developer: 'Emaar Properties', location: 'Dubai Creek Harbour', startingPrice: 'AED 1,250,000', completion: 'Q4 2027', type: 'Apartments', roi: '8.5% est. ROI', image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80', badge: 'New Launch', slug: '' },
+      { id: 2, name: 'Palm Vista Villas', developer: 'Nakheel', location: 'Palm Jebel Ali, Dubai', startingPrice: 'AED 6,800,000', completion: 'Q2 2026', type: 'Villas', roi: '7.2% est. ROI', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80', badge: 'Selling Fast', slug: '' },
+      { id: 3, name: 'Skyline Towers', developer: 'DAMAC Properties', location: 'Business Bay, Dubai', startingPrice: 'AED 890,000', completion: 'Q1 2028', type: 'Apartments', roi: '9.1% est. ROI', image: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=800&q=80', badge: 'Early Bird', slug: '' },
     ];
   });
 
@@ -543,12 +550,12 @@ export class HomeComponent implements OnInit {
     const live = this.latestProjectsLive();
     if (live.length) return live;
     return [
-      { id: 0, name: 'Avena by Emaar',       location: 'Arabian Ranches 3',     developer: 'Emaar',    handover: 'Q1 2029', startingPrice: 'AED 3.5M',  paymentPlan: '10 / 80',       badge: true,  image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80' },
-      { id: 0, name: 'Avarra By Palace',      location: 'Business Bay',          developer: 'Emaar',    handover: 'Q2 2031', startingPrice: 'AED 13.6M', paymentPlan: '10 / 80 / 10',  badge: false, image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80' },
-      { id: 0, name: 'Binghatti Skyflame',    location: 'Majan',                 developer: 'Binghatti',handover: 'Q4 2027', startingPrice: 'AED 585K',  paymentPlan: '10 / 60 / 30',  badge: false, image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80' },
-      { id: 0, name: 'The Edit at d3',        location: 'Dubai Design District', developer: 'Meraas',   handover: 'Q4 2027', startingPrice: 'AED 1.9M',  paymentPlan: '20 / 55 / 25',  badge: false, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80' },
-      { id: 0, name: 'Creek Horizon',         location: 'Dubai Creek Harbour',   developer: 'Emaar',    handover: 'Q4 2027', startingPrice: 'AED 1.25M', paymentPlan: '20 / 60 / 20',  badge: true,  image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80' },
-      { id: 0, name: 'Palm Vista Residences', location: 'Palm Jebel Ali',        developer: 'Nakheel',  handover: 'Q2 2026', startingPrice: 'AED 6.8M',  paymentPlan: '15 / 55 / 30',  badge: false, image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80' },
+      { id: 0, name: 'Avena by Emaar',       location: 'Arabian Ranches 3',     developer: 'Emaar',    handover: 'Q1 2029', startingPrice: 'AED 3.5M',  paymentPlan: '10 / 80',       badge: true,  image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80',       slug: '' },
+      { id: 0, name: 'Avarra By Palace',      location: 'Business Bay',          developer: 'Emaar',    handover: 'Q2 2031', startingPrice: 'AED 13.6M', paymentPlan: '10 / 80 / 10',  badge: false, image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80',       slug: '' },
+      { id: 0, name: 'Binghatti Skyflame',    location: 'Majan',                 developer: 'Binghatti',handover: 'Q4 2027', startingPrice: 'AED 585K',  paymentPlan: '10 / 60 / 30',  badge: false, image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80',       slug: '' },
+      { id: 0, name: 'The Edit at d3',        location: 'Dubai Design District', developer: 'Meraas',   handover: 'Q4 2027', startingPrice: 'AED 1.9M',  paymentPlan: '20 / 55 / 25',  badge: false, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80',       slug: '' },
+      { id: 0, name: 'Creek Horizon',         location: 'Dubai Creek Harbour',   developer: 'Emaar',    handover: 'Q4 2027', startingPrice: 'AED 1.25M', paymentPlan: '20 / 60 / 20',  badge: true,  image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80',       slug: '' },
+      { id: 0, name: 'Palm Vista Residences', location: 'Palm Jebel Ali',        developer: 'Nakheel',  handover: 'Q2 2026', startingPrice: 'AED 6.8M',  paymentPlan: '15 / 55 / 30',  badge: false, image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80',       slug: '' },
     ];
   });
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { toProjectSlug } from '../../shared/utils/slug';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 
@@ -143,5 +144,9 @@ export class ProjectsPublicComponent implements OnInit {
 
   toggleFaq(i: number) {
     this.faqs = this.faqs.map((f, idx) => ({ ...f, open: idx === i ? !f.open : false }));
+  }
+
+  projectSlug(p: Project): string {
+    return toProjectSlug(p.title, p.id);
   }
 }

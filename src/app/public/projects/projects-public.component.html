@@ -62,7 +62,7 @@
 
     <!-- Grid -->
     <div class="prj-grid" *ngIf="!loading()">
-      <a [routerLink]="['/projects', p.id]" class="prj-card" *ngFor="let p of pagedProjects()">
+      <a [routerLink]="['/projects', projectSlug(p)]" class="prj-card" *ngFor="let p of pagedProjects()">
         <div class="prj-card-img-wrap">
           <img [src]="p.images?.[0] || '/images/dummy-image.png'" [alt]="p.title" class="prj-card-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
           <span *ngIf="p.badge" class="prj-badge prj-badge--overlay">{{ p.badge }}</span>

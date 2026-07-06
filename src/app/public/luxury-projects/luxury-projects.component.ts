@@ -6,6 +6,7 @@ import { NewsletterSectionComponent } from '../../shared/components/newsletter-s
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+import { toProjectSlug } from '../../shared/utils/slug';
 
 interface Project {
   id: number;
@@ -178,5 +179,9 @@ export class LuxuryProjectsComponent implements OnInit {
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
+  }
+
+  projectSlug(p: { title: string; id: number }): string {
+    return toProjectSlug(p.title, p.id);
   }
 }

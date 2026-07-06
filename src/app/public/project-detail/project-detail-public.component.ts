@@ -9,6 +9,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
+import { projectIdFromSlug, toProjectSlug } from '../../shared/utils/slug';
 
 interface Project {
   id: number;
@@ -189,19 +190,30 @@ export class ProjectDetailPublicComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) { this.notFound.set(true); this.loading.set(false); return; }
+    const raw = this.route.snapshot.paramMap.get('id');
+    if (!raw) { this.notFound.set(true); this.loading.set(false); return; }
+
+    // Support both legacy numeric IDs and new slug format (title-slug-id)
+    const numericId = /^\d+$/.test(raw) ? Number(raw) : projectIdFromSlug(raw);
+    if (!numericId) { this.notFound.set(true); this.loading.set(false); return; }
+
     this.loadMasterAmenities();
 
     const { data } = await this.sb
       .from('projects')
       .select('*')
-      .eq('id', id)
+      .eq('id', numericId)
       .eq('status', 'Published')
       .single();
 
     if (data) {
       const p = data as Project;
+
+      // Redirect legacy numeric URL to SEO-friendly slug URL
+      if (/^\d+$/.test(raw)) {
+        this.router.navigate(['/projects', toProjectSlug(p.title, p.id)], { replaceUrl: true });
+      }
+
       p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com') && !u.includes('dummy-image'));
       // Put real uploaded images first, placeholder fallback last
       const real = p.images.filter(u => !u.includes('/images/'));

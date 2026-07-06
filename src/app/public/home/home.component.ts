@@ -657,12 +657,12 @@ export class HomeComponent implements OnInit {
     const live = this.trendingProjectsDb();
     if (live.length) return live.filter(p => p.type === tab);
     const fallback: TrendingProject[] = [
-      { id: 0, name: 'One at Palm Jumeirah', developer: 'Omniyat', price: '14M', badge: 'Ready', type: 'Luxury', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80' },
-      { id: 0, name: 'Six Senses', developer: 'Select Group', price: '12.5M', badge: '40 / 60 Payment Plan', type: 'Luxury', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80' },
-      { id: 0, name: 'Palm Vista Villas', developer: 'Nakheel', price: '6.8M', badge: 'Ready', type: 'Villas', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80' },
-      { id: 0, name: 'Emirates Hills Villa', developer: 'Emaar', price: '22M', badge: '20 / 80 Payment Plan', type: 'Villas', image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80' },
-      { id: 0, name: 'Skyline Tower', developer: 'DAMAC', price: '890K', badge: '60 / 40 Payment Plan', type: 'Flats', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80' },
-      { id: 0, name: 'Creek Horizon', developer: 'Emaar', price: '1.25M', badge: '20 / 60 / 20 Payment Plan', type: 'Flats', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80' },
+      { id: 0, name: 'One at Palm Jumeirah', developer: 'Omniyat',      price: '14M',   badge: 'Ready',                    type: 'Luxury', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80', slug: '' },
+      { id: 0, name: 'Six Senses',           developer: 'Select Group', price: '12.5M', badge: '40 / 60 Payment Plan',     type: 'Luxury', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80', slug: '' },
+      { id: 0, name: 'Palm Vista Villas',    developer: 'Nakheel',      price: '6.8M',  badge: 'Ready',                    type: 'Villas', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80', slug: '' },
+      { id: 0, name: 'Emirates Hills Villa', developer: 'Emaar',        price: '22M',   badge: '20 / 80 Payment Plan',     type: 'Villas', image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80', slug: '' },
+      { id: 0, name: 'Skyline Tower',        developer: 'DAMAC',        price: '890K',  badge: '60 / 40 Payment Plan',     type: 'Flats',  image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80', slug: '' },
+      { id: 0, name: 'Creek Horizon',        developer: 'Emaar',        price: '1.25M', badge: '20 / 60 / 20 Payment Plan', type: 'Flats', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80', slug: '' },
     ];
     return fallback.filter(p => p.type === (tab || 'Luxury'));
   });

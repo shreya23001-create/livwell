@@ -5,6 +5,11 @@ import { RichEditorComponent } from '../../shared/components/rich-editor/rich-ed
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
 
+interface DeveloperFaq {
+  question: string;
+  answer: string;
+}
+
 interface Developer {
   id?: string;
   slug: string;
@@ -22,13 +27,14 @@ interface Developer {
   nationality: string;
   featured: boolean;
   sort_order: number;
+  faqs: DeveloperFaq[];
 }
 
 const EMPTY = (): Developer => ({
   slug: '', name: '', logo: '', cover_image: '', established: null,
   projects: 0, delivered_projects: 0, units: 0,
   sales_volume: '', sales_value: '', capital_gain: '',
-  about: '', nationality: 'UAE', featured: false, sort_order: 0,
+  about: '', nationality: 'UAE', featured: false, sort_order: 0, faqs: [],
 });
 
 @Component({
@@ -49,6 +55,7 @@ export class AdminDevelopersComponent implements OnInit {
   modalOpen    = signal(false);
   editingId    = signal<string | null>(null);
   form         = signal<Developer>(EMPTY());
+  faqs         = signal<DeveloperFaq[]>([]);
   deleteTarget = signal<Developer | null>(null);
 
   // Logo upload
@@ -95,12 +102,14 @@ export class AdminDevelopersComponent implements OnInit {
       sales_volume: d.sales_volume ?? '',
       sales_value:  d.sales_value  ?? '',
       capital_gain: d.capital_gain ?? '',
+      faqs:         Array.isArray(d.faqs) ? d.faqs : [],
     })));
     this.loading.set(false);
   }
 
   openAdd(): void {
     this.form.set(EMPTY());
+    this.faqs.set([]);
     this.editingId.set(null);
     this.logoPreview.set('');
     this.coverPreview.set('');
@@ -109,10 +118,37 @@ export class AdminDevelopersComponent implements OnInit {
 
   openEdit(d: Developer): void {
     this.form.set({ ...d });
+    this.faqs.set(d.faqs?.length ? d.faqs.map(f => ({ ...f })) : []);
     this.editingId.set(d.id!);
     this.logoPreview.set(d.logo || '');
     this.coverPreview.set(d.cover_image || '');
     this.modalOpen.set(true);
+  }
+
+  trackByIndex(i: number): number { return i; }
+
+  addFaq(): void {
+    this.faqs.update(list => [...list, { question: '', answer: '' }]);
+  }
+
+  removeFaq(i: number): void {
+    this.faqs.update(list => list.filter((_, idx) => idx !== i));
+  }
+
+  patchFaqQuestion(i: number, value: string): void {
+    this.faqs.update(list => {
+      const next = [...list];
+      next[i] = { ...next[i], question: value };
+      return next;
+    });
+  }
+
+  patchFaqAnswer(i: number, value: string): void {
+    this.faqs.update(list => {
+      const next = [...list];
+      next[i] = { ...next[i], answer: value };
+      return next;
+    });
   }
 
   closeModal(): void { this.modalOpen.set(false); }
@@ -215,6 +251,7 @@ export class AdminDevelopersComponent implements OnInit {
       nationality:        f.nationality,
       featured:           f.featured,
       sort_order:         Number(f.sort_order)    || 0,
+      faqs:               this.faqs().filter(q => q.question.trim()),
     };
 
     if (this.editingId()) {

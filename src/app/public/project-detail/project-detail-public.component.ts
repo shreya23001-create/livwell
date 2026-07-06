@@ -38,6 +38,7 @@ interface Project {
   agent_name: string;
   created_at: string;
   video_url: string | null;
+  faqs: { question: string; answer: string }[];
 }
 
 @Component({
@@ -122,6 +123,10 @@ export class ProjectDetailPublicComponent implements OnInit {
     const key = String(idx);
     this.faqOpen.set(this.faqOpen() === key ? null : key);
   }
+
+  dbFaqOpen = signal<number | null>(null);
+  toggleDbFaq(i: number): void { this.dbFaqOpen.set(this.dbFaqOpen() === i ? null : i); }
+  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 
   fpOpenIndex = signal<number | null>(null);
   toggleFpRow(i: number): void {
@@ -219,6 +224,7 @@ export class ProjectDetailPublicComponent implements OnInit {
       const real = p.images.filter(u => !u.includes('/images/'));
       const local = p.images.filter(u => u.includes('/images/'));
       p.images = [...real, ...local];
+      p.faqs = Array.isArray((data as any).faqs) ? (data as any).faqs : [];
       this.project.set(p);
       this.geocodeAndSetMap(data as Project);
       const userId = this.auth.currentUser()?.id;

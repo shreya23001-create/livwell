@@ -38,9 +38,7 @@
       <div class="dd-info-card__text">
         <h1 class="dd-info-card__name">{{ d.name }}</h1>
         <p class="dd-info-card__founded">Founded in {{ d.established }}</p>
-        <div class="dd-info-card__about">
-          <p *ngFor="let para of (d.about ?? '').split('\n\n')">{{ para }}</p>
-        </div>
+        <div class="dd-info-card__about" [innerHTML]="safeHtml(d.about)"></div>
       </div>
     </div>
 
@@ -69,7 +67,7 @@
         </select>
       </div>
 
-      <button class="dd-filter-btn dd-filter-btn--search">
+      <button class="dd-filter-btn dd-filter-btn--search" (click)="$any($event.target).blur()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         Search
       </button>
@@ -131,6 +129,23 @@
         </a>
       </div>
 
+    </div>
+
+    <!-- ── FAQs ──────────────────────────────────────────────────── -->
+    <div class="dd-faqs" *ngIf="d.faqs && d.faqs.length > 0">
+      <h2 class="dd-faqs__title">Frequently Asked Questions</h2>
+      <div class="dd-faq-list">
+        <div class="dd-faq-item" *ngFor="let faq of d.faqs; let i = index"
+          [class.dd-faq-item--open]="openFaqIndex() === i">
+          <button class="dd-faq-q" (click)="toggleFaq(i)">
+            <span>{{ faq.question }}</span>
+            <svg class="dd-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="dd-faq-a" *ngIf="openFaqIndex() === i" [innerHTML]="safeHtml(faq.answer)"></div>
+        </div>
+      </div>
     </div>
 
   </div>

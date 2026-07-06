@@ -2,7 +2,10 @@ import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
+
+interface DeveloperFaq { question: string; answer: string; }
 
 interface Developer {
   id: string;
@@ -16,6 +19,7 @@ interface Developer {
   about: string;
   nationality: string;
   featured: boolean;
+  faqs: DeveloperFaq[];
 }
 
 interface Project {
@@ -42,8 +46,9 @@ interface Project {
   styleUrl: './developer-detail.component.scss',
 })
 export class DeveloperDetailComponent implements OnInit {
-  private sb    = inject(SupabaseService).client;
-  private route = inject(ActivatedRoute);
+  private sb        = inject(SupabaseService).client;
+  private route     = inject(ActivatedRoute);
+  private sanitizer = inject(DomSanitizer);
 
   dev      = signal<Developer | null>(null);
   notFound = signal(false);
@@ -53,6 +58,7 @@ export class DeveloperDetailComponent implements OnInit {
   searchQuery    = signal('');
   filterType     = signal('All');
   filterHandover = signal('All');
+  openFaqIndex   = signal<number | null>(null);
 
   projectTypes = ['All', 'Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Home', 'Mixed', 'Duplex'];
 
@@ -111,7 +117,7 @@ export class DeveloperDetailComponent implements OnInit {
       return;
     }
 
-    this.dev.set(data as Developer);
+    this.dev.set({ ...data, faqs: Array.isArray(data.faqs) ? data.faqs : [] } as Developer);
 
     // Load published projects for this developer
     const { data: projs } = await this.sb
@@ -145,5 +151,13 @@ export class DeveloperDetailComponent implements OnInit {
   coverImage(p: Project): string {
     const real = (p.images ?? []).find(u => u && !u.includes('unsplash.com') && !u.includes('dummy-image'));
     return real ?? p.images?.[0] ?? '/images/dummy-image.png';
+  }
+
+  safeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html ?? '');
+  }
+
+  toggleFaq(i: number): void {
+    this.openFaqIndex.set(this.openFaqIndex() === i ? null : i);
   }
 }

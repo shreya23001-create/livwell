@@ -221,6 +221,31 @@
         <app-rich-editor [placeholder]="'Short description…'" [initialValue]="form().about" (valueChange)="patch('about', $event)"></app-rich-editor>
       </div>
 
+      <!-- FAQs -->
+      <div class="adv-field adv-field--full">
+        <div class="adv-faq-head">
+          <label>FAQs <span class="adv-field-hint">(shown on developer page)</span></label>
+          <button type="button" class="adv-btn adv-btn--ghost adv-btn--sm" (click)="addFaq()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add Question
+          </button>
+        </div>
+        <div class="adv-faq-list" *ngIf="faqs().length > 0">
+          <div class="adv-faq-row" *ngFor="let faq of faqs(); let i = index; trackBy: trackByIndex">
+            <div class="adv-faq-fields">
+              <input type="text" placeholder="Question" [value]="faq.question"
+                (change)="patchFaqQuestion(i, $any($event.target).value)" class="adv-faq-q" />
+              <app-rich-editor [placeholder]="'Answer…'" [initialValue]="faq.answer"
+                (valueChange)="patchFaqAnswer(i, $event)"></app-rich-editor>
+            </div>
+            <button type="button" class="adv-faq-remove" (click)="removeFaq(i)" title="Remove">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+        <p class="adv-faq-empty" *ngIf="faqs().length === 0">No FAQs added yet.</p>
+      </div>
+
       <!-- Featured -->
       <div class="adv-field adv-field--checkbox">
         <label>

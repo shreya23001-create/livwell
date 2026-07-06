@@ -177,7 +177,7 @@
       <div class="apr-form-row">
         <div class="apr-form-group apr-form-group--grow">
           <label>Title *</label>
-          <input type="text" [value]="form().title" (input)="form.update(f=>({...f,title:$any($event.target).value}))" placeholder="e.g. Emaar Skyrise">
+          <input type="text" [(ngModel)]="draft.title" placeholder="e.g. Emaar Skyrise">
         </div>
       </div>
 
@@ -185,7 +185,7 @@
       <div class="apr-form-row">
         <div class="apr-form-group">
           <label>Location</label>
-          <app-ms-select [options]="locationOpts()" [value]="form().location ? [form().location] : []"
+          <app-ms-select [options]="locationOpts()" [value]="draft.location ? [draft.location] : []"
             placeholder="Search location…" [multi]="false"
             (valueChange)="onLocationChange($event)"></app-ms-select>
         </div>
@@ -197,7 +197,7 @@
         </div>
         <div class="apr-form-group">
           <label>Status</label>
-          <app-ms-select [options]="statusOpts()" [value]="form().status ? [form().status] : []"
+          <app-ms-select [options]="statusOpts()" [value]="draft.status ? [draft.status] : []"
             placeholder="Select status…" [multi]="false"
             (valueChange)="onStatusChange($event)"></app-ms-select>
         </div>
@@ -207,19 +207,19 @@
       <div class="apr-form-row">
         <div class="apr-form-group">
           <label>Badge</label>
-          <app-ms-select [options]="badgeOpts()" [value]="form().badge !== undefined ? [form().badge] : []"
+          <app-ms-select [options]="badgeOpts()" [value]="draft.badge !== undefined ? [draft.badge] : []"
             placeholder="Select badge…" [multi]="false"
             (valueChange)="onBadgeChange($event)"></app-ms-select>
         </div>
         <div class="apr-form-group">
           <label>Trending Category</label>
-          <app-ms-select [options]="trendOpts()" [value]="form().trending_category ? [form().trending_category] : []"
+          <app-ms-select [options]="trendOpts()" [value]="draft.trending_category ? [draft.trending_category] : []"
             placeholder="Select category…" [multi]="false"
             (valueChange)="onTrendChange($event)"></app-ms-select>
         </div>
         <div class="apr-form-group">
           <label>Developer</label>
-          <app-ms-select [options]="developerOpts()" [value]="form().developer ? [form().developer] : []"
+          <app-ms-select [options]="developerOpts()" [value]="draft.developer ? [draft.developer] : []"
             placeholder="Select developer…" [multi]="false"
             (valueChange)="onDeveloperChange($event)"></app-ms-select>
         </div>
@@ -229,15 +229,15 @@
       <div class="apr-form-row">
         <div class="apr-form-group">
           <label>Price From (AED)</label>
-          <input type="number" [value]="form().price_from" (input)="form.update(f=>({...f,price_from:+$any($event.target).value}))" placeholder="e.g. 1200000">
+          <input type="number" [(ngModel)]="draft.price_from" placeholder="e.g. 1200000">
         </div>
         <div class="apr-form-group">
           <label>Price Label</label>
-          <input type="text" [value]="form().price_label" (input)="form.update(f=>({...f,price_label:$any($event.target).value}))" placeholder="e.g. AED 1.2M">
+          <input type="text" [(ngModel)]="draft.price_label" placeholder="e.g. AED 1.2M">
         </div>
         <div class="apr-form-group">
           <label>Beds</label>
-          <input type="text" [value]="form().beds" (input)="form.update(f=>({...f,beds:$any($event.target).value}))" placeholder="e.g. 1–4 Beds">
+          <input type="text" [(ngModel)]="draft.beds" placeholder="e.g. 1–4 Beds">
         </div>
       </div>
 
@@ -245,15 +245,15 @@
       <div class="apr-form-row">
         <div class="apr-form-group">
           <label>Completion Date</label>
-          <input type="text" [value]="form().completion_date" (input)="form.update(f=>({...f,completion_date:$any($event.target).value}))" placeholder="e.g. Q4 2027">
+          <input type="text" [(ngModel)]="draft.completion_date" placeholder="e.g. Q4 2027">
         </div>
         <div class="apr-form-group apr-form-group--grow">
           <label>Payment Plan</label>
-          <input type="text" [value]="form().payment_plan" (input)="form.update(f=>({...f,payment_plan:$any($event.target).value}))" placeholder="e.g. 40/60, 1% monthly, post-handover">
+          <input type="text" [(ngModel)]="draft.payment_plan" placeholder="e.g. 40/60, 1% monthly, post-handover">
         </div>
         <div class="apr-form-group">
           <label>Area (sqft)</label>
-          <input type="number" [value]="form().area_sqft" (input)="form.update(f=>({...f,area_sqft:+$any($event.target).value}))" placeholder="e.g. 1200">
+          <input type="number" [(ngModel)]="draft.area_sqft" placeholder="e.g. 1200">
         </div>
       </div>
 
@@ -261,60 +261,60 @@
       <div class="apr-form-row">
         <div class="apr-form-group apr-form-group--grow">
           <label>Assign Agent</label>
-          <app-ms-select [options]="agentOpts()" [value]="form().agent_name ? [form().agent_name] : []"
+          <app-ms-select [options]="agentOpts()" [value]="draft.agent_name ? [draft.agent_name] : []"
             placeholder="— Unassigned —" [multi]="false"
             (valueChange)="onAgentChange($event)"></app-ms-select>
         </div>
         <div class="apr-form-group">
           <label>Floor Plan URL</label>
-          <input type="text" [value]="form().floor_plan_url" (input)="form.update(f=>({...f,floor_plan_url:$any($event.target).value}))" placeholder="https://...">
+          <input type="text" [(ngModel)]="draft.floor_plan_url" placeholder="https://...">
         </div>
       </div>
 
       <!-- Description -->
       <div class="apr-form-group">
         <label>Description</label>
-        <app-rich-editor [placeholder]="'Project overview…'" [initialValue]="form().description" (valueChange)="form.update(f=>({...f,description:$event}))"></app-rich-editor>
+        <app-rich-editor [placeholder]="'Project overview…'" [initialValue]="draft.description" (valueChange)="draft.description = $event"></app-rich-editor>
       </div>
 
       <!-- Flags -->
       <div class="apr-form-row apr-form-row--flags">
         <label class="apr-checkbox">
-          <input type="checkbox" [checked]="form().is_featured" (change)="form.update(f=>({...f,is_featured:$any($event.target).checked}))">
+          <input type="checkbox" [(ngModel)]="draft.is_featured">
           Featured
         </label>
         <label class="apr-checkbox">
-          <input type="checkbox" [checked]="form().is_luxury" (change)="form.update(f=>({...f,is_luxury:$any($event.target).checked}))">
+          <input type="checkbox" [(ngModel)]="draft.is_luxury">
           Luxury
         </label>
         <label class="apr-checkbox">
-          <input type="checkbox" [checked]="form().is_ultra_luxury" (change)="form.update(f=>({...f,is_ultra_luxury:$any($event.target).checked}))">
+          <input type="checkbox" [(ngModel)]="draft.is_ultra_luxury">
           Ultra Luxury
         </label>
         <label class="apr-checkbox">
-          <input type="checkbox" [checked]="form().is_branded" (change)="form.update(f=>({...f,is_branded:$any($event.target).checked}))">
+          <input type="checkbox" [(ngModel)]="draft.is_branded">
           Branded Residence
         </label>
       </div>
 
       <!-- Brand name + logo (shown when is_branded) -->
-      <div class="apr-form-group" *ngIf="form().is_branded">
+      <div class="apr-form-group" *ngIf="draft.is_branded">
         <label>Brand Name</label>
-        <input type="text" [value]="form().brand" (input)="form.update(f=>({...f,brand:$any($event.target).value}))" placeholder="e.g. Bulgari, Four Seasons, Armani">
+        <input type="text" [(ngModel)]="draft.brand" placeholder="e.g. Bulgari, Four Seasons, Armani">
       </div>
-      <div class="apr-form-group" *ngIf="form().is_branded">
+      <div class="apr-form-group" *ngIf="draft.is_branded">
         <label>Brand Logo</label>
         <div class="apr-brand-logo-row">
-          <img *ngIf="form().brand_logo_url" [src]="form().brand_logo_url" alt="Brand Logo" class="apr-brand-logo-preview">
+          <img *ngIf="draft.brand_logo_url" [src]="draft.brand_logo_url" alt="Brand Logo" class="apr-brand-logo-preview">
           <label class="apr-btn apr-btn--ghost apr-brand-logo-btn" [class.apr-btn--loading]="uploadingBrandLogo()">
             <input type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" style="display:none" (change)="uploadBrandLogo($event)" [disabled]="uploadingBrandLogo()">
             <ng-container *ngIf="uploadingBrandLogo()"><span class="apr-btn-spinner"></span> Uploading…</ng-container>
             <ng-container *ngIf="!uploadingBrandLogo()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              {{ form().brand_logo_url ? 'Change Logo' : 'Upload Logo' }}
+              {{ draft.brand_logo_url ? 'Change Logo' : 'Upload Logo' }}
             </ng-container>
           </label>
-          <button *ngIf="form().brand_logo_url" class="apr-btn apr-btn--danger-ghost" type="button" (click)="form.update(f=>({...f,brand_logo_url:''}))">Remove</button>
+          <button *ngIf="draft.brand_logo_url" class="apr-btn apr-btn--danger-ghost" type="button" (click)="draft.brand_logo_url = ''">Remove</button>
         </div>
         <small class="apr-hint">PNG, SVG or WebP recommended. Max 2 MB. Will show next to brand name on listing.</small>
       </div>
@@ -359,13 +359,35 @@
         </ng-container>
       </div>
 
+      <!-- FAQs -->
+      <div class="apr-form-group">
+        <div class="adv-faq-head">
+          <label>FAQs</label>
+          <button type="button" class="apr-btn apr-btn--ghost adv-btn--sm" (click)="addFaq()">+ Add FAQ</button>
+        </div>
+        <div class="adv-faq-list" *ngIf="faqs().length > 0">
+          <div class="adv-faq-row" *ngFor="let faq of faqs(); let i = index; trackBy: trackByIndex">
+            <div class="adv-faq-fields">
+              <input type="text" placeholder="Question" [value]="faq.question"
+                (change)="patchFaqQuestion(i, $any($event.target).value)" class="adv-faq-q" />
+              <app-rich-editor [placeholder]="'Answer…'" [initialValue]="faq.answer"
+                (valueChange)="patchFaqAnswer(i, $event)"></app-rich-editor>
+            </div>
+            <button type="button" class="adv-faq-remove" (click)="removeFaq(i)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+        <p class="adv-faq-empty" *ngIf="faqs().length === 0">No FAQs yet. Click "+ Add FAQ" to add one.</p>
+      </div>
+
       <!-- Amenities -->
       <div class="apr-form-group">
         <label>Amenities</label>
         @if (masterAmenities().length === 0) {
           <p class="apr-hint">No amenities configured. Add them in Master Data → Amenities.</p>
         } @else {
-          <app-ms-select [options]="amenityOpts()" [value]="form().amenities ?? []"
+          <app-ms-select [options]="amenityOpts()" [value]="draft.amenities ?? []"
             placeholder="Select amenities…" [multi]="true"
             (valueChange)="onAmenitiesChange($event)"></app-ms-select>
         }

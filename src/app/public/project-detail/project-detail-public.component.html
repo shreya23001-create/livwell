@@ -302,7 +302,21 @@
       <!-- ── FAQ ───────────────────────────────────────────── -->
       <div class="pd-section">
         <h2 class="pd-section-title">{{ p.title }} FAQ's</h2>
-        <div class="pd-faq-list">
+
+        <!-- DB-seeded FAQs (shown when available) -->
+        <div class="pd-faq-list" *ngIf="p.faqs && p.faqs.length > 0">
+          <div class="pd-faq-item" *ngFor="let faq of p.faqs; let i = index"
+            (click)="toggleDbFaq(i)" [class.open]="dbFaqOpen() === i">
+            <div class="pd-faq-q">
+              {{ faq.question }}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="pd-faq-a" *ngIf="dbFaqOpen() === i" [innerHTML]="safeHtml(faq.answer)"></div>
+          </div>
+        </div>
+
+        <!-- Auto-generated fallback FAQs (shown when no DB FAQs) -->
+        <div class="pd-faq-list" *ngIf="!p.faqs || p.faqs.length === 0">
           <div class="pd-faq-item" (click)="toggleFaq(0)" [class.open]="faqOpen()==='0'">
             <div class="pd-faq-q">
               Where is the location of {{ p.title }}?

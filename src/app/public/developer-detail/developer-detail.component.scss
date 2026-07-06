@@ -53,7 +53,7 @@ $white:  #fff;
 .dd-info-card {
   display: flex; gap: 2rem;
   background: $white; border: 1px solid $border; border-radius: 16px;
-  overflow: hidden; margin: 1.5rem 0 1.25rem;
+  margin: 1.5rem 0 1.25rem;
 
   @media(max-width: 640px) { flex-direction: column; }
 
@@ -62,8 +62,9 @@ $white:  #fff;
     display: flex; align-items: center; justify-content: center;
     padding: 2rem;
     border-right: 1px solid $border;
-    background: $white;
-    @media(max-width: 640px) { width: 100%; border-right: none; border-bottom: 1px solid $border; padding: 1.5rem; min-height: 120px; }
+    border-radius: 16px 0 0 16px;
+    background: $white; overflow: hidden;
+    @media(max-width: 640px) { width: 100%; border-right: none; border-radius: 16px 16px 0 0; border-bottom: 1px solid $border; padding: 1.5rem; min-height: 120px; }
   }
 
   &__logo {
@@ -78,7 +79,7 @@ $white:  #fff;
   }
 
   &__text {
-    flex: 1; padding: 1.75rem 1.75rem 1.75rem 0;
+    flex: 1; min-width: 0; padding: 1.75rem 1.75rem 1.75rem 0;
     @media(max-width: 640px) { padding: 1.25rem; }
   }
 
@@ -91,8 +92,10 @@ $white:  #fff;
   }
 
   &__about {
-    display: flex; flex-direction: column; gap: 0.75rem;
-    p { font-size: 0.875rem; color: $mid; line-height: 1.7; margin: 0; }
+    font-size: 0.875rem; color: $mid; line-height: 1.7;
+    ::ng-deep p { margin: 0 0 0.75rem; }
+    ::ng-deep p:last-child { margin-bottom: 0; }
+    ::ng-deep span { background-color: transparent !important; color: inherit !important; }
   }
 }
 
@@ -302,4 +305,53 @@ $white:  #fff;
 
 @media (max-width: 480px) {
   .dd-info-card__name { font-size: 1.1rem; }
+}
+
+// ── FAQs ──────────────────────────────────────────────────────────
+.dd-faqs {
+  margin: 0 0 4rem;
+  &__title {
+    font-size: 1.25rem; font-weight: 700; color: $text;
+    margin: 0 0 1rem;
+  }
+}
+
+.dd-faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.dd-faq-item {
+  background: $white; border: 1px solid $border; border-radius: 10px;
+  overflow: hidden;
+
+  &--open { border-color: darken($border, 8%); }
+}
+
+.dd-faq-q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 1rem 1.125rem;
+  background: none; border: none; cursor: pointer; text-align: left;
+  font-size: 0.9rem; font-weight: 600; color: $text;
+
+  &:hover { background: $bg; }
+
+  span { flex: 1; }
+}
+
+.dd-faq-chevron {
+  flex-shrink: 0; color: $muted; transition: transform 0.2s;
+  .dd-faq-item--open & { transform: rotate(180deg); }
+}
+
+.dd-faq-a {
+  padding: 0 1.125rem 1rem;
+  font-size: 0.875rem; color: $mid; line-height: 1.7;
+  ::ng-deep p { margin: 0 0 0.5rem; }
+  ::ng-deep p:last-child { margin-bottom: 0; }
+  ::ng-deep span { background-color: transparent !important; color: inherit !important; }
+  ::ng-deep ul, ::ng-deep ol { padding-left: 1.25rem; margin: 0 0 0.5rem; }
+}
+
+@media (max-width: 768px) {
+  .dd-faqs { margin-bottom: 2.5rem; }
+  .dd-faq-q { font-size: 0.85rem; padding: 0.875rem 1rem; }
+  .dd-faq-a { padding: 0 1rem 0.875rem; }
 }

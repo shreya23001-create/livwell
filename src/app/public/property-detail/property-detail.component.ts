@@ -33,6 +33,7 @@ interface Property {
   share_count: number;
   amenities: string[];
   video_url: string | null;
+  faqs: { question: string; answer: string }[];
 }
 
 @Component({
@@ -129,6 +130,10 @@ export class PropertyDetailComponent implements OnInit {
   isFaved           = signal(false);
   favLoading        = signal(false);
   shareToast        = signal(false);
+
+  faqOpen = signal<number | null>(null);
+  toggleFaq(i: number): void { this.faqOpen.set(this.faqOpen() === i ? null : i); }
+  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 
   // Mortgage calculator
   mortgageDown   = signal(20);
@@ -482,6 +487,7 @@ export class PropertyDetailComponent implements OnInit {
       return ['Swimming Pool','Gym','Concierge','Central A/C','Covered Parking','Balcony','Security','High-Speed WiFi'];
     })(),
     video_url:    p.video_url    || null,
+    faqs:         Array.isArray(p.faqs) ? p.faqs : [],
   });
 
   setImage(i: number): void { this.activeImageIndex.set(i); }

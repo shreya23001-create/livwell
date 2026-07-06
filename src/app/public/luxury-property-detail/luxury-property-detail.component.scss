@@ -268,6 +268,8 @@ $radius: 10px;
 .lpd-about-wrap { margin-bottom: 1.25rem; }
 .lpd-about {
   color: #374151; line-height: 1.8; font-size: 0.93rem; margin: 0;
+  ::ng-deep p { margin: 0 0 0.5rem; }
+  ::ng-deep span { background-color: transparent !important; color: inherit !important; }
   &.truncated {
     display: -webkit-box;
     -webkit-line-clamp: 4;
@@ -470,3 +472,23 @@ $radius: 10px;
 .lpd-video-msg { font-size: 1rem; font-weight: 600; color: #e5e7eb; margin: 0; }
 .lpd-video-sub { font-size: 0.85rem; color: #9ca3af; margin: 0; }
 .lpd-video-btn { display: inline-flex; align-items: center; padding: 0.6rem 1.5rem; background: $gold; color: #111; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; text-decoration: none; margin-top: 0.25rem; &:hover { opacity: 0.9; } }
+
+// FAQs
+.lpd-faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.lpd-faq-item {
+  border: 1px solid $border; border-radius: 10px; overflow: hidden; cursor: pointer;
+  &.open {
+    .lpd-faq-q svg { transform: rotate(180deg); }
+    .lpd-faq-a { display: block; }
+  }
+}
+.lpd-faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.25rem; font-weight: 600; font-size: 0.92rem; color: $text;
+  svg { flex-shrink: 0; transition: transform 0.2s ease; color: $muted; }
+}
+.lpd-faq-a {
+  display: none; padding: 0 1.25rem 1rem; font-size: 0.88rem; color: $muted; line-height: 1.7;
+  ::ng-deep p { margin: 0 0 0.5rem; }
+  ::ng-deep span { background-color: transparent !important; color: inherit !important; }
+}

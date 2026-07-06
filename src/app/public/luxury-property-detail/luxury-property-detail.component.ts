@@ -35,6 +35,7 @@ export interface PropertyDetail {
   mapUrl: string;
   nearbySchools: { name: string; distance: string; rating: string }[];
   video_url?: string | null;
+  faqs?: { question: string; answer: string }[];
 }
 
 const AGENT_ANUJ = { name: 'Anuj Sharma', role: 'Luxury Property Specialist', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' };
@@ -578,6 +579,10 @@ export class LuxuryPropertyDetailComponent implements OnInit {
   isFaved    = signal(false);
   favLoading = signal(false);
   shareToast = signal(false);
+  faqOpen    = signal<number | null>(null);
+
+  toggleFaq(i: number): void { this.faqOpen.set(this.faqOpen() === i ? null : i); }
+  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
   private sb   = inject(SupabaseService).client;
   private auth = inject(AuthService);
 
@@ -665,7 +670,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
     const { data, error } = await this.sb
       .from('properties')
-      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, created_at, status, video_url, views')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, created_at, status, video_url, views, faqs')
       .eq('id', id)
       .single();
 
@@ -731,6 +736,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
       mapUrl:       '',
       nearbySchools: [],
       video_url:    p.video_url ?? null,
+      faqs:         Array.isArray(p.faqs) ? p.faqs : [],
     };
 
     this.property.set(detail);

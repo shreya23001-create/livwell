@@ -755,3 +755,24 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   .pd-contact-btns { grid-template-columns: 1fr 1fr; }
   .pd-title { font-size: 1.2rem; }
 }
+
+
+/* ── FAQs ──────────────────────────────────────────── */
+.pd-faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.pd-faq-item {
+  border: 1px solid $border; border-radius: 10px; overflow: hidden; cursor: pointer;
+  &.open {
+    .pd-faq-q svg { transform: rotate(180deg); }
+    .pd-faq-a { display: block; }
+  }
+}
+.pd-faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.25rem; font-weight: 600; font-size: 0.92rem; color: $dark;
+  svg { flex-shrink: 0; transition: transform 0.2s ease; color: $text2; }
+}
+.pd-faq-a {
+  display: none; padding: 0 1.25rem 1rem; font-size: 0.88rem; color: $text2; line-height: 1.7;
+  ::ng-deep p { margin: 0 0 0.5rem; }
+  ::ng-deep span { background-color: transparent !important; color: inherit !important; }
+}

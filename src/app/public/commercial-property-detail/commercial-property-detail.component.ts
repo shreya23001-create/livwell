@@ -33,6 +33,7 @@ interface CommercialDetail {
   agent: { name: string; role: string; phone: string; email: string; avatar: string };
   mapUrl: string;
   video_url?: string | null;
+  faqs?: { question: string; answer: string }[];
 }
 
 const A = { name: 'Anuj Sharma', role: 'Commercial Property Specialist', phone: '+971542481813', email: 'anuj@livwelldubai.ae', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' };
@@ -200,6 +201,10 @@ export class CommercialPropertyDetailComponent implements OnInit {
   isFaved     = signal(false);
   favLoading  = signal(false);
   shareToast  = signal(false);
+  faqOpen     = signal<number | null>(null);
+
+  toggleFaq(i: number): void { this.faqOpen.set(this.faqOpen() === i ? null : i); }
+  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 
   lightboxOpen  = signal(false);
   lightboxIndex = signal(0);
@@ -422,7 +427,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
 
     const { data, error } = await this.sb
       .from('properties')
-      .select('id, title, location, community, price, listing_type, type, area_sqft, images, furnishing, agent_name, description, is_featured, created_at, video_url, views')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, images, furnishing, agent_name, description, is_featured, created_at, video_url, views, faqs')
       .eq('id', id)
       .in('type', ['Office', 'Shop', 'Warehouse', 'Plot'])
       .single();
@@ -485,6 +490,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
         agent:        agentObj,
         mapUrl:       '',
         video_url:    p.video_url ?? null,
+        faqs:         Array.isArray(p.faqs) ? p.faqs : [],
       };
       // Redirect legacy numeric URL to SEO-friendly slug URL
       if (/^\d+$/.test(rawParam)) {

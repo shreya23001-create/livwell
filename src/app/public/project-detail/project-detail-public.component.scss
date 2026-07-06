@@ -728,6 +728,8 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
 .pd-faq-a {
   display: none; padding: 0 1.125rem 1rem;
   font-size: 0.875rem; color: $text2; line-height: 1.7;
+  ::ng-deep p { margin: 0 0 0.5rem; }
+  ::ng-deep span { background-color: transparent !important; color: inherit !important; }
 }
 
 /* ── Price card (sidebar) ────────────────────────── */

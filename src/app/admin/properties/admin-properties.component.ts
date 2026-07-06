@@ -13,6 +13,8 @@ import { MsSelectComponent, MsOption } from '../../shared/components/ms-select/m
 import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 import * as XLSX from 'xlsx';
 
+export interface PropertyFaq { question: string; answer: string; }
+
 export type PropStatus   = 'Draft' | 'Pending Review' | 'Published' | 'Archived' | 'Sold' | 'Rented';
 export type PropType     = 'Apartment' | 'Villa' | 'Townhouse' | 'Penthouse' | 'Studio' | 'Office' | 'Shop' | 'Warehouse' | 'Plot';
 export type PropCategory = 'Sale' | 'Rent' | 'Off-Plan';
@@ -42,6 +44,7 @@ export interface Property {
   images:          string[];
   amenities:       string[];
   video_url:       string;
+  faqs:            PropertyFaq[];
 }
 
 const EMPTY_FORM = (): Partial<Property> => ({
@@ -49,7 +52,7 @@ const EMPTY_FORM = (): Partial<Property> => ({
   price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', project_name: '', address: '', description: '',
   furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, images: [],
-  amenities: [], video_url: '',
+  amenities: [], video_url: '', faqs: [],
 });
 
 @Component({
@@ -89,12 +92,15 @@ export class AdminPropertiesComponent implements OnInit {
   editingId      = signal<number | null>(null);
   deleteModal    = signal<Property | null>(null);
   form           = signal<Partial<Property>>(EMPTY_FORM());
+  // Mutable draft — ngModel binds here; signal only written on open/save
+  draft: Partial<Property> = EMPTY_FORM();
   formErrors     = signal<Record<string, string>>({});
   saveError      = signal('');
   uploadingImages  = signal(false);
   uploadedImages   = signal<string[]>([]);   // final public URLs (saved to DB)
   previewImages    = signal<string[]>([]);   // local blob URLs for instant preview
   amenityDropdownOpen = signal(false);
+  faqs             = signal<PropertyFaq[]>([]);
   masterAmenities  = this.dataSvc.amenities;
   uploadingVideo   = signal(false);
   videoDragOver    = signal(false);
@@ -203,6 +209,7 @@ export class AdminPropertiesComponent implements OnInit {
         agent_name:   p.agent_name || '—',
         agent_avatar: avatarMap[p.agent_name] ?? '',
         created_by:   p.created_by || p.agent_name || 'Admin',
+        faqs:         Array.isArray(p.faqs) ? p.faqs : [],
       })));
     }
     this.loading.set(false);
@@ -238,7 +245,9 @@ export class AdminPropertiesComponent implements OnInit {
 
   // ── Modal ─────────────────────────────────────────────
   openAdd(): void {
-    this.form.set(EMPTY_FORM());
+    this.draft = EMPTY_FORM();
+    this.form.set(this.draft);
+    this.faqs.set([]);
     this.formErrors.set({});
     this.saveError.set('');
     this.uploadedImages.set([]);
@@ -253,7 +262,9 @@ export class AdminPropertiesComponent implements OnInit {
   }
 
   openEdit(p: Property): void {
-    this.form.set({ ...p });
+    this.draft = { ...p };
+    this.form.set(this.draft);
+    this.faqs.set((p as any).faqs?.length ? (p as any).faqs.map((f: PropertyFaq) => ({ ...f })) : []);
     this.formErrors.set({});
     this.saveError.set('');
     this.uploadedImages.set(p.images ?? []);
@@ -372,20 +383,32 @@ export class AdminPropertiesComponent implements OnInit {
   }
 
   isAmenitySelected(name: string): boolean {
-    return (this.form().amenities ?? []).includes(name);
+    return (this.draft.amenities ?? []).includes(name);
   }
 
   toggleAmenity(name: string): void {
-    this.form.update(f => {
-      const current = f.amenities ?? [];
-      return { ...f, amenities: current.includes(name) ? current.filter(x => x !== name) : [...current, name] };
-    });
+    const current = this.draft.amenities ?? [];
+    this.draft.amenities = current.includes(name) ? current.filter(x => x !== name) : [...current, name];
   }
 
   getAmenityIconSvg(iconKey: string): SafeHtml {
     const iconDef = AMENITY_ICONS.find(i => i.key === iconKey);
     const svg = iconDef?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
     return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
+
+  trackByIndex(i: number): number { return i; }
+
+  addFaq(): void { this.faqs.update(list => [...list, { question: '', answer: '' }]); }
+
+  removeFaq(i: number): void { this.faqs.update(list => list.filter((_, idx) => idx !== i)); }
+
+  patchFaqQuestion(i: number, value: string): void {
+    this.faqs.update(list => { const next = [...list]; next[i] = { ...next[i], question: value }; return next; });
+  }
+
+  patchFaqAnswer(i: number, value: string): void {
+    this.faqs.update(list => { const next = [...list]; next[i] = { ...next[i], answer: value }; return next; });
   }
 
   closeModal(): void {
@@ -402,7 +425,7 @@ export class AdminPropertiesComponent implements OnInit {
 
     this.saving.set(true);
     this.saveError.set('');
-    const f = this.form();
+    const f = this.draft;
 
     const payload: any = {
       title:           f.title?.trim(),
@@ -425,6 +448,7 @@ export class AdminPropertiesComponent implements OnInit {
       images:          this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
       amenities:       f.amenities ?? [],
       video_url:       f.video_url?.trim() || null,
+      faqs:            this.faqs().filter(q => q.question.trim()),
     };
 
     try {
@@ -464,7 +488,7 @@ export class AdminPropertiesComponent implements OnInit {
 
   private validateForm(): Record<string, string> {
     const errs: Record<string, string> = {};
-    const f = this.form();
+    const f = this.draft;
     if (!f.title?.trim())    errs['title']    = 'Title is required.';
     if (!f.location?.trim()) errs['location'] = 'Location is required.';
     if (!f.price || f.price <= 0) errs['price'] = 'Price must be greater than 0.';
@@ -475,7 +499,7 @@ export class AdminPropertiesComponent implements OnInit {
   }
 
   patchForm(field: string, value: any): void {
-    this.form.update(f => ({ ...f, [field]: value }));
+    (this.draft as any)[field] = value;
     this.formErrors.update(e => { const n = { ...e }; delete n[field]; return n; });
   }
 
@@ -636,11 +660,11 @@ export class AdminPropertiesComponent implements OnInit {
     iconHtml: this.getAmenityIconSvg(a.icon),
   })));
 
-  onCategoryChange(vals: string[])  { this.patchForm('listing_type', vals[0] ?? 'Sale'); }
-  onTypeChange(vals: string[])      { this.patchForm('type', vals[0] ?? ''); }
-  onStatusChange(vals: string[])    { this.patchForm('status', vals[0] ?? 'Draft'); }
-  onFurnishingChange(vals: string[]){ this.patchForm('furnishing', vals[0] ?? ''); }
-  onLocationChange(vals: string[])  { this.patchForm('location', vals[0] ?? ''); this.locSearch.set(vals[0] ?? ''); }
-  onAgentChange(vals: string[])     { this.patchForm('agent_name', vals[0] ?? ''); }
-  onAmenitiesChange(vals: string[]) { this.patchForm('amenities', vals); }
+  onCategoryChange(vals: string[])  { this.draft.listing_type = (vals[0] ?? 'Sale') as any; }
+  onTypeChange(vals: string[])      { this.draft.type = (vals[0] ?? '') as any; }
+  onStatusChange(vals: string[])    { this.draft.status = (vals[0] ?? 'Draft') as any; }
+  onFurnishingChange(vals: string[]){ this.draft.furnishing = vals[0] ?? ''; }
+  onLocationChange(vals: string[])  { this.draft.location = vals[0] ?? ''; this.locSearch.set(vals[0] ?? ''); }
+  onAgentChange(vals: string[])     { this.draft.agent_name = vals[0] ?? ''; }
+  onAmenitiesChange(vals: string[]) { this.draft.amenities = vals; }
 }

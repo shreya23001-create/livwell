@@ -174,7 +174,7 @@
           <section class="lpd-section">
             <h2 class="lpd-sec-title">About this property</h2>
             <div class="lpd-about-wrap">
-              <p class="lpd-about" [class.truncated]="!aboutExpanded()">{{ property()!.about }}</p>
+              <div class="lpd-about" [class.truncated]="!aboutExpanded()" [innerHTML]="safeHtml(property()!.about)"></div>
               <button *ngIf="property()!.about.length > 320" class="lpd-read-more" (click)="aboutExpanded.set(!aboutExpanded())">
                 {{ aboutExpanded() ? 'Show less ↑' : 'Read more ↓' }}
               </button>
@@ -292,6 +292,21 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                   <span>{{ s.rating }}</span>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- FAQs -->
+          <section class="lpd-section" *ngIf="property()!.faqs && property()!.faqs!.length > 0">
+            <h2 class="lpd-sec-title">Frequently Asked Questions</h2>
+            <div class="lpd-faq-list">
+              <div class="lpd-faq-item" *ngFor="let faq of property()!.faqs; let i = index"
+                (click)="toggleFaq(i)" [class.open]="faqOpen() === i">
+                <div class="lpd-faq-q">
+                  {{ faq.question }}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+                <div class="lpd-faq-a" *ngIf="faqOpen() === i" [innerHTML]="safeHtml(faq.answer)"></div>
               </div>
             </div>
           </section>

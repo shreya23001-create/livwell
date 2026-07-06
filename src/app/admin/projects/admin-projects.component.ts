@@ -10,6 +10,8 @@ import { MsSelectComponent, MsOption } from '../../shared/components/ms-select/m
 import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 import * as XLSX from 'xlsx';
 
+export interface ProjectFaq { question: string; answer: string; }
+
 export interface Project {
   id?: number;
   title: string;
@@ -40,6 +42,7 @@ export interface Project {
   agent_name: string;
   video_url: string | null;
   trending_category: string;
+  faqs: ProjectFaq[];
   created_at?: string;
 }
 
@@ -50,7 +53,7 @@ const BLANK: Project = {
   description: '', amenities: [], images: [], floor_plan_url: '',
   badge: '', is_featured: false, is_luxury: false, is_ultra_luxury: false,
   is_branded: false, brand: '', brand_logo_url: '', agent_name: '', video_url: null,
-  trending_category: '',
+  trending_category: '', faqs: [],
 };
 
 @Component({
@@ -80,6 +83,9 @@ export class AdminProjectsComponent implements OnInit {
   showModal       = signal(false);
   editMode        = signal(false);
   form            = signal<Project>({ ...BLANK });
+  // Mutable draft — ngModel binds here; signal only updated on open/save
+  draft: Project  = { ...BLANK };
+  faqs            = signal<ProjectFaq[]>([]);
   amenityDropdownOpen = signal(false);
   locSearch       = signal('');
   locDropdownOpen = signal(false);
@@ -120,14 +126,14 @@ export class AdminProjectsComponent implements OnInit {
     iconHtml: this.getAmenityIconSvg(a.icon),
   })));
 
-  onLocationChange(vals: string[])       { this.form.update(f => ({ ...f, location: vals[0] ?? '' })); }
-  onStatusChange(vals: string[])         { this.form.update(f => ({ ...f, status: (vals[0] ?? 'Draft') as any })); }
-  onBadgeChange(vals: string[])          { this.form.update(f => ({ ...f, badge: vals[0] ?? '' })); }
-  onTrendChange(vals: string[])          { this.form.update(f => ({ ...f, trending_category: vals[0] ?? '' })); }
-  onDeveloperChange(vals: string[])      { this.form.update(f => ({ ...f, developer: vals[0] ?? '' })); }
-  onAgentChange(vals: string[])          { this.form.update(f => ({ ...f, agent_name: vals[0] ?? '' })); }
-  onTypesChange(vals: string[])          { this.selectedTypes.set(vals); this.form.update(f => ({ ...f, type: vals.join(',') })); }
-  onAmenitiesChange(vals: string[])      { this.form.update(f => ({ ...f, amenities: vals })); }
+  onLocationChange(vals: string[])       { this.draft.location = vals[0] ?? ''; }
+  onStatusChange(vals: string[])         { this.draft.status = (vals[0] ?? 'Draft') as any; }
+  onBadgeChange(vals: string[])          { this.draft.badge = vals[0] ?? ''; }
+  onTrendChange(vals: string[])          { this.draft.trending_category = vals[0] ?? ''; }
+  onDeveloperChange(vals: string[])      { this.draft.developer = vals[0] ?? ''; }
+  onAgentChange(vals: string[])          { this.draft.agent_name = vals[0] ?? ''; }
+  onTypesChange(vals: string[])          { this.selectedTypes.set(vals); this.draft.type = vals.join(','); }
+  onAmenitiesChange(vals: string[])      { this.draft.amenities = vals; }
 
   isTypeSelected(t: string): boolean {
     return this.selectedTypes().includes(t);
@@ -137,18 +143,16 @@ export class AdminProjectsComponent implements OnInit {
     this.selectedTypes.update(arr =>
       arr.includes(t) ? arr.filter(x => x !== t) : [...arr, t]
     );
-    this.form.update(f => ({ ...f, type: this.selectedTypes().join(',') }));
+    this.draft.type = this.selectedTypes().join(',');
   }
 
   isAmenitySelected(name: string): boolean {
-    return (this.form().amenities ?? []).includes(name);
+    return (this.draft.amenities ?? []).includes(name);
   }
 
   toggleAmenity(name: string): void {
-    this.form.update(f => {
-      const current = f.amenities ?? [];
-      return { ...f, amenities: current.includes(name) ? current.filter(x => x !== name) : [...current, name] };
-    });
+    const current = this.draft.amenities ?? [];
+    this.draft.amenities = current.includes(name) ? current.filter(x => x !== name) : [...current, name];
   }
 
   getAmenityIconSvg(iconKey: string): SafeHtml {
@@ -228,13 +232,18 @@ export class AdminProjectsComponent implements OnInit {
     this.loading.set(true);
     const { data } = await this.sb.from('projects').select('*').order('created_at', { ascending: false });
     const projects = (data as Project[]) ?? [];
-    projects.forEach(p => { p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com')); });
+    projects.forEach(p => {
+      p.images = (p.images ?? []).filter(u => u && !u.includes('unsplash.com'));
+      p.faqs = Array.isArray((p as any).faqs) ? (p as any).faqs : [];
+    });
     this.projects.set(projects);
     this.loading.set(false);
   }
 
   openAdd() {
-    this.form.set({ ...BLANK });
+    this.draft = { ...BLANK };
+    this.form.set(this.draft);
+    this.faqs.set([]);
     this.locSearch.set('');
     this.commSearch.set('');
     this.uploadedImages.set([]);
@@ -248,7 +257,9 @@ export class AdminProjectsComponent implements OnInit {
   }
 
   openEdit(p: Project) {
-    this.form.set({ ...p });
+    this.draft = { ...p };
+    this.form.set(this.draft);
+    this.faqs.set(p.faqs?.length ? p.faqs.map(f => ({ ...f })) : []);
     this.locSearch.set(p.location ?? '');
     this.commSearch.set(p.community ?? '');
     this.uploadedImages.set(p.images ?? []);
@@ -259,6 +270,20 @@ export class AdminProjectsComponent implements OnInit {
     this.amenityDropdownOpen.set(false);
     this.editMode.set(true);
     this.showModal.set(true);
+  }
+
+  trackByIndex(i: number): number { return i; }
+
+  addFaq(): void { this.faqs.update(list => [...list, { question: '', answer: '' }]); }
+
+  removeFaq(i: number): void { this.faqs.update(list => list.filter((_, idx) => idx !== i)); }
+
+  patchFaqQuestion(i: number, value: string): void {
+    this.faqs.update(list => { const next = [...list]; next[i] = { ...next[i], question: value }; return next; });
+  }
+
+  patchFaqAnswer(i: number, value: string): void {
+    this.faqs.update(list => { const next = [...list]; next[i] = { ...next[i], answer: value }; return next; });
   }
 
   closeModal() {
@@ -334,12 +359,12 @@ export class AdminProjectsComponent implements OnInit {
     const { data, error } = await this.sb.storage.from('imagesFolder').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
     if (error) { alert('Logo upload failed: ' + error.message); this.uploadingBrandLogo.set(false); return; }
     const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
-    this.form.update(f => ({ ...f, brand_logo_url: pub.publicUrl }));
+    this.draft.brand_logo_url = pub.publicUrl;
     this.uploadingBrandLogo.set(false);
   }
 
   async save() {
-    const f = this.form();
+    const f = this.draft;
     if (!f.title.trim()) return;
     this.saving.set(true);
 
@@ -357,6 +382,7 @@ export class AdminProjectsComponent implements OnInit {
       agent_name: f.agent_name,
       video_url: (f as any).video_url ?? null,
       trending_category: f.trending_category ?? '',
+      faqs: this.faqs().filter(q => q.question.trim()),
     };
 
     if (this.editMode() && f.id) {

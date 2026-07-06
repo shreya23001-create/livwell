@@ -193,6 +193,39 @@ $bg:     #f9fafb;
   input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: $green; }
 }
 
+// FAQ section
+.adv-faq-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  margin-bottom: .75rem;
+  label { margin: 0; }
+}
+.adv-btn--sm {
+  padding: .3rem .75rem; font-size: .78rem;
+  display: inline-flex; align-items: center; gap: .35rem;
+}
+.adv-faq-list { display: flex; flex-direction: column; gap: .75rem; }
+.adv-faq-row {
+  display: flex; gap: .625rem; align-items: flex-start;
+}
+.adv-faq-fields {
+  flex: 1; display: flex; flex-direction: column; gap: .375rem;
+}
+.adv-faq-q, .adv-faq-a {
+  border: 1px solid $border; border-radius: 8px; padding: .5rem .75rem;
+  font-size: .875rem; outline: none; width: 100%; box-sizing: border-box;
+  font-family: inherit; background: #fff;
+  &:focus { border-color: $green; box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
+}
+.adv-faq-a { resize: vertical; min-height: 64px; }
+.adv-faq-remove {
+  width: 28px; height: 28px; flex-shrink: 0; margin-top: .25rem;
+  border: 1px solid $border; border-radius: 6px; background: #fff;
+  cursor: pointer; color: $muted; display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  &:hover { border-color: $red; color: $red; }
+}
+.adv-faq-empty { font-size: .8rem; color: $muted; margin: .25rem 0 0; }
+
 // Partner logos section
 .adv-partner-section {
   margin-top: 2.5rem;

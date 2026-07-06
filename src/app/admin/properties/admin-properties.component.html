@@ -330,7 +330,7 @@
 <!-- ══════════════════════════════════════════════════════ -->
 <!-- ADD / EDIT MODAL                                       -->
 <!-- ══════════════════════════════════════════════════════ -->
-<div class="prop-modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
+<div class="prop-modal-backdrop" *ngIf="modalOpen()"></div>
 <div class="prop-modal" *ngIf="modalOpen()">
   <div class="prop-modal-header">
     <h2 class="prop-modal-title">{{ editingId() !== null ? 'Edit Property' : 'Add Property' }}</h2>
@@ -604,7 +604,7 @@
 <!-- ══════════════════════════════════════════════════════ -->
 <!-- DELETE CONFIRM MODAL                                   -->
 <!-- ══════════════════════════════════════════════════════ -->
-<div class="prop-modal-backdrop" *ngIf="deleteModal()" (click)="cancelDelete()"></div>
+<div class="prop-modal-backdrop" *ngIf="deleteModal()"></div>
 <div class="prop-modal prop-modal--sm" *ngIf="deleteModal()">
   <div class="prop-modal-header">
     <h2 class="prop-modal-title">Delete Property</h2>

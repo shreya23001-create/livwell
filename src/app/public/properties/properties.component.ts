@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { toPropertySlug } from '../../shared/utils/slug';
 
 export interface PropertyListing {
   id: number;
@@ -689,5 +690,9 @@ export class PropertiesComponent implements OnInit {
     const { data } = await this.sb.from('properties').select('share_count').eq('id', id).single();
     const next = ((data as any)?.share_count ?? 0) + 1;
     await this.sb.from('properties').update({ share_count: next }).eq('id', id);
+  }
+
+  propertySlug(p: { title: string; id: number }): string {
+    return toPropertySlug(p.title, p.id);
   }
 }

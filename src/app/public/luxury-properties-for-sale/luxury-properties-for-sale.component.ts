@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { toPropertySlug } from '../../shared/utils/slug';
 
 interface LuxuryProperty {
   id: number;
@@ -298,8 +299,8 @@ export class LuxuryPropertiesForSaleComponent implements OnInit {
   }
 
   detailLink(p: LuxuryProperty): string {
-    // DB properties use numeric id; static legacy ones use slug
-    return p.detailSlug ?? String(p.id);
+    if (p.detailSlug) return p.detailSlug;
+    return toPropertySlug(p.title, p.id);
   }
 
   statusClass(status: string): string {

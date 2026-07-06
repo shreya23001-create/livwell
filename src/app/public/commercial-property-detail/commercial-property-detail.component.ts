@@ -11,6 +11,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
+import { toPropertySlug, idFromSlug } from '../../shared/utils/slug';
 
 interface CommercialDetail {
   id: number;
@@ -392,10 +393,12 @@ export class CommercialPropertyDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      const id = Number(params['id']);
+      const rawParam = params['id'] as string;
+      const numericId = /^\d+$/.test(rawParam) ? Number(rawParam) : idFromSlug(rawParam);
+      const id = numericId ?? 0;
       this.activeImage.set(0);
       window.scrollTo({ top: 0 });
-      this.loadProperty(id);
+      this.loadProperty(id, rawParam);
     });
     this.auth.waitForSession().then(() => this.prefillInquiryForm());
   }
@@ -412,7 +415,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
     this.router.navigate(['/customer'], { queryParams: { returnUrl: this.router.url } });
   }
 
-  private async loadProperty(id: number): Promise<void> {
+  private async loadProperty(id: number, rawParam = ''): Promise<void> {
     this.loading.set(true);
     this.notFound.set(false);
     this.property.set(null);
@@ -483,6 +486,11 @@ export class CommercialPropertyDetailComponent implements OnInit {
         mapUrl:       '',
         video_url:    p.video_url ?? null,
       };
+      // Redirect legacy numeric URL to SEO-friendly slug URL
+      if (/^\d+$/.test(rawParam)) {
+        this.router.navigate(['/commercial', toPropertySlug(detail.title, detail.id)], { replaceUrl: true });
+      }
+
       this.property.set(detail);
       this.loading.set(false);
       this.geocodeAndSetMap(p.community ?? '', p.location ?? '');

@@ -6,7 +6,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
-import { toProjectSlug } from '../../shared/utils/slug';
+import { toProjectSlug, toPropertySlug } from '../../shared/utils/slug';
 
 interface Property {
   id: number;
@@ -181,7 +181,7 @@ export class HomeComponent implements OnInit {
     this.searchQuery.set(item.label);
     const tab = this.searchType();
     if (item.type === 'property' && item.id) {
-      this.router.navigate(['/properties', item.id]);
+      this.router.navigate(['/properties', toPropertySlug(item.label, item.id)]);
     } else if (item.type === 'project' && item.id) {
       this.router.navigate(['/projects', toProjectSlug(item.label, item.id)]);
     } else {
@@ -721,5 +721,9 @@ export class HomeComponent implements OnInit {
   get sideArticles(): NewsArticle[] {
     const featured = this.featuredArticle;
     return this.newsArticles().filter(a => a.id !== featured?.id);
+  }
+
+  propertySlug(p: { title: string; id: number }): string {
+    return toPropertySlug(p.title, p.id);
   }
 }

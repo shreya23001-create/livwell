@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
-import { toProjectSlug } from '../../shared/utils/slug';
+import { toProjectSlug, toPropertySlug } from '../../shared/utils/slug';
 
 interface TrackedProperty {
   id: number;
@@ -74,7 +74,7 @@ interface TrackedProject {
         } @else {
           <div class="fp-grid">
             @for (item of items(); track item.id) {
-              <a [routerLink]="['/properties', item.id]" class="fp-card">
+              <a [routerLink]="['/properties', propertySlug(item.title, item.id)]" class="fp-card">
                 <div class="fp-img-wrap">
                   <img [src]="item.image" [alt]="item.title" class="fp-img" loading="lazy"
                        (error)="$any($event.target).src='/images/dummy-image.png'">
@@ -276,5 +276,9 @@ export class CustomerFollowedPricesComponent implements OnInit {
 
   projectSlug(title: string, id: number): string {
     return toProjectSlug(title, id);
+  }
+
+  propertySlug(title: string, id: number): string {
+    return toPropertySlug(title, id);
   }
 }

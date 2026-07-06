@@ -327,7 +327,7 @@
            (mouseleave)="hoveredPropertyId.set(null)">
 
         <!-- Clickable area → detail page -->
-        <a [routerLink]="['/properties', property.id]" class="prop-card-link">
+        <a [routerLink]="['/properties', propertySlug(property)]" class="prop-card-link">
 
           <!-- Image carousel -->
           <div class="prop-img-wrap">
@@ -486,7 +486,7 @@
       <div *ngFor="let property of paginatedProperties()" class="prop-list-card">
 
         <!-- Clickable area → detail page -->
-        <a [routerLink]="['/properties', property.id]" class="plc-link">
+        <a [routerLink]="['/properties', propertySlug(property)]" class="plc-link">
           <div class="plc-img-wrap">
             <img [src]="property.images[0]" [alt]="property.title" class="plc-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
             <div class="plc-img-overlay"></div>
@@ -652,7 +652,7 @@
               <span>· {{ property.sqftLabel }}</span>
             </div>
           </div>
-          <a [routerLink]="['/properties', property.id]" class="map-card-link">View →</a>
+          <a [routerLink]="['/properties', propertySlug(property)]" class="map-card-link">View →</a>
         </div>
       </div>
     </div>

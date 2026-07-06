@@ -355,28 +355,22 @@
       <!-- Enquiry form -->
       <div class="pd-inquiry-card">
         <div class="pd-inquiry-title">Send Enquiry</div>
-        <ng-container *ngIf="!isLoggedIn()">
-          <p class="pd-inquiry-note">Please sign in to send an enquiry.</p>
-          <button class="pd-submit-btn" (click)="redirectToLogin()">Sign In to Enquire</button>
-        </ng-container>
-        <ng-container *ngIf="isLoggedIn()">
-          <div *ngIf="inquirySent()" class="pd-inquiry-success">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            Enquiry sent! An agent will contact you shortly.
-          </div>
-          <form *ngIf="!inquirySent()" (ngSubmit)="submitInquiry(p)">
-            <input type="text" placeholder="Your Name *" class="pd-input" [(ngModel)]="inquiryName" name="inqName" required>
-            <input type="tel" placeholder="Your Phone *" class="pd-input" [(ngModel)]="inquiryPhone" name="inqPhone" required>
-            <input type="email" placeholder="Your Email" class="pd-input" [(ngModel)]="inquiryEmail" name="inqEmail">
-            <input type="text" placeholder="Your Budget (e.g. AED 2M)" class="pd-input" [(ngModel)]="inquiryBudget" name="inqBudget">
-            <textarea placeholder="I'm interested in this project…" class="pd-textarea" rows="3"
-              [(ngModel)]="inquiryMessage" name="inqMessage"></textarea>
-            <p *ngIf="inquiryError()" class="pd-inquiry-error">{{ inquiryError() }}</p>
-            <button type="submit" class="pd-submit-btn" [disabled]="inquirySubmitting()">
-              {{ inquirySubmitting() ? 'Sending…' : 'Send Enquiry' }}
-            </button>
-          </form>
-        </ng-container>
+        <div *ngIf="inquirySent()" class="pd-inquiry-success">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Enquiry sent! An agent will contact you shortly.
+        </div>
+        <form *ngIf="!inquirySent()" (ngSubmit)="submitInquiry(p)">
+          <input type="text" placeholder="Your Name *" class="pd-input" [(ngModel)]="inquiryName" name="inqName" required>
+          <input type="tel" placeholder="Your Phone *" class="pd-input" [(ngModel)]="inquiryPhone" name="inqPhone" required>
+          <input type="email" placeholder="Your Email" class="pd-input" [(ngModel)]="inquiryEmail" name="inqEmail">
+          <input type="text" placeholder="Your Budget (e.g. AED 2M)" class="pd-input" [(ngModel)]="inquiryBudget" name="inqBudget">
+          <textarea placeholder="I'm interested in this project…" class="pd-textarea" rows="3"
+            [(ngModel)]="inquiryMessage" name="inqMessage"></textarea>
+          <p *ngIf="inquiryError()" class="pd-inquiry-error">{{ inquiryError() }}</p>
+          <button type="submit" class="pd-submit-btn" [disabled]="inquirySubmitting()">
+            {{ inquirySubmitting() ? 'Sending…' : 'Send Enquiry' }}
+          </button>
+        </form>
       </div>
 
     </aside>

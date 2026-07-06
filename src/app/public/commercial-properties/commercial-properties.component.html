@@ -215,7 +215,7 @@
     <div class="lpfs-list">
       <div *ngFor="let p of pagedProperties()" class="lpfs-card">
 
-        <a [routerLink]="['/commercial', p.id]" class="lpfs-card-img-wrap">
+        <a [routerLink]="['/commercial', propertySlug(p)]" class="lpfs-card-img-wrap">
           <img [src]="p.image || '/images/dummy-image.png'" [alt]="p.title" class="lpfs-card-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
           <span *ngIf="p.badge" class="lpfs-badge">{{ p.badge }}</span>
           <span *ngIf="p.tour360" class="lpfs-badge-360">360°</span>
@@ -243,7 +243,7 @@
               <span *ngIf="p.furnished" class="lpfs-tag lpfs-tag--green">Furnished</span>
             </div>
             <h2 class="lpfs-card-title">
-              <a [routerLink]="['/commercial', p.id]" class="lpfs-card-title-link">{{ p.title }}</a>
+              <a [routerLink]="['/commercial', propertySlug(p)]" class="lpfs-card-title-link">{{ p.title }}</a>
             </h2>
             <div class="lpfs-card-sub">
               <span class="lpfs-card-info">
@@ -296,7 +296,7 @@
             </div>
           </div>
 
-          <a [routerLink]="['/commercial', p.id]" class="lpfs-view-details-btn">
+          <a [routerLink]="['/commercial', propertySlug(p)]" class="lpfs-view-details-btn">
             View Details
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { toPropertySlug } from '../../shared/utils/slug';
 
 interface LeadMessage {
   id: number;
@@ -336,4 +337,8 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     id: r.id, senderRole: r.sender_role, senderName: r.sender_name,
     content: r.content, createdAt: this.fmtDate(r.created_at),
   });
+
+  propertySlug(p: { title: string; id: number }): string {
+    return toPropertySlug(p.title, p.id);
+  }
 }

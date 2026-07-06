@@ -1,12 +1,14 @@
 import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { toPropertySlug, idFromSlug } from '../../shared/utils/slug';
+import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 
 export interface PropertyDetail {
   id: string;
@@ -598,7 +600,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     return /\.(mp4|mov|avi|webm)(\?|$)/i.test(url) ? url : null;
   });
 
-  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer) {}
+  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router) {}
 
   private async geocodeAndSetMap(community: string, location: string): Promise<void> {
     const raw   = community?.trim() || location?.trim() || 'Dubai';
@@ -623,33 +625,41 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
-      const id = params.get('id') ?? '';
+      const rawParam = params.get('id') ?? '';
       this.activeImage.set(0);
       this.aboutExpanded.set(false);
       this.notFound.set(false);
 
-      // Numeric id → DB property; slug → static fallback
-      const numericId = Number(id);
-      if (!isNaN(numericId) && numericId > 0 && String(numericId) === id) {
-        this.loadFromDb(numericId);
-      } else {
-        const found = PROPERTIES[id];
-        if (found) {
-          this.property.set(found);
-          this.mortgageAmount.set(parseInt(found.price.replace(/[^0-9]/g, '')) || 0);
-          if (found.mapUrl) {
-            this.safeMapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(found.mapUrl));
-          } else {
-            this.geocodeAndSetMap(found.community, found.location);
-          }
+      // Pure numeric → DB property
+      if (/^\d+$/.test(rawParam)) {
+        this.loadFromDb(Number(rawParam), rawParam);
+        return;
+      }
+
+      // title-slug-id format → extract numeric id from tail
+      const parsedId = idFromSlug(rawParam);
+      if (parsedId !== null) {
+        this.loadFromDb(parsedId, rawParam);
+        return;
+      }
+
+      // Static legacy slug fallback
+      const found = PROPERTIES[rawParam];
+      if (found) {
+        this.property.set(found);
+        this.mortgageAmount.set(parseInt(found.price.replace(/[^0-9]/g, '')) || 0);
+        if (found.mapUrl) {
+          this.safeMapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(found.mapUrl));
         } else {
-          this.notFound.set(true);
+          this.geocodeAndSetMap(found.community, found.location);
         }
+      } else {
+        this.notFound.set(true);
       }
     });
   }
 
-  private async loadFromDb(id: number): Promise<void> {
+  private async loadFromDb(id: number, rawParam = ''): Promise<void> {
     this.loading.set(true);
     this.property.set(null);
 
@@ -713,7 +723,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
       parking:      '1',
       furnished:    (p.furnishing ?? '').toLowerCase() === 'furnished',
       listedDate:   'Recently listed',
-      images:       imgs.length ? imgs : ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=85'],
+      images:       imgs.length ? imgs : ['/images/dummy-image.png'],
       about:        p.description ?? '',
       amenities:    p.type === 'Villa' || p.type === 'Home' ? VILLA_AMENITIES : STANDARD_AMENITIES,
       agent:        agentObj,
@@ -726,6 +736,9 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     this.property.set(detail);
     this.mortgageAmount.set(priceNum);
     this.geocodeAndSetMap(p.community ?? '', p.location ?? '');
+    if (/^\d+$/.test(rawParam)) {
+      this.router.navigate(['/luxury-property', toPropertySlug(p.title, p.id)], { replaceUrl: true });
+    }
     this.loading.set(false);
     this.auth.waitForSession().then(() => this.checkFavStatus(p.id));
     this.sb.from('properties').update({ views: (p.views || 0) + 1 }).eq('id', p.id).then(() => {});
@@ -798,5 +811,13 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
   statusClass(status: string): string {
     return ({ 'Ready': 'status--ready', 'Off-Plan': 'status--offplan', 'Under Construction': 'status--construction' }[status] ?? '');
+  }
+
+  getAmenityIcon(name: string): SafeHtml {
+    const label = name.toLowerCase();
+    const match = AMENITY_ICONS.find(i => i.label.toLowerCase() === label)
+               ?? AMENITY_ICONS.find(i => label.includes(i.key) || i.label.toLowerCase().split(' ').some(w => w.length > 3 && label.includes(w)));
+    const svg = match?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
   }
 }

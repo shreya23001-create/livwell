@@ -88,8 +88,8 @@
 
 <!-- ── Add/Edit Modal ──────────────────────────────────── -->
 @if (showModal()) {
-  <div class="blg-overlay" (click)="showModal.set(false)">
-    <div class="blg-modal" (click)="$event.stopPropagation()">
+  <div class="blg-overlay">
+    <div class="blg-modal">
       <div class="blg-modal-header">
         <h2>{{ editingId() ? 'Edit Post' : 'New Post' }}</h2>
         <button class="blg-modal-close" (click)="showModal.set(false)">
@@ -202,8 +202,8 @@
 
 <!-- ── Delete Confirm ──────────────────────────────────── -->
 @if (deleteId() !== null) {
-  <div class="blg-overlay" (click)="deleteId.set(null)">
-    <div class="blg-modal blg-modal--sm" (click)="$event.stopPropagation()">
+  <div class="blg-overlay">
+    <div class="blg-modal blg-modal--sm">
       <div class="blg-modal-header"><h2>Delete Post</h2></div>
       <div class="blg-modal-body"><p class="blg-del-msg">This post will be permanently deleted and removed from the site.</p></div>
       <div class="blg-modal-footer">

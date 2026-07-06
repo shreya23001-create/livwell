@@ -275,7 +275,7 @@
 </div>
 
 <!-- ── Add / Edit Modal ── -->
-<div class="modal-overlay" *ngIf="showModal()" (click)="closeModal()">
+<div class="modal-overlay" *ngIf="showModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>{{ isEdit() ? 'Edit Lead' : 'Add Lead' }}</h2>
@@ -399,7 +399,7 @@
 </div>
 
 <!-- ── View Lead Modal (from notification) ── -->
-<div class="modal-overlay" *ngIf="showViewModal() && viewLead()" (click)="closeViewModal()">
+<div class="modal-overlay" *ngIf="showViewModal() && viewLead()">
   <div class="modal modal--view" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Lead Details</h2>
@@ -455,7 +455,7 @@
 </div>
 
 <!-- ── Delete Confirm Modal ── -->
-<div class="modal-overlay" *ngIf="showDeleteModal()" (click)="cancelDelete()">
+<div class="modal-overlay" *ngIf="showDeleteModal()">
   <div class="modal modal--sm" (click)="$event.stopPropagation()">
     <div class="modal-header modal-header--danger">
       <h2>Delete Lead</h2>

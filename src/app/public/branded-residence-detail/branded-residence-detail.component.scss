@@ -320,15 +320,21 @@ $radius: 10px;
 
 // ── Amenities ────────────────────────────────────────────
 .brd-amenities {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
 
   @media (max-width: 600px) { grid-template-columns: repeat(2, 1fr); }
 }
 
 .brd-amenity-item {
   display: flex; align-items: center; gap: 0.5rem;
-  font-size: 0.82rem; color: $text; padding: 0.4rem 0;
-  svg { color: $green; flex-shrink: 0; }
+  font-size: 0.85rem; color: $text;
+  background: #f8fafc; border-radius: 0.5rem; padding: 0.6rem 0.875rem;
+}
+
+.brd-amenity-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; flex-shrink: 0; color: #059669;
+  ::ng-deep svg { width: 100%; height: 100%; }
 }
 
 // ── Overview ─────────────────────────────────────────────
@@ -462,10 +468,10 @@ $radius: 10px;
 
 // ── Gallery empty ────────────────────────────────────────
 .brd-gallery-empty {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 220px; background: $bg; border: 1.5px dashed $border;
-  border-radius: $radius; color: $muted; gap: 0.75rem;
-  font-size: 0.85rem; margin-bottom: 1rem;
+  border-radius: $radius; overflow: hidden; margin-bottom: 1rem;
+}
+.brd-gallery-dummy-img {
+  width: 100%; max-height: 420px; object-fit: cover; border-radius: $radius; display: block;
 }
 
 // ── Agent dummy SVG ──────────────────────────────────────

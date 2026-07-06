@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
-import { toProjectSlug } from '../../shared/utils/slug';
+import { toProjectSlug, toPropertySlug } from '../../shared/utils/slug';
 
 interface RatableItem {
   id: number;
@@ -64,7 +64,7 @@ interface RatableItem {
                   <img [src]="item.image" [alt]="item.title" class="rt-img"
                        (error)="$any($event.target).src='/images/dummy-image.png'">
                   <div class="rt-info">
-                    <a [routerLink]="['/properties', item.id]" class="rt-name">{{ item.title }}</a>
+                    <a [routerLink]="['/properties', propertySlug(item.title, item.id)]" class="rt-name">{{ item.title }}</a>
                     <div class="rt-loc">{{ item.location }}</div>
                     <span class="rt-type">{{ item.type }}</span>
                   </div>
@@ -314,5 +314,9 @@ export class CustomerRatingsComponent implements OnInit {
 
   projectSlug(title: string, id: number): string {
     return toProjectSlug(title, id);
+  }
+
+  propertySlug(title: string, id: number): string {
+    return toPropertySlug(title, id);
   }
 }

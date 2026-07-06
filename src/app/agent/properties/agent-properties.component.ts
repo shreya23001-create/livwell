@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { toPropertySlug } from '../../shared/utils/slug';
 import { ToastService } from '../../shared/services/toast.service';
 import * as XLSX from 'xlsx';
 
@@ -413,5 +414,9 @@ export class AgentPropertiesComponent implements OnInit {
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(2)}M`;
     if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
+  }
+
+  propertySlug(p: { title: string; id: number }): string {
+    return toPropertySlug(p.title, p.id);
   }
 }

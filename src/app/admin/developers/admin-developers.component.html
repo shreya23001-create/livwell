@@ -92,7 +92,7 @@
 </div>
 
 <!-- ── Add / Edit Modal ──────────────────────────────────────────── -->
-<div class="adv-overlay" *ngIf="modalOpen()" (click)="closeModal()"></div>
+<div class="adv-overlay" *ngIf="modalOpen()"></div>
 <div class="adv-modal" *ngIf="modalOpen()">
   <div class="adv-modal__head">
     <h2>{{ editingId() ? 'Edit Developer' : 'Add Developer' }}</h2>
@@ -241,7 +241,7 @@
 </div>
 
 <!-- ── Delete Confirm ────────────────────────────────────────────── -->
-<div class="adv-overlay" *ngIf="deleteTarget()" (click)="cancelDelete()"></div>
+<div class="adv-overlay" *ngIf="deleteTarget()"></div>
 <div class="adv-confirm" *ngIf="deleteTarget()">
   <p>Delete <strong>{{ deleteTarget()?.name }}</strong>? This cannot be undone.</p>
   <div class="adv-confirm__btns">

@@ -353,12 +353,19 @@ $radius: 10px;
 
 // Amenities
 .lpd-amenities {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.55rem;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.625rem;
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: 1fr 1fr; }
 }
 .lpd-amenity {
   display: flex; align-items: center; gap: 0.5rem;
-  font-size: 0.86rem; color: #374151;
-  svg { color: $green; flex-shrink: 0; }
+  font-size: 0.85rem; color: #374151;
+  background: #f8fafc; border-radius: 0.5rem; padding: 0.6rem 0.875rem;
+}
+.lpd-amenity-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; flex-shrink: 0; color: #059669;
+  ::ng-deep svg { width: 100%; height: 100%; }
 }
 
 // Map

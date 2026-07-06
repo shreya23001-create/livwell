@@ -298,7 +298,7 @@
 </div>
 
 <!-- ══ ADD / EDIT MODAL ════════════════════════════════ -->
-<div class="usr-modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
+<div class="usr-modal-backdrop" *ngIf="modalOpen()"></div>
 <div class="usr-modal" *ngIf="modalOpen()">
   <div class="usr-modal-header">
     <h2 class="usr-modal-title">{{ editingId() !== null ? 'Edit User' : 'Add User' }}</h2>
@@ -453,7 +453,7 @@
 </div>
 
 <!-- ══ DELETE MODAL ════════════════════════════════════ -->
-<div class="usr-modal-backdrop" *ngIf="deleteTarget()" (click)="cancelDelete()"></div>
+<div class="usr-modal-backdrop" *ngIf="deleteTarget()"></div>
 <div class="usr-modal usr-modal--sm" *ngIf="deleteTarget()">
   <div class="usr-modal-header">
     <h2 class="usr-modal-title">Delete User</h2>

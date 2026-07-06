@@ -329,7 +329,7 @@
       <div class="pd-section" *ngIf="similarProperties().length > 0">
         <h2 class="pd-section-title">Similar Properties</h2>
         <div class="pd-similar-grid">
-          <a *ngFor="let sp of similarProperties()" [routerLink]="['/properties', sp.id]" class="pd-sim-card">
+          <a *ngFor="let sp of similarProperties()" [routerLink]="['/properties', propertySlug(sp)]" class="pd-sim-card">
             <div class="pd-sim-img-wrap">
               <img [src]="sp.images[0] || '/images/dummy-image.png'" [alt]="sp.title" class="pd-sim-img" loading="lazy"
                    (error)="$any($event.target).src='/images/dummy-image.png'">
@@ -412,10 +412,7 @@
       <!-- Inquiry form card -->
       <div class="pd-inquiry-card">
         <div class="pd-inquiry-title">Send Enquiry</div>
-        @if (!isLoggedIn()) {
-          <p style="font-size:.85rem;color:#555;margin:0 0 12px;line-height:1.5;">Please sign in to send an enquiry.</p>
-          <button class="pd-submit-btn" (click)="redirectToLogin()">Sign In to Enquire</button>
-        } @else if (inquirySent()) {
+        @if (inquirySent()) {
           <div class="pd-inquiry-success">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
             Inquiry sent! An agent will contact you shortly.
@@ -424,7 +421,7 @@
           <form (ngSubmit)="submitInquiry(p)" #inquiryForm="ngForm">
             <input type="text" placeholder="Your Name *" class="pd-input" [(ngModel)]="inquiryForm_name" name="inqName" required />
             <input type="tel" placeholder="Your Phone *" class="pd-input" [(ngModel)]="inquiryForm_phone" name="inqPhone" required />
-            <input type="email" placeholder="Your Email *" class="pd-input" [(ngModel)]="inquiryForm_email" name="inqEmail" required />
+            <input type="email" placeholder="Your Email" class="pd-input" [(ngModel)]="inquiryForm_email" name="inqEmail" />
             <input type="text" placeholder="Your Budget (e.g. AED 2M)" class="pd-input" [(ngModel)]="inquiryForm_budget" name="inqBudget" />
             <textarea placeholder="I'm interested in this property…" class="pd-textarea" rows="3"
               [(ngModel)]="inquiryForm_message" name="inqMessage"></textarea>

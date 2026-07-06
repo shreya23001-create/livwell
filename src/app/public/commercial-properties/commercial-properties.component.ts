@@ -6,6 +6,7 @@ import { NewsletterSectionComponent } from '../../shared/components/newsletter-s
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
+import { toPropertySlug } from '../../shared/utils/slug';
 
 interface CommercialProperty {
   id: number;
@@ -490,5 +491,9 @@ export class CommercialPropertiesComponent implements OnInit {
     const { data } = await this.sb.from('properties').select('share_count').eq('id', id).single();
     const next = ((data as any)?.share_count ?? 0) + 1;
     await this.sb.from('properties').update({ share_count: next }).eq('id', id);
+  }
+
+  propertySlug(p: { title: string; id: number }): string {
+    return toPropertySlug(p.title, p.id);
   }
 }

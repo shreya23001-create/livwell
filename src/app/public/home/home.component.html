@@ -589,7 +589,7 @@
 
     <div class="fp-track-wrap">
       <div class="properties-grid" #featPropTrack>
-      <a *ngFor="let property of featuredPropertiesLive(); let i = index" [routerLink]="['/properties', property.id]"
+      <a *ngFor="let property of featuredPropertiesLive(); let i = index" [routerLink]="['/properties', propertySlug(property)]"
         class="property-card">
 
         <!-- Full image fills the card -->

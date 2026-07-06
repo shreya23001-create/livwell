@@ -81,7 +81,7 @@
 </div>
 
 <!-- ── Add / Edit Modal ── -->
-<div class="afaq-overlay" *ngIf="modalOpen()" (click)="closeModal()"></div>
+<div class="afaq-overlay" *ngIf="modalOpen()"></div>
 <div class="afaq-modal" *ngIf="modalOpen()">
   <div class="afaq-modal__head">
     <h2>{{ editingId() ? 'Edit FAQ' : 'Add FAQ' }}</h2>
@@ -139,7 +139,7 @@
 </div>
 
 <!-- ── Delete confirm ── -->
-<div class="afaq-overlay" *ngIf="deleteTarget()" (click)="cancelDelete()"></div>
+<div class="afaq-overlay" *ngIf="deleteTarget()"></div>
 <div class="afaq-confirm" *ngIf="deleteTarget()">
   <p>Delete this FAQ?<br><strong>{{ deleteTarget()?.question }}</strong></p>
   <div class="afaq-confirm__btns">

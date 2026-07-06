@@ -11,8 +11,15 @@ export function toProjectSlug(title: string, id: number): string {
   return `${toSlug(title)}-${id}`;
 }
 
-export function projectIdFromSlug(slug: string): number | null {
+export function toPropertySlug(title: string, id: number): string {
+  return `${toSlug(title)}-${id}`;
+}
+
+export function idFromSlug(slug: string): number | null {
   const parts = slug.split('-');
   const id = Number(parts[parts.length - 1]);
   return isNaN(id) ? null : id;
 }
+
+// Keep old name as alias for backwards compat
+export const projectIdFromSlug = idFromSlug;

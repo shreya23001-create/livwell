@@ -292,8 +292,8 @@
 
   <!-- Story modal -->
   @if (showStoryModal()) {
-    <div class="modal-overlay" (click)="showStoryModal.set(false)">
-      <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-overlay">
+      <div class="modal">
         <div class="modal-header">
           <h2>{{ editingStoryId() ? 'Edit' : 'Add' }} Success Story</h2>
           <button class="modal-close" (click)="showStoryModal.set(false)">
@@ -370,8 +370,8 @@
 
   <!-- Delete confirm -->
   @if (deleteStoryId() !== null) {
-    <div class="modal-overlay" (click)="deleteStoryId.set(null)">
-      <div class="modal modal--sm" (click)="$event.stopPropagation()">
+    <div class="modal-overlay">
+      <div class="modal modal--sm">
         <div class="modal-header"><h2>Delete Story</h2></div>
         <div class="modal-body"><p class="delete-msg">Are you sure? This cannot be undone.</p></div>
         <div class="modal-footer">
@@ -387,8 +387,8 @@
 
 <!-- ── Banner Add/Edit Modal ──────────────────────────── -->
 @if (showBannerModal()) {
-<div class="modal-overlay" (click)="showBannerModal.set(false)">
-  <div class="modal" (click)="$event.stopPropagation()">
+<div class="modal-overlay">
+  <div class="modal">
     <div class="modal-header">
       <h2>{{ editingBannerId() !== null ? 'Edit Banner' : 'Add Banner' }}</h2>
       <button class="modal-close" (click)="showBannerModal.set(false)">
@@ -463,8 +463,8 @@
 
 <!-- ── Banner Delete Confirm ──────────────────────────── -->
 @if (deleteBannerId() !== null) {
-<div class="modal-overlay" (click)="deleteBannerId.set(null)">
-  <div class="modal modal--sm" (click)="$event.stopPropagation()">
+<div class="modal-overlay">
+  <div class="modal modal--sm">
     <div class="modal-header modal-header--danger">
       <h2>Delete Banner</h2>
       <button class="modal-close" (click)="deleteBannerId.set(null)">
@@ -488,8 +488,8 @@
 
 <!-- ── Announcement Add/Edit Modal ───────────────────── -->
 @if (showAnnModal()) {
-<div class="modal-overlay" (click)="showAnnModal.set(false)">
-  <div class="modal" (click)="$event.stopPropagation()">
+<div class="modal-overlay">
+  <div class="modal">
     <div class="modal-header">
       <h2>{{ editingAnnId() !== null ? 'Edit Announcement' : 'Add Announcement' }}</h2>
       <button class="modal-close" (click)="showAnnModal.set(false)">
@@ -565,8 +565,8 @@
 
 <!-- ── Announcement Delete Confirm ───────────────────── -->
 @if (deleteAnnId() !== null) {
-<div class="modal-overlay" (click)="deleteAnnId.set(null)">
-  <div class="modal modal--sm" (click)="$event.stopPropagation()">
+<div class="modal-overlay">
+  <div class="modal modal--sm">
     <div class="modal-header modal-header--danger">
       <h2>Delete Announcement</h2>
       <button class="modal-close" (click)="deleteAnnId.set(null)">

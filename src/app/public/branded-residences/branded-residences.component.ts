@@ -5,6 +5,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
+import { toPropertySlug } from '../../shared/utils/slug';
 
 export interface BrandedResidence {
   id: number;
@@ -82,6 +83,10 @@ export class BrandedResidencesComponent implements OnInit {
   hoveredResidence = computed(() =>
     this.allResidences().find(r => r.id === this.hoveredId()) ?? null
   );
+
+  residenceSlug(r: BrandedResidence): string {
+    return toPropertySlug(r.title, r.id);
+  }
 
   formatPrice(n: number): string {
     if (!n) return 'Price on request';

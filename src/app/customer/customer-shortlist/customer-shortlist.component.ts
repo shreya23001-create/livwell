@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
-import { toProjectSlug } from '../../shared/utils/slug';
+import { toProjectSlug, toPropertySlug } from '../../shared/utils/slug';
 
 @Component({
   selector: 'app-customer-shortlist',
@@ -46,7 +46,7 @@ import { toProjectSlug } from '../../shared/utils/slug';
         } @else {
           <div class="sl-grid">
             @for (item of items(); track item.savedRowId) {
-              <a [routerLink]="['/properties', item.id]" class="sl-card">
+              <a [routerLink]="['/properties', propertySlug(item.title, item.id)]" class="sl-card">
                 <div class="sl-img-wrap">
                   <img [src]="item.image || '/images/dummy-image.png'"
                        [alt]="item.title" class="sl-img" loading="lazy"
@@ -254,5 +254,9 @@ export class CustomerShortlistComponent implements OnInit {
 
   projectSlug(title: string, id: number): string {
     return toProjectSlug(title, id);
+  }
+
+  propertySlug(title: string, id: number): string {
+    return toPropertySlug(title, id);
   }
 }

@@ -1,12 +1,14 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
+import { toPropertySlug, idFromSlug } from '../../shared/utils/slug';
+import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 
 export interface BRProperty {
   id: number;
@@ -48,6 +50,7 @@ export interface BRProperty {
 export class BrandedResidenceDetailComponent implements OnInit {
   private sb        = inject(SupabaseService).client;
   private route     = inject(ActivatedRoute);
+  private router    = inject(Router);
   private sanitizer = inject(DomSanitizer);
   private auth      = inject(AuthService);
 
@@ -98,8 +101,13 @@ export class BrandedResidenceDetailComponent implements OnInit {
   mapSrc = signal<SafeResourceUrl>('');
 
   async ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) { this.notFound.set(true); this.loading.set(false); return; }
+    const rawParam = this.route.snapshot.paramMap.get('id');
+    if (!rawParam) { this.notFound.set(true); this.loading.set(false); return; }
+
+    const numId = /^\d+$/.test(rawParam) ? Number(rawParam) : idFromSlug(rawParam);
+    if (!numId) { this.notFound.set(true); this.loading.set(false); return; }
+
+    const id = numId;
 
     const { data } = await this.sb
       .from('projects')
@@ -112,6 +120,9 @@ export class BrandedResidenceDetailComponent implements OnInit {
       p.images = (p.images ?? []).filter((u: string) => u && !u.includes('unsplash.com'));
       this.property.set(p);
       this.geocodeAndSetMap(p);
+      if (/^\d+$/.test(rawParam)) {
+        this.router.navigate(['/branded-residence', toPropertySlug(p.title, p.id)], { replaceUrl: true });
+      }
       this.sb.from('projects').update({ views: ((data as BRProperty).views || 0) + 1 }).eq('id', id).then(() => {});
       const agentName = (data as BRProperty).agent_name;
       if (agentName) {
@@ -205,6 +216,14 @@ export class BrandedResidenceDetailComponent implements OnInit {
     });
     this.inquirySubmitting.set(false);
     this.inquirySent.set(true);
+  }
+
+  getAmenityIcon(name: string): SafeHtml {
+    const label = name.toLowerCase();
+    const match = AMENITY_ICONS.find(i => i.label.toLowerCase() === label)
+               ?? AMENITY_ICONS.find(i => label.includes(i.key) || i.label.toLowerCase().split(' ').some(w => w.length > 3 && label.includes(w)));
+    const svg = match?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
   }
 
   private async geocodeAndSetMap(p: BRProperty): Promise<void> {

@@ -47,7 +47,7 @@
       <div class="br-list">
         <a *ngFor="let r of filteredResidences()"
              class="br-card"
-             [routerLink]="['/branded-residence', r.id]"
+             [routerLink]="['/branded-residence', residenceSlug(r)]"
              [class.hovered]="hoveredId() === r.id"
              (mouseenter)="hoveredId.set(r.id)"
              (mouseleave)="hoveredId.set(null)">

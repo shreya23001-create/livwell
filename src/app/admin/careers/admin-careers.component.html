@@ -145,7 +145,7 @@
 </div>
 
 <!-- ── Job Form Modal ──────────────────────────────────── -->
-<div *ngIf="jobModalOpen()" class="ac-modal-overlay" (click)="closeJobModal()">
+<div *ngIf="jobModalOpen()" class="ac-modal-overlay">
   <div class="ac-modal" (click)="$event.stopPropagation()">
     <div class="ac-modal-header">
       <h2 class="ac-modal-title">{{ editingJobId() ? 'Edit Job Post' : 'New Job Post' }}</h2>
@@ -200,7 +200,7 @@
 </div>
 
 <!-- ── Application Detail Modal ───────────────────────── -->
-<div *ngIf="selectedApp()" class="ac-modal-overlay" (click)="closeApp()">
+<div *ngIf="selectedApp()" class="ac-modal-overlay">
   <div class="ac-modal ac-modal--app" (click)="$event.stopPropagation()">
     <div class="ac-modal-header">
       <h2 class="ac-modal-title">Application Detail</h2>

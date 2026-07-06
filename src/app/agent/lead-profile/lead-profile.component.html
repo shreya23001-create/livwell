@@ -225,7 +225,7 @@
                 <span class="lp-prop-spec" *ngIf="prop.bedrooms !== undefined">{{ prop.bedrooms === 0 ? 'Studio' : prop.bedrooms + ' Bed' }}</span>
                 <span class="lp-prop-spec" *ngIf="prop.area_sqft">{{ prop.area_sqft | number }} sqft</span>
               </div>
-              <a [routerLink]="['/properties', prop.id]" target="_blank" class="lp-prop-link">View full listing →</a>
+              <a [routerLink]="['/properties', propertySlug(prop)]" target="_blank" class="lp-prop-link">View full listing →</a>
             </div>
           </div>
           <div class="lp-no-prop" *ngIf="!propLoading() && !property()">

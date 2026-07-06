@@ -295,28 +295,22 @@
         <!-- Inquiry card -->
         <div class="pd-inquiry-card">
           <div class="pd-inquiry-title">Send Enquiry</div>
-          <ng-container *ngIf="!isLoggedIn()">
-            <p style="font-size:.85rem;color:#555;margin:0 0 12px;line-height:1.5;">Please sign in to send an enquiry.</p>
-            <button class="pd-submit-btn" (click)="redirectToLogin()">Sign In to Enquire</button>
-          </ng-container>
-          <ng-container *ngIf="isLoggedIn()">
-            <ng-container *ngIf="!inquirySent()">
-              <input class="pd-input" type="text" placeholder="Your Name *" [(ngModel)]="inquiryName" />
-              <input class="pd-input" type="tel" placeholder="Phone *" [(ngModel)]="inquiryPhone" />
-              <input class="pd-input" type="email" placeholder="Email *" [(ngModel)]="inquiryEmail" />
-              <input class="pd-input" type="text" placeholder="Your Budget (e.g. AED 2M)" [(ngModel)]="inquiryBudget" />
-              <textarea class="pd-textarea" rows="3" placeholder="Message (optional)" [(ngModel)]="inquiryMessage"></textarea>
-              <button class="pd-submit-btn" (click)="submitInquiry(p)" [disabled]="inquirySubmitting()">
-                {{ inquirySubmitting() ? 'Sending…' : 'Send Enquiry' }}
-              </button>
-              <p *ngIf="inquiryError()" class="pd-inquiry-error">{{ inquiryError() }}</p>
-            </ng-container>
-            <div *ngIf="inquirySent()" class="pd-inquiry-success">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;flex-shrink:0">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-              </svg>
-              Enquiry sent! We'll be in touch soon.
-            </div>
+          <div *ngIf="inquirySent()" class="pd-inquiry-success">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;flex-shrink:0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+            Enquiry sent! We'll be in touch soon.
+          </div>
+          <ng-container *ngIf="!inquirySent()">
+            <input class="pd-input" type="text" placeholder="Your Name *" [(ngModel)]="inquiryName" />
+            <input class="pd-input" type="tel" placeholder="Phone *" [(ngModel)]="inquiryPhone" />
+            <input class="pd-input" type="email" placeholder="Email *" [(ngModel)]="inquiryEmail" />
+            <input class="pd-input" type="text" placeholder="Your Budget (e.g. AED 2M)" [(ngModel)]="inquiryBudget" />
+            <textarea class="pd-textarea" rows="3" placeholder="Message (optional)" [(ngModel)]="inquiryMessage"></textarea>
+            <button class="pd-submit-btn" (click)="submitInquiry(p)" [disabled]="inquirySubmitting()">
+              {{ inquirySubmitting() ? 'Sending…' : 'Send Enquiry' }}
+            </button>
+            <p *ngIf="inquiryError()" class="pd-inquiry-error">{{ inquiryError() }}</p>
           </ng-container>
         </div>
 

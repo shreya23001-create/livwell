@@ -262,8 +262,8 @@
             <h2 class="lpd-sec-title">Amenities</h2>
             <div class="lpd-amenities">
               <div *ngFor="let a of property()!.amenities" class="lpd-amenity">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-                {{ a }}
+                <div class="lpd-amenity-icon" [innerHTML]="getAmenityIcon(a)"></div>
+                <span>{{ a }}</span>
               </div>
             </div>
           </section>

@@ -8,6 +8,7 @@ import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
 import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
+import { toPropertySlug, idFromSlug } from '../../shared/utils/slug';
 
 interface Property {
   id: number;
@@ -91,9 +92,15 @@ export class PropertyDetailComponent implements OnInit {
   masterAmenities = signal<{ name: string; icon: string }[]>([]);
 
   getAmenityIconSvg(name: string): SafeHtml {
-    const amenity = this.masterAmenities().find(a => a.name === name);
-    const iconDef = amenity ? AMENITY_ICONS.find(i => i.key === amenity.icon) : null;
-    const svg = iconDef?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
+    const label = name.toLowerCase();
+    // 1. Match against master amenities (icon key stored in color column)
+    const amenity = this.masterAmenities().find(a => a.name.toLowerCase() === label);
+    const byKey = amenity ? AMENITY_ICONS.find(i => i.key === amenity.icon) : null;
+    if (byKey) return this.sanitizer.bypassSecurityTrustHtml(byKey.svg);
+    // 2. Fuzzy match against AMENITY_ICONS label
+    const byLabel = AMENITY_ICONS.find(i => i.label.toLowerCase() === label)
+                 ?? AMENITY_ICONS.find(i => label.includes(i.key) || i.label.toLowerCase().split(' ').some(w => label.includes(w)));
+    const svg = byLabel?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
     return this.sanitizer.bypassSecurityTrustHtml(svg);
   }
 
@@ -183,8 +190,8 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   async submitInquiry(p: Property): Promise<void> {
-    if (!this.inquiryForm_name.trim() || !this.inquiryForm_phone.trim() || !this.inquiryForm_email.trim()) {
-      this.inquiryError.set('Please fill in Name, Phone and Email.');
+    if (!this.inquiryForm_name.trim() || !this.inquiryForm_phone.trim()) {
+      this.inquiryError.set('Please fill in your Name and Phone.');
       return;
     }
     const _ph = this.inquiryForm_phone.trim();
@@ -292,7 +299,9 @@ export class PropertyDetailComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.loadMasterAmenities();
     this.route.params.subscribe(async params => {
-      const id = Number(params['id']);
+      const raw = params['id'] as string;
+      const numericId = /^\d+$/.test(raw) ? Number(raw) : idFromSlug(raw);
+      const id = numericId ?? 0;
       this.loading.set(true);
       this.notFound.set(false);
       this.isFaved.set(false);
@@ -311,6 +320,12 @@ export class PropertyDetailComponent implements OnInit {
       }
 
       const prop = this.mapProperty(data);
+
+      // Redirect legacy numeric URL to SEO-friendly slug URL
+      if (/^\d+$/.test(raw)) {
+        this.router.navigate(['/properties', toPropertySlug(prop.title, prop.id)], { replaceUrl: true });
+      }
+
       this.property.set(prop);
       this.mortgagePrice.set(prop.price);
       this.geocodeAndSetMap(prop);
@@ -454,7 +469,18 @@ export class PropertyDetailComponent implements OnInit {
     created_at:   p.created_at   || '',
     views:        p.views        || 0,
     share_count:  p.share_count  || 0,
-    amenities:    p.amenities    || [],
+    amenities:    (() => {
+      let a: string[] = [];
+      if (Array.isArray(p.amenities)) a = p.amenities;
+      else if (typeof p.amenities === 'string' && p.amenities.trim()) {
+        try { a = JSON.parse(p.amenities); } catch { a = []; }
+      }
+      if (a.length) return a;
+      const t = (p.type ?? '').toLowerCase();
+      if (t === 'villa' || t === 'townhouse') return ['Private Pool','Private Garden','Covered Parking','Maid Room','Central A/C','BBQ Area','Security','Smart Home System'];
+      if (t === 'penthouse') return ['Swimming Pool','Gym','Concierge','Valet Parking','Central A/C','Balcony','Security','High-Speed WiFi'];
+      return ['Swimming Pool','Gym','Concierge','Central A/C','Covered Parking','Balcony','Security','High-Speed WiFi'];
+    })(),
     video_url:    p.video_url    || null,
   });
 
@@ -498,5 +524,9 @@ export class PropertyDetailComponent implements OnInit {
       const { data } = await this.sb.from('master_data').select('name, color').eq('type', 'amenity');
       if (data) this.masterAmenities.set(data.map((r: any) => ({ name: r.name, icon: r.color || 'star' })));
     } catch { /* table may not have amenities yet */ }
+  }
+
+  propertySlug(p: { title: string; id: number }): string {
+    return toPropertySlug(p.title, p.id);
   }
 }

@@ -564,3 +564,29 @@ $radius: 10px;
 .brd-video-msg { font-size: 1rem; font-weight: 600; color: #e5e7eb; margin: 0; }
 .brd-video-sub { font-size: 0.85rem; color: #9ca3af; margin: 0; }
 .brd-video-btn { display: inline-flex; align-items: center; padding: 0.6rem 1.5rem; background: $gold; color: #111; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; text-decoration: none; margin-top: 0.25rem; &:hover { opacity: 0.9; } }
+
+/* ── FAQs ──────────────────────────────────────────── */
+.brd-faq-section {
+  max-width: 900px; margin: 0 auto 3rem; padding: 0 1.5rem;
+}
+.brd-faq-title {
+  font-size: 1.4rem; font-weight: 700; color: #0a0e1a; margin-bottom: 1.25rem;
+}
+.brd-faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.brd-faq-item {
+  border: 1px solid #e8eaed; border-radius: 10px; overflow: hidden; cursor: pointer;
+  &.open {
+    .brd-faq-q svg { transform: rotate(180deg); }
+    .brd-faq-a { display: block; }
+  }
+}
+.brd-faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.25rem; font-weight: 600; font-size: 0.92rem; color: #0a0e1a;
+  svg { flex-shrink: 0; transition: transform 0.2s ease; color: #6b7280; }
+}
+.brd-faq-a {
+  display: none; padding: 0 1.25rem 1rem; font-size: 0.88rem; color: #6b7280; line-height: 1.7;
+  ::ng-deep p { margin: 0 0 0.5rem; }
+  ::ng-deep span { background-color: transparent !important; color: inherit !important; }
+}

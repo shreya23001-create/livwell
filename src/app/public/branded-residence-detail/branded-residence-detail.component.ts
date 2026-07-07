@@ -38,6 +38,7 @@ export interface BRProperty {
   created_at: string;
   video_url: string | null;
   views?: number;
+  faqs: { question: string; answer: string }[];
 }
 
 @Component({
@@ -118,6 +119,7 @@ export class BrandedResidenceDetailComponent implements OnInit {
     if (data) {
       const p = data as BRProperty;
       p.images = (p.images ?? []).filter((u: string) => u && !u.includes('unsplash.com'));
+      p.faqs = Array.isArray((data as any).faqs) ? (data as any).faqs : [];
       this.property.set(p);
       this.geocodeAndSetMap(p);
       if (/^\d+$/.test(rawParam)) {
@@ -189,6 +191,8 @@ export class BrandedResidenceDetailComponent implements OnInit {
   statusClass(status: string): string {
     return ({ 'Ready': 'status--ready', 'Off-Plan': 'status--offplan', 'Under Construction': 'status--construction' }[status] ?? '');
   }
+
+  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 
   toggleFaq(i: number) {
     this.openFaqIndex.set(this.openFaqIndex() === i ? null : i);

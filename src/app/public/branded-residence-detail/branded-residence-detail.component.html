@@ -177,6 +177,21 @@
         </button>
       </div>
 
+      <!-- FAQs -->
+      <div class="brd-section" *ngIf="property()?.faqs && property()!.faqs.length > 0">
+        <h2 class="brd-section-title">Frequently Asked Questions</h2>
+        <div class="brd-faq-list">
+          <div class="brd-faq-item" *ngFor="let faq of property()!.faqs; let i = index"
+            (click)="toggleFaq(i)" [class.open]="openFaqIndex() === i">
+            <div class="brd-faq-q">
+              {{ faq.question }}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="brd-faq-a" *ngIf="openFaqIndex() === i" [innerHTML]="safeHtml(faq.answer)"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- RIGHT: Sticky sidebar -->
@@ -310,21 +325,6 @@
         <a routerLink="/customer" class="brd-video-btn">Sign In to Watch</a>
       </div>
       </ng-template>
-    </div>
-  </div>
-
-  <!-- ── FAQs ─────────────────────────────────────────────── -->
-  <div class="brd-faq-section" *ngIf="property()?.faqs && property()!.faqs.length > 0">
-    <h2 class="brd-faq-title">Frequently Asked Questions</h2>
-    <div class="brd-faq-list">
-      <div class="brd-faq-item" *ngFor="let faq of property()!.faqs; let i = index"
-        (click)="toggleFaq(i)" [class.open]="openFaqIndex() === i">
-        <div class="brd-faq-q">
-          {{ faq.question }}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        </div>
-        <div class="brd-faq-a" *ngIf="openFaqIndex() === i" [innerHTML]="safeHtml(faq.answer)"></div>
-      </div>
     </div>
   </div>
 

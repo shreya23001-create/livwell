@@ -2,7 +2,7 @@ import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, Title } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface DeveloperFaq { question: string; answer: string; }
@@ -49,6 +49,7 @@ export class DeveloperDetailComponent implements OnInit {
   private sb        = inject(SupabaseService).client;
   private route     = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
+  private titleSvc  = inject(Title);
 
   dev      = signal<Developer | null>(null);
   notFound = signal(false);
@@ -117,7 +118,9 @@ export class DeveloperDetailComponent implements OnInit {
       return;
     }
 
-    this.dev.set({ ...data, faqs: Array.isArray(data.faqs) ? data.faqs : [] } as Developer);
+    const dev = { ...data, faqs: Array.isArray(data.faqs) ? data.faqs : [] } as Developer;
+    this.dev.set(dev);
+    this.titleSvc.setTitle(`${dev.name} | Livwell`);
 
     // Load published projects for this developer
     const { data: projs } = await this.sb

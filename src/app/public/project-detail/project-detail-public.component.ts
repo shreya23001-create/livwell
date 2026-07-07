@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl, Title } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
@@ -53,6 +53,7 @@ export class ProjectDetailPublicComponent implements OnInit {
   private route      = inject(ActivatedRoute);
   private router     = inject(Router);
   private sanitizer  = inject(DomSanitizer);
+  private titleSvc   = inject(Title);
   private auth       = inject(AuthService);
   private emailSvc   = inject(EmailService);
   private platformId = inject(PLATFORM_ID);
@@ -226,6 +227,7 @@ export class ProjectDetailPublicComponent implements OnInit {
       p.images = [...real, ...local];
       p.faqs = Array.isArray((data as any).faqs) ? (data as any).faqs : [];
       this.project.set(p);
+      this.titleSvc.setTitle(`${p.title} | Livwell`);
       this.geocodeAndSetMap(data as Project);
       const userId = this.auth.currentUser()?.id;
       if (userId) {

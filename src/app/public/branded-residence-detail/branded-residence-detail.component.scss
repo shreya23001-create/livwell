@@ -566,12 +566,6 @@ $radius: 10px;
 .brd-video-btn { display: inline-flex; align-items: center; padding: 0.6rem 1.5rem; background: $gold; color: #111; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; text-decoration: none; margin-top: 0.25rem; &:hover { opacity: 0.9; } }
 
 /* ── FAQs ──────────────────────────────────────────── */
-.brd-faq-section {
-  max-width: 900px; margin: 0 auto 3rem; padding: 0 1.5rem;
-}
-.brd-faq-title {
-  font-size: 1.4rem; font-weight: 700; color: #0a0e1a; margin-bottom: 1.25rem;
-}
 .brd-faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
 .brd-faq-item {
   border: 1px solid #e8eaed; border-radius: 10px; overflow: hidden; cursor: pointer;

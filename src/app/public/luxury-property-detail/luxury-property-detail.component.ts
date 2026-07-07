@@ -2,7 +2,7 @@ import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml, Title } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
@@ -605,6 +605,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     return /\.(mp4|mov|avi|webm)(\?|$)/i.test(url) ? url : null;
   });
 
+  private titleSvc = inject(Title);
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router) {}
 
   private async geocodeAndSetMap(community: string, location: string): Promise<void> {
@@ -740,6 +741,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     };
 
     this.property.set(detail);
+    this.titleSvc.setTitle(`${detail.title} | Livwell`);
     this.mortgageAmount.set(priceNum);
     this.geocodeAndSetMap(p.community ?? '', p.location ?? '');
     if (/^\d+$/.test(rawParam)) {

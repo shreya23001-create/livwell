@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed, inject, PLATFORM_ID, HostListener 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl, Title } from '@angular/platform-browser';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
@@ -50,6 +50,7 @@ export class PropertyDetailComponent implements OnInit {
   private auth       = inject(AuthService);
   private emailSvc   = inject(EmailService);
   private sanitizer  = inject(DomSanitizer);
+  private titleSvc   = inject(Title);
   private platformId = inject(PLATFORM_ID);
 
   property          = signal<Property | null>(null);
@@ -332,6 +333,7 @@ export class PropertyDetailComponent implements OnInit {
       }
 
       this.property.set(prop);
+      this.titleSvc.setTitle(`${prop.title} | Livwell`);
       this.mortgagePrice.set(prop.price);
       this.geocodeAndSetMap(prop);
 

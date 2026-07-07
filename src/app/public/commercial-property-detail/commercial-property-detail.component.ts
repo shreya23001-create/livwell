@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml, Title } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
@@ -327,6 +327,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
   private route      = inject(ActivatedRoute);
   private router     = inject(Router);
   private sanitizer  = inject(DomSanitizer);
+  private titleSvc   = inject(Title);
   private sb         = inject(SupabaseService).client;
   private auth       = inject(AuthService);
   private emailSvc   = inject(EmailService);
@@ -498,6 +499,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
       }
 
       this.property.set(detail);
+      this.titleSvc.setTitle(`${detail.title} | Livwell`);
       this.loading.set(false);
       this.geocodeAndSetMap(p.community ?? '', p.location ?? '');
       this.auth.waitForSession().then(() => this.checkFavStatus(p.id));
@@ -508,6 +510,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
     // Fall back to static data for legacy IDs 1–15
     const found = ALL_COMMERCIAL[id] ?? null;
     this.property.set(found);
+    if (found) { this.titleSvc.setTitle(`${found.title} | Livwell`); }
     this.notFound.set(!found);
     this.loading.set(false);
     if (found) { this.geocodeAndSetMap(found.developer ?? '', found.location ?? ''); }

@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml, Title } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
@@ -53,6 +53,7 @@ export class BrandedResidenceDetailComponent implements OnInit {
   private route     = inject(ActivatedRoute);
   private router    = inject(Router);
   private sanitizer = inject(DomSanitizer);
+  private titleSvc  = inject(Title);
   private auth      = inject(AuthService);
 
   isLoggedIn = this.auth.isLoggedIn;
@@ -121,6 +122,7 @@ export class BrandedResidenceDetailComponent implements OnInit {
       p.images = (p.images ?? []).filter((u: string) => u && !u.includes('unsplash.com'));
       p.faqs = Array.isArray((data as any).faqs) ? (data as any).faqs : [];
       this.property.set(p);
+      this.titleSvc.setTitle(`${p.title} | Livwell`);
       this.geocodeAndSetMap(p);
       if (/^\d+$/.test(rawParam)) {
         this.router.navigate(['/branded-residence', toPropertySlug(p.title, p.id)], { replaceUrl: true });

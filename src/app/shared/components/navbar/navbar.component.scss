@@ -31,7 +31,10 @@
       background: transparent;
       border-color: #1a5c3a;
       color: #1a5c3a;
-      .nav-profile-name { color: #1a5c3a; }
+
+      .nav-profile-name {
+        color: #1a5c3a;
+      }
     }
 
     .hamburger span {
@@ -486,9 +489,9 @@
   align-items: center;
   gap: 0.5rem;
   background: white;
-  border: 1.5px solid rgba(255,255,255,0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
   border-radius: 0.375rem;
-  padding: 0.45rem 0.9rem 0.45rem 0.5rem;
+  padding: 0.30rem 0.6rem 0.3rem 0.4rem;
   cursor: pointer;
   transition: all 0.2s;
   color: #000;
@@ -496,7 +499,7 @@
   font-weight: 600;
 
   &:hover {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     border-color: #fff;
   }
 
@@ -509,11 +512,20 @@
     &:hover {
       background: #1a5c3a;
       color: #fff;
-      .nav-profile-name { color: #fff; }
-      .nav-avatar { background: #fff; color: #1a5c3a; }
+
+      .nav-profile-name {
+        color: #fff;
+      }
+
+      .nav-avatar {
+        background: #fff;
+        color: #1a5c3a;
+      }
     }
 
-    .nav-profile-name { color: #1a5c3a; }
+    .nav-profile-name {
+      color: #1a5c3a;
+    }
   }
 }
 
@@ -589,13 +601,22 @@
   cursor: pointer;
   font-size: 0.83rem;
 
-  svg { flex-shrink: 0; color: #6b7280; }
+  svg {
+    flex-shrink: 0;
+    color: #6b7280;
+  }
 }
 
 .nav-dd-item--danger {
   color: #dc2626 !important;
-  svg { color: #dc2626; }
-  &:hover { background: #fff5f5 !important; }
+
+  svg {
+    color: #dc2626;
+  }
+
+  &:hover {
+    background: #fff5f5 !important;
+  }
 }
 
 /* ── Hamburger (mobile) ───────────────────────── */
@@ -701,7 +722,9 @@
   color: #1a1a2e;
   transition: background 0.15s;
 
-  &:hover { background: #f3f4f6; }
+  &:hover {
+    background: #f3f4f6;
+  }
 }
 
 /* Drawer nav body */
@@ -725,9 +748,14 @@
   border-bottom: 1px solid #f5f5f5;
   transition: color 0.15s;
 
-  svg { color: #9ca3af; flex-shrink: 0; }
+  svg {
+    color: #9ca3af;
+    flex-shrink: 0;
+  }
 
-  &:hover { color: #1a5c3a; }
+  &:hover {
+    color: #1a5c3a;
+  }
 }
 
 /* Accordion section */
@@ -759,10 +787,15 @@
 
   &.open {
     color: #1a5c3a;
-    svg { transform: rotate(180deg); }
+
+    svg {
+      transform: rotate(180deg);
+    }
   }
 
-  &:hover { color: #1a5c3a; }
+  &:hover {
+    color: #1a5c3a;
+  }
 }
 
 .mob-section-body {
@@ -786,7 +819,9 @@
   border-bottom: 1px solid #f0f0f0;
   transition: color 0.15s, background 0.15s;
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 
   &:hover {
     color: #1a5c3a;
@@ -875,21 +910,31 @@
   &--primary {
     background: #1a5c3a;
     color: #fff;
-    &:hover { background: #154d30; }
+
+    &:hover {
+      background: #154d30;
+    }
   }
 
   &--outline {
     background: transparent;
     border: 1.5px solid #1a5c3a;
     color: #1a5c3a;
-    &:hover { background: #1a5c3a; color: #fff; }
+
+    &:hover {
+      background: #1a5c3a;
+      color: #fff;
+    }
   }
 
   &--danger {
     background: #fff5f5;
     color: #dc2626;
     border: 1.5px solid #fca5a5;
-    &:hover { background: #fee2e2; }
+
+    &:hover {
+      background: #fee2e2;
+    }
   }
 }
 
@@ -1091,7 +1136,9 @@
     display: block;
     pointer-events: none;
 
-    &.open { pointer-events: auto; }
+    &.open {
+      pointer-events: auto;
+    }
   }
 
   .mob-drawer {

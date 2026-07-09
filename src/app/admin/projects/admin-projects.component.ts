@@ -27,6 +27,7 @@ export interface Project {
   bathrooms: number;
   area_sqft: number;
   completion_date: string;
+  launch_date: string;
   payment_plan: string;
   description: string;
   amenities: string[];
@@ -49,7 +50,7 @@ export interface Project {
 const BLANK: Project = {
   title: '', developer: '', location: '', community: '', type: 'Apartment',
   status: 'Draft', price_from: 0, price_label: '', price_per_sqft: '',
-  beds: '', bathrooms: 0, area_sqft: 0, completion_date: '', payment_plan: '',
+  beds: '', bathrooms: 0, area_sqft: 0, completion_date: '', launch_date: '', payment_plan: '',
   description: '', amenities: [], images: [], floor_plan_url: '',
   badge: '', is_featured: false, is_luxury: false, is_ultra_luxury: false,
   is_branded: false, brand: '', brand_logo_url: '', agent_name: '', video_url: null,
@@ -373,7 +374,7 @@ export class AdminProjectsComponent implements OnInit {
       type: f.type, status: f.status, price_from: f.price_from || 0,
       price_label: f.price_label, price_per_sqft: f.price_per_sqft,
       beds: f.beds, bathrooms: f.bathrooms || 0, area_sqft: f.area_sqft || 0,
-      completion_date: f.completion_date, payment_plan: f.payment_plan,
+      completion_date: f.completion_date, launch_date: f.launch_date, payment_plan: f.payment_plan,
       description: f.description, amenities: f.amenities,
       images: this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
       floor_plan_url: f.floor_plan_url, badge: f.badge,
@@ -435,6 +436,7 @@ export class AdminProjectsComponent implements OnInit {
       'Bathrooms':      p.bathrooms,
       'Area (sqft)':    p.area_sqft,
       'Completion':     p.completion_date,
+      'Launch Date':    p.launch_date,
       'Payment Plan':   p.payment_plan,
       'Description':    p.description,
       'Amenities':      (p.amenities ?? []).join(', '),
@@ -496,6 +498,7 @@ export class AdminProjectsComponent implements OnInit {
       bathrooms:      Number(r['Bathrooms'])|| 0,
       area_sqft:      Number(r['Area (sqft)']) || 0,
       completion_date: r['Completion']      || '',
+      launch_date:     r['Launch Date']     || '',
       payment_plan:   r['Payment Plan']     || '',
       description:    r['Description']      || '',
       amenities:      r['Amenities'] ? String(r['Amenities']).split(',').map((s: string) => s.trim()).filter(Boolean) : [],

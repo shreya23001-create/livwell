@@ -104,6 +104,7 @@ export class ProjectsPublicComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['q'])        this.searchQuery.set(params['q']);
       if (params['location']) this.searchQuery.set(params['location']);
+      if (params['type'])     this.selectedType.set(params['type']);
       this.currentPage.set(1);
     });
 

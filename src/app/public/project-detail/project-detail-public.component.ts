@@ -26,6 +26,7 @@ interface Project {
   bathrooms: number;
   area_sqft: number;
   completion_date: string;
+  launch_date: string;
   payment_plan: string;
   description: string;
   amenities: string[];

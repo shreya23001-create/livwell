@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
 
@@ -38,7 +38,8 @@ export interface FaqItem {
   styleUrl: './off-plan.component.scss',
 })
 export class OffPlanComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb    = inject(SupabaseService).client;
+  private route = inject(ActivatedRoute);
 
   allProjects = signal<OffPlanProject[]>([]);
   loading     = signal(true);
@@ -80,6 +81,10 @@ export class OffPlanComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
+    this.route.queryParams.subscribe(params => {
+      if (params['type']) this.selectedType.set(params['type']);
+    });
+
     const { data } = await this.sb
       .from('projects')
       .select('id, title, developer, location, community, type, status, price_from, price_label, beds, completion_date, badge, images, is_featured, description, amenities')

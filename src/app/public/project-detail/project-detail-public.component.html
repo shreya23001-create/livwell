@@ -151,12 +151,12 @@
             <span class="pd-hl-val">{{ p.community || p.location }}</span>
           </div>
 
-          <div class="pd-hl-cell" *ngIf="p.created_at">
+          <div class="pd-hl-cell" *ngIf="p.launch_date">
             <div class="pd-hl-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25"/></svg>
             </div>
             <span class="pd-hl-lbl">Launch</span>
-            <span class="pd-hl-val">{{ p.created_at | date:'QQQ yyyy' }}</span>
+            <span class="pd-hl-val">{{ p.launch_date }}</span>
           </div>
 
           <div class="pd-hl-cell" *ngIf="p.completion_date">

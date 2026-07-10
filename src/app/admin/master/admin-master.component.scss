@@ -361,3 +361,131 @@ $red:    #ef4444;
   margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid $border;
 }
 
+// ── Settings Tab ──────────────────────────────────────────
+.stt-tabs {
+  display: flex; gap: 0.5rem; margin: 1.25rem 0 0;
+  border-bottom: 1px solid $border; padding-bottom: 0;
+}
+.stt-tab {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 1.1rem; border: none; background: none;
+  font-size: 0.875rem; font-weight: 500; color: $muted;
+  cursor: pointer; border-bottom: 2.5px solid transparent;
+  margin-bottom: -1px; border-radius: 0.375rem 0.375rem 0 0;
+  transition: color 0.15s, border-color 0.15s;
+  &:hover { color: $text; }
+  &.active { color: $accent; border-bottom-color: $accent; font-weight: 600; }
+  svg { flex-shrink: 0; }
+}
+
+.stt-panel {
+  padding: 1.5rem 0 0.25rem;
+}
+
+.stt-field-group {
+  margin-bottom: 1.1rem;
+}
+
+.stt-label {
+  display: block; font-size: 0.8rem; font-weight: 600;
+  color: $text; margin-bottom: 0.35rem;
+}
+
+.stt-hint {
+  font-size: 0.78rem; color: $muted; margin: 0 0 0.6rem; line-height: 1.5;
+}
+
+.stt-input-row {
+  display: flex; align-items: center; gap: 0;
+}
+
+.stt-prefix {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; flex-shrink: 0;
+  background: #f3f4f6; border: 1px solid $border;
+  border-right: none; border-radius: 0.5rem 0 0 0.5rem;
+  color: $muted;
+  &.stt-prefix--wa { color: #25d366; }
+  &.stt-prefix--fb { color: #1877f2; }
+  &.stt-prefix--ig { color: #e1306c; }
+  &.stt-prefix--li { color: #0a66c2; }
+  &.stt-prefix--yt { color: #ff0000; }
+}
+
+.stt-input {
+  width: 100%; height: 38px; padding: 0 0.75rem;
+  border: 1px solid $border; border-radius: 0.5rem;
+  font-size: 0.85rem; color: $text; background: #fff;
+  transition: border-color 0.15s;
+  &:focus { border-color: $accent; }
+  &.stt-input--prefixed { border-radius: 0 0.5rem 0.5rem 0; }
+  &.stt-input--pass { border-radius: 0.5rem 0 0 0.5rem; border-right: none; flex: 1; }
+}
+
+.stt-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.6rem center; background-size: 16px;
+  padding-right: 2rem;
+}
+
+.stt-eye {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; flex-shrink: 0;
+  border: 1px solid $border; border-left: none; border-radius: 0 0.5rem 0.5rem 0;
+  background: #f9fafb; cursor: pointer; color: $muted;
+  &:hover { color: $text; }
+}
+
+.stt-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.5rem;
+}
+
+.stt-smtp-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.5rem;
+}
+
+.stt-smtp-col { padding-top: 0.5rem; }
+
+.stt-section-head {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+  color: $muted; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+.stt-section-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #10b981; flex-shrink: 0;
+}
+
+.stt-test-row {
+  display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem;
+}
+
+.stt-test-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.55rem 1.1rem; border: 1.5px solid $accent;
+  border-radius: 0.5rem; background: #fff; color: $accent;
+  font-size: 0.825rem; font-weight: 600; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  &:hover:not(:disabled) { background: $accent; color: #fff; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.stt-test-msg {
+  font-size: 0.8rem; font-weight: 500;
+  &.ok  { color: #10b981; }
+  &.err { color: $red; }
+}
+
+@keyframes stt-spin { to { transform: rotate(360deg); } }
+.stt-spin { animation: stt-spin 0.8s linear infinite; }
+
+.stt-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid $border;
+}
+
+.stt-footer-note {
+  font-size: 0.78rem; color: $muted; margin: 0;
+}
+

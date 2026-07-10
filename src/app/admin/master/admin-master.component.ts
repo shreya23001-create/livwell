@@ -10,7 +10,8 @@ import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 
 export { AMENITY_ICONS };
 
-type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' | 'locations' | 'communities' | 'amenities' | 'partner-logos';
+type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' | 'locations' | 'communities' | 'amenities' | 'partner-logos' | 'settings';
+type SettingsSubTab = 'whatsapp' | 'social' | 'smtp';
 
 
 
@@ -32,7 +33,99 @@ export class AdminMasterComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    await this.loadPartnerLogos();
+    await Promise.all([this.loadPartnerLogos(), this.loadSettings()]);
+  }
+
+  private async loadSettings(): Promise<void> {
+    const { data } = await this.sb.from('site_settings')
+      .select('key, value')
+      .in('key', ['whatsapp_number', 'social_links', 'smtp_config']);
+    if (!data) return;
+    for (const row of data) {
+      if (row.key === 'whatsapp_number') {
+        this.whatsappNumber.set(row.value ?? '');
+      } else if (row.key === 'social_links') {
+        try { this.socialLinks.set({ ...this.socialLinks(), ...JSON.parse(row.value) }); } catch {}
+      } else if (row.key === 'smtp_config') {
+        try { this.smtp.set({ ...this.smtp(), ...JSON.parse(row.value) }); } catch {}
+      }
+    }
+  }
+
+  async saveWhatsapp(): Promise<void> {
+    this.whatsappSaving.set(true);
+    const { error } = await this.sb.from('site_settings')
+      .upsert({ key: 'whatsapp_number', value: this.whatsappNumber() }, { onConflict: 'key' });
+    this.whatsappSaving.set(false);
+    if (error) { this.toast.error(error.message); return; }
+    this.whatsappSaved.set(true);
+    setTimeout(() => this.whatsappSaved.set(false), 2500);
+  }
+
+  async saveSocial(): Promise<void> {
+    this.socialSaving.set(true);
+    const { error } = await this.sb.from('site_settings')
+      .upsert({ key: 'social_links', value: JSON.stringify(this.socialLinks()) }, { onConflict: 'key' });
+    this.socialSaving.set(false);
+    if (error) { this.toast.error(error.message); return; }
+    this.socialSaved.set(true);
+    setTimeout(() => this.socialSaved.set(false), 2500);
+  }
+
+  updateSocial(field: keyof ReturnType<typeof this.socialLinks>, value: string): void {
+    this.socialLinks.update(s => ({ ...s, [field]: value }));
+  }
+
+  updateSmtp(field: keyof ReturnType<typeof this.smtp>, value: string): void {
+    this.smtp.update(s => ({ ...s, [field]: value }));
+  }
+
+  async saveSmtp(): Promise<void> {
+    this.smtpSaving.set(true);
+    const { error } = await this.sb.from('site_settings')
+      .upsert({ key: 'smtp_config', value: JSON.stringify(this.smtp()) }, { onConflict: 'key' });
+    this.smtpSaving.set(false);
+    if (error) { this.toast.error(error.message); return; }
+    this.smtpSaved.set(true);
+    setTimeout(() => this.smtpSaved.set(false), 2500);
+  }
+
+  async sendTestEmail(): Promise<void> {
+    const toEmail = this.smtp().from_email || this.smtp().username;
+    if (!toEmail) { this.toast.error('Set a From Email first.'); return; }
+    this.smtpTesting.set(true);
+    this.smtpTestMsg.set('');
+    this.smtpTestOk.set(null);
+    await this.saveSmtp();
+    try {
+      const supabaseUrl = (this.sb as any).supabaseUrl as string;
+      const { data: { session } } = await this.sb.auth.getSession();
+      const res = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({
+          type: 'smtp_test',
+          data: { to_email: toEmail, name: 'Admin', subject: 'SMTP Test from Livwell' },
+        }),
+      });
+      const json = await res.json().catch(() => null);
+      this.smtpTesting.set(false);
+      if (res.ok || json?.sent) {
+        this.smtpTestOk.set(true);
+        this.smtpTestMsg.set('✓ Test email sent to ' + toEmail);
+      } else {
+        this.smtpTestOk.set(false);
+        this.smtpTestMsg.set('Failed: ' + (json?.error ?? res.statusText));
+      }
+    } catch (e: any) {
+      this.smtpTesting.set(false);
+      this.smtpTestOk.set(false);
+      this.smtpTestMsg.set('Error: ' + e.message);
+    }
+    setTimeout(() => { this.smtpTestMsg.set(''); this.smtpTestOk.set(null); }, 5000);
   }
 
   activeTab = signal<MasterTab>('categories');
@@ -79,6 +172,45 @@ export class AdminMasterComponent implements OnInit {
   }
   amenityError     = signal('');
   saving           = signal(false);
+
+  // Settings
+  settingsSubTab = signal<SettingsSubTab>('whatsapp');
+
+  // WhatsApp
+  whatsappNumber  = signal('');
+  whatsappSaving  = signal(false);
+  whatsappSaved   = signal(false);
+
+  // Social media
+  socialLinks = signal({
+    facebook:  '',
+    instagram: '',
+    twitter:   '',
+    linkedin:  '',
+    youtube:   '',
+    tiktok:    '',
+  });
+  socialSaving = signal(false);
+  socialSaved  = signal(false);
+
+  // SMTP
+  smtp = signal({
+    host:       '',
+    port:       '587',
+    username:   '',
+    password:   '',
+    encryption: 'TLS',
+    auth_method:'Login',
+    from_name:  '',
+    from_email: '',
+    reply_to:   '',
+  });
+  smtpSaving    = signal(false);
+  smtpSaved     = signal(false);
+  smtpTesting   = signal(false);
+  smtpTestMsg   = signal('');
+  smtpTestOk    = signal<boolean | null>(null);
+  smtpShowPass  = signal(false);
 
   // Partner logos
   partnerLogos     = signal<{ url: string; name: string; link: string }[]>([]);

@@ -49,6 +49,16 @@ export class NavbarComponent implements OnInit {
 
   currentYear = new Date().getFullYear();
 
+  whatsappNumber = signal('');
+  socialLinks = signal({ facebook: '', instagram: '', twitter: '', linkedin: '', youtube: '', tiktok: '' });
+
+  get whatsappHref(): string {
+    const digits = this.whatsappNumber().replace(/[^\d]/g, '');
+    return digits
+      ? `https://wa.me/${digits}?text=Hello%2C%20I%27m%20interested%20in%20a%20property%20on%20Livwell.`
+      : 'https://wa.me/971500000000?text=Hello%2C%20I%27m%20interested%20in%20a%20property%20on%20Livwell.';
+  }
+
   private sb = inject(SupabaseService).client;
 
   constructor(public auth: AuthService, private router: Router) {}
@@ -61,6 +71,20 @@ export class NavbarComponent implements OnInit {
 
     this.loadLuxeTypes();
     this.loadProjectFlags();
+    this.loadSiteSettings();
+  }
+
+  private async loadSiteSettings(): Promise<void> {
+    const { data } = await this.sb.from('site_settings')
+      .select('key, value')
+      .in('key', ['whatsapp_number', 'social_links']);
+    if (!data) return;
+    for (const row of data) {
+      if (row.key === 'whatsapp_number') this.whatsappNumber.set(row.value ?? '');
+      if (row.key === 'social_links') {
+        try { this.socialLinks.set({ ...this.socialLinks(), ...JSON.parse(row.value) }); } catch {}
+      }
+    }
   }
 
   private async loadLuxeTypes(): Promise<void> {

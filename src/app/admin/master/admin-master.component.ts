@@ -81,7 +81,7 @@ export class AdminMasterComponent implements OnInit {
   saving           = signal(false);
 
   // Partner logos
-  partnerLogos     = signal<{ url: string; name: string }[]>([]);
+  partnerLogos     = signal<{ url: string; name: string; link: string }[]>([]);
   plDragOver       = signal(false);
   plUploading      = signal(false);
   plSaving         = signal(false);
@@ -347,7 +347,7 @@ export class AdminMasterComponent implements OnInit {
     if (error) { this.partnerLogoError.set('Upload failed: ' + error.message); this.plUploading.set(false); return; }
     const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
     const name = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
-    this.partnerLogos.update(list => [...list, { url: pub.publicUrl, name }]);
+    this.partnerLogos.update(list => [...list, { url: pub.publicUrl, name, link: '' }]);
     this.plUploading.set(false);
   }
 
@@ -357,11 +357,15 @@ export class AdminMasterComponent implements OnInit {
       return;
     }
     this.partnerLogoError.set('');
-    this.partnerLogos.update(list => [...list, { ...preset }]);
+    this.partnerLogos.update(list => [...list, { ...preset, link: '' }]);
   }
 
   updatePartnerLogoName(index: number, name: string): void {
     this.partnerLogos.update(list => list.map((l, i) => i === index ? { ...l, name } : l));
+  }
+
+  updatePartnerLogoLink(index: number, link: string): void {
+    this.partnerLogos.update(list => list.map((l, i) => i === index ? { ...l, link } : l));
   }
 
   removePartnerLogo(index: number): void {

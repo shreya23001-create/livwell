@@ -42,6 +42,7 @@ export interface Project {
   brand_logo_url: string;
   agent_name: string;
   video_url: string | null;
+  total_units: number | null;
   trending_category: string;
   faqs: ProjectFaq[];
   created_at?: string;
@@ -54,7 +55,7 @@ const BLANK: Project = {
   description: '', amenities: [], images: [], floor_plan_url: '',
   badge: '', is_featured: false, is_luxury: false, is_ultra_luxury: false,
   is_branded: false, brand: '', brand_logo_url: '', agent_name: '', video_url: null,
-  trending_category: '', faqs: [],
+  total_units: null, trending_category: '', faqs: [],
 };
 
 @Component({
@@ -105,6 +106,10 @@ export class AdminProjectsComponent implements OnInit {
   uploadedImages     = signal<string[]>([]);
   previewImages      = signal<string[]>([]);
   uploadingBrandLogo = signal(false);
+  uploadingVideo     = signal(false);
+  videoDragOver      = signal(false);
+  videoTab           = signal<'url' | 'upload'>('url');
+  videoError         = signal('');
 
   readonly masterPropTypes = this.dataSvc.propTypes;
 
@@ -381,7 +386,8 @@ export class AdminProjectsComponent implements OnInit {
       is_featured: f.is_featured, is_luxury: f.is_luxury, is_ultra_luxury: f.is_ultra_luxury,
       is_branded: f.is_branded, brand: f.brand, brand_logo_url: f.brand_logo_url,
       agent_name: f.agent_name,
-      video_url: (f as any).video_url ?? null,
+      video_url: f.video_url ?? null,
+      total_units: f.total_units ? Number(f.total_units) : null,
       trending_category: f.trending_category ?? '',
       faqs: this.faqs().filter(q => q.question.trim()),
     };
@@ -521,5 +527,50 @@ export class AdminProjectsComponent implements OnInit {
 
     this.importing.set(false);
     input.value = '';
+  }
+
+  onVideoFileChange(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) this.uploadVideoFile(file);
+  }
+
+  onVideoDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.videoDragOver.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (file) this.uploadVideoFile(file);
+  }
+
+  private async uploadVideoFile(file: File): Promise<void> {
+    const allowed = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
+    const maxSize = 200 * 1024 * 1024;
+    if (!allowed.includes(file.type)) { this.videoError.set('Unsupported format. Use MP4, WebM, MOV, or AVI.'); return; }
+    if (file.size > maxSize) { this.videoError.set('Video exceeds 200 MB limit.'); return; }
+    this.uploadingVideo.set(true);
+    this.videoError.set('');
+    try {
+      const ext  = (file.name.split('.').pop() || 'mp4').toLowerCase();
+      const path = `videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { data, error } = await this.sb.storage
+        .from('imagesFolder')
+        .upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
+      if (error) {
+        const msg = error.message ?? '';
+        if (msg.toLowerCase().includes('payload too large') || msg.toLowerCase().includes('file size') || msg.includes('413')) {
+          this.videoError.set('Upload failed: file exceeds the storage bucket limit. Ask your admin to increase the bucket max file size in Supabase → Storage → imagesFolder → Edit bucket.');
+        } else {
+          this.videoError.set('Upload failed: ' + msg);
+        }
+        return;
+      }
+      if (data) {
+        const { data: pub } = this.sb.storage.from('imagesFolder').getPublicUrl(data.path);
+        this.draft.video_url = pub.publicUrl;
+      }
+    } catch (e: any) {
+      this.videoError.set('Upload error: ' + (e?.message ?? 'Unknown'));
+    } finally {
+      this.uploadingVideo.set(false);
+    }
   }
 }

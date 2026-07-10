@@ -379,6 +379,8 @@
             </div>
             <input class="master-pl-name" type="text" [value]="logo.name"
               (input)="updatePartnerLogoName(i, $any($event.target).value)" placeholder="Logo name" />
+            <input class="master-pl-name master-pl-link" type="url" [value]="logo.link || ''"
+              (input)="updatePartnerLogoLink(i, $any($event.target).value)" placeholder="https://developer.com (optional)" />
             <div class="master-pl-card__actions">
               <button class="master-pl-move" (click)="movePartnerLogo(i, -1)" [disabled]="i === 0" title="Move left">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>

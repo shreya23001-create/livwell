@@ -171,6 +171,59 @@
   box-sizing: border-box;
 }
 
+/* Disable Tailwind Forms blue focus ring globally */
+[type='text']:focus,
+[type='email']:focus,
+[type='url']:focus,
+[type='password']:focus,
+[type='number']:focus,
+[type='date']:focus,
+[type='datetime-local']:focus,
+[type='month']:focus,
+[type='search']:focus,
+[type='tel']:focus,
+[type='time']:focus,
+[type='week']:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus {
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
+  --tw-ring-offset-shadow: none !important;
+  box-shadow: none !important;
+  border-color: inherit !important;
+  outline: none !important;
+}
+
+/* =============================================
+   RICH TEXT LIST RESET — override Tailwind preflight
+   ============================================= */
+/* Standard ul/ol inside rich text containers */
+.pd-desc-text ul { padding-left: 2rem !important; list-style-type: disc !important; margin: 0.5rem 0 1.1rem !important; }
+.pd-desc-text ol { padding-left: 2rem !important; list-style-type: decimal !important; margin: 0.5rem 0 1.1rem !important; }
+.pd-desc-text ul li { list-style-type: disc !important; display: list-item !important; padding-left: 0.25rem; margin-bottom: 0.4rem; }
+.pd-desc-text ol li { list-style-type: decimal !important; display: list-item !important; padding-left: 0.25rem; margin-bottom: 0.4rem; }
+.pd-desc-text p { margin: 0 0 0.6rem !important; }
+.pd-desc-text p:has(> strong:only-child),
+.pd-desc-text p:has(> b:only-child) { margin-top: 1.4rem !important; margin-bottom: 0.25rem !important; }
+.pd-desc-text a { color: #1a5c3a !important; text-decoration: underline !important; }
+.pd-desc-text table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.875rem; }
+.pd-desc-text table td, .pd-desc-text table th { border: 1px solid #e5e7eb; padding: 0.5rem 0.75rem; text-align: left; }
+
+/* Quill data-list attributes (editor + rendered output) */
+li[data-list="bullet"] {
+  list-style-type: disc !important;
+  display: list-item !important;
+}
+li[data-list="bullet"]::before { content: none !important; }
+
+li[data-list="ordered"] {
+  list-style-type: decimal !important;
+  display: list-item !important;
+  padding-left: 0.25rem !important;
+}
+li[data-list="ordered"]::before { content: none !important; }
+
 html {
   scroll-behavior: smooth;
   font-size: 16px;
@@ -187,6 +240,66 @@ body {
 }
 
 /* =============================================
+   GLOBAL FOCUS — remove blue browser outline everywhere
+   ============================================= */
+*:focus,
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible,
+button:focus,
+button:focus-visible,
+a:focus,
+a:focus-visible,
+[contenteditable]:focus,
+[contenteditable]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* =============================================
+   DETAIL PAGE TITLES — Plus Jakarta Sans font
+   ============================================= */
+.pd-hero-title,
+.pd-title,
+.brd-title,
+.lpd-hero-title,
+.lpd-main-title,
+.ard-title,
+.bd-title,
+.gd-hero-title,
+.nd-hero-title,
+.nd-plain-title,
+.dd-info-card__name {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif !important;
+}
+
+/* =============================================
+   GLOBAL CARD HOVER — applies across all pages
+   ============================================= */
+.prop-card, .prop-list-card, .prj-card, .op-card, .lxp-card,
+.lpfs-card, .br-card, .dev-row, .dd-proj-card,
+.agent-card, .ag-card,
+.lp-card, .offplan-card, .trending-card, .property-card,
+.bl-card, .bl-featured, .guide-card, .guide-card__cta,
+.news-card, .bd-sugg-card, .nd-related-card,
+.area-card, .pd-prop-card {
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+
+  &:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+/* =============================================
    TYPOGRAPHY
    ============================================= */
 h1,
@@ -195,7 +308,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'DM Serif Display', 'Plus Jakarta Sans', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   line-height: 1.25;
   font-weight: 700;
   color: var(--dark-800);

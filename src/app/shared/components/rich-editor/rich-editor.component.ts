@@ -1,15 +1,16 @@
 import {
   Component, Input, Output, EventEmitter,
   AfterViewInit, OnDestroy, OnChanges, SimpleChanges,
-  ViewChild, ElementRef, forwardRef
+  ViewChild, ElementRef, forwardRef, signal
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import Quill from 'quill';
 
 @Component({
   selector: 'app-rich-editor',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => RichEditorComponent),
@@ -29,6 +30,8 @@ import Quill from 'quill';
         <button type="button" class="re-btn" (mousedown)="fmtHeader($event,3)" title="Sub-heading">H3</button>
         <span class="re-sep"></span>
         <button type="button" class="re-btn" (mousedown)="insertLink($event)" title="Link">🔗</button>
+        <button type="button" class="re-btn" (mousedown)="insertTable($event)" title="Insert Table">⊞</button>
+        <button type="button" class="re-btn re-del-table" (mousedown)="deleteTable($event)" title="Delete Table" [class.re-del-table--active]="hasAnyTable()">🗑</button>
         <button type="button" class="re-btn" (mousedown)="clearFmt($event)" title="Clear">✕</button>
       </div>
       <div #editorEl class="re-editor"></div>
@@ -49,6 +52,8 @@ import Quill from 'quill';
       line-height: 1.4; min-width: 28px; text-align: center;
       &:hover { background: #e5e7eb; }
       &.active { background: #dcfce7; color: #1a5c3a; border-color: #bbf7d0; }
+      &.re-del-table { color: #9ca3af; pointer-events: none; opacity: 0.5; }
+      &.re-del-table--active { color: #dc2626; pointer-events: auto; opacity: 1; &:hover { background: #fee2e2; } }
     }
     .re-italic { font-style: italic; }
     .re-underline { text-decoration: underline; }
@@ -60,8 +65,35 @@ import Quill from 'quill';
     :host ::ng-deep .re-editor p { margin: 0 0 0.4em; }
     :host ::ng-deep .re-editor h2 { font-size: 1.1rem; font-weight: 700; margin: 0.5em 0 0.25em; }
     :host ::ng-deep .re-editor h3 { font-size: 0.95rem; font-weight: 700; margin: 0.5em 0 0.25em; }
-    :host ::ng-deep .re-editor ul, :host ::ng-deep .re-editor ol { margin: 0.25em 0 0.25em 1.25em; padding: 0; }
+    :host ::ng-deep .ql-editor ul,
+    :host ::ng-deep .ql-editor ol { padding-left: 1.5em !important; margin: 0.25em 0; }
+
+    /* Quill bullet list — data-list="bullet" */
+    :host ::ng-deep .ql-editor li[data-list="bullet"] {
+      list-style-type: disc !important;
+      display: list-item !important;
+    }
+    :host ::ng-deep .ql-editor li[data-list="bullet"]::before {
+      content: none !important;
+    }
+
+    /* Quill ordered list — data-list="ordered" */
+    :host ::ng-deep .ql-editor li[data-list="ordered"] {
+      list-style-type: decimal !important;
+      display: list-item !important;
+    }
+    :host ::ng-deep .ql-editor li[data-list="ordered"]::before {
+      content: none !important;
+    }
+
+    /* Counter reset for ordered lists */
+    :host ::ng-deep .ql-editor ol { counter-reset: list-0; }
+    :host ::ng-deep .ql-editor li[data-list="ordered"] { counter-increment: list-0; }
     :host ::ng-deep .re-editor a { color: #1a5c3a; text-decoration: underline; }
+    :host ::ng-deep .ql-editor table { width: 100%; border-collapse: collapse; margin: 0.75em 0; }
+    :host ::ng-deep .ql-editor th,
+    :host ::ng-deep .ql-editor td { border: 1px solid #d1d5db; padding: 0.4rem 0.6rem; text-align: left; min-width: 60px; }
+    :host ::ng-deep .ql-editor th { background: #f0fdf4; font-weight: 700; }
     :host ::ng-deep .ql-editor { padding: 0; min-height: 130px; }
     :host ::ng-deep .ql-editor.ql-blank::before { color: #9ca3af; font-style: normal; left: 0; }
     :host ::ng-deep .ql-container { border: none; font-size: 0.875rem; font-family: inherit; }
@@ -72,6 +104,9 @@ export class RichEditorComponent implements AfterViewInit, OnChanges, OnDestroy,
   @Input() placeholder = 'Write something…';
   @Input() initialValue = '';
   @Output() valueChange = new EventEmitter<string>();
+
+  cursorInTable = signal(false);
+  hasAnyTable = signal(false);
 
   private quill!: Quill;
   private onChange: (v: string) => void = () => {};
@@ -93,6 +128,16 @@ export class RichEditorComponent implements AfterViewInit, OnChanges, OnDestroy,
       const val = html === '<p></p>' ? '' : html;
       this.onChange(val);
       this.valueChange.emit(val);
+      this.hasAnyTable.set(!!this.editorEl.nativeElement.querySelector('table'));
+    });
+
+    this.quill.on('selection-change', () => {
+      const range = this.quill.getSelection();
+      if (!range) { this.cursorInTable.set(false); return; }
+      const [leaf] = (this.quill as any).getLeaf(range.index);
+      const el: HTMLElement | null = leaf?.domNode;
+      this.cursorInTable.set(!!el?.closest('table'));
+      this.hasAnyTable.set(!!this.editorEl.nativeElement.querySelector('table'));
     });
   }
 
@@ -134,6 +179,43 @@ export class RichEditorComponent implements AfterViewInit, OnChanges, OnDestroy,
       const range = this.quill.getSelection();
       if (range) this.quill.format('link', url);
     }
+  }
+
+  insertTable(e: MouseEvent) {
+    e.preventDefault();
+    const rows = parseInt(prompt('Rows (including header):') || '3', 10) || 3;
+    const cols = parseInt(prompt('Columns:') || '3', 10) || 3;
+    const headerCells = Array.from({ length: cols }, (_, i) =>
+      `<td style="background:#f0fdf4;font-weight:700;padding:6px 10px;border:1px solid #d1d5db;">Header ${i + 1}</td>`
+    ).join('');
+    const bodyCell = `<td style="padding:6px 10px;border:1px solid #d1d5db;">&nbsp;</td>`;
+    const bodyRow = Array.from({ length: cols }, () => bodyCell).join('');
+    const bodyRows = Array.from({ length: rows - 1 }, () => `<tr>${bodyRow}</tr>`).join('');
+    const tableHtml = `<table style="width:100%;border-collapse:collapse;margin:0.75em 0;"><tbody><tr>${headerCells}</tr>${bodyRows}</tbody></table><p><br></p>`;
+    const range = this.quill.getSelection(true);
+    this.quill.clipboard.dangerouslyPasteHTML(range.index, tableHtml);
+  }
+
+  deleteTable(e: MouseEvent) {
+    e.preventDefault();
+    // Try cursor position first, then fall back to any table in the editor
+    let table: HTMLElement | null = null;
+    const range = this.quill.getSelection();
+    if (range) {
+      const [leaf] = (this.quill as any).getLeaf(range.index);
+      table = leaf?.domNode?.closest('table') ?? null;
+    }
+    if (!table) {
+      table = this.editorEl.nativeElement.querySelector('table');
+    }
+    if (!table) return;
+    table.remove();
+    this.cursorInTable.set(false);
+    this.hasAnyTable.set(!!this.editorEl.nativeElement.querySelector('table'));
+    const html = this.quill.getSemanticHTML();
+    const val = html === '<p></p>' ? '' : html;
+    this.onChange(val);
+    this.valueChange.emit(val);
   }
 
   clearFmt(e: MouseEvent) {

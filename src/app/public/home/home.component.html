@@ -67,7 +67,14 @@
             <circle cx="11" cy="11" r="8" />
             <path stroke-linecap="round" d="m21 21-4.35-4.35" />
           </svg>
-          <input type="text" class="hero-search-input" placeholder="Search area, community or project…"
+          <!-- Selected location tags -->
+          <div class="hero-loc-tags" *ngIf="selectedLocations().length > 0">
+            <span class="hero-loc-tag" *ngFor="let loc of selectedLocations()">
+              {{ loc }}
+              <button type="button" class="hero-loc-tag-x" (mousedown)="$event.preventDefault(); removeLocation(loc)">×</button>
+            </span>
+          </div>
+          <input type="text" class="hero-search-input" [placeholder]="selectedLocations().length > 0 ? 'Add another location…' : 'Search area, community or project…'"
             [ngModel]="searchQuery()" (ngModelChange)="onSearchInput($event)" (focus)="onSearchFocus()"
             (blur)="closeSearchDrop()" (keydown.enter)="doSearch()" />
         </div>
@@ -88,7 +95,7 @@
           <div class="hero-sdrop-empty">No results found</div>
           } @else {
           @for (item of searchResults(); track item.label) {
-          <button class="hero-sdrop-item" (click)="selectResult(item)">
+          <button class="hero-sdrop-item" [class.selected]="item.type === 'location' && selectedLocations().includes(item.label)" (mousedown)="$event.preventDefault(); selectResult(item)">
             <span class="hero-sdrop-icon">
               @if (item.type === 'location') {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -111,6 +118,11 @@
               <span class="hero-sdrop-label">{{ item.label }}</span>
               <span class="hero-sdrop-sub">{{ item.sub }}</span>
             </span>
+            @if (item.type === 'location' && selectedLocations().includes(item.label)) {
+            <svg class="hero-sdrop-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            }
           </button>
           }
           }
@@ -294,9 +306,14 @@
       <div class="trust-dev-logos">
         <!-- Dynamic logos from admin -->
         <ng-container *ngIf="partnerLogos().length > 0">
-          <div *ngFor="let logo of partnerLogos()" class="dev-logo-box">
-            <img [src]="logo.url" [alt]="logo.name" class="dev-logo-img">
-          </div>
+          <ng-container *ngFor="let logo of partnerLogos()">
+            <a *ngIf="logo.link" [href]="logo.link" target="_blank" rel="noopener noreferrer" class="dev-logo-box dev-logo-box--link">
+              <img [src]="logo.url" [alt]="logo.name" class="dev-logo-img">
+            </a>
+            <div *ngIf="!logo.link" class="dev-logo-box">
+              <img [src]="logo.url" [alt]="logo.name" class="dev-logo-img">
+            </div>
+          </ng-container>
         </ng-container>
         <!-- Fallback hardcoded logos -->
         <ng-container *ngIf="partnerLogos().length === 0">
@@ -339,7 +356,7 @@
     <!-- Scrollable cards track -->
     <div class="lp-track-wrap">
       <div class="lp-track" #lpTrack>
-        <div *ngFor="let p of latestProjects()" class="lp-card">
+        <div *ngFor="let p of latestProjects()" class="lp-card" (click)="navigateTo(p.id ? ['/projects', p.slug] : ['/off-plan'])" style="cursor:pointer">
           <!-- Image -->
           <div class="lp-img-wrap">
             <img [src]="p.image" [alt]="p.name" class="lp-img"
@@ -370,7 +387,7 @@
             </div>
             <div class="lp-divider"></div>
             <p class="lp-handover">Handover in {{ p.handover }}</p>
-            <a [routerLink]="p.id ? ['/projects', p.slug] : ['/off-plan']" class="lp-price-btn">from {{ p.startingPrice
+            <a [routerLink]="p.id ? ['/projects', p.slug] : ['/off-plan']" class="lp-price-btn" (click)="$event.stopPropagation()">from {{ p.startingPrice
               }}</a>
           </div>
         </div>
@@ -679,7 +696,7 @@
 
     <div class="offplan-track-wrap">
     <div class="offplan-grid" #offplanTrack>
-      <div *ngFor="let project of offPlanProjects(); let i = index" class="offplan-card">
+      <div *ngFor="let project of offPlanProjects(); let i = index" class="offplan-card" (click)="navigateTo(project.id ? ['/projects', project.slug] : ['/off-plan'])" style="cursor:pointer">
         <div class="offplan-img-wrap">
           <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy"
             (error)="$any($event.target).src='/images/dummy-image.png'">
@@ -729,7 +746,7 @@
             </div>
           </div>
           <div class="offplan-actions">
-            <a [routerLink]="project.id ? ['/projects', project.slug] : ['/off-plan']" class="offplan-cta">
+            <a [routerLink]="project.id ? ['/projects', project.slug] : ['/off-plan']" class="offplan-cta" (click)="$event.stopPropagation()">
               View Project
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                 stroke="currentColor" class="w-4 h-4">

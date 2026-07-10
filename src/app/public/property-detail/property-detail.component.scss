@@ -483,7 +483,7 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
 }
 
 /* Similar properties */
-.pd-similar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.pd-similar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
 .pd-sim-card {
   border-radius: 0.875rem; overflow: hidden;
   border: 1px solid $border; text-decoration: none;
@@ -738,7 +738,7 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
 
   .pd-amenities-grid { grid-template-columns: repeat(2, 1fr); }
   .pd-mortgage { grid-template-columns: 1fr; }
-  .pd-similar-grid { grid-template-columns: 1fr 1fr; }
+  .pd-similar-grid { grid-template-columns: repeat(2, 1fr); }
 
   .pd-map-wrap { height: 220px; }
 

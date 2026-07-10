@@ -148,8 +148,8 @@ export class AdminPropertiesComponent implements OnInit {
     });
 
     list = [...list].sort((a, b) => {
-      const av = a[sf] as any;
-      const bv = b[sf] as any;
+      const av = a[sf] ?? '';
+      const bv = b[sf] ?? '';
       const cmp = av < bv ? -1 : av > bv ? 1 : 0;
       return sd === 'asc' ? cmp : -cmp;
     });
@@ -231,8 +231,12 @@ export class AdminPropertiesComponent implements OnInit {
 
   // ── Sorting / Filtering ───────────────────────────────
   sort(field: keyof Property): void {
-    if (this.sortField() === field) this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
-    else { this.sortField.set(field); this.sortDir.set('asc'); }
+    if (this.sortField() === field) {
+      this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortField.set(field);
+      this.sortDir.set(field === 'created_at' ? 'desc' : 'asc');
+    }
     this.page.set(1);
   }
   onSearch(): void { this.page.set(1); }

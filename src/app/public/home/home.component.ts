@@ -105,8 +105,10 @@ export class HomeComponent implements OnInit {
   heroHeadline = computed(() => this.homePage()?.heading    || 'Find Your Dream Property in Dubai');
   heroSubline  = computed(() => this.homePage()?.subheading || 'Over 2,500 premium listings. Expert agents. End-to-end support.');
 
-  searchQuery = signal('');
-  searchType  = signal('buy');
+  searchQuery       = signal('');
+  searchType        = signal('buy');
+  selectedLocations = signal<string[]>([]);
+
 
   // Search dropdown
   searchDropOpen   = signal(false);
@@ -124,9 +126,13 @@ export class HomeComponent implements OnInit {
     this.searchQuery.set(value);
     clearTimeout(this.searchTimer);
     if (!value.trim()) {
-      this.searchResults.set(
-        this.activeLocations().map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
-      );
+      if (this.searchType() === 'new-projects') {
+        this.loadAllProjects();
+      } else {
+        this.searchResults.set(
+          this.activeLocations().map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
+        );
+      }
       this.searchDropOpen.set(true);
       return;
     }
@@ -177,41 +183,72 @@ export class HomeComponent implements OnInit {
   }
 
   selectResult(item: { type: 'location' | 'property' | 'project'; id?: number; label: string; sub: string }): void {
-    this.searchDropOpen.set(false);
-    this.searchQuery.set(item.label);
-    const tab = this.searchType();
     if (item.type === 'property' && item.id) {
+      this.searchDropOpen.set(false);
       this.router.navigate(['/properties', toPropertySlug(item.label, item.id)]);
-    } else if (item.type === 'project' && item.id) {
-      this.router.navigate(['/projects', toProjectSlug(item.label, item.id)]);
-    } else {
-      // location — route depends on active tab
-      if (tab === 'new-projects') {
-        this.router.navigate(['/projects'], { queryParams: { location: item.label } });
-      } else {
-        this.router.navigate(['/properties'], { queryParams: { location: item.label, status: tab === 'rent' ? 'rent' : 'sale' } });
-      }
+      return;
     }
+    // Both location and project — add/remove from multi-select tags, navigate on Search
+    const locs = this.selectedLocations();
+    if (locs.includes(item.label)) {
+      this.selectedLocations.set(locs.filter(l => l !== item.label));
+    } else {
+      this.selectedLocations.set([...locs, item.label]);
+    }
+    this.searchQuery.set('');
+  }
+
+  removeLocation(loc: string): void {
+    this.selectedLocations.set(this.selectedLocations().filter(l => l !== loc));
   }
 
   doSearch(): void {
     this.searchDropOpen.set(false);
-    const q = this.searchQuery().trim();
-    const tab = this.searchType();
+    const q    = this.searchQuery().trim();
+    const tab  = this.searchType();
+    const locs = this.selectedLocations();
+
     if (tab === 'new-projects') {
-      this.router.navigate(['/projects'], q ? { queryParams: { q } } : {});
+      const params: Record<string, string> = {};
+      if (locs.length > 0) params['q'] = locs.join(',');
+      else if (q)          params['q'] = q;
+      this.router.navigate(['/projects'], Object.keys(params).length ? { queryParams: params } : {});
     } else {
-      this.router.navigate(['/properties'], q ? { queryParams: { q, status: tab === 'rent' ? 'rent' : 'sale' } } : { queryParams: { status: tab === 'rent' ? 'rent' : 'sale' } });
+      const params: Record<string, string> = {};
+      params['status'] = tab === 'rent' ? 'Rent' : 'Sale';
+      if (locs.length > 0)  params['location'] = locs.join(',');
+      else if (q)           params['q'] = q;
+      this.router.navigate(['/properties'], { queryParams: params });
     }
   }
 
   onSearchFocus(): void {
     if (!this.searchQuery().trim()) {
-      this.searchResults.set(
-        this.activeLocations().map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
-      );
+      if (this.searchType() === 'new-projects') {
+        this.loadAllProjects();
+      } else {
+        this.searchResults.set(
+          this.activeLocations().map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
+        );
+      }
     }
     this.searchDropOpen.set(true);
+  }
+
+  private async loadAllProjects(): Promise<void> {
+    this.searchLoading.set(true);
+    const { data } = await this.sb.from('projects')
+      .select('id, title, location, community')
+      .eq('status', 'Published')
+      .order('is_featured', { ascending: false })
+      .limit(12);
+
+    const items = (data ?? []).map((p: any) => ({
+      type: 'project' as const, id: p.id,
+      label: p.title, sub: p.community || p.location || 'Project',
+    }));
+    this.searchResults.set(items);
+    this.searchLoading.set(false);
   }
 
   closeSearchDrop(): void {
@@ -260,7 +297,7 @@ export class HomeComponent implements OnInit {
   trendingProjectsDb     = signal<TrendingProject[]>([]);
   topAgentsLive          = signal<HomeAgent[]>([]);
   propertyCounts         = signal<Record<string, number>>({});
-  partnerLogos           = signal<{ url: string; name: string }[]>([]);
+  partnerLogos           = signal<{ url: string; name: string; link: string }[]>([]);
 
   displayedAgents = computed(() => this.topAgentsLive().length ? this.topAgentsLive() : this.topAgents);
 
@@ -726,4 +763,6 @@ export class HomeComponent implements OnInit {
   propertySlug(p: { title: string; id: number }): string {
     return toPropertySlug(p.title, p.id);
   }
+
+  navigateTo(commands: any[]): void { this.router.navigate(commands); }
 }

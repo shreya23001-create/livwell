@@ -300,9 +300,9 @@ $gold-light: #e8c870;
   transition: all 0.2s;
 
   &.active {
-    background: #fff;
-    color: #111;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+    background: $gold;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(200, 168, 75, 0.4);
   }
 
   &:hover:not(.active) {
@@ -332,19 +332,53 @@ $gold-light: #e8c870;
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   background: #f9fafb;
   border: 1.5px solid #e5e7eb;
   border-radius: 0.75rem;
-  padding: 0 1rem;
+  padding: 0.5rem 1rem;
   transition: border-color 0.2s;
   position: relative;
   z-index: 300;
+  min-height: 52px;
 
   &:focus-within {
     border-color: $gold;
     background: #fff;
   }
+}
+
+.hero-loc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.hero-loc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: $gold;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 2rem;
+  white-space: nowrap;
+}
+
+.hero-loc-tag-x {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.8;
+  &:hover { opacity: 1; }
 }
 
 .hero-search-icon {
@@ -356,9 +390,10 @@ $gold-light: #e8c870;
 
 .hero-search-input {
   flex: 1;
+  min-width: 120px;
   border: none;
   outline: none;
-  padding: 0.875rem 0;
+  padding: 0.3rem 0;
   font-size: 0.925rem;
   color: #111;
   background: transparent;
@@ -442,9 +477,19 @@ $gold-light: #e8c870;
     background: #f9fafb;
   }
 
+  &.selected {
+    background: rgba(200, 168, 75, 0.08);
+  }
+
   &+& {
     border-top: 1px solid #f3f4f6;
   }
+}
+
+.hero-sdrop-check {
+  margin-left: auto;
+  color: $gold;
+  flex-shrink: 0;
 }
 
 .hero-sdrop-icon {
@@ -926,6 +971,17 @@ $gold-light: #e8c870;
     border-color: #c8a84b;
     background: #fff;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  &--link {
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      border-color: #1a5c3a;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
   }
 }
 

@@ -999,3 +999,131 @@ $red-faq: #ef4444;
   &:hover { border-color: $red-faq; color: $red-faq; }
 }
 .adv-faq-empty { font-size: .8rem; color: $muted; margin: .25rem 0 0; }
+
+// ── Video Tour ────────────────────────────────────────────────
+$accent: $green;
+
+.apr-video-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0.625rem;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.apr-video-tab {
+  padding: 0.35rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+  border: none;
+  color: $muted;
+  transition: background 0.15s, color 0.15s;
+
+  &.active {
+    background: $green;
+    color: #fff;
+  }
+
+  &:not(.active):hover {
+    background: $bg;
+  }
+}
+
+.apr-video-drop {
+  border: 2px dashed $border;
+  border-radius: 0.625rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  color: $muted;
+
+  svg {
+    margin: 0 auto 0.5rem;
+    display: block;
+    color: #9ca3af;
+  }
+
+  &--over {
+    border-color: $green;
+    background: rgba($green, 0.04);
+  }
+
+  &:hover {
+    border-color: #9ca3af;
+  }
+}
+
+.apr-video-drop-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text;
+  margin: 0 0 0.25rem;
+}
+
+.apr-video-drop-hint {
+  font-size: 0.75rem;
+  color: $muted;
+  margin: 0;
+}
+
+.apr-video-uploading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.apr-video-uploaded {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.875rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.5rem;
+
+  svg {
+    color: #16a34a;
+    flex-shrink: 0;
+  }
+}
+
+.apr-video-url-text {
+  font-size: 0.78rem;
+  color: $text;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.apr-video-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $muted;
+  font-size: 0.9rem;
+  line-height: 1;
+  flex-shrink: 0;
+  padding: 0 0.25rem;
+
+  &:hover {
+    color: $red;
+  }
+}
+
+.apr-btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: apr-spin 0.6s linear infinite;
+}

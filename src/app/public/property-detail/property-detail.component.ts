@@ -359,14 +359,35 @@ export class PropertyDetailComponent implements OnInit {
       // Increment view count
       this.sb.from('properties').update({ views: (data.views || 0) + 1 }).eq('id', id).then(() => {});
 
-      const { data: similar } = await this.sb
-        .from('properties')
-        .select('*')
-        .eq('type', data.type)
-        .eq('status', 'Published')
-        .neq('id', id)
-        .limit(3);
-      if (similar) this.similarProperties.set(similar.map(this.mapProperty));
+      // Similar: same type + same location/community, fallback to same type only
+      const location = data.community || data.location || '';
+      let similar: any[] = [];
+      if (location) {
+        const locField = data.community ? 'community' : 'location';
+        const { data: byBoth } = await this.sb
+          .from('properties')
+          .select('*')
+          .eq('type', data.type)
+          .eq(locField, location)
+          .eq('status', 'Published')
+          .neq('id', id)
+          .order('created_at', { ascending: false })
+          .limit(4);
+        similar = byBoth ?? [];
+      }
+      if (similar.length < 3) {
+        const existingIds = [id, ...similar.map((s: any) => s.id)];
+        const { data: byType } = await this.sb
+          .from('properties')
+          .select('*')
+          .eq('type', data.type)
+          .eq('status', 'Published')
+          .not('id', 'in', `(${existingIds.join(',')})`)
+          .order('created_at', { ascending: false })
+          .limit(4 - similar.length);
+        similar = [...similar, ...(byType ?? [])];
+      }
+      this.similarProperties.set(similar.slice(0, 4).map(this.mapProperty));
 
       this.loading.set(false);
 

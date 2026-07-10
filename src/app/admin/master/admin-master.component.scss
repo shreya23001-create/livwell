@@ -337,6 +337,12 @@ $red:    #ef4444;
   font-size: 0.72rem; width: 100%; box-sizing: border-box; outline: none; text-align: center;
   &:focus { border-color: $accent; }
 }
+.master-pl-link {
+  margin-top: 0.25rem;
+  font-size: 0.68rem;
+  color: #2563eb;
+  text-align: left;
+}
 .master-pl-move {
   display: flex; align-items: center; justify-content: center;
   width: 26px; height: 26px; border: 1px solid $border; border-radius: 0.375rem;

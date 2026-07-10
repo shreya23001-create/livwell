@@ -39,6 +39,7 @@ interface Project {
   agent_name: string;
   created_at: string;
   video_url: string | null;
+  total_units: number | null;
   faqs: { question: string; answer: string }[];
 }
 
@@ -107,6 +108,35 @@ export class ProjectDetailPublicComponent implements OnInit {
   project    = signal<Project | null>(null);
   agent      = signal<{ name: string; email: string; phone: string; avatar_url?: string; designation?: string } | null>(null);
   loading    = signal(true);
+
+  projectProperties = signal<{
+    id: number; title: string; price: number; price_label: string;
+    type: string; bedrooms: number; bathrooms: number; area_sqft: string; images: string[];
+    listing_type: string; community: string; location: string; badge: string; views: number;
+    agent_name: string; agent_phone: string;
+  }[]>([]);
+  propCarouselIndex = signal(0);
+
+  propCarouselVisible = computed(() => {
+    return this.projectProperties().slice(this.propCarouselIndex(), this.propCarouselIndex() + 3);
+  });
+
+  propCarouselPrev(): void {
+    this.propCarouselIndex.set(Math.max(0, this.propCarouselIndex() - 1));
+  }
+
+  propCarouselNext(): void {
+    const max = Math.max(0, this.projectProperties().length - 3);
+    this.propCarouselIndex.set(Math.min(max, this.propCarouselIndex() + 1));
+  }
+
+  formatBeds(beds: number): string {
+    return beds === 0 ? 'Studio' : `${beds} Beds`;
+  }
+
+  propSlug(p: { title: string; id: number }): string {
+    return p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + p.id;
+  }
   notFound   = signal(false);
   activeImg  = signal(0);
   mapUrl     = signal<SafeResourceUrl>('');
@@ -127,6 +157,7 @@ export class ProjectDetailPublicComponent implements OnInit {
   }
 
   dbFaqOpen = signal<number | null>(null);
+  descExpanded = signal(false);
   toggleDbFaq(i: number): void { this.dbFaqOpen.set(this.dbFaqOpen() === i ? null : i); }
   safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 
@@ -230,6 +261,7 @@ export class ProjectDetailPublicComponent implements OnInit {
       this.project.set(p);
       this.titleSvc.setTitle(`${p.title} | Livwell`);
       this.geocodeAndSetMap(data as Project);
+      this.loadProjectProperties(p.title);
       const userId = this.auth.currentUser()?.id;
       if (userId) {
         const { data: saved } = await this.sb.from('saved_projects').select('id').eq('user_id', userId).eq('project_id', p.id).maybeSingle();
@@ -248,6 +280,53 @@ export class ProjectDetailPublicComponent implements OnInit {
     }
     this.loading.set(false);
     this.auth.waitForSession().then(() => this.prefillInquiryForm());
+  }
+
+  private async loadProjectProperties(projectTitle: string): Promise<void> {
+    const fields = 'id, title, price, price_label, type, bedrooms, bathrooms, area_sqft, images, listing_type, community, location, badge, views, agent_name';
+
+    // Try matching by project_name (case-insensitive, wildcard)
+    const { data: d1 } = await this.sb
+      .from('properties')
+      .select(fields)
+      .ilike('project_name', `%${projectTitle}%`)
+      .eq('status', 'Published')
+      .order('created_at', { ascending: false })
+      .limit(12);
+    let data = d1;
+
+    // Fallback: match by community
+    if (!data || data.length === 0) {
+      const res2 = await this.sb
+        .from('properties')
+        .select(fields)
+        .ilike('community', `%${projectTitle}%`)
+        .eq('status', 'Published')
+        .order('created_at', { ascending: false })
+        .limit(12);
+      data = res2.data;
+    }
+
+
+    if (data && data.length > 0) {
+      // Fetch agent phones in one query
+      const agentNames = [...new Set(data.map((p: any) => p.agent_name).filter(Boolean))];
+      let agentPhoneMap: Record<string, string> = {};
+      if (agentNames.length > 0) {
+        const { data: agents } = await this.sb
+          .from('profiles')
+          .select('name, phone')
+          .in('name', agentNames);
+        if (agents) agents.forEach((a: any) => { agentPhoneMap[a.name] = a.phone ?? ''; });
+      }
+
+      this.projectProperties.set(data.map((p: any) => ({
+        ...p,
+        images: Array.isArray(p.images) ? p.images.filter((u: string) => u && !u.includes('unsplash.com')) : [],
+        area_sqft: p.area_sqft ? p.area_sqft.toLocaleString() : '',
+        agent_phone: agentPhoneMap[p.agent_name] ?? '',
+      })));
+    }
   }
 
   private prefillInquiryForm(): void {

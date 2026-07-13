@@ -211,6 +211,7 @@ export class AdminMasterComponent implements OnInit {
   smtpTestMsg   = signal('');
   smtpTestOk    = signal<boolean | null>(null);
   smtpShowPass  = signal(false);
+  smtpGuideOpen = signal(false);
 
   // Partner logos
   partnerLogos     = signal<{ url: string; name: string; link: string }[]>([]);

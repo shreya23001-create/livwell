@@ -447,6 +447,69 @@ $red:    #ef4444;
 
 .stt-smtp-col { padding-top: 0.5rem; }
 
+.stt-guide-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: $accent; color: #fff;
+  font-size: 0.65rem; font-weight: 700; font-style: italic; font-family: serif;
+  margin-left: 6px; cursor: pointer; flex-shrink: 0;
+  &:hover { background: darken($accent, 8%); }
+}
+
+.stt-guide-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+}
+.stt-guide-modal {
+  background: #fff; border-radius: 12px; width: 480px; max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2); overflow: hidden;
+}
+.stt-guide-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.25rem; background: #f0fdf4; border-bottom: 1px solid #bbf7d0;
+  font-weight: 700; font-size: 0.9rem; color: #166534;
+}
+.stt-guide-close {
+  background: none; border: none; cursor: pointer; color: #166534; padding: 2px;
+  display: flex; align-items: center;
+  &:hover { color: #14532d; }
+}
+.stt-guide-modal-body {
+  padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;
+}
+.stt-guide-step {
+  line-height: 1.6; font-size: 0.82rem; color: #374151;
+  p { margin: 0.25rem 0 0; }
+  strong { color: #111827; }
+}
+.stt-guide-badge {
+  display: inline-block; background: #dcfce7; color: #15803d;
+  border: 1px solid #86efac; border-radius: 4px;
+  font-size: 0.7rem; font-weight: 700; padding: 2px 8px; margin-bottom: 0.4rem;
+  &--domain { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+}
+
+.stt-tooltip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: #e5e7eb; color: #6b7280;
+  font-size: 0.68rem; font-weight: 700; font-style: italic; font-family: serif; cursor: help;
+  margin-left: 4px; vertical-align: middle;
+  position: relative;
+  &:hover::after {
+    content: attr(title);
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: #1f2937; color: #fff; font-size: 0.72rem; font-weight: 400;
+    padding: 0.4rem 0.6rem; border-radius: 6px; white-space: normal;
+    width: 220px; z-index: 100; line-height: 1.4; text-align: left;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  &:hover::before {
+    content: ''; position: absolute; bottom: calc(100% + 1px); left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: #1f2937; z-index: 100;
+  }
+}
+
 .stt-section-head {
   display: flex; align-items: center; gap: 0.5rem;
   font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;

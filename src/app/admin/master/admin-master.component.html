@@ -438,6 +438,9 @@
         <button class="stt-tab" [class.active]="settingsSubTab()==='smtp'" (click)="settingsSubTab.set('smtp')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           SMTP Setup
+          @if (settingsSubTab() === 'smtp') {
+            <span class="stt-guide-icon" (click)="$event.stopPropagation(); smtpGuideOpen.set(true)" title="Setup Guide">i</span>
+          }
         </button>
       </div>
 
@@ -541,6 +544,33 @@
       <!-- ── SMTP ── -->
       @if (settingsSubTab() === 'smtp') {
         <div class="stt-panel">
+
+          <!-- Guide popup modal -->
+          @if (smtpGuideOpen()) {
+            <div class="stt-guide-overlay" (click)="smtpGuideOpen.set(false)">
+              <div class="stt-guide-modal" (click)="$event.stopPropagation()">
+                <div class="stt-guide-modal-header">
+                  <span>SMTP Setup Guide</span>
+                  <button class="stt-guide-close" (click)="smtpGuideOpen.set(false)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+                <div class="stt-guide-modal-body">
+                  <div class="stt-guide-step">
+                    <span class="stt-guide-badge">Gmail</span>
+                    <p>Enable 2-Step Verification → Google Account → Security → App Passwords → generate a 16-char password.</p>
+                    <p><strong>Username and From Email must be the same Gmail address</strong> — Gmail does not allow sending from a different address.</p>
+                  </div>
+                  <div class="stt-guide-step">
+                    <span class="stt-guide-badge stt-guide-badge--domain">Domain / cPanel</span>
+                    <p>Use credentials from your hosting provider (e.g. <em>mail.yourdomain.com</em>, port 587).</p>
+                    <p>From Email can be any address on your domain (e.g. <em>contact&#64;livwelldubai.com</em>).</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
           <div class="stt-smtp-layout">
             <div class="stt-smtp-col">
               <div class="stt-section-head">
@@ -548,22 +578,34 @@
                 SMTP SERVER
               </div>
               <div class="stt-field-group">
-                <label class="stt-label">SMTP Host</label>
+                <label class="stt-label">
+                  SMTP Host
+                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="Gmail: smtp.gmail.com | cPanel: mail.yourdomain.com | Brevo: smtp-relay.brevo.com">i</span>
+                </label>
                 <input class="stt-input" type="text" placeholder="smtp.example.com"
                        [ngModel]="smtp().host" (ngModelChange)="updateSmtp('host', $event)">
               </div>
               <div class="stt-field-group">
-                <label class="stt-label">Port</label>
+                <label class="stt-label">
+                  Port
+                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="587 for TLS (recommended) | 465 for SSL | 25 for plain (not recommended)">i</span>
+                </label>
                 <input class="stt-input" type="number" placeholder="587"
                        [ngModel]="smtp().port" (ngModelChange)="updateSmtp('port', $event)">
               </div>
               <div class="stt-field-group">
-                <label class="stt-label">Username</label>
+                <label class="stt-label">
+                  Username
+                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="Your SMTP login email. For Gmail this must match the From Email exactly.">i</span>
+                </label>
                 <input class="stt-input" type="text" placeholder="no-reply@yourdomain.com"
                        [ngModel]="smtp().username" (ngModelChange)="updateSmtp('username', $event)">
               </div>
               <div class="stt-field-group">
-                <label class="stt-label">Password</label>
+                <label class="stt-label">
+                  Password
+                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="Gmail: use App Password (16 chars) from Google Account → Security → App Passwords. Do NOT use your regular Gmail password.">i</span>
+                </label>
                 <div class="stt-input-row">
                   <input class="stt-input stt-input--pass" [type]="smtpShowPass() ? 'text' : 'password'" placeholder="••••••••••••"
                          [ngModel]="smtp().password" (ngModelChange)="updateSmtp('password', $event)">
@@ -583,13 +625,6 @@
                   <option>TLS</option><option>SSL</option><option>None</option>
                 </select>
               </div>
-              <div class="stt-field-group">
-                <label class="stt-label">Auth Method</label>
-                <select class="stt-input stt-select"
-                        [ngModel]="smtp().auth_method" (ngModelChange)="updateSmtp('auth_method', $event)">
-                  <option>Login</option><option>Plain</option><option>CRAMMD5</option>
-                </select>
-              </div>
             </div>
 
             <div class="stt-smtp-col">
@@ -603,12 +638,18 @@
                        [ngModel]="smtp().from_name" (ngModelChange)="updateSmtp('from_name', $event)">
               </div>
               <div class="stt-field-group">
-                <label class="stt-label">From Email</label>
+                <label class="stt-label">
+                  From Email
+                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="The email address recipients will see as the sender. For Gmail, this must match the Username. For domain SMTP, this can be any email on your domain.">i</span>
+                </label>
                 <input class="stt-input" type="email" placeholder="no-reply@yourdomain.com"
                        [ngModel]="smtp().from_email" (ngModelChange)="updateSmtp('from_email', $event)">
               </div>
               <div class="stt-field-group">
-                <label class="stt-label">Reply-To</label>
+                <label class="stt-label">
+                  Reply-To
+                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="When a recipient clicks Reply, their email will be addressed here. Can be different from From Email.">i</span>
+                </label>
                 <input class="stt-input" type="email" placeholder="support@yourdomain.com"
                        [ngModel]="smtp().reply_to" (ngModelChange)="updateSmtp('reply_to', $event)">
               </div>

@@ -11,12 +11,12 @@ $amber:   #f59e0b;
 $blue:    #3b82f6;
 $purple:  #8b5cf6;
 
-:host { display: block; padding: 1.5rem 2rem 3rem; background: $bg; min-height: 100vh; }
+:host { display: block; padding: 1.5rem 2rem 3rem; background: $bg; }
 
 // ── Loading ─────────────────────────────────────────────────
 .pv-loading {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 60vh; gap: 1rem; color: $muted;
+  min-height: 300px; gap: 1rem; color: $muted;
 }
 .pv-spinner {
   width: 44px; height: 44px; border: 3px solid $border; border-top-color: $accent;
@@ -53,28 +53,35 @@ $purple:  #8b5cf6;
   background: rgba($gold,0.15); color: darken($gold, 12%); border: 1px solid rgba($gold,0.3);
 }
 
-// ── Main Grid ────────────────────────────────────────────────
-.pv-grid {
-  display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start;
-  @media(max-width: 1100px) { grid-template-columns: 1fr; }
-}
+// ── Layout ───────────────────────────────────────────────────
+.pv-content { display: flex; flex-direction: column; }
 
 // ── Cards shared ─────────────────────────────────────────────
-.pv-info-card, .pv-specs-card, .pv-section-card, .pv-analytics-card,
-.pv-pipeline-card, .pv-details-card, .pv-agent-card, .pv-price-card {
+.pv-info-card, .pv-specs-card, .pv-section-card, .pv-analytics-card {
   background: $white; border: 1px solid $border; border-radius: 1rem;
   padding: 1.25rem 1.5rem; margin-bottom: 1rem;
   box-shadow: 0 1px 4px rgba(0,0,0,.04);
 }
+.pv-section-card--details { padding: 1.25rem 0; overflow: hidden;
+  .pv-section-title { padding: 0 1.5rem; }
+}
 
-// ── Gallery ──────────────────────────────────────────────────
-.pv-gallery { margin-bottom: 1rem; }
+// ── Hero (gallery + info side by side) ───────────────────────
+.pv-hero {
+  display: grid; grid-template-columns: 1fr 340px; gap: 1rem;
+  margin-bottom: 1rem; align-items: start;
+  @media(max-width: 900px) { grid-template-columns: 1fr; }
+}
+.pv-hero-right { display: flex; flex-direction: column; gap: 0.75rem;
+  .pv-info-card { margin-bottom: 0; flex: 1; }
+}
+
 .pv-gallery-main {
   position: relative; border-radius: 1rem; overflow: hidden;
-  height: 380px; background: #1a1a1a;
-  @media(max-width: 768px) { height: 220px; }
+  height: 320px; background: #1a1a1a;
+  @media(max-width: 768px) { height: 200px; }
 }
-.pv-gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pv-gallery-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
 .pv-gallery-empty {
   width: 100%; height: 100%; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 0.5rem; color: #4b5563;
@@ -87,10 +94,10 @@ $purple:  #8b5cf6;
   padding: 0.2rem 0.65rem; border-radius: 2rem;
 }
 .pv-gallery-thumbs {
-  display: flex; gap: 0.5rem; margin-top: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem;
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
 }
 .pv-gallery-thumb {
-  width: 80px; height: 56px; object-fit: cover; border-radius: 0.5rem;
+  width: 72px; height: 52px; object-fit: cover; border-radius: 0.5rem;
   cursor: pointer; opacity: 0.55; flex-shrink: 0;
   border: 2px solid transparent; transition: opacity 0.15s, border-color 0.15s;
   &.active, &:hover { opacity: 1; border-color: $accent; }
@@ -135,13 +142,35 @@ $purple:  #8b5cf6;
 }
 
 // ── Description ──────────────────────────────────────────────
-.pv-desc { font-size: 0.88rem; color: $muted; line-height: 1.8; margin: 0; }
+.pv-desc {
+  font-size: 0.88rem; color: $muted; line-height: 1.8; margin: 0;
+  overflow: hidden; word-break: break-word;
+  p, div { margin: 0 0 0.5rem; &:last-child { margin-bottom: 0; } }
+  strong, b { color: $text; font-weight: 600; }
+  ul, ol { padding-left: 1.25rem; margin: 0.5rem 0; }
+  li { margin-bottom: 0.25rem; }
+  &--collapsed { max-height: 4.8rem; position: relative;
+    &::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2rem;
+      background: linear-gradient(transparent, #fff); }
+  }
+}
+.pv-read-more {
+  margin-top: 0.5rem; background: none; border: none; cursor: pointer;
+  font-size: 0.8rem; font-weight: 600; color: $accent; padding: 0;
+  &:hover { text-decoration: underline; }
+}
 
 // ── Amenities ────────────────────────────────────────────────
-.pv-amenities { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; @media(max-width:600px){ grid-template-columns: repeat(2,1fr); } }
+.pv-amenities { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .pv-amenity {
-  display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: $text;
-  svg { width: 14px; height: 14px; color: $green; flex-shrink: 0; }
+  display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; color: $text;
+  background: $bg; border: 1px solid $border; border-radius: 0.5rem; padding: 0.5rem 0.75rem;
+}
+.pv-amenity-icon {
+  flex-shrink: 0; line-height: 1; display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; color: $green;
+  &--fallback { font-size: 1rem; }
+  ::ng-deep svg { width: 18px; height: 18px; display: block; stroke: currentColor; fill: none; }
 }
 
 // ── Video ────────────────────────────────────────────────────
@@ -209,7 +238,7 @@ $purple:  #8b5cf6;
 
 // ── Analytics Card ───────────────────────────────────────────
 .pv-card-title { font-size: 0.9rem; font-weight: 700; color: $text; margin: 0 0 1rem; }
-.pv-analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.pv-analytics-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; @media(max-width: 768px) { grid-template-columns: repeat(3, 1fr); } }
 .pv-analytic {
   display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
   padding: 0.875rem 0.5rem; background: $bg; border: 1px solid $border;
@@ -237,26 +266,41 @@ $purple:  #8b5cf6;
 .pv-pipe-count { font-size: 0.78rem; font-weight: 700; color: $text; width: 24px; text-align: right; }
 
 // ── Property Details ─────────────────────────────────────────
-.pv-detail-rows { display: flex; flex-direction: column; }
-.pv-detail-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0.5rem 0; border-bottom: 1px solid $border; font-size: 0.82rem;
-  &:last-child { border-bottom: none; }
+.pv-detail-rows {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+  @media(max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
 }
-.pv-detail-label { color: $muted; }
-.pv-detail-value { font-weight: 600; color: $text; text-align: right; }
+.pv-detail-row {
+  display: flex; flex-direction: column; gap: 0.25rem;
+  padding: 0.875rem 1rem; border-bottom: 1px solid $border; border-right: 1px solid $border; font-size: 0.82rem;
+  &:nth-child(3n) { border-right: none; }
+  &:nth-last-child(-n+3) { border-bottom: none; }
+  @media(max-width: 768px) {
+    &:nth-child(3n) { border-right: 1px solid $border; }
+    &:nth-child(2n) { border-right: none; }
+    &:nth-last-child(-n+3) { border-bottom: 1px solid $border; }
+    &:nth-last-child(-n+2) { border-bottom: none; }
+  }
+}
+.pv-detail-label { font-size: 0.72rem; color: $muted; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
+.pv-detail-value { font-weight: 700; color: $text; font-size: 0.88rem; }
 
 // ── Agent ────────────────────────────────────────────────────
+.pv-agent-card {
+  background: $white; border: 1px solid $border; border-radius: 1rem;
+  padding: 1rem 1.25rem; box-shadow: 0 1px 4px rgba(0,0,0,.04); margin-bottom: 0;
+}
 .pv-agent-inner { display: flex; align-items: center; gap: 0.875rem; }
 .pv-agent-avatar-wrap { flex-shrink: 0; }
 .pv-agent-avatar {
-  width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+  width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
   border: 2px solid $border; display: block;
 }
 .pv-agent-dummy {
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
   display: flex; align-items: center; justify-content: center;
-  svg { width: 24px; height: 24px; color: #9ca3af; }
+  svg { width: 22px; height: 22px; color: #9ca3af; }
 }
-.pv-agent-name { font-size: 0.9rem; font-weight: 700; color: $text; }
-.pv-agent-role { font-size: 0.75rem; color: $muted; margin-top: 0.1rem; }
+.pv-agent-label { font-size: 0.68rem; font-weight: 600; color: $muted; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem; }
+.pv-agent-name { font-size: 0.88rem; font-weight: 700; color: $text; }
+.pv-agent-role { font-size: 0.72rem; color: $muted; margin-top: 0.1rem; }

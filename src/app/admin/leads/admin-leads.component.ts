@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -23,7 +24,7 @@ const EMPTY_FORM = (): Partial<Lead> => ({
 @Component({
   selector: 'app-admin-leads',
   standalone: true,
-  imports: [CommonModule, FormsModule, RichEditorComponent],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, RichEditorComponent],
   templateUrl: './admin-leads.component.html',
   styleUrl: './admin-leads.component.scss',
 })
@@ -62,6 +63,26 @@ export class AdminLeadsComponent implements OnInit {
   showViewModal = signal(false);
   viewLead      = signal<Lead | null>(null);
 
+  // ── Multi-select location ─────────────────────────────
+  selectedLocations = signal<string[]>([]);
+  locationDropdownOpen = signal(false);
+
+  toggleLocation(loc: string): void {
+    this.selectedLocations.update(prev => {
+      const next = prev.includes(loc) ? prev.filter(l => l !== loc) : [...prev, loc];
+      this.updateForm({ location: next.join(', ') });
+      return next;
+    });
+  }
+
+  closeLocationDropdown(): void { this.locationDropdownOpen.set(false); }
+
+  onLocationFocusOut(event: FocusEvent): void {
+    const current = event.currentTarget as HTMLElement;
+    const related = event.relatedTarget as Node | null;
+    if (!related || !current.contains(related)) this.locationDropdownOpen.set(false);
+  }
+
   // ── Import / Export ───────────────────────────────────
   importing     = signal(false);
   importError   = signal('');
@@ -72,21 +93,24 @@ export class AdminLeadsComponent implements OnInit {
     'Unassigned',
     ...this.dataSvc.users().filter(u => u.role === 'agent').map(u => u.name),
   ]);
-  readonly statuses: LeadStatus[]     = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
+  readonly leadStatusList = computed(() => this.dataSvc.leadStatuses().map(s => s.name));
+  get statuses(): string[] { return this.leadStatusList(); }
   readonly sources:  LeadSource[]     = ['website', 'referral', 'walk_in', 'social_media', 'portal', 'cold_call'];
   readonly categories: LeadCategory[] = ['buy', 'rent', 'invest'];
 
   // ── Computed ──────────────────────────────────────────
   stats = computed(() => {
     const all = this.leads();
-    return {
-      total:       all.length,
-      new:         all.filter(l => l.status === 'new').length,
-      qualified:   all.filter(l => l.status === 'qualified').length,
-      negotiating: all.filter(l => l.status === 'negotiating').length,
-      won:         all.filter(l => l.status === 'won').length,
-    };
+    const counts: Record<string, number> = { total: all.length };
+    for (const s of this.dataSvc.leadStatuses()) {
+      counts[s.name] = all.filter(l => l.status === s.name).length;
+    }
+    return counts;
   });
+
+  statusColor(name: string): string {
+    return this.dataSvc.leadStatuses().find(s => s.name === name)?.color ?? '#6b7280';
+  }
 
   filtered = computed(() => {
     const q   = this.search().toLowerCase();
@@ -144,6 +168,8 @@ export class AdminLeadsComponent implements OnInit {
     this.saveError.set('');
     this.isEdit.set(false);
     this.editId.set(null);
+    this.selectedLocations.set([]);
+    this.locationDropdownOpen.set(false);
     this.showModal.set(true);
   }
 
@@ -153,6 +179,8 @@ export class AdminLeadsComponent implements OnInit {
     this.saveError.set('');
     this.isEdit.set(true);
     this.editId.set(lead.id);
+    this.selectedLocations.set(lead.location ? lead.location.split(', ').filter(Boolean) : []);
+    this.locationDropdownOpen.set(false);
     this.showModal.set(true);
   }
 
@@ -173,7 +201,6 @@ export class AdminLeadsComponent implements OnInit {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errs['email'] = 'Enter a valid email.';
     if (!f.phone?.trim())    errs['phone']    = 'Phone is required.';
     else if (!/^\+?[\d\s\-()]+$/.test(f.phone.trim()) || (f.phone.replace(/\D/g, '').length < 7 || f.phone.replace(/\D/g, '').length > 15)) errs['phone'] = 'Enter a valid phone number (7–15 digits).';
-    if (!f.budget?.trim())   errs['budget']   = 'Budget is required.';
     if (!f.location?.trim()) errs['location'] = 'Location is required.';
     this.formErrors.set(errs);
     if (Object.keys(errs).length) return;
@@ -321,8 +348,9 @@ export class AdminLeadsComponent implements OnInit {
   }
 
   // ── Helpers ───────────────────────────────────────────
-  labelStatus(s: LeadStatus): string {
-    return { new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' }[s];
+  labelStatus(s: string): string {
+    const found = this.dataSvc.leadStatuses().find(ls => ls.name === s);
+    return found ? found.name.charAt(0).toUpperCase() + found.name.slice(1) : s;
   }
 
   labelSource(s: LeadSource): string {

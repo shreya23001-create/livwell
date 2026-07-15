@@ -218,5 +218,13 @@ export class AreasComponent implements OnInit {
 
   featuredAreas = computed(() => this.allAreas().filter(a => a.featured).slice(0, 6));
 
-  goToArea(slug: string) { this.router.navigate(['/areas', slug]); }
+  readonly knownAreaSlugs = new Set(['downtown-dubai', 'dubai-marina', 'palm-jumeirah']);
+
+  goToArea(a: { slug: string; name: string }) {
+    if (this.knownAreaSlugs.has(a.slug)) {
+      this.router.navigate(['/areas', a.slug]);
+    } else {
+      this.router.navigate(['/properties'], { queryParams: { location: a.name } });
+    }
+  }
 }

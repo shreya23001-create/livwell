@@ -89,9 +89,7 @@
 
             <div class="form-field" [class.has-error]="profileErrors()['phone']">
               <label class="form-label">Phone Number <span class="req">*</span></label>
-              <input type="tel" class="form-input" [value]="profile().phone"
-                (input)="profile.update(p => ({ ...p, phone: $any($event.target).value })); clearProfileError('phone')"
-                name="phone" placeholder="+971 50 123 4567" />
+              <app-phone-input [ngModel]="profile().phone" (ngModelChange)="profile.update(p => ({ ...p, phone: $event })); clearProfileError('phone')" name="phone" placeholder="50 123 4567" [hasError]="!!profileErrors()['phone']"></app-phone-input>
               <span class="field-error" *ngIf="profileErrors()['phone']">{{ profileErrors()['phone'] }}</span>
             </div>
 

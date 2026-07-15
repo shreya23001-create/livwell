@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -48,7 +49,7 @@ const EMPTY_FORM = (): ApplyForm => ({
 @Component({
   selector: 'app-careers',
   standalone: true,
-  imports: [CommonModule, FormsModule, NewsletterSectionComponent, SeoLinksSectionComponent],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, NewsletterSectionComponent, SeoLinksSectionComponent],
   templateUrl: './careers.component.html',
   styleUrl: './careers.component.scss',
 })

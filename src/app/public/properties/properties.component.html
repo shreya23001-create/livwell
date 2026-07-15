@@ -324,7 +324,9 @@
       <div *ngFor="let property of paginatedProperties()"
            class="prop-card"
            (mouseenter)="hoveredPropertyId.set(property.id)"
-           (mouseleave)="hoveredPropertyId.set(null)">
+           (mouseleave)="hoveredPropertyId.set(null)"
+           (click)="navigateTo(['/properties', propertySlug(property)])"
+           style="cursor:pointer">
 
         <!-- Clickable area → detail page -->
         <a [routerLink]="['/properties', propertySlug(property)]" class="prop-card-link">
@@ -483,7 +485,7 @@
 
     <!-- ── LIST VIEW ──────────────────────────────────────── -->
     <div *ngIf="viewMode() === 'list' && totalResults() > 0" class="props-list">
-      <div *ngFor="let property of paginatedProperties()" class="prop-list-card">
+      <div *ngFor="let property of paginatedProperties()" class="prop-list-card" (click)="navigateTo(['/properties', propertySlug(property)])" style="cursor:pointer">
 
         <!-- Clickable area → detail page -->
         <a [routerLink]="['/properties', propertySlug(property)]" class="plc-link">

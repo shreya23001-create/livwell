@@ -10,7 +10,7 @@ import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
 
 export { AMENITY_ICONS };
 
-type MasterTab = 'categories' | 'property-types' | 'statuses' | 'trending-tabs' | 'locations' | 'communities' | 'amenities' | 'partner-logos' | 'settings';
+type MasterTab = 'categories' | 'property-types' | 'statuses' | 'lead-statuses' | 'trending-tabs' | 'locations' | 'communities' | 'amenities' | 'partner-logos' | 'settings';
 type SettingsSubTab = 'whatsapp' | 'social' | 'smtp';
 
 
@@ -58,6 +58,7 @@ export class AdminMasterComponent implements OnInit {
       .upsert({ key: 'whatsapp_number', value: this.whatsappNumber() }, { onConflict: 'key' });
     this.whatsappSaving.set(false);
     if (error) { this.toast.error(error.message); return; }
+    this.dataSvc.whatsappNumber.set(this.whatsappNumber());
     this.whatsappSaved.set(true);
     setTimeout(() => this.whatsappSaved.set(false), 2500);
   }
@@ -68,6 +69,7 @@ export class AdminMasterComponent implements OnInit {
       .upsert({ key: 'social_links', value: JSON.stringify(this.socialLinks()) }, { onConflict: 'key' });
     this.socialSaving.set(false);
     if (error) { this.toast.error(error.message); return; }
+    this.dataSvc.socialLinks.set({ ...this.socialLinks() });
     this.socialSaved.set(true);
     setTimeout(() => this.socialSaved.set(false), 2500);
   }
@@ -134,6 +136,7 @@ export class AdminMasterComponent implements OnInit {
   categories    = this.dataSvc.categories;
   propertyTypes = this.dataSvc.propTypes;
   statuses      = this.dataSvc.propStatuses;
+  leadStatuses  = this.dataSvc.leadStatuses;
   trendingTabs  = this.dataSvc.trendingTabs;
   locations     = this.dataSvc.locations;
   communities   = this.dataSvc.communities;
@@ -149,6 +152,9 @@ export class AdminMasterComponent implements OnInit {
   newStatus      = signal('');
   newStatusColor = signal('#6b7280');
   statusError    = signal('');
+  newLeadStatus      = signal('');
+  newLeadStatusColor = signal('#6b7280');
+  leadStatusError    = signal('');
   newTrendingTab   = signal('');
   trendingTabError = signal('');
   newLocation        = signal('');
@@ -188,7 +194,6 @@ export class AdminMasterComponent implements OnInit {
     twitter:   '',
     linkedin:  '',
     youtube:   '',
-    tiktok:    '',
   });
   socialSaving = signal(false);
   socialSaved  = signal(false);
@@ -243,6 +248,7 @@ export class AdminMasterComponent implements OnInit {
     categories:   this.categories().length,
     types:        this.propertyTypes().length,
     statuses:     this.statuses().length,
+    leadStatuses: this.leadStatuses().length,
     trendingTabs: this.trendingTabs().length,
     locations:    this.locations().length,
     communities:  this.communities().length,
@@ -302,6 +308,25 @@ export class AdminMasterComponent implements OnInit {
   async removeStatus(name: string): Promise<void> {
     const err = await this.dataSvc.removeMasterItem('status', name);
     if (err) this.statusError.set('Delete failed: ' + err);
+  }
+
+  // ── Lead Statuses ─────────────────────────────────────
+  async addLeadStatus(): Promise<void> {
+    const val = this.newLeadStatus().trim();
+    if (!val) { this.leadStatusError.set('Enter a status name.'); return; }
+    if (this.leadStatuses().find(s => s.name === val)) { this.leadStatusError.set('Already exists.'); return; }
+    this.saving.set(true);
+    const err = await this.dataSvc.addMasterItem('lead_status', val, this.newLeadStatusColor());
+    this.saving.set(false);
+    if (err) { this.leadStatusError.set(err); return; }
+    this.newLeadStatus.set('');
+    this.newLeadStatusColor.set('#6b7280');
+    this.leadStatusError.set('');
+  }
+
+  async removeLeadStatus(name: string): Promise<void> {
+    const err = await this.dataSvc.removeMasterItem('lead_status', name);
+    if (err) this.leadStatusError.set('Delete failed: ' + err);
   }
 
   // ── Trending Tabs ─────────────────────────────────────

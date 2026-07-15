@@ -50,6 +50,7 @@ export interface AdminUser {
   password?: string;
   designation?: string;
   avatar_url?: string;
+  whatsapp_number?: string;
 }
 
 export interface Lead {
@@ -83,11 +84,23 @@ export class AdminDataService {
   readonly trendingTabs = signal<string[]>(['Villas', 'Luxury', 'Flats']);
   readonly communities  = signal<string[]>(['Emaar Properties', 'DAMAC Properties', 'Nakheel', 'Meraas', 'Dubai Properties', 'Azizi Developments', 'Binghatti', 'Sobha Realty', 'Aldar Properties', 'Select Group', 'Omniyat', 'Ellington Properties', 'Tiger Properties', 'Danube Properties', 'Object 1', 'Reportage Properties', 'Deyaar', 'MAG Property Development', 'Samana Developers', 'Imtiaz Developments']);
   readonly locations    = signal<string[]>(['Downtown Dubai', 'Palm Jumeirah', 'Dubai Marina', 'Business Bay', 'JBR', 'Arabian Ranches', 'Emirates Hills', 'Jumeirah Village Circle', 'Dubai Hills Estate', 'Meydan', 'Dubai Creek Harbour', 'Jumeirah', 'Al Barsha', 'DIFC', 'Dubai South', 'Bluewaters Island', 'City Walk', 'Al Furjan', 'Sports City', 'Motor City', 'Silicon Oasis', 'International City', 'Discovery Gardens', 'Green Community', 'The Springs', 'The Meadows', 'The Lakes', 'The Greens', 'Al Quoz', 'Deira', 'Bur Dubai', 'Karama', 'Satwa', 'Oud Metha', 'Rashidiya', 'Muhaisnah', 'Al Nahda', 'Al Qusais', 'Mirdif', 'Academic City']);
-  readonly propStatuses = signal<MasterStatus[]>([
+  readonly propStatuses  = signal<MasterStatus[]>([
     { name: 'Draft', color: '#6b7280' }, { name: 'Pending Review', color: '#f59e0b' },
     { name: 'Published', color: '#10b981' }, { name: 'Archived', color: '#8b5cf6' },
     { name: 'Sold', color: '#3b82f6' }, { name: 'Rented', color: '#6366f1' },
   ]);
+  readonly leadStatuses  = signal<MasterStatus[]>([
+    { name: 'new', color: '#f59e0b' }, { name: 'contacted', color: '#059669' },
+    { name: 'qualified', color: '#6366f1' }, { name: 'negotiating', color: '#7c3aed' },
+    { name: 'won', color: '#1a5c3a' }, { name: 'lost', color: '#dc2626' },
+  ]);
+
+  // ── Site Settings Signals ─────────────────────────────
+  whatsappNumber = signal('');
+  socialLinks = signal({
+    facebook: '', instagram: '', twitter: '', linkedin: '', youtube: '',
+  });
+
   private sb = inject(SupabaseService).client;
 
   readonly users        = signal<AdminUser[]>([]);
@@ -110,10 +123,27 @@ export class AdminDataService {
 
   constructor() {
     this.loadMasterData();
+    this.loadSiteSettings();
     this.loadUsers();
     this.loadLeads();
     this.loadCms();
     this.loadAuditLogs();
+  }
+
+  async loadSiteSettings(): Promise<void> {
+    try {
+      const { data } = await this.sb.from('site_settings')
+        .select('key, value')
+        .in('key', ['whatsapp_number', 'social_links']);
+      if (!data) return;
+      for (const row of data) {
+        if (row.key === 'whatsapp_number') {
+          this.whatsappNumber.set(row.value ?? '');
+        } else if (row.key === 'social_links') {
+          try { this.socialLinks.set({ ...this.socialLinks(), ...JSON.parse(row.value) }); } catch {}
+        }
+      }
+    } catch {}
   }
 
   // ── Master Data (Supabase) ────────────────────────────
@@ -144,11 +174,13 @@ export class AdminDataService {
         if (dbCommunities.length) this.communities.set(dbCommunities);
         const dbAmenities = data.filter((r: any) => r.type === 'amenity').map((r: any) => ({ name: r.name, icon: r.color || 'star' }));
         if (dbAmenities.length) this.amenities.set(dbAmenities);
+        const dbLeadStatuses = data.filter((r: any) => r.type === 'lead_status').map((r: any) => ({ name: r.name, color: r.color || '#6b7280' }));
+        if (dbLeadStatuses.length) this.leadStatuses.set(dbLeadStatuses);
       }
     } catch { /* table not created yet — defaults remain */ }
   }
 
-  async addMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location' | 'community' | 'amenity', name: string, color?: string): Promise<string | null> {
+  async addMasterItem(type: 'category' | 'property_type' | 'status' | 'lead_status' | 'trending_tab' | 'location' | 'community' | 'amenity', name: string, color?: string): Promise<string | null> {
     const order = type === 'category'
       ? this.categories().length + 1
       : type === 'property_type'
@@ -161,14 +193,16 @@ export class AdminDataService {
               ? this.communities().length + 1
               : type === 'amenity'
                 ? this.amenities().length + 1
-                : this.propStatuses().length + 1;
+                : type === 'lead_status'
+                  ? this.leadStatuses().length + 1
+                  : this.propStatuses().length + 1;
     const { error } = await this.sb.from('master_data').insert({ type, name, color: color || null, sort_order: order });
     if (error) return error.message;
     await this.loadMasterData();
     return null;
   }
 
-  async removeMasterItem(type: 'category' | 'property_type' | 'status' | 'trending_tab' | 'location' | 'community' | 'amenity', name: string): Promise<string | null> {
+  async removeMasterItem(type: 'category' | 'property_type' | 'status' | 'lead_status' | 'trending_tab' | 'location' | 'community' | 'amenity', name: string): Promise<string | null> {
     if (type === 'category')      this.categories.update(l => l.filter(x => x !== name));
     if (type === 'property_type') this.propTypes.update(l => l.filter(x => x !== name));
     if (type === 'trending_tab')  this.trendingTabs.update(l => l.filter(x => x !== name));
@@ -176,6 +210,7 @@ export class AdminDataService {
     if (type === 'community')     this.communities.update(l => l.filter(x => x !== name));
     if (type === 'amenity')       this.amenities.update(l => l.filter(x => x.name !== name));
     if (type === 'status')        this.propStatuses.update(l => l.filter(x => x.name !== name));
+    if (type === 'lead_status')   this.leadStatuses.update(l => l.filter(x => x.name !== name));
 
     const { error } = await this.sb.from('master_data').delete().eq('type', type).eq('name', name);
     if (error) {
@@ -197,13 +232,32 @@ export class AdminDataService {
     this.usersError.set('');
     const { data, error } = await this.sb
       .from('profiles')
-      .select('id, name, email, phone, role, status, created_at, designation, avatar_url')
+      .select('id, name, email, phone, role, status, created_at, designation, avatar_url, whatsapp_number')
       .order('created_at', { ascending: false });
 
     this.dbLog('loadUsers', error, data);
     if (error) {
       this.usersError.set(error.message);
     } else if (data) {
+      // Fetch property and lead counts per agent in bulk
+      const [propsRes, leadsEmailRes, leadsAgentRes] = await Promise.all([
+        this.sb.from('properties').select('agent_name'),
+        this.sb.from('admin_leads').select('agent_email'),
+        this.sb.from('admin_leads').select('assigned_agent'),
+      ]);
+      const propsByName: Record<string, number> = {};
+      for (const p of propsRes.data ?? []) {
+        if (p.agent_name) propsByName[p.agent_name] = (propsByName[p.agent_name] || 0) + 1;
+      }
+      const leadsByEmail: Record<string, number> = {};
+      for (const l of leadsEmailRes.data ?? []) {
+        if (l.agent_email) leadsByEmail[l.agent_email] = (leadsByEmail[l.agent_email] || 0) + 1;
+      }
+      const leadsByName: Record<string, number> = {};
+      for (const l of leadsAgentRes.data ?? []) {
+        if (l.assigned_agent) leadsByName[l.assigned_agent] = (leadsByName[l.assigned_agent] || 0) + 1;
+      }
+
       this.users.set(data.map((p: any) => ({
         id:              p.id,
         name:            p.name        || '',
@@ -213,11 +267,12 @@ export class AdminDataService {
         status:          p.status      || 'active',
         joinedDate:      (p.created_at || '').slice(0, 10),
         lastActive:      (p.created_at || '').slice(0, 10),
-        propertiesCount: 0,
-        leadsCount:      0,
+        propertiesCount: propsByName[p.name] || 0,
+        leadsCount:      (leadsByEmail[p.email] || 0) + (leadsByName[p.name] || 0),
         password:        '',
-        designation:     p.designation || '',
-        avatar_url:      p.avatar_url  || '',
+        designation:     p.designation     || '',
+        avatar_url:      p.avatar_url      || '',
+        whatsapp_number: p.whatsapp_number || '',
       })));
     }
     this.usersLoading.set(false);
@@ -230,8 +285,9 @@ export class AdminDataService {
       phone:       u.phone?.trim()       || null,
       role:        u.role                || 'customer',
       status:      u.status              || 'active',
-      designation: u.designation?.trim() || null,
-      avatar_url:  u.avatar_url?.trim()  || null,
+      designation:     u.designation?.trim()     || null,
+      avatar_url:      u.avatar_url?.trim()      || null,
+      whatsapp_number: u.whatsapp_number?.trim() || null,
     };
     let error: any;
     if (editingId !== null) {

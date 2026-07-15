@@ -1,10 +1,11 @@
 import { Component, OnInit, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { toProjectSlug } from '../../shared/utils/slug';
 
@@ -36,7 +37,44 @@ interface Project {
 export class LuxuryProjectsComponent implements OnInit {
   private sb      = inject(SupabaseService).client;
   private route   = inject(ActivatedRoute);
+  private router  = inject(Router);
+  private auth    = inject(AuthService);
   private dataSvc = inject(AdminDataService);
+
+  savedIds     = signal<Set<number>>(new Set());
+  shareToastId = signal<number | null>(null);
+
+  isSaved(id: number): boolean { return this.savedIds().has(id); }
+
+  async toggleSave(id: number, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.isSaved(id)) {
+      await this.sb.from('saved_projects').delete().eq('user_id', userId).eq('project_id', id);
+      this.savedIds.update(s => { const n = new Set(s); n.delete(id); return n; });
+    } else {
+      await this.sb.from('saved_projects').insert({ user_id: userId, project_id: id });
+      this.savedIds.update(s => new Set(s).add(id));
+    }
+  }
+
+  shareCard(id: number, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const url = `${window.location.origin}/projects/${toProjectSlug(title, id)}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.shareToastId.set(id);
+    setTimeout(() => this.shareToastId.set(null), 2000);
+  }
+
+  private async loadSavedIds(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_projects').select('project_id').eq('user_id', userId);
+    if (data) this.savedIds.set(new Set(data.map((r: any) => r.project_id)));
+  }
 
   allProjects = signal<Project[]>([]);
   loading     = signal(true);
@@ -133,6 +171,7 @@ export class LuxuryProjectsComponent implements OnInit {
     });
     this.allProjects.set(projects);
     this.loading.set(false);
+    this.loadSavedIds();
   }
 
   closeAllDrops() {
@@ -184,4 +223,6 @@ export class LuxuryProjectsComponent implements OnInit {
   projectSlug(p: { title: string; id: number }): string {
     return toProjectSlug(p.title, p.id);
   }
+
+  openUrl(url: string): void { window.open(url, '_blank'); }
 }

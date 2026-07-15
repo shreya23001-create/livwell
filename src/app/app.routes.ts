@@ -109,6 +109,7 @@ export const routes: Routes = [
           { path: 'faqs', loadComponent: () => import('./admin/faqs/admin-faqs.component').then(m => m.AdminFaqsComponent) },
           { path: 'templates', loadComponent: () => import('./admin/templates/admin-templates.component').then(m => m.AdminTemplatesComponent) },
           { path: 'developers', loadComponent: () => import('./admin/developers/admin-developers.component').then(m => m.AdminDevelopersComponent) },
+          { path: 'ratings', loadComponent: () => import('./admin/ratings/admin-ratings.component').then(m => m.AdminRatingsComponent) },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         ],
       },

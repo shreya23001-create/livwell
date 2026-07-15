@@ -1,8 +1,9 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { toPropertySlug } from '../../shared/utils/slug';
@@ -35,7 +36,9 @@ export interface BrandedResidence {
   styleUrl: './branded-residences.component.scss',
 })
 export class BrandedResidencesComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb        = inject(SupabaseService).client;
+  private auth      = inject(AuthService);
+  private router    = inject(Router);
   private sanitizer = inject(DomSanitizer);
 
   allResidences = signal<BrandedResidence[]>([]);
@@ -43,10 +46,44 @@ export class BrandedResidencesComponent implements OnInit {
   hoveredId     = signal<number | null>(null);
   activeFilter  = signal('All');
   searchQuery   = signal('');
+  savedIds      = signal<Set<number>>(new Set());
+  shareToastId  = signal<number | null>(null);
 
   readonly filters = ['All', 'Luxury', 'Ultra Luxury'];
 
   dbError = signal('');
+
+  isSaved(id: number): boolean { return this.savedIds().has(id); }
+
+  async toggleSave(id: number, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.isSaved(id)) {
+      await this.sb.from('saved_projects').delete().eq('user_id', userId).eq('project_id', id);
+      this.savedIds.update(s => { const n = new Set(s); n.delete(id); return n; });
+    } else {
+      await this.sb.from('saved_projects').insert({ user_id: userId, project_id: id });
+      this.savedIds.update(s => new Set(s).add(id));
+    }
+  }
+
+  shareCard(id: number, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const url = `${window.location.origin}/branded-residence/${toPropertySlug(title, id)}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.shareToastId.set(id);
+    setTimeout(() => this.shareToastId.set(null), 2000);
+  }
+
+  private async loadSavedIds(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_projects').select('project_id').eq('user_id', userId);
+    if (data) this.savedIds.set(new Set(data.map((r: any) => r.project_id)));
+  }
 
   async ngOnInit() {
     const { data, error } = await this.sb
@@ -63,6 +100,7 @@ export class BrandedResidencesComponent implements OnInit {
     residences.forEach((r: any) => { const clean = (r.images ?? []).filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); r.images = [...clean.filter((u: string) => !u.includes('/images/')), ...clean.filter((u: string) => u.includes('/images/'))]; });
     this.allResidences.set(residences);
     this.loading.set(false);
+    this.loadSavedIds();
   }
 
   filteredResidences = computed(() => {

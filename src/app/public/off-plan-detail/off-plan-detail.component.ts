@@ -1,8 +1,9 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { OffPlanProject } from '../off-plan/off-plan.component';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 
@@ -199,7 +200,7 @@ export interface FaqItem { question: string; answer: string; open: boolean; }
 @Component({
   selector: 'app-off-plan-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, NewsletterSectionComponent],
+  imports: [PhoneInputComponent, CommonModule, RouterLink, FormsModule, NewsletterSectionComponent],
   templateUrl: './off-plan-detail.component.html',
   styleUrl: './off-plan-detail.component.scss',
 })
@@ -361,7 +362,5 @@ export class OffPlanDetailComponent implements OnInit {
     return `${-offset}`;
   }
 
-  getDescParagraphs(p: OffPlanProject): string[] {
-    return p.description.split('\n\n');
-  }
+  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 }

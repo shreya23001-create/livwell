@@ -498,31 +498,32 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
 /* Inquiry card */
 .pd-inquiry-card {
   background: #fff; border: 1px solid $border;
-  border-radius: 1rem; padding: 1.375rem;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-  display: flex; flex-direction: column; gap: 0.625rem;
+  border-radius: 0.875rem; padding: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  display: flex; flex-direction: column; gap: 0.5rem;
 
   form {
-    display: flex; flex-direction: column; gap: 0.75rem;
+    display: flex; flex-direction: column; gap: 0.5rem;
   }
 }
 .pd-inquiry-title {
-  font-size: 0.9rem; font-weight: 700; color: $dark; margin-bottom: 0.25rem;
+  font-size: 0.83rem; font-weight: 700; color: $dark; margin-bottom: 0.1rem;
 }
 .pd-input, .pd-textarea {
-  width: 100%; padding: 0.6rem 0.875rem;
+  width: 100%; padding: 0.5rem 0.75rem;
   border: 1.5px solid $border; border-radius: 0.5rem;
-  font-size: 0.85rem; color: $dark; background: #fff;
+  font-size: 0.825rem; color: $dark; background: #fff;
   outline: none; transition: border-color 0.2s;
   box-sizing: border-box; font-family: inherit;
   &::placeholder { color: $text3; }
   &:focus { border-color: $accent; }
+  &[readonly] { background: #f3f4f6; color: #6b7280; cursor: default; &:focus { border-color: $border; } }
 }
-.pd-textarea { resize: vertical; }
+.pd-textarea { resize: vertical; min-height: 70px; }
 .pd-submit-btn {
-  width: 100%; padding: 0.75rem; background: $accent;
-  color: #fff; border: none; border-radius: 0.625rem;
-  font-size: 0.9rem; font-weight: 700; cursor: pointer;
+  width: 100%; padding: 0.625rem; background: $accent;
+  color: #fff; border: none; border-radius: 0.5rem;
+  font-size: 0.85rem; font-weight: 700; cursor: pointer;
   transition: background 0.2s;
   &:hover:not(:disabled) { background: #134430; }
   &:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -755,6 +756,30 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
 }
 .pd-expert-card {
   width: 200px; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 0.6rem;
+
+  &__actions {
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+  }
+
+  &__action-btn {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.4rem 0.8rem; border-radius: 0.5rem;
+    font-size: 0.75rem; font-weight: 600; text-decoration: none;
+    border: 1.5px solid transparent; transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap; flex: 1; justify-content: center;
+    &:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    &--call {
+      background: #f0fdf4; color: #15803d; border-color: #86efac;
+    }
+    &--wa {
+      background: #f0fdf4; color: #15803d; border-color: #25d366;
+    }
+    &--email {
+      background: #eff6ff; color: #1d4ed8; border-color: #93c5fd;
+    }
+  }
   @media(max-width: 480px) { width: 160px; }
 
   &__photo-wrap {
@@ -795,8 +820,31 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
     text-decoration: none; color: #fff;
     box-shadow: 0 2px 8px rgba(37,211,102,0.5);
     transition: transform 0.15s, box-shadow 0.15s;
+    border: none; cursor: pointer; padding: 0;
     &:hover { transform: scale(1.1); box-shadow: 0 4px 14px rgba(37,211,102,0.6); }
   }
+}
+
+.pd-wa-wrap {
+  position: absolute; bottom: 0.75rem; right: 0.75rem;
+}
+
+.pd-wa-toast {
+  position: absolute; bottom: calc(100% + 8px); right: 0;
+  background: #1f2937; color: #fff;
+  font-size: 0.72rem; font-weight: 500; white-space: nowrap;
+  padding: 0.35rem 0.65rem; border-radius: 0.4rem;
+  pointer-events: none; z-index: 20;
+  animation: pd-wa-fadein 0.15s ease;
+  &::after {
+    content: ''; position: absolute; top: 100%; right: 12px;
+    border: 5px solid transparent; border-top-color: #1f2937;
+  }
+}
+
+@keyframes pd-wa-fadein {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Floor plan wrap ─────────────────────────────── */
@@ -819,6 +867,51 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
     flex-shrink: 0; transition: background 0.2s;
     &:hover { background: $accent; }
   }
+}
+
+/* ── Review Modal ────────────────────────────────── */
+.pd-review-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 999;
+}
+.pd-review-modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 1000; background: #fff; border-radius: 1.25rem;
+  padding: 2rem; width: 90%; max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  &__head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+  &__title { font-size: 1.2rem; font-weight: 700; color: $dark; margin: 0 0 .25rem; }
+  &__sub { font-size: .82rem; color: $text2; margin: 0; }
+  &__close {
+    background: none; border: none; cursor: pointer; color: $text2; padding: .25rem;
+    border-radius: .5rem; display: flex; align-items: center; justify-content: center;
+    &:hover { background: #f1f5f9; color: $dark; }
+  }
+}
+.pd-review-stars {
+  display: flex; gap: .5rem; margin-bottom: 1.25rem;
+}
+.pd-review-star {
+  background: none; border: none; cursor: pointer; padding: .1rem;
+  svg { width: 40px; height: 40px; transition: transform .15s; }
+  &:hover svg { transform: scale(1.15); }
+}
+.pd-review-label { display: block; font-size: .8rem; font-weight: 600; color: $text2; margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .06em; }
+.pd-review-textarea {
+  width: 100%; border: 1.5px solid $border; border-radius: .75rem;
+  padding: .75rem 1rem; font-size: .9rem; color: $dark; resize: none;
+  outline: none; font-family: inherit; box-sizing: border-box;
+  &:focus { border-color: $accent; }
+}
+.pd-review-actions { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.25rem; }
+.pd-review-btn {
+  padding: .6rem 1.4rem; border-radius: .625rem; font-size: .875rem; font-weight: 600; cursor: pointer; border: none;
+  &--cancel { background: #f1f5f9; color: $text2; &:hover { background: #e2e8f0; } }
+  &--submit { background: $accent; color: #fff; &:hover { background: darken($accent, 8%); } &:disabled { opacity: .5; cursor: not-allowed; } }
+}
+.pd-review-success {
+  text-align: center; padding: 1.5rem 0 .5rem;
+  svg { margin: 0 auto 1rem; display: block; }
+  p { font-size: 1rem; font-weight: 600; color: $accent; margin: 0; }
 }
 
 /* ── FAQ ─────────────────────────────────────────── */
@@ -995,6 +1088,25 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   display: flex; align-items: center; gap: 0.25rem;
   background: rgba(0,0,0,0.45); color: #fff;
   font-size: 0.72rem; padding: 0.18rem 0.5rem; border-radius: 2rem;
+}
+.pd-prop-card-actions {
+  position: absolute; top: .5rem; right: .5rem;
+  display: flex; gap: .3rem; z-index: 3;
+}
+.pd-prop-action-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255,255,255,.88); backdrop-filter: blur(4px);
+  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: #374151; transition: all .2s;
+  svg { width: 14px; height: 14px; flex-shrink: 0; }
+  &:hover { background: #fff; color: $accent; }
+  &.saved { color: #e11d48; }
+}
+.pd-prop-share-toast {
+  position: absolute; top: calc(100% + 5px); right: 0;
+  background: #111827; color: #fff; font-size: .7rem; font-weight: 600;
+  padding: .25rem .6rem; border-radius: .35rem; white-space: nowrap;
+  pointer-events: none;
 }
 .pd-prop-body { padding: 0.85rem 1rem; }
 .pd-prop-price-row {

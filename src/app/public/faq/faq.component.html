@@ -43,7 +43,7 @@
         </button>
 
         <div class="faq-answer" *ngIf="openId() === faq.id">
-          <p>{{ faq.answer }}</p>
+          <div [innerHTML]="safeHtml(faq.answer)"></div>
           <div class="faq-answer-meta">
             <span class="faq-cat-tag">{{ faq.category }}</span>
             <span class="faq-answer-author">Answered by {{ faq.author }}</span>

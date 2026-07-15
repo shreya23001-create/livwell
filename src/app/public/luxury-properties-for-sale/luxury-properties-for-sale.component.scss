@@ -922,9 +922,20 @@ $white: #fff;
   transition: color .15s, box-shadow .15s;
 
   &:hover {
-    color: #e53e3e;
+    color: $green;
     box-shadow: 0 4px 12px rgba(0, 0, 0, .16);
   }
+
+  &.active {
+    color: #e11d48;
+  }
+}
+
+.lpfs-share-toast {
+  position: absolute; top: calc(100% + 5px); right: 0;
+  background: #111827; color: #fff; font-size: .7rem; font-weight: 600;
+  padding: .25rem .6rem; border-radius: .35rem; white-space: nowrap;
+  pointer-events: none; z-index: 10;
 }
 
 // ── Loading ───────────────────────────────────────────────

@@ -50,7 +50,7 @@ export class NavbarComponent implements OnInit {
   currentYear = new Date().getFullYear();
 
   whatsappNumber = signal('');
-  socialLinks = signal({ facebook: '', instagram: '', twitter: '', linkedin: '', youtube: '', tiktok: '' });
+  socialLinks = signal({ facebook: '', instagram: '', twitter: '', linkedin: '', youtube: '' });
 
   get whatsappHref(): string {
     const digits = this.whatsappNumber().replace(/[^\d]/g, '');
@@ -90,17 +90,17 @@ export class NavbarComponent implements OnInit {
   private async loadLuxeTypes(): Promise<void> {
     const { data } = await this.sb
       .from('properties')
-      .select('type')
+      .select('type, listing_type')
       .eq('status', 'Published')
-      .in('type', LUXE_TYPES_ORDER);
+      .eq('is_luxury', true);
 
     if (data && data.length > 0) {
-      const found = [...new Set((data as any[]).map(r => r.type).filter(Boolean))];
-      const ordered = LUXE_TYPES_ORDER.filter(t => found.includes(t));
-      if (ordered.length > 0) {
-        this.luxeSaleTypes.set(ordered);
-        this.luxeRentTypes.set(ordered);
-      }
+      const saleTypes = [...new Set((data as any[]).filter(r => r.listing_type === 'Sale').map(r => r.type).filter(Boolean))];
+      const rentTypes = [...new Set((data as any[]).filter(r => r.listing_type === 'Rent').map(r => r.type).filter(Boolean))];
+      const orderedSale = LUXE_TYPES_ORDER.filter(t => saleTypes.includes(t));
+      const orderedRent = LUXE_TYPES_ORDER.filter(t => rentTypes.includes(t));
+      if (orderedSale.length > 0) this.luxeSaleTypes.set(orderedSale);
+      if (orderedRent.length > 0) this.luxeRentTypes.set(orderedRent);
     }
   }
 

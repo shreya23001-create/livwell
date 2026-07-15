@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject, HostListener, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -46,18 +47,18 @@ interface Project {
 @Component({
   selector: 'app-project-detail-public',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NewsletterSectionComponent],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, RouterLink, NewsletterSectionComponent],
   templateUrl: './project-detail-public.component.html',
   styleUrl: './project-detail-public.component.scss',
 })
 export class ProjectDetailPublicComponent implements OnInit {
-  private sb         = inject(SupabaseService).client;
-  private route      = inject(ActivatedRoute);
-  private router     = inject(Router);
-  private sanitizer  = inject(DomSanitizer);
-  private titleSvc   = inject(Title);
-  private auth       = inject(AuthService);
-  private emailSvc   = inject(EmailService);
+  private sb = inject(SupabaseService).client;
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private sanitizer = inject(DomSanitizer);
+  private titleSvc = inject(Title);
+  private auth = inject(AuthService);
+  private emailSvc = inject(EmailService);
   private platformId = inject(PLATFORM_ID);
 
   isLoggedIn = this.auth.isLoggedIn;
@@ -72,7 +73,7 @@ export class ProjectDetailPublicComponent implements OnInit {
 
     // 2. Fallback: match amenity name against AMENITY_ICONS label directly
     const byLabel = AMENITY_ICONS.find(i => i.label.toLowerCase() === name.toLowerCase())
-                 ?? AMENITY_ICONS.find(i => name.toLowerCase().includes(i.key));
+      ?? AMENITY_ICONS.find(i => name.toLowerCase().includes(i.key));
     const svg = byLabel?.svg ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>';
     return this.sanitizer.bypassSecurityTrustHtml(svg);
   }
@@ -105,9 +106,9 @@ export class ProjectDetailPublicComponent implements OnInit {
     return null;
   });
 
-  project    = signal<Project | null>(null);
-  agent      = signal<{ name: string; email: string; phone: string; avatar_url?: string; designation?: string } | null>(null);
-  loading    = signal(true);
+  project = signal<Project | null>(null);
+  agent = signal<{ name: string; email: string; phone: string; avatar_url?: string; designation?: string; whatsapp_number?: string } | null>(null);
+  loading = signal(true);
 
   projectProperties = signal<{
     id: number; title: string; price: number; price_label: string;
@@ -137,18 +138,101 @@ export class ProjectDetailPublicComponent implements OnInit {
   propSlug(p: { title: string; id: number }): string {
     return p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + p.id;
   }
-  notFound   = signal(false);
-  activeImg  = signal(0);
-  mapUrl     = signal<SafeResourceUrl>('');
+  notFound = signal(false);
+  activeImg = signal(0);
+  mapUrl = signal<SafeResourceUrl>('');
 
-  avatarError  = signal(false);
-  agentAvatar  = computed(() => '');
-  agentPhone   = computed(() => this.agent()?.phone ?? '');
-  agentEmail   = computed(() => this.agent()?.email ?? '');
+  avatarError = signal(false);
+  agentAvatar = computed(() => '');
+  agentPhone = computed(() => this.agent()?.phone ?? '');
+  agentEmail = computed(() => this.agent()?.email ?? '');
+  agentWhatsapp = computed(() => this.agent()?.whatsapp_number ?? '');
+  waUnavailable = signal(false);
 
-  isFaved     = signal(false);
-  favLoading  = signal(false);
-  shareToast  = signal(false);
+  showWaUnavailable(): void {
+    this.waUnavailable.set(true);
+    setTimeout(() => this.waUnavailable.set(false), 3000);
+  }
+
+  isFaved = signal(false);
+  favLoading = signal(false);
+  shareToast = signal(false);
+
+  reviewModalOpen  = signal(false);
+  reviewRating     = signal(0);
+  reviewHover      = signal(0);
+  reviewComment    = '';
+  reviewSubmitting = signal(false);
+  reviewSubmitted  = signal(false);
+
+  async openReviewModal(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    this.reviewRating.set(0);
+    this.reviewHover.set(0);
+    this.reviewComment = '';
+    this.reviewSubmitted.set(false);
+    this.reviewModalOpen.set(true);
+  }
+
+  closeReviewModal(): void { this.reviewModalOpen.set(false); }
+
+  async submitReview(): Promise<void> {
+    if (this.reviewRating() === 0 || this.reviewSubmitting()) return;
+    const userId = this.auth.currentUser()?.id;
+    const projId = this.project()?.id;
+    if (!userId || !projId) return;
+    this.reviewSubmitting.set(true);
+    const user = this.auth.currentUser();
+    await this.sb.from('reviews').insert({
+      user_id:        userId,
+      project_id:     projId,
+      rating:         this.reviewRating(),
+      comment:        this.reviewComment.trim() || null,
+      reviewer_name:  user?.name  ?? '',
+      reviewer_email: user?.email ?? '',
+    });
+    this.reviewSubmitting.set(false);
+    this.reviewSubmitted.set(true);
+    setTimeout(() => this.reviewModalOpen.set(false), 2000);
+  }
+
+  savedPropIds     = signal<Set<number>>(new Set());
+  propShareToastId = signal<number | null>(null);
+
+  isPropSaved(id: number): boolean { return this.savedPropIds().has(id); }
+
+  async togglePropSave(id: number, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.isPropSaved(id)) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', id);
+      this.savedPropIds.update(s => { const n = new Set(s); n.delete(id); return n; });
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: id });
+      this.savedPropIds.update(s => new Set(s).add(id));
+    }
+  }
+
+  sharePropCard(id: number, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const slug = this.propSlug({ title, id });
+    const url  = `${window.location.origin}/properties/${slug}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.propShareToastId.set(id);
+    setTimeout(() => this.propShareToastId.set(null), 2000);
+  }
+
+  private async loadSavedPropIds(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('property_id').eq('user_id', userId);
+    if (data) this.savedPropIds.set(new Set(data.map((r: any) => r.property_id)));
+  }
 
   faqOpen = signal<string | null>(null);
   toggleFaq(idx: number): void {
@@ -185,7 +269,7 @@ export class ProjectDetailPublicComponent implements OnInit {
     }
   }
 
-  lightboxOpen  = signal(false);
+  lightboxOpen = signal(false);
   lightboxIndex = signal(0);
 
   openLightbox(index: number): void {
@@ -210,18 +294,18 @@ export class ProjectDetailPublicComponent implements OnInit {
   onKey(e: KeyboardEvent): void {
     if (!this.lightboxOpen()) return;
     if (e.key === 'ArrowRight') this.lightboxNext();
-    if (e.key === 'ArrowLeft')  this.lightboxPrev();
-    if (e.key === 'Escape')     this.closeLightbox();
+    if (e.key === 'ArrowLeft') this.lightboxPrev();
+    if (e.key === 'Escape') this.closeLightbox();
   }
 
-  inquiryName    = '';
-  inquiryPhone   = '';
-  inquiryEmail   = '';
-  inquiryBudget  = '';
+  inquiryName = '';
+  inquiryPhone = '';
+  inquiryEmail = '';
+  inquiryBudget = '';
   inquiryMessage = '';
-  inquirySent        = signal(false);
-  inquirySubmitting  = signal(false);
-  inquiryError       = signal('');
+  inquirySent = signal(false);
+  inquirySubmitting = signal(false);
+  inquiryError = signal('');
 
   getReferenceNumber(id: number): string {
     return `LW-${String(id).padStart(6, '0')}`;
@@ -236,6 +320,7 @@ export class ProjectDetailPublicComponent implements OnInit {
     if (!numericId) { this.notFound.set(true); this.loading.set(false); return; }
 
     this.loadMasterAmenities();
+    await this.auth.waitForSession();
 
     const { data } = await this.sb
       .from('projects')
@@ -270,7 +355,7 @@ export class ProjectDetailPublicComponent implements OnInit {
       if ((data as Project).agent_name) {
         const { data: agentData } = await this.sb
           .from('profiles')
-          .select('name, email, phone, avatar_url, designation')
+          .select('name, email, phone, avatar_url, designation, whatsapp_number')
           .eq('name', (data as Project).agent_name)
           .maybeSingle();
         if (agentData) this.agent.set(agentData as any);
@@ -279,7 +364,7 @@ export class ProjectDetailPublicComponent implements OnInit {
       this.notFound.set(true);
     }
     this.loading.set(false);
-    this.auth.waitForSession().then(() => this.prefillInquiryForm());
+    this.prefillInquiryForm();
   }
 
   private async loadProjectProperties(projectTitle: string): Promise<void> {
@@ -326,13 +411,14 @@ export class ProjectDetailPublicComponent implements OnInit {
         area_sqft: p.area_sqft ? p.area_sqft.toLocaleString() : '',
         agent_phone: agentPhoneMap[p.agent_name] ?? '',
       })));
+      this.loadSavedPropIds();
     }
   }
 
   private prefillInquiryForm(): void {
     const user = this.auth.currentUser();
     if (!user) return;
-    if (!this.inquiryName)  this.inquiryName  = user.name  ?? '';
+    if (!this.inquiryName) this.inquiryName = user.name ?? '';
     if (!this.inquiryPhone) this.inquiryPhone = user.phone ?? '';
     if (!this.inquiryEmail) this.inquiryEmail = user.email ?? '';
   }
@@ -342,15 +428,15 @@ export class ProjectDetailPublicComponent implements OnInit {
   }
 
   private async geocodeAndSetMap(p: Project): Promise<void> {
-    const raw   = p.community?.trim() || p.location?.trim() || p.title?.trim() || 'Dubai';
+    const raw = p.community?.trim() || p.location?.trim() || p.title?.trim() || 'Dubai';
     const query = raw.toLowerCase().includes('dubai') ? raw : raw + ', Dubai, UAE';
     try {
-      const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
       const data = await res.json();
       if (data?.length) {
         const lat = parseFloat(data[0].lat);
         const lon = parseFloat(data[0].lon);
-        const q   = encodeURIComponent(query);
+        const q = encodeURIComponent(query);
         const url = `https://maps.google.com/maps?q=${q}&ll=${lat},${lon}&t=m&z=15&output=embed`;
         this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
       } else {
@@ -364,17 +450,20 @@ export class ProjectDetailPublicComponent implements OnInit {
   }
 
   async toggleFav(): Promise<void> {
+    await this.auth.waitForSession();
     const userId = this.auth.currentUser()?.id;
     if (!userId) { this.router.navigate(['/customer']); return; }
     const projId = this.project()?.id;
     if (!projId || this.favLoading()) return;
     this.favLoading.set(true);
     if (this.isFaved()) {
-      await this.sb.from('saved_projects').delete().eq('user_id', userId).eq('project_id', projId);
-      this.isFaved.set(false);
+      const { error } = await this.sb.from('saved_projects').delete().eq('user_id', userId).eq('project_id', projId);
+      if (!error) this.isFaved.set(false);
+      else console.error('[toggleFav delete]', error);
     } else {
-      await this.sb.from('saved_projects').insert({ user_id: userId, project_id: projId });
-      this.isFaved.set(true);
+      const { error } = await this.sb.from('saved_projects').insert({ user_id: userId, project_id: projId });
+      if (!error) this.isFaved.set(true);
+      else console.error('[toggleFav insert]', error);
     }
     this.favLoading.set(false);
   }
@@ -382,14 +471,31 @@ export class ProjectDetailPublicComponent implements OnInit {
   async shareProject(): Promise<void> {
     const p = this.project();
     if (!p) return;
-    const url  = isPlatformBrowser(this.platformId) ? window.location.href : '';
-    const text = `Check out ${p.title} by ${p.developer} on LivWell Dubai`;
+
+    const url = isPlatformBrowser(this.platformId) ? window.location.href : '';
+
+    const text = `Hi, Please check this listing I found on LivWell Real Estate.
+
+🏡 ${p.title}
+👤 Developer: ${p.developer}
+
+${url}`;
+
     if (isPlatformBrowser(this.platformId) && navigator.share) {
-      try { await navigator.share({ title: p.title, text, url }); return; } catch {}
+      try {
+        await navigator.share({
+          title: p.title,
+          text,
+          url
+        });
+        return;
+      } catch { }
     }
+
     if (isPlatformBrowser(this.platformId)) {
-      navigator.clipboard?.writeText(url).catch(() => {});
+      navigator.clipboard?.writeText(url).catch(() => { });
     }
+
     this.shareToast.set(true);
     setTimeout(() => this.shareToast.set(false), 2500);
   }
@@ -397,14 +503,14 @@ export class ProjectDetailPublicComponent implements OnInit {
   formatPrice(n: number): string {
     if (!n) return 'Price on request';
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
+    if (n >= 1_000) return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
   }
 
   formatPriceShort(n: number): string {
     if (!n) return 'Call for Price';
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
+    if (n >= 1_000) return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
   }
 
@@ -435,31 +541,31 @@ export class ProjectDetailPublicComponent implements OnInit {
     }
 
     const { error: insertError } = await this.sb.from('admin_leads').insert({
-      name:           this.inquiryName.trim(),
-      phone:          this.inquiryPhone.trim(),
-      email:          this.inquiryEmail.trim(),
-      notes:          this.inquiryMessage.trim() || `Enquiry about project: ${p.title}`,
-      budget:         this.inquiryBudget.trim() || null,
-      project_id:     p.id,
-      project_title:  p.title,
-      property_type:  p.type,
-      customer_id:    userId,
-      location:       p.community || p.location,
+      name: this.inquiryName.trim(),
+      phone: this.inquiryPhone.trim(),
+      email: this.inquiryEmail.trim(),
+      notes: this.inquiryMessage.trim() || `Enquiry about project: ${p.title}`,
+      budget: this.inquiryBudget.trim() || null,
+      project_id: p.id,
+      project_title: p.title,
+      property_type: p.type,
+      customer_id: userId,
+      location: p.community || p.location,
       assigned_agent: hasAgent ? p.agent_name : null,
-      agent_email:    agentEmail,
-      source:         'website',
-      status:         'new',
+      agent_email: agentEmail,
+      source: 'website',
+      status: 'new',
     });
     this.inquirySubmitting.set(false);
 
     // Confirmation email to enquirer
     if (!insertError && this.inquiryEmail.trim()) {
       this.emailSvc.send('enquiry_project', {
-        to_email:      this.inquiryEmail.trim(),
-        name:          this.inquiryName.trim(),
+        to_email: this.inquiryEmail.trim(),
+        name: this.inquiryName.trim(),
         project_title: p.title,
-        agent_name:    hasAgent ? p.agent_name : 'Livwell Team',
-        agent_phone:   this.agentPhone() || '+971 4 000 0000',
+        agent_name: hasAgent ? p.agent_name : 'Livwell Team',
+        agent_phone: this.agentPhone() || '+971 4 000 0000',
       });
     }
 
@@ -467,22 +573,22 @@ export class ProjectDetailPublicComponent implements OnInit {
     if (agentEmail) {
       if (hasAgent) {
         this.emailSvc.send('agent_new_lead', {
-          to_email:       agentEmail,
-          agent_name:     p.agent_name,
-          customer_name:  this.inquiryName.trim(),
+          to_email: agentEmail,
+          agent_name: p.agent_name,
+          customer_name: this.inquiryName.trim(),
           customer_phone: this.inquiryPhone.trim(),
           customer_email: this.inquiryEmail.trim(),
           property_title: p.title,
-          message:        this.inquiryMessage.trim() || '',
+          message: this.inquiryMessage.trim() || '',
         });
       } else {
         this.emailSvc.send('admin_unassigned_lead', {
-          to_email:       agentEmail,
-          customer_name:  this.inquiryName.trim(),
+          to_email: agentEmail,
+          customer_name: this.inquiryName.trim(),
           customer_phone: this.inquiryPhone.trim(),
           customer_email: this.inquiryEmail.trim(),
           property_title: p.title,
-          message:        this.inquiryMessage.trim() || '',
+          message: this.inquiryMessage.trim() || '',
         });
       }
     }

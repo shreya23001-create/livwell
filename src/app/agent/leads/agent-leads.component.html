@@ -8,11 +8,14 @@
   </div>
 
   <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-val">{{ stats().total }}</div><div class="stat-lbl">Total</div></div>
-    <div class="stat-card stat-card--amber"><div class="stat-val">{{ stats().new }}</div><div class="stat-lbl">New</div></div>
-    <div class="stat-card stat-card--blue"><div class="stat-val">{{ stats().active }}</div><div class="stat-lbl">Active</div></div>
-    <div class="stat-card stat-card--green"><div class="stat-val">{{ stats().won }}</div><div class="stat-lbl">Won</div></div>
+  <div class="stats-row" [style.grid-template-columns]="'repeat(' + (dataSvc.leadStatuses().length + 1) + ', 1fr)'">
+    <div class="stat-card"><div class="stat-val">{{ stats()['total'] }}</div><div class="stat-lbl">Total</div></div>
+    @for (s of dataSvc.leadStatuses(); track s.name) {
+      <div class="stat-card" [style.border-top]="'3px solid ' + s.color">
+        <div class="stat-val" [style.color]="s.color">{{ stats()[s.name] ?? 0 }}</div>
+        <div class="stat-lbl">{{ s.name.charAt(0).toUpperCase() + s.name.slice(1) }}</div>
+      </div>
+    }
   </div>
 
   <!-- Filters -->
@@ -34,7 +37,7 @@
     </div>
     <div class="select-wrapper">
       <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
-        <option value="">All Statuses</option>
+        <option value="">Status</option>
         <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
       </select>
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
@@ -144,7 +147,7 @@
         <div class="form-row">
           <div class="form-field" [class.has-error]="formErrors()['phone']">
             <label>Phone *</label>
-            <input type="text" [value]="form()['phone']" (input)="updateForm({phone:$any($event.target).value})" placeholder="+971 50 000 0000">
+            <app-phone-input [ngModel]="form()['phone']" (ngModelChange)="updateForm({phone: $event})" placeholder="50 000 0000"></app-phone-input>
             <span class="field-error" *ngIf="formErrors()['phone']">{{ formErrors()['phone'] }}</span>
           </div>
           <div class="form-field">

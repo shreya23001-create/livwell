@@ -12,7 +12,7 @@
 <section class="guides-section">
   <div class="guides-container">
     <div class="guides-grid">
-      <article class="guide-card" *ngFor="let g of guides">
+      <article class="guide-card" *ngFor="let g of guides" [routerLink]="['/guides', g.slug]" style="cursor:pointer">
         <div class="guide-card__icon-wrap" [style.background]="g.color + '18'">
           <svg class="guide-card__icon" [style.color]="g.color" xmlns="http://www.w3.org/2000/svg"
             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

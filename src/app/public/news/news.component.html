@@ -130,7 +130,7 @@
         } @else {
           <div class="news-list">
             @for (a of pagedPosts(); track a.id) {
-              <article class="news-card">
+              <article class="news-card" [routerLink]="['/news', a.slug]" style="cursor:pointer">
                 <a [routerLink]="['/news', a.slug]" class="news-card-img-wrap">
                   @if (a.image) {
                     <img [src]="a.image" [alt]="a.title" class="news-card-img" loading="lazy">

@@ -290,6 +290,13 @@ $bg: #f4f6fa;
     &:focus {
       border-color: $accent;
     }
+
+    &[readonly] {
+      background: #f3f4f6;
+      color: #6b7280;
+      cursor: default;
+      &:focus { border-color: $border; }
+    }
   }
 }
 

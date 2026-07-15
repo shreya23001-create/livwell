@@ -65,8 +65,7 @@
       <div class="adm-prof-form-row">
         <div class="adm-prof-field">
           <label class="adm-prof-label">Phone Number *</label>
-          <input class="adm-prof-input" [class.is-err]="profileErrors()['phone']" type="tel"
-            [value]="profile().phone" (input)="profile.update(p => ({ ...p, phone: $any($event.target).value })); clearErr('phone')" placeholder="+971 50 000 0000" />
+          <app-phone-input [ngModel]="profile().phone" (ngModelChange)="profile.update(p => ({ ...p, phone: $event })); clearErr('phone')" placeholder="50 000 0000" [hasError]="!!profileErrors()['phone']"></app-phone-input>
           <span class="adm-prof-err" *ngIf="profileErrors()['phone']">{{ profileErrors()['phone'] }}</span>
         </div>
       </div>

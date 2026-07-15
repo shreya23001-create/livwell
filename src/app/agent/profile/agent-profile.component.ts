@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +11,7 @@ type Tab = 'profile' | 'password' | 'notifications';
 @Component({
   selector: 'app-agent-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [PhoneInputComponent, CommonModule, FormsModule],
   templateUrl: './agent-profile.component.html',
   styleUrl: './agent-profile.component.scss',
 })

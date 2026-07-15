@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 ﻿import { Component, signal, computed, OnInit, inject, HostListener, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -30,7 +31,7 @@ interface CommercialDetail {
   images: string[];
   about: string;
   features: string[];
-  agent: { name: string; role: string; phone: string; email: string; avatar: string };
+  agent: { name: string; role: string; phone: string; email: string; avatar: string; whatsapp?: string };
   mapUrl: string;
   video_url?: string | null;
   faqs?: { question: string; answer: string }[];
@@ -187,7 +188,7 @@ EXTRA_OFFICES.forEach(o => { ALL_COMMERCIAL[o.id] = o; });
 @Component({
   selector: 'app-commercial-property-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NewsletterSectionComponent, SeoLinksSectionComponent],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, RouterLink, NewsletterSectionComponent, SeoLinksSectionComponent],
   templateUrl: './commercial-property-detail.component.html',
   styleUrl: './commercial-property-detail.component.scss',
 })
@@ -202,6 +203,16 @@ export class CommercialPropertyDetailComponent implements OnInit {
   favLoading  = signal(false);
   shareToast  = signal(false);
   faqOpen     = signal<number | null>(null);
+  waUnavailable = signal(false);
+
+  agentPhone     = computed(() => this.property()?.agent?.phone    ?? '');
+  agentWhatsapp  = computed(() => this.property()?.agent?.whatsapp ?? '');
+  agentEmail     = computed(() => this.property()?.agent?.email    ?? '');
+
+  showWaUnavailable(): void {
+    this.waUnavailable.set(true);
+    setTimeout(() => this.waUnavailable.set(false), 3000);
+  }
 
   toggleFaq(i: number): void { this.faqOpen.set(this.faqOpen() === i ? null : i); }
   safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
@@ -217,6 +228,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
   inquirySent       = signal(false);
   inquirySubmitting = signal(false);
   inquiryError      = signal('');
+  descExpanded      = signal(false);
 
   openLightbox(index: number): void {
     this.lightboxIndex.set(index);
@@ -449,21 +461,22 @@ export class CommercialPropertyDetailComponent implements OnInit {
 
       // Fetch agent profile
       const cleanAgent = (n: string) => (n ?? '').trim().replace(/^[-–—]+$/, '');
-      let agentObj = { name: cleanAgent(p.agent_name) || 'LivWell Agent', role: 'Property Consultant', phone: '', email: '', avatar: '' };
+      let agentObj = { name: cleanAgent(p.agent_name) || 'LivWell Agent', role: 'Property Consultant', phone: '', email: '', avatar: '', whatsapp: '' };
       if (cleanAgent(p.agent_name)) {
         const { data: prof } = await this.sb
           .from('profiles')
-          .select('name, phone, email, avatar_url, designation')
+          .select('name, phone, email, avatar_url, designation, whatsapp_number')
           .eq('name', p.agent_name)
           .maybeSingle();
         if (prof) {
           const av = prof.avatar_url ?? '';
           agentObj = {
-            name:   cleanAgent(prof.name) || cleanAgent(p.agent_name) || 'LivWell Agent',
-            role:   prof.designation ?? 'Property Consultant',
-            phone:  prof.phone  ?? '',
-            email:  prof.email  ?? '',
-            avatar: (av && !av.startsWith('data:')) ? av : '',
+            name:     cleanAgent(prof.name) || cleanAgent(p.agent_name) || 'LivWell Agent',
+            role:     prof.designation ?? 'Property Consultant',
+            phone:    prof.phone  ?? '',
+            email:    prof.email  ?? '',
+            avatar:   (av && !av.startsWith('data:')) ? av : '',
+            whatsapp: prof.whatsapp_number ?? '',
           };
         }
       }
@@ -502,7 +515,8 @@ export class CommercialPropertyDetailComponent implements OnInit {
       this.titleSvc.setTitle(`${detail.title} | Livwell`);
       this.loading.set(false);
       this.geocodeAndSetMap(p.community ?? '', p.location ?? '');
-      this.auth.waitForSession().then(() => this.checkFavStatus(p.id));
+      await this.auth.waitForSession();
+      await this.checkFavStatus(p.id);
       this.sb.from('properties').update({ views: (p.views || 0) + 1 }).eq('id', p.id).then(() => {});
       return;
     }
@@ -524,6 +538,7 @@ export class CommercialPropertyDetailComponent implements OnInit {
   }
 
   async toggleFav(): Promise<void> {
+    await this.auth.waitForSession();
     const p = this.property();
     const userId = this.auth.currentUser()?.id;
     if (!userId) { this.router.navigate(['/customer']); return; }

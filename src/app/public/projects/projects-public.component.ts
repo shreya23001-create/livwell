@@ -1,8 +1,9 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { toProjectSlug } from '../../shared/utils/slug';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -36,8 +37,45 @@ interface Project {
   styleUrl: './projects-public.component.scss',
 })
 export class ProjectsPublicComponent implements OnInit {
-  private sb    = inject(SupabaseService).client;
-  private route = inject(ActivatedRoute);
+  private sb     = inject(SupabaseService).client;
+  private route  = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth   = inject(AuthService);
+
+  savedIds      = signal<Set<number>>(new Set());
+  shareToastId  = signal<number | null>(null);
+
+  isSaved(id: number): boolean { return this.savedIds().has(id); }
+
+  async toggleSave(id: number, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.isSaved(id)) {
+      await this.sb.from('saved_projects').delete().eq('user_id', userId).eq('project_id', id);
+      this.savedIds.update(s => { const n = new Set(s); n.delete(id); return n; });
+    } else {
+      await this.sb.from('saved_projects').insert({ user_id: userId, project_id: id });
+      this.savedIds.update(s => new Set(s).add(id));
+    }
+  }
+
+  shareCard(id: number, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const url = `${window.location.origin}/projects/${toProjectSlug(title, id)}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.shareToastId.set(id);
+    setTimeout(() => this.shareToastId.set(null), 2000);
+  }
+
+  private async loadSavedIds(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_projects').select('project_id').eq('user_id', userId);
+    if (data) this.savedIds.set(new Set(data.map((r: any) => r.project_id)));
+  }
 
   allProjects = signal<Project[]>([]);
   loading     = signal(true);
@@ -55,12 +93,24 @@ export class ProjectsPublicComponent implements OnInit {
   filteredProjects = computed(() => {
     let list = this.allProjects().slice();
     const q = this.searchQuery().toLowerCase().trim();
-    if (q) list = list.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      (p.developer ?? '').toLowerCase().includes(q) ||
-      (p.community ?? '').toLowerCase().includes(q) ||
-      (p.location ?? '').toLowerCase().includes(q)
-    );
+    if (q) {
+      const terms = q.split(',').map(t => t.trim()).filter(Boolean);
+      if (terms.length > 1) {
+        list = list.filter(p => terms.some(t =>
+          p.title.toLowerCase().includes(t) ||
+          (p.developer ?? '').toLowerCase().includes(t) ||
+          (p.community ?? '').toLowerCase().includes(t) ||
+          (p.location ?? '').toLowerCase().includes(t)
+        ));
+      } else {
+        list = list.filter(p =>
+          p.title.toLowerCase().includes(q) ||
+          (p.developer ?? '').toLowerCase().includes(q) ||
+          (p.community ?? '').toLowerCase().includes(q) ||
+          (p.location ?? '').toLowerCase().includes(q)
+        );
+      }
+    }
     if (this.selectedType() !== 'All') list = list.filter(p => p.type === this.selectedType());
     if (this.selectedHandover() !== 'All') list = list.filter(p => (p.completion_date ?? '').includes(this.selectedHandover()));
     const sort = this.sortBy();
@@ -122,6 +172,7 @@ export class ProjectsPublicComponent implements OnInit {
     });
     this.allProjects.set(projects);
     this.loading.set(false);
+    this.loadSavedIds();
   }
 
   formatPrice(n: number): string {

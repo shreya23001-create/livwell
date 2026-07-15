@@ -20,7 +20,11 @@
     </div>
     <div class="master-stat" [class.active]="activeTab()==='statuses'" (click)="activeTab.set('statuses')">
       <div class="master-stat-val">{{ counts().statuses }}</div>
-      <div class="master-stat-lbl">Statuses</div>
+      <div class="master-stat-lbl">Status</div>
+    </div>
+    <div class="master-stat" [class.active]="activeTab()==='lead-statuses'" (click)="activeTab.set('lead-statuses')">
+      <div class="master-stat-val">{{ counts().leadStatuses }}</div>
+      <div class="master-stat-lbl">Lead Status</div>
     </div>
     <div class="master-stat" [class.active]="activeTab()==='trending-tabs'" (click)="activeTab.set('trending-tabs')">
       <div class="master-stat-val">{{ counts().trendingTabs }}</div>
@@ -38,19 +42,14 @@
       <div class="master-stat-val">{{ partnerLogos().length }}</div>
       <div class="master-stat-lbl">Partner Logos</div>
     </div>
-    <div class="master-stat" [class.active]="activeTab()==='settings'" (click)="activeTab.set('settings')">
-      <div class="master-stat-val">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-      </div>
-      <div class="master-stat-lbl">Settings</div>
-    </div>
   </div>
 
   <!-- ── Tabs ── -->
   <div class="master-tabs">
     <button class="master-tab" [class.active]="activeTab()==='categories'"     (click)="activeTab.set('categories')">Categories</button>
     <button class="master-tab" [class.active]="activeTab()==='property-types'" (click)="activeTab.set('property-types')">Property Types</button>
-    <button class="master-tab" [class.active]="activeTab()==='statuses'"       (click)="activeTab.set('statuses')">Statuses</button>
+    <button class="master-tab" [class.active]="activeTab()==='statuses'"       (click)="activeTab.set('statuses')">Status</button>
+    <button class="master-tab" [class.active]="activeTab()==='lead-statuses'"  (click)="activeTab.set('lead-statuses')">Lead Status</button>
     <button class="master-tab" [class.active]="activeTab()==='trending-tabs'"  (click)="activeTab.set('trending-tabs')">Trending Tabs</button>
     <button class="master-tab" [class.active]="activeTab()==='locations'"      (click)="activeTab.set('locations')">Locations</button>
     <button class="master-tab" [class.active]="activeTab()==='amenities'"      (click)="activeTab.set('amenities')">Amenities</button>
@@ -136,7 +135,7 @@
   @if (activeTab() === 'statuses') {
     <div class="master-card">
       <div class="master-card-header">
-        <h2 class="master-card-title">Property Statuses</h2>
+        <h2 class="master-card-title">Property Status</h2>
         <p class="master-card-sub">Status options available on property listings</p>
       </div>
 
@@ -165,6 +164,47 @@
             <span class="master-item-name">{{ s.name }}</span>
             <span class="master-status-badge" [style.background]="s.color + '22'" [style.color]="s.color">{{ s.name }}</span>
             <button class="master-item-del" (click)="removeStatus(s.name)" title="Remove">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ══ LEAD STATUSES ════════════════════════════════════ -->
+  @if (activeTab() === 'lead-statuses') {
+    <div class="master-card">
+      <div class="master-card-header">
+        <h2 class="master-card-title">Lead Status</h2>
+        <p class="master-card-sub">Status options used in the leads pipeline (e.g. new, contacted, won)</p>
+      </div>
+
+      <div class="master-add-row">
+        <input class="master-input" type="text" placeholder="e.g. Follow Up"
+               [ngModel]="newLeadStatus()" (ngModelChange)="newLeadStatus.set($event)"
+               (keyup.enter)="addLeadStatus()">
+        <div class="master-color-wrap">
+          <label class="master-color-lbl">Color</label>
+          <input type="color" class="master-color-input"
+                 [ngModel]="newLeadStatusColor()" (ngModelChange)="newLeadStatusColor.set($event)">
+        </div>
+        <button class="master-btn master-btn--primary" (click)="addLeadStatus()" [disabled]="saving()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Add Status
+        </button>
+      </div>
+      @if (leadStatusError()) {
+        <p class="master-error">{{ leadStatusError() }}</p>
+      }
+
+      <div class="master-list">
+        @for (s of leadStatuses(); track s.name) {
+          <div class="master-item">
+            <span class="master-status-dot" [style.background]="s.color"></span>
+            <span class="master-item-name">{{ s.name }}</span>
+            <span class="master-status-badge" [style.background]="s.color + '22'" [style.color]="s.color">{{ s.name }}</span>
+            <button class="master-item-del" (click)="removeLeadStatus(s.name)" title="Remove">
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
             </button>
           </div>
@@ -519,16 +559,6 @@
                 </span>
                 <input class="stt-input stt-input--prefixed" type="url" placeholder="https://youtube.com/@yourchannel"
                        [ngModel]="socialLinks().youtube" (ngModelChange)="updateSocial('youtube', $event)">
-              </div>
-            </div>
-            <div class="stt-field-group">
-              <label class="stt-label">TikTok</label>
-              <div class="stt-input-row">
-                <span class="stt-prefix">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.78a4.85 4.85 0 0 1-1.01-.09z"/></svg>
-                </span>
-                <input class="stt-input stt-input--prefixed" type="url" placeholder="https://tiktok.com/@yourhandle"
-                       [ngModel]="socialLinks().tiktok" (ngModelChange)="updateSocial('tiktok', $event)">
               </div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { toPropertySlug } from '../../shared/utils/slug';
 
 interface LuxuryProperty {
@@ -42,6 +43,44 @@ const LUXE_TYPES = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Home', 'Man
 })
 export class LuxuryPropertiesForSaleComponent implements OnInit {
   private sb    = inject(SupabaseService).client;
+  private auth  = inject(AuthService);
+  private router2 = inject(Router);
+
+  savedIds     = signal<Set<number>>(new Set());
+  shareToastId = signal<number | null>(null);
+
+  isSaved(id: number): boolean { return this.savedIds().has(id); }
+
+  async toggleSave(id: number, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router2.navigate(['/customer']); return; }
+    if (this.isSaved(id)) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', id);
+      this.savedIds.update(s => { const n = new Set(s); n.delete(id); return n; });
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: id });
+      this.savedIds.update(s => new Set(s).add(id));
+    }
+  }
+
+  shareCard(id: number, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const slug = toPropertySlug(title, id);
+    const url  = `${window.location.origin}/luxury-property/${slug}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.shareToastId.set(id);
+    setTimeout(() => this.shareToastId.set(null), 2000);
+  }
+
+  private async loadSavedIds(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('property_id').eq('user_id', userId);
+    if (data) this.savedIds.set(new Set(data.map((r: any) => r.property_id)));
+  }
 
   // ── Search & filter state ──────────────────────────────
   searchArea   = signal('');
@@ -178,8 +217,8 @@ export class LuxuryPropertiesForSaleComponent implements OnInit {
 
     const { data, error } = await this.sb
       .from('properties')
-      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, is_featured, created_at, status')
-      .in('type', LUXE_TYPES)
+      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, is_featured, is_luxury, created_at, status')
+      .eq('is_luxury', true)
       .eq('status', 'Published')
       .order('created_at', { ascending: false });
 
@@ -252,6 +291,7 @@ export class LuxuryPropertiesForSaleComponent implements OnInit {
 
     this.allProperties.set(mapped);
     this.loading.set(false);
+    this.loadSavedIds();
   }
 
   setIntent(value: 'Buy' | 'Rent') {
@@ -325,4 +365,6 @@ export class LuxuryPropertiesForSaleComponent implements OnInit {
   typeLabel(): string {
     return this.activeType() === 'Any' ? 'Property Type' : this.activeType() + 's';
   }
+
+  navigateTo(commands: any[]): void { this.router.navigate(commands); }
 }

@@ -411,8 +411,8 @@ $light:  #f4f6fa;
     &::after {
       content: '';
       position: absolute;
-      left: 2px; top: -1px;
-      width: 5px; height: 9px;
+      left: 3px; top: 1px;
+      width: 4px; height: 8px;
       border: 2px solid #fff;
       border-top: none; border-left: none;
       transform: rotate(45deg);

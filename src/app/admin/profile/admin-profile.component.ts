@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +11,7 @@ type Tab = 'profile' | 'password';
 @Component({
   selector: 'app-admin-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [PhoneInputComponent, CommonModule, FormsModule],
   templateUrl: './admin-profile.component.html',
   styleUrl: './admin-profile.component.scss',
 })

@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,11 +14,11 @@ import { environment } from '../../../environments/environment';
 export type { AdminUser };
 
 const EMPTY_FORM = (): Partial<AdminUser> => ({
-  name: '', email: '', phone: '', role: 'customer', status: 'active',
+  name: '', email: '', phone: '', role: 'agent', status: 'active',
   joinedDate: new Date().toISOString().slice(0, 10),
   lastActive:  new Date().toISOString().slice(0, 10),
   propertiesCount: 0, leadsCount: 0,
-  designation: '', avatar_url: '',
+  designation: '', avatar_url: '', whatsapp_number: '',
 });
 
 interface UserForm extends Partial<AdminUser> { password?: string; }
@@ -25,7 +26,7 @@ interface UserForm extends Partial<AdminUser> { password?: string; }
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [PhoneInputComponent, CommonModule, FormsModule],
   templateUrl: './admin-users.component.html',
   styleUrl: './admin-users.component.scss',
 })
@@ -41,6 +42,59 @@ export class AdminUsersComponent {
   uploadingAvatar = signal(false);
   avatarPreview   = signal<string | null>(null);
   avatarDragOver  = signal(false);
+
+  // ── Details Popup ─────────────────────────────────────
+  detailsUser    = signal<AdminUser | null>(null);
+  detailsLoading = signal(false);
+  detailsData    = signal<{
+    properties: any[];
+    projects: any[];
+    leads: any[];
+    members: any[];
+    enquiries: any[];
+  } | null>(null);
+
+  async openDetails(u: AdminUser): Promise<void> {
+    this.detailsUser.set(u);
+    this.detailsData.set(null);
+    this.detailsLoading.set(true);
+
+    if (u.role === 'agent' || u.role === 'admin') {
+      const [propsRes, projRes, leadsEmailRes, leadsNameRes, membersRes] = await Promise.all([
+        this.sb.from('properties').select('id, title, type, listing_type, status, price, location').eq('agent_name', u.name).order('created_at', { ascending: false }),
+        this.sb.from('projects').select('id, name, type, status, location').eq('agent_name', u.name).order('created_at', { ascending: false }),
+        this.sb.from('admin_leads').select('id, name, status, property_title, created_at').eq('agent_email', u.email).order('created_at', { ascending: false }),
+        this.sb.from('admin_leads').select('id, name, status, property_title, created_at').eq('assigned_agent', u.name).is('agent_email', null).order('created_at', { ascending: false }),
+        this.sb.from('profiles').select('id, name, email, role, created_at').eq('created_by', u.id).order('created_at', { ascending: false }),
+      ]);
+      this.detailsData.set({
+        properties: propsRes.data ?? [],
+        projects:   projRes.data ?? [],
+        leads:      [...(leadsEmailRes.data ?? []), ...(leadsNameRes.data ?? [])],
+        members:    membersRes.data ?? [],
+        enquiries:  [],
+      });
+    } else {
+      const [enqRes, propsRes, projRes] = await Promise.all([
+        this.sb.from('admin_leads').select('id, name, status, property_title, project_title, created_at').eq('email', u.email).order('created_at', { ascending: false }),
+        this.sb.from('properties').select('id, title, type, status').eq('created_by', u.id).order('created_at', { ascending: false }),
+        this.sb.from('projects').select('id, name, type, status').eq('created_by', u.id).order('created_at', { ascending: false }),
+      ]);
+      this.detailsData.set({
+        properties: propsRes.data ?? [],
+        projects:   projRes.data ?? [],
+        leads:      [],
+        members:    [],
+        enquiries:  enqRes.data ?? [],
+      });
+    }
+    this.detailsLoading.set(false);
+  }
+
+  closeDetails(): void {
+    this.detailsUser.set(null);
+    this.detailsData.set(null);
+  }
 
   users   = this.dataSvc.users;
   loading = this.dataSvc.usersLoading;
@@ -210,8 +264,9 @@ export class AdminUsersComponent {
           phone:       f.phone?.trim()       ?? null,
           role:        f.role                ?? 'customer',
           status:      f.status              ?? 'active',
-          designation: f.designation?.trim() ?? null,
-          avatar_url:  f.avatar_url?.trim()  ?? null,
+          designation:     f.designation?.trim()     ?? null,
+          avatar_url:      f.avatar_url?.trim()      ?? null,
+          whatsapp_number: f.whatsapp_number?.trim() ?? null,
         }),
       });
       const createJson = await createRes.json().catch(() => null);

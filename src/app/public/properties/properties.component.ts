@@ -452,7 +452,7 @@ export class PropertiesComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['type'])      this.selectedType.set(params['type']);
       if (params['status'])    this.selectedStatus.set(params['status']);
-      if (params['location'])  { this.selectedLocations.set([params['location']]); }
+      if (params['location'])  { this.selectedLocations.set(params['location'].split('|').map((l: string) => l.trim()).filter(Boolean)); }
       if (params['q'])         this.searchQuery.set(params['q']);
       if (params['beds'])      this.selectedBeds.set(params['beds']);
       if (params['minPrice'])  this.minPrice.set(Number(params['minPrice']));
@@ -529,12 +529,8 @@ export class PropertiesComponent implements OnInit {
           agentPhone:   ag.phone,
         };
       }));
-    } else if (!error) {
-      // DB returned no rows — keep mock data so page isn't blank
-      this.allProperties.set(this._mockProperties);
     } else {
-      // DB error — use mock data as fallback
-      this.allProperties.set(this._mockProperties);
+      this.allProperties.set([]);
     }
     this.isLoading.set(false);
   }
@@ -695,4 +691,6 @@ export class PropertiesComponent implements OnInit {
   propertySlug(p: { title: string; id: number }): string {
     return toPropertySlug(p.title, p.id);
   }
+
+  navigateTo(commands: any[]): void { this.router.navigate(commands); }
 }

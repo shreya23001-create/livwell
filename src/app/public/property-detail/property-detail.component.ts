@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
@@ -39,7 +40,7 @@ interface Property {
 @Component({
   selector: 'app-property-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, FooterComponent],
+  imports: [PhoneInputComponent, CommonModule, RouterLink, FormsModule, FooterComponent],
   templateUrl: './property-detail.component.html',
   styleUrl: './property-detail.component.scss',
 })
@@ -57,6 +58,51 @@ export class PropertyDetailComponent implements OnInit {
   similarProperties = signal<Property[]>([]);
   agentAvatar       = signal('');
   agentPhone        = signal('');
+  agentWhatsapp     = signal('');
+  agentDesignation  = signal('');
+  agentEmail        = signal('');
+  waUnavailable     = signal(false);
+
+  savedSimIds      = signal<Set<number>>(new Set());
+  simShareToastId  = signal<number | null>(null);
+
+  isSimSaved(id: number): boolean { return this.savedSimIds().has(id); }
+
+  async toggleSimSave(id: number, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.isSimSaved(id)) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', id);
+      this.savedSimIds.update(s => { const n = new Set(s); n.delete(id); return n; });
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: id });
+      this.savedSimIds.update(s => new Set(s).add(id));
+    }
+  }
+
+  shareSimCard(id: number, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const slug = toPropertySlug(title, id);
+    const url  = `${window.location.origin}/properties/${slug}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.simShareToastId.set(id);
+    setTimeout(() => this.simShareToastId.set(null), 2000);
+  }
+
+  private async loadSavedSimIds(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('property_id').eq('user_id', userId);
+    if (data) this.savedSimIds.set(new Set(data.map((r: any) => r.property_id)));
+  }
+
+  showWaUnavailable(): void {
+    this.waUnavailable.set(true);
+    setTimeout(() => this.waUnavailable.set(false), 3000);
+  }
 
   lightboxOpen  = signal(false);
   lightboxIndex = signal(0);
@@ -337,13 +383,16 @@ export class PropertyDetailComponent implements OnInit {
       this.mortgagePrice.set(prop.price);
       this.geocodeAndSetMap(prop);
 
-      // Load agent avatar + phone
+      // Load agent avatar + phone + whatsapp + designation + email
       this.agentAvatar.set('');
       this.agentPhone.set('');
+      this.agentWhatsapp.set('');
+      this.agentDesignation.set('');
+      this.agentEmail.set('');
       if (prop.agent_name && prop.agent_name !== 'LivWell Agent') {
         const { data: profile } = await this.sb
           .from('profiles')
-          .select('avatar_url, phone, designation')
+          .select('avatar_url, phone, email, designation, whatsapp_number')
           .eq('name', prop.agent_name)
           .eq('role', 'agent')
           .maybeSingle();
@@ -353,6 +402,9 @@ export class PropertyDetailComponent implements OnInit {
             this.agentAvatar.set(av);
           }
           this.agentPhone.set(profile.phone ?? '');
+          this.agentEmail.set(profile.email ?? '');
+          this.agentWhatsapp.set(profile.whatsapp_number ?? '');
+          this.agentDesignation.set(profile.designation ?? '');
         }
       }
 
@@ -406,6 +458,7 @@ export class PropertyDetailComponent implements OnInit {
           .maybeSingle();
         this.isFaved.set(!!saved);
       });
+      this.loadSavedSimIds();
     });
   }
 

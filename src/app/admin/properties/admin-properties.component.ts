@@ -38,6 +38,7 @@ export interface Property {
   created_at:      string;
   views:           number;
   is_featured:     boolean;
+  is_luxury:       boolean;
   description:     string;
   address:         string;
   furnishing:      string;
@@ -51,7 +52,7 @@ const EMPTY_FORM = (): Partial<Property> => ({
   title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
   price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', project_name: '', address: '', description: '',
-  furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, images: [],
+  furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, is_luxury: false, images: [],
   amenities: [], video_url: '', faqs: [],
 });
 
@@ -449,6 +450,7 @@ export class AdminPropertiesComponent implements OnInit {
       agent_name:      f.agent_name    || null,
       agent_id:        null,
       is_featured:     f.is_featured   ?? false,
+      is_luxury:       f.is_luxury     ?? false,
       images:          this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
       amenities:       f.amenities ?? [],
       video_url:       f.video_url?.trim() || null,
@@ -575,6 +577,7 @@ export class AdminPropertiesComponent implements OnInit {
       'Furnishing':   p.furnishing,
       'Description':  p.description,
       'Featured':     p.is_featured ? 'Yes' : 'No',
+      'Luxury':       (p as any).is_luxury ? 'Yes' : 'No',
     }));
 
     const ws = XLSX.utils.json_to_sheet(rows);
@@ -630,6 +633,7 @@ export class AdminPropertiesComponent implements OnInit {
       furnishing:   r['Furnishing']  || 'Unfurnished',
       description:  r['Description'] || '',
       is_featured:  r['Featured'] === 'Yes',
+      is_luxury:    r['Luxury'] === 'Yes',
       images:       [],
     })).filter(r => r.title.trim());
 

@@ -41,7 +41,7 @@
           <input class="ac-search-input" placeholder="Search name or email…" [value]="searchApps()" (input)="searchApps.set($any($event.target).value)" />
         </div>
         <select class="ac-select" [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
-          <option value="">All Statuses</option>
+          <option value="">Status</option>
           <option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</option>
         </select>
         <select class="ac-select" [value]="filterJob()" (change)="filterJob.set($any($event.target).value)">

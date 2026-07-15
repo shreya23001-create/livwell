@@ -8,7 +8,8 @@
 <div *ngIf="!loading() && notFound()" class="pd-not-found">
   <div class="pd-nf-inner">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
     </svg>
     <h2>Project Not Found</h2>
     <p>This project may have been unpublished or removed.</p>
@@ -38,20 +39,34 @@
     <div class="pd-wrap">
       <div class="pd-hero-inner">
         <div>
-          <h1 class="pd-hero-title">{{ p.title }}{{ p.community ? ' - ' + p.community : '' }} Starting from {{ formatPriceShort(p.price_from) }}</h1>
+          <h1 class="pd-hero-title">{{ p.title }}{{ p.community ? ' - ' + p.community : '' }} Starting from {{
+            formatPriceShort(p.price_from) }}</h1>
           <div class="pd-hero-loc">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              <path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+            </svg>
             {{ p.community || p.location }}, Dubai
           </div>
         </div>
         <div class="pd-hero-actions">
           <button class="pd-action-btn" [class.pd-action-btn--faved]="isFaved()" (click)="toggleFav()">
-            <svg width="16" height="16" viewBox="0 0 24 24" [attr.fill]="isFaved() ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" [attr.fill]="isFaved() ? 'currentColor' : 'none'"
+              stroke="currentColor" stroke-width="2">
+              <path
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
             {{ isFaved() ? 'Saved' : 'Save' }}
           </button>
           <div style="position:relative">
             <button class="pd-action-btn" (click)="shareProject()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              </svg>
               Share
             </button>
             <div *ngIf="shareToast()" class="pd-share-toast">Link copied!</div>
@@ -66,19 +81,23 @@
     <div class="pd-mosaic" [class.single]="!p.images?.length || p.images.length <= 1">
       <div class="pd-mosaic-main" (click)="openLightbox(0)">
         <img [src]="p.images?.[0] || '/images/dummy-image.png'" [alt]="p.title" class="pd-mosaic-img"
-             (error)="$any($event.target).src='/images/dummy-image.png'">
+          (error)="$any($event.target).src='/images/dummy-image.png'">
       </div>
       <div class="pd-mosaic-grid" *ngIf="(p.images?.length ?? 0) > 1">
         <div class="pd-mosaic-cell" *ngFor="let img of p.images.slice(1,5); let i = index" (click)="openLightbox(i+1)">
           <img [src]="img" [alt]="p.title" class="pd-mosaic-img" loading="lazy"
-               (error)="$any($event.target).src='/images/dummy-image.png'">
+            (error)="$any($event.target).src='/images/dummy-image.png'">
           <div class="pd-mosaic-overlay" *ngIf="i===3 && p.images.length>5">
             <span>+{{ p.images.length - 5 }} more</span>
           </div>
         </div>
       </div>
       <button class="pd-photo-count" (click)="openLightbox(0)" *ngIf="(p.images?.length ?? 0) > 0">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="m21 15-5-5L5 21" />
+        </svg>
         {{ p.images.length }} Photos
       </button>
     </div>
@@ -97,7 +116,10 @@
 
           <div class="pd-hl-cell" *ngIf="p.developer">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Developer</span>
             <span class="pd-hl-val">{{ p.developer }}</span>
@@ -105,7 +127,10 @@
 
           <div class="pd-hl-cell" *ngIf="p.status">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Status</span>
             <span class="pd-hl-val">{{ p.status }}</span>
@@ -113,7 +138,10 @@
 
           <div class="pd-hl-cell" *ngIf="p.type">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Type</span>
             <span class="pd-hl-val">{{ p.type }}</span>
@@ -121,7 +149,10 @@
 
           <div class="pd-hl-cell" *ngIf="p.beds">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Beds</span>
             <span class="pd-hl-val">{{ p.beds }}</span>
@@ -129,7 +160,10 @@
 
           <div class="pd-hl-cell" *ngIf="p.payment_plan">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Title type</span>
             <span class="pd-hl-val">{{ p.payment_plan }}</span>
@@ -137,7 +171,10 @@
 
           <div class="pd-hl-cell" *ngIf="p.area_sqft">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Lifestyle</span>
             <span class="pd-hl-val">{{ p.area_sqft | number }} sqft</span>
@@ -145,7 +182,11 @@
 
           <div class="pd-hl-cell" *ngIf="p.community || p.location">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Location</span>
             <span class="pd-hl-val">{{ p.community || p.location }}</span>
@@ -153,7 +194,9 @@
 
           <div class="pd-hl-cell" *ngIf="p.total_units">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Total Units</span>
             <span class="pd-hl-val">{{ p.total_units }}</span>
@@ -161,7 +204,10 @@
 
           <div class="pd-hl-cell" *ngIf="p.launch_date">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Launch</span>
             <span class="pd-hl-val">{{ p.launch_date }}</span>
@@ -169,7 +215,10 @@
 
           <div class="pd-hl-cell" *ngIf="p.completion_date">
             <div class="pd-hl-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75" />
+              </svg>
             </div>
             <span class="pd-hl-lbl">Completion</span>
             <span class="pd-hl-val">{{ p.completion_date }}</span>
@@ -186,13 +235,15 @@
             <div class="pd-expert-card__photo-wrap">
               <!-- Show photo if agent has avatar_url -->
               <ng-container *ngIf="agent()?.avatar_url; else noPhoto">
-                <img [src]="agent()!.avatar_url" [alt]="agent()?.name || p.agent_name"
-                     class="pd-expert-card__photo"
-                     (error)="$any($event.target).parentElement.classList.add('no-photo')">
+                <img [src]="agent()!.avatar_url" [alt]="agent()?.name || p.agent_name" class="pd-expert-card__photo"
+                  (error)="$any($event.target).parentElement.classList.add('no-photo')">
               </ng-container>
               <ng-template #noPhoto>
                 <div class="pd-expert-card__photo-placeholder">
-                  <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor" opacity="0.35"><path d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"/></svg>
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor" opacity="0.35">
+                    <path
+                      d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" />
+                  </svg>
                 </div>
               </ng-template>
               <!-- Bottom info overlay on photo -->
@@ -201,10 +252,52 @@
                 <span class="pd-expert-card__role">{{ agent()?.designation || 'Property Consultant' }}</span>
               </div>
               <!-- Green WhatsApp button bottom-right -->
-              <a [href]="'https://wa.me/' + (agentPhone() || '97152520970').replace(/\D/g,'')"
-                 target="_blank" class="pd-expert-card__wa" aria-label="WhatsApp">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-              </a>
+              @if (agentWhatsapp()) {
+                <a [href]="'https://wa.me/' + agentWhatsapp().replace(/\D/g,'')"
+                  target="_blank" class="pd-expert-card__wa" aria-label="WhatsApp">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+                  </svg>
+                </a>
+              } @else {
+                <div class="pd-wa-wrap">
+                  <button type="button" class="pd-expert-card__wa" (click)="showWaUnavailable()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+                    </svg>
+                  </button>
+                  @if (waUnavailable()) {
+                    <div class="pd-wa-toast">WhatsApp number not available</div>
+                  }
+                </div>
+              }
+            </div>
+            <!-- Action buttons below photo -->
+            <div class="pd-expert-card__actions">
+              @if (agentPhone()) {
+                <a [href]="'tel:' + agentPhone()" class="pd-expert-card__action-btn pd-expert-card__action-btn--call" aria-label="Call">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.79a16 16 0 0 0 6.29 6.29l1.46-1.46a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                  Call
+                </a>
+              }
+              @if (agentWhatsapp()) {
+                <a [href]="'https://wa.me/' + agentWhatsapp().replace(/\D/g,'')" target="_blank" rel="noopener" class="pd-expert-card__action-btn pd-expert-card__action-btn--wa" aria-label="WhatsApp">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+                  </svg>
+                  WhatsApp
+                </a>
+              }
+              @if (agentEmail()) {
+                <a [href]="'mailto:' + agentEmail()" class="pd-expert-card__action-btn pd-expert-card__action-btn--email" aria-label="Email">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                  </svg>
+                  Email
+                </a>
+              }
             </div>
           </div>
         </div>
@@ -215,27 +308,37 @@
         <h2 class="pd-section-title">Floor plans</h2>
         <p class="pd-fp-type">{{ p.type }}</p>
         <div class="pd-fp-list">
-          <div class="pd-fp-row" *ngFor="let row of floorPlanRows(); let i = index"
-               (click)="toggleFpRow(i)" [class.open]="fpOpenIndex() === i">
+          <div class="pd-fp-row" *ngFor="let row of floorPlanRows(); let i = index" (click)="toggleFpRow(i)"
+            [class.open]="fpOpenIndex() === i">
             <div class="pd-fp-row__header">
               <div class="pd-fp-row__left">
-                <svg class="pd-fp-row__bed-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+                <svg class="pd-fp-row__bed-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                </svg>
                 <span class="pd-fp-row__beds">{{ row.label }}</span>
               </div>
               <div class="pd-fp-row__right">
                 <div class="pd-fp-row__sqft-wrap">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                  </svg>
                   <div>
                     <div class="pd-fp-row__sqft">{{ row.sqft }}</div>
                     <div class="pd-fp-row__sqft-sub">Size range</div>
                   </div>
                 </div>
-                <svg class="pd-fp-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                <svg class="pd-fp-row__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </div>
             </div>
             <div class="pd-fp-row__body">
               <img [src]="p.floor_plan_url" alt="Floor Plan" class="pd-fp-img"
-                   (error)="$any($event.target).src='/images/dummy-image.png'">
+                (error)="$any($event.target).src='/images/dummy-image.png'">
             </div>
           </div>
         </div>
@@ -248,7 +351,10 @@
           <iframe [src]="mapUrl()!" class="pd-map" allowfullscreen loading="lazy"></iframe>
         </div>
         <div class="pd-map-address">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+          </svg>
           {{ p.community || p.location }}, Dubai
         </div>
       </div>
@@ -281,17 +387,19 @@
         <h2 class="pd-section-title">Project Video Tour</h2>
         <div class="pd-video-wrap">
           <ng-container *ngIf="isLoggedIn(); else videoLocked">
-            <iframe *ngIf="videoEmbedUrl()" [src]="videoEmbedUrl()!" class="pd-video-iframe"
-              frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            <iframe *ngIf="videoEmbedUrl()" [src]="videoEmbedUrl()!" class="pd-video-iframe" frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen loading="lazy"></iframe>
-            <video *ngIf="!videoEmbedUrl() && videoDirectUrl()" [src]="videoDirectUrl()!"
-              class="pd-video-iframe" controls preload="metadata"></video>
+            <video *ngIf="!videoEmbedUrl() && videoDirectUrl()" [src]="videoDirectUrl()!" class="pd-video-iframe"
+              controls preload="metadata"></video>
           </ng-container>
           <ng-template #videoLocked>
             <div class="pd-video-placeholder">
               <div class="pd-video-lock-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 18.75 8.25Z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 18.75 8.25Z" />
                 </svg>
               </div>
               <p class="pd-video-msg">Sign in to watch the video tour</p>
@@ -305,12 +413,57 @@
       <div class="pd-share-card">
         <div class="pd-share-card__left">
           <h3 class="pd-share-card__title">Share Your Experience</h3>
-          <p class="pd-share-card__sub">Have you visited this project? Leave a review to help others in their property journey.</p>
+          <p class="pd-share-card__sub">Have you visited this project? Leave a review to help others in their property
+            journey.</p>
         </div>
-        <a routerLink="/contact" class="pd-share-card__btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+        <button class="pd-share-card__btn" (click)="openReviewModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+          </svg>
           Write a Review
-        </a>
+        </button>
+      </div>
+
+      <!-- ── Review Modal ───────────────────────────────────── -->
+      <div class="pd-review-backdrop" *ngIf="reviewModalOpen()" (click)="closeReviewModal()"></div>
+      <div class="pd-review-modal" *ngIf="reviewModalOpen()">
+        <div class="pd-review-modal__head">
+          <div>
+            <h3 class="pd-review-modal__title">Leave a review</h3>
+            <p class="pd-review-modal__sub">How was your experience today?</p>
+          </div>
+          <button class="pd-review-modal__close" (click)="closeReviewModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Stars -->
+        <div class="pd-review-stars" *ngIf="!reviewSubmitted()">
+          <button *ngFor="let s of [1,2,3,4,5]" class="pd-review-star" [class.active]="reviewRating() >= s"
+            (click)="reviewRating.set(s)" (mouseenter)="reviewHover.set(s)" (mouseleave)="reviewHover.set(0)">
+            <svg viewBox="0 0 24 24" [attr.fill]="(reviewHover() || reviewRating()) >= s ? '#f59e0b' : 'none'" stroke="#f59e0b" stroke-width="1.5">
+              <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+            </svg>
+          </button>
+        </div>
+
+        <ng-container *ngIf="!reviewSubmitted()">
+          <label class="pd-review-label">Your comment</label>
+          <textarea class="pd-review-textarea" rows="4" placeholder="Share your experience…"
+            [(ngModel)]="reviewComment"></textarea>
+          <div class="pd-review-actions">
+            <button class="pd-review-btn pd-review-btn--cancel" (click)="closeReviewModal()">Not now</button>
+            <button class="pd-review-btn pd-review-btn--submit" [disabled]="reviewRating() === 0 || reviewSubmitting()"
+              (click)="submitReview()">
+              {{ reviewSubmitting() ? 'Submitting…' : 'Publish review' }}
+            </button>
+          </div>
+        </ng-container>
+
+        <div class="pd-review-success" *ngIf="reviewSubmitted()">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a5c3a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/></svg>
+          <p>Thank you for your review!</p>
+        </div>
       </div>
 
       <!-- ── FAQ ───────────────────────────────────────────── -->
@@ -319,11 +472,13 @@
 
         <!-- DB-seeded FAQs (shown when available) -->
         <div class="pd-faq-list" *ngIf="p.faqs && p.faqs.length > 0">
-          <div class="pd-faq-item" *ngFor="let faq of p.faqs; let i = index"
-            (click)="toggleDbFaq(i)" [class.open]="dbFaqOpen() === i">
+          <div class="pd-faq-item" *ngFor="let faq of p.faqs; let i = index" (click)="toggleDbFaq(i)"
+            [class.open]="dbFaqOpen() === i">
             <div class="pd-faq-q">
               {{ faq.question }}
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </div>
             <div class="pd-faq-a" *ngIf="dbFaqOpen() === i" [innerHTML]="safeHtml(faq.answer)"></div>
           </div>
@@ -334,23 +489,31 @@
           <div class="pd-faq-item" (click)="toggleFaq(0)" [class.open]="faqOpen()==='0'">
             <div class="pd-faq-q">
               Where is the location of {{ p.title }}?
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </div>
             <div class="pd-faq-a">{{ p.title }} is located in {{ p.community || p.location }}, Dubai, UAE.</div>
           </div>
           <div class="pd-faq-item" (click)="toggleFaq(1)" [class.open]="faqOpen()==='1'">
             <div class="pd-faq-q">
               What are the property types offered in {{ p.title }}?
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </div>
-            <div class="pd-faq-a">{{ p.title }} offers {{ p.type }} units{{ p.beds ? ' with ' + p.beds + ' bedroom configurations' : '' }}.</div>
+            <div class="pd-faq-a">{{ p.title }} offers {{ p.type }} units{{ p.beds ? ' with ' + p.beds + ' bedroom
+              configurations' : '' }}.</div>
           </div>
           <div class="pd-faq-item" (click)="toggleFaq(2)" [class.open]="faqOpen()==='2'">
             <div class="pd-faq-q">
               What are the amenities in {{ p.title }}?
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </div>
-            <div class="pd-faq-a">{{ p.amenities?.length ? p.title + ' features: ' + p.amenities.join(', ') + '.' : 'Please contact us for details about amenities.' }}</div>
+            <div class="pd-faq-a">{{ p.amenities?.length ? p.title + ' features: ' + p.amenities.join(', ') + '.' :
+              'Please contact us for details about amenities.' }}</div>
           </div>
         </div>
       </div>
@@ -369,14 +532,21 @@
         <!-- Discover More — scrolls to enquiry form -->
         <button class="pd-pc-discover" (click)="scrollToEnquiry()">
           DISCOVER MORE
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+          </svg>
         </button>
 
         <!-- Download Brochure -->
         <a [href]="agentEmail() ? 'mailto:'+agentEmail()+'?subject=Brochure Request - '+p.title : '/contact'"
-           class="pd-pc-brochure">
+          class="pd-pc-brochure">
           DOWNLOAD BROCHURE
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
         </a>
       </div>
 
@@ -384,15 +554,16 @@
       <div class="pd-inquiry-card">
         <div class="pd-inquiry-title">Send Enquiry</div>
         <div *ngIf="inquirySent()" class="pd-inquiry-success">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
           Enquiry sent! An agent will contact you shortly.
         </div>
         <form *ngIf="!inquirySent()" (ngSubmit)="submitInquiry(p)">
           <input type="text" placeholder="Your Name *" class="pd-input" [(ngModel)]="inquiryName" name="inqName" required>
-          <input type="tel" placeholder="Your Phone *" class="pd-input" [(ngModel)]="inquiryPhone" name="inqPhone" required>
-          <input type="email" placeholder="Your Email" class="pd-input" [(ngModel)]="inquiryEmail" name="inqEmail">
-          <input type="text" placeholder="Your Budget (e.g. AED 2M)" class="pd-input" [(ngModel)]="inquiryBudget" name="inqBudget">
-          <textarea placeholder="I'm interested in this project…" class="pd-textarea" rows="3"
+          <app-phone-input [(ngModel)]="inquiryPhone" name="inqPhone" placeholder="50 000 0000"></app-phone-input>
+          <input type="email" placeholder="Your Email" class="pd-input" [(ngModel)]="inquiryEmail" name="inqEmail" [readonly]="!!inquiryEmail">
+          <textarea placeholder="I'm interested in this project…" class="pd-textarea" rows="2"
             [(ngModel)]="inquiryMessage" name="inqMessage"></textarea>
           <p *ngIf="inquiryError()" class="pd-inquiry-error">{{ inquiryError() }}</p>
           <button type="submit" class="pd-submit-btn" [disabled]="inquirySubmitting()">
@@ -411,21 +582,28 @@
 <div class="pd-lightbox" *ngIf="lightboxOpen()" (click)="closeLightbox()">
   <div class="pd-lb-inner" (click)="$event.stopPropagation()">
     <button class="pd-lb-close" (click)="closeLightbox()">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
     </button>
-    <div class="pd-lb-counter" *ngIf="project()?.images?.length">{{ lightboxIndex()+1 }} / {{ project()!.images.length }}</div>
+    <div class="pd-lb-counter" *ngIf="project()?.images?.length">{{ lightboxIndex()+1 }} / {{ project()!.images.length
+      }}</div>
     <img [src]="project()!.images[lightboxIndex()]" [alt]="project()!.title" class="pd-lb-img"
-         (error)="$any($event.target).src='/images/dummy-image.png'">
+      (error)="$any($event.target).src='/images/dummy-image.png'">
     <button class="pd-lb-nav prev" (click)="lightboxPrev()" *ngIf="project()!.images.length>1">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
     </button>
     <button class="pd-lb-nav next" (click)="lightboxNext()" *ngIf="project()!.images.length>1">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
     </button>
     <div class="pd-lb-thumbs" *ngIf="project()!.images.length>1">
       <img *ngFor="let img of project()!.images; let i=index" [src]="img" class="pd-lb-thumb"
-           [class.active]="lightboxIndex()===i" (click)="lightboxIndex.set(i)" loading="lazy"
-           (error)="$any($event.target).src='/images/dummy-image.png'">
+        [class.active]="lightboxIndex()===i" (click)="lightboxIndex.set(i)" loading="lazy"
+        (error)="$any($event.target).src='/images/dummy-image.png'">
     </div>
   </div>
 </div>
@@ -437,10 +615,15 @@
       <h2 class="pd-prop-carousel-title">Properties in {{ project()?.title }}</h2>
       <div class="pd-prop-carousel-nav" *ngIf="projectProperties().length > 3">
         <button class="pd-prop-nav-btn" (click)="propCarouselPrev()" [disabled]="propCarouselIndex() === 0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
-        <button class="pd-prop-nav-btn" (click)="propCarouselNext()" [disabled]="propCarouselIndex() >= projectProperties().length - 3">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        <button class="pd-prop-nav-btn" (click)="propCarouselNext()"
+          [disabled]="propCarouselIndex() >= projectProperties().length - 3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
     </div>
@@ -461,7 +644,8 @@
             <div class="pd-prop-top-row">
               <div class="pd-prop-badges-left">
                 <span *ngIf="prop.badge" class="pd-prop-badge">{{ prop.badge }}</span>
-                <span class="pd-prop-status-badge" [class.sale]="prop.listing_type === 'Sale'" [class.rent]="prop.listing_type === 'Rent'">
+                <span class="pd-prop-status-badge" [class.sale]="prop.listing_type === 'Sale'"
+                  [class.rent]="prop.listing_type === 'Rent'">
                   {{ prop.listing_type === 'Sale' ? 'For Sale' : 'For Rent' }}
                 </span>
               </div>
@@ -470,10 +654,31 @@
             <!-- Type pill -->
             <span class="pd-prop-type-pill">{{ prop.type }}</span>
 
+            <!-- Save / Share -->
+            <div class="pd-prop-card-actions">
+              <button class="pd-prop-action-btn" [class.saved]="isPropSaved(prop.id)"
+                [title]="isPropSaved(prop.id) ? 'Remove from saved' : 'Save property'"
+                (click)="togglePropSave(prop.id, $event)">
+                <svg viewBox="0 0 24 24" [attr.fill]="isPropSaved(prop.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                </svg>
+              </button>
+              <div style="position:relative">
+                <button class="pd-prop-action-btn" title="Share" (click)="sharePropCard(prop.id, prop.title, $event)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/>
+                  </svg>
+                </button>
+                <div *ngIf="propShareToastId() === prop.id" class="pd-prop-share-toast">Link copied!</div>
+              </div>
+            </div>
+
             <!-- Views -->
             <span class="pd-prop-views" *ngIf="prop.views">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="14" height="14">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" width="14" height="14">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
               </svg>
               {{ prop.views }}
@@ -488,24 +693,39 @@
             <h3 class="pd-prop-title">{{ prop.title }}</h3>
             <div class="pd-prop-specs">
               <span class="pd-spec-item" *ngIf="prop.area_sqft">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" width="14" height="14">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                </svg>
                 {{ prop.area_sqft }} sqft
               </span>
               <span class="pd-spec-sep" *ngIf="prop.area_sqft && prop.bedrooms">·</span>
               <span class="pd-spec-item" *ngIf="prop.bedrooms !== undefined">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" width="14" height="14">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
                 {{ formatBeds(prop.bedrooms) }}
               </span>
               <span class="pd-spec-sep" *ngIf="prop.bathrooms">·</span>
               <span class="pd-spec-item" *ngIf="prop.bathrooms">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" width="14" height="14">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33" />
+                </svg>
                 {{ prop.bathrooms }} Bath
               </span>
             </div>
-            <div class="pd-prop-sub-label">{{ prop.type }} for {{ prop.listing_type === 'Sale' ? 'Sale' : 'Rent' }} in {{ prop.community }}</div>
+            <div class="pd-prop-sub-label">{{ prop.type }} for {{ prop.listing_type === 'Sale' ? 'Sale' : 'Rent' }} in
+              {{ prop.community }}</div>
             <div class="pd-prop-location">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="13" height="13">
-                <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd"
+                  d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
+                  clip-rule="evenodd" />
               </svg>
               {{ prop.location }}
             </div>
@@ -518,7 +738,9 @@
             <div class="pd-prop-agent-avatar-wrap">
               <div class="pd-prop-agent-avatar pd-prop-agent-dummy">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                  <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd"/>
+                  <path fill-rule="evenodd"
+                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                    clip-rule="evenodd" />
                 </svg>
               </div>
             </div>
@@ -526,15 +748,27 @@
           </div>
           <div class="pd-prop-contact-btns">
             <a [href]="'tel:' + prop.agent_phone" class="pd-prop-contact-btn call">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" width="14" height="14">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+              </svg>
               <span>Call</span>
             </a>
-            <a [href]="'https://wa.me/' + (prop.agent_phone || '').replace(/\D/g, '')" class="pd-prop-contact-btn whatsapp" target="_blank" rel="noopener">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            <a [href]="'https://wa.me/' + (prop.agent_phone || '').replace(/\D/g, '')"
+              class="pd-prop-contact-btn whatsapp" target="_blank" rel="noopener">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+              </svg>
               <span>WhatsApp</span>
             </a>
             <a routerLink="/contact" class="pd-prop-contact-btn email">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" width="14" height="14">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
               <span>Email</span>
             </a>
           </div>

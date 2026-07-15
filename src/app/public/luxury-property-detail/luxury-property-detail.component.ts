@@ -30,7 +30,7 @@ export interface PropertyDetail {
   images: string[];
   about: string;
   amenities: string[];
-  agent: { name: string; role: string; phone: string; email: string; avatar: string };
+  agent: { name: string; role: string; phone: string; email: string; avatar: string; whatsapp?: string };
   mortgageRate: number;
   mapUrl: string;
   nearbySchools: { name: string; distance: string; rating: string }[];
@@ -548,38 +548,127 @@ export class LuxuryPropertyDetailComponent implements OnInit {
   property = signal<PropertyDetail | null>(null);
   notFound = signal(false);
   activeImage = signal(0);
-  message = signal('');
   aboutExpanded = signal(false);
 
   mortgageAmount = signal(0);
-  mortgageYears = signal(25);
-  mortgageDown = signal(20);
+  mortgageYears  = signal(25);
+  mortgageDown   = signal(20);
+  mortgageRate   = signal(4.5);
 
-  hasData = computed(() => {
-    const p = this.property();
-    return p !== null && p.about.length > 0;
-  });
+  lpd_similarProperties = signal<PropertyDetail[]>([]);
+
+  hasData = computed(() => this.property() !== null);
 
   monthlyPayment = computed(() => {
-    const p = this.property();
-    if (!p) return 0;
-    const priceNum = parseInt(p.price.replace(/[^0-9]/g, '')) || 0;
-    const principal = priceNum * (1 - this.mortgageDown() / 100);
-    const r = (p.mortgageRate / 100) / 12;
+    const principal = this.mortgageAmount() * (1 - this.mortgageDown() / 100);
+    const r = this.mortgageRate() / 100 / 12;
     const n = this.mortgageYears() * 12;
     if (r === 0 || n === 0) return principal / (n || 1);
     return (principal * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
   });
 
-  totalPayment = computed(() => this.monthlyPayment() * this.mortgageYears() * 12);
+  lpd_purchaseCosts = computed(() => {
+    const price = this.mortgageAmount();
+    if (!price) return [];
+    return [
+      { label: 'Purchase Price',                   amount: price },
+      { label: 'Dubai Land Department Fee (4%)',   amount: Math.round(price * 0.04) },
+      { label: 'Agency Fee (2% + 5% VAT)',         amount: Math.round(price * 0.021) },
+      { label: 'Registration & Conveyancer',       amount: 10000 },
+      { label: 'Mortgage Registration (0.25%)',    amount: Math.round(price * 0.0025) },
+    ];
+  });
+
+  lpd_totalPurchaseCost = computed(() =>
+    this.lpd_purchaseCosts().reduce((s, c) => s + c.amount, 0)
+  );
+
+  lpd_propertySlug(p: PropertyDetail): string {
+    return p.id ? `${p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${p.id}` : p.id;
+  }
 
   safeMapUrl = signal<SafeResourceUrl>('');
 
-  loading    = signal(false);
-  isFaved    = signal(false);
-  favLoading = signal(false);
-  shareToast = signal(false);
-  faqOpen    = signal<number | null>(null);
+  loading       = signal(false);
+  isFaved       = signal(false);
+  favLoading    = signal(false);
+  shareToast    = signal(false);
+  faqOpen       = signal<number | null>(null);
+  waUnavailable = signal(false);
+
+  savedSimIds     = signal<Set<number>>(new Set());
+  simShareToastId = signal<string | null>(null);
+
+  isSimSaved(id: string): boolean { return this.savedSimIds().has(parseInt(id, 10)); }
+
+  async toggleSimSave(id: string, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    const numId = parseInt(id, 10);
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.isSimSaved(id)) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', numId);
+      this.savedSimIds.update(s => { const n = new Set(s); n.delete(numId); return n; });
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: numId });
+      this.savedSimIds.update(s => new Set(s).add(numId));
+    }
+  }
+
+  shareSimCard(id: string, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const slug = toPropertySlug(title, parseInt(id, 10));
+    const url  = `${window.location.origin}/luxury-property/${slug}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.simShareToastId.set(id);
+    setTimeout(() => this.simShareToastId.set(null), 2000);
+  }
+
+  private async loadSavedSimIds(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const { data } = await this.sb.from('saved_properties').select('property_id').eq('user_id', userId);
+    if (data) this.savedSimIds.set(new Set(data.map((r: any) => r.property_id)));
+  }
+
+  agentPhone    = computed(() => this.property()?.agent?.phone    ?? '');
+  agentWhatsapp = computed(() => this.property()?.agent?.whatsapp ?? '');
+  agentEmail    = computed(() => this.property()?.agent?.email    ?? '');
+
+  showWaUnavailable(): void {
+    this.waUnavailable.set(true);
+    setTimeout(() => this.waUnavailable.set(false), 3000);
+  }
+
+  lpd_inquiryName  = '';
+  lpd_inquiryPhone = '';
+  lpd_inquiryEmail = '';
+  lpd_inquiryMsg   = '';
+  lpd_enquirySending = signal(false);
+  lpd_enquirySent    = signal(false);
+
+  async lpd_sendEnquiry(): Promise<void> {
+    if (!this.lpd_inquiryName.trim() || !this.lpd_inquiryPhone.trim()) return;
+    this.lpd_enquirySending.set(true);
+    const p = this.property();
+    await this.sb.from('enquiries').insert({
+      name:        this.lpd_inquiryName.trim(),
+      phone:       this.lpd_inquiryPhone.trim(),
+      email:       this.lpd_inquiryEmail.trim() || null,
+      message:     this.lpd_inquiryMsg.trim() || `I'm interested in ${p?.title ?? 'this property'}`,
+      property_id: p?.id ? Number(p.id) : null,
+      source:      'luxury-detail',
+    });
+    this.lpd_enquirySent.set(true);
+    this.lpd_enquirySending.set(false);
+    this.lpd_inquiryName = '';
+    this.lpd_inquiryPhone = '';
+    this.lpd_inquiryEmail = '';
+    this.lpd_inquiryMsg = '';
+    setTimeout(() => this.lpd_enquirySent.set(false), 4000);
+  }
 
   toggleFaq(i: number): void { this.faqOpen.set(this.faqOpen() === i ? null : i); }
   safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
@@ -671,7 +760,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
     const { data, error } = await this.sb
       .from('properties')
-      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, created_at, status, video_url, views, faqs')
+      .select('id, title, location, community, price, listing_type, type, area_sqft, bedrooms, bathrooms, images, furnishing, agent_name, description, created_at, status, video_url, views, faqs, amenities, is_luxury')
       .eq('id', id)
       .single();
 
@@ -682,6 +771,21 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     }
 
     const p = data as any;
+
+    // Redirect commercial types to the correct route
+    const commercialTypes = ['Office', 'Shop', 'Warehouse', 'Plot'];
+    if (commercialTypes.includes(p.type ?? '')) {
+      this.router.navigate(['/commercial', toPropertySlug(p.title, p.id)], { replaceUrl: true });
+      this.loading.set(false);
+      return;
+    }
+
+    // Redirect non-luxury residential properties to /properties
+    if (!(p.is_luxury)) {
+      this.router.navigate(['/properties', toPropertySlug(p.title, p.id)], { replaceUrl: true });
+      this.loading.set(false);
+      return;
+    }
     const priceNum  = typeof p.price === 'number' ? p.price : parseFloat(String(p.price ?? '0').replace(/[^0-9.]/g, ''));
     const areaNum   = typeof p.area_sqft === 'number' ? p.area_sqft : parseFloat(String(p.area_sqft ?? '0'));
     const ppsf      = areaNum > 0 ? Math.round(priceNum / areaNum) : 0;
@@ -692,21 +796,22 @@ export class LuxuryPropertyDetailComponent implements OnInit {
 
     // Fetch agent profile
     const cleanAgentName = (n: string) => (n ?? '').trim().replace(/^[-–—]+$/, '');
-    let agentObj = { name: cleanAgentName(p.agent_name) || 'LivWell Agent', role: 'Property Consultant', phone: '', email: '', avatar: '' };
+    let agentObj = { name: cleanAgentName(p.agent_name) || 'LivWell Agent', role: 'Property Consultant', phone: '', email: '', avatar: '', whatsapp: '' };
     if (cleanAgentName(p.agent_name)) {
       const { data: prof } = await this.sb
         .from('profiles')
-        .select('name, phone, email, avatar_url, designation')
+        .select('name, phone, email, avatar_url, designation, whatsapp_number')
         .eq('name', p.agent_name)
         .maybeSingle();
       if (prof) {
         const av = prof.avatar_url ?? '';
         agentObj = {
-          name:   cleanAgentName(prof.name) || cleanAgentName(p.agent_name) || 'LivWell Agent',
-          role:   prof.designation ?? 'Property Consultant',
-          phone:  prof.phone ?? '',
-          email:  prof.email ?? '',
-          avatar: (av && !av.startsWith('data:')) ? av : '',
+          name:     cleanAgentName(prof.name) || cleanAgentName(p.agent_name) || 'LivWell Agent',
+          role:     prof.designation ?? 'Property Consultant',
+          phone:    prof.phone ?? '',
+          email:    prof.email ?? '',
+          avatar:   (av && !av.startsWith('data:')) ? av : '',
+          whatsapp: prof.whatsapp_number ?? '',
         };
       }
     }
@@ -731,7 +836,15 @@ export class LuxuryPropertyDetailComponent implements OnInit {
       listedDate:   'Recently listed',
       images:       imgs.length ? imgs : ['/images/dummy-image.png'],
       about:        p.description ?? '',
-      amenities:    p.type === 'Villa' || p.type === 'Home' ? VILLA_AMENITIES : STANDARD_AMENITIES,
+      amenities:    (() => {
+                      let a: string[] = [];
+                      if (Array.isArray(p.amenities)) a = p.amenities;
+                      else if (typeof p.amenities === 'string' && p.amenities.trim()) {
+                        try { a = JSON.parse(p.amenities); } catch { a = []; }
+                      }
+                      if (a.length) return a;
+                      return p.type === 'Villa' || p.type === 'Home' ? VILLA_AMENITIES : STANDARD_AMENITIES;
+                    })(),
       agent:        agentObj,
       mortgageRate: 4.5,
       mapUrl:       '',
@@ -750,6 +863,50 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     this.loading.set(false);
     this.auth.waitForSession().then(() => this.checkFavStatus(p.id));
     this.sb.from('properties').update({ views: (p.views || 0) + 1 }).eq('id', p.id).then(() => {});
+
+    // Load similar properties
+    this.lpd_loadSimilar(id, p.type ?? '', p.community ?? '', p.location ?? '');
+  }
+
+  private async lpd_loadSimilar(currentId: number, type: string, community: string, location: string): Promise<void> {
+    const loc = community || location;
+    let rows: any[] = [];
+    if (loc) {
+      const locField = community ? 'community' : 'location';
+      const { data } = await this.sb.from('properties')
+        .select('id, title, type, price, listing_type, area_sqft, bedrooms, bathrooms, images, community, location, status')
+        .eq('is_luxury', true).eq('status', 'Published').eq(locField, loc)
+        .neq('id', currentId).order('created_at', { ascending: false }).limit(4);
+      rows = data ?? [];
+    }
+    if (rows.length < 3) {
+      const ids = [currentId, ...rows.map((r: any) => r.id)];
+      const { data } = await this.sb.from('properties')
+        .select('id, title, type, price, listing_type, area_sqft, bedrooms, bathrooms, images, community, location, status')
+        .eq('is_luxury', true).eq('status', 'Published').eq('type', type)
+        .not('id', 'in', `(${ids.join(',')})`)
+        .order('created_at', { ascending: false }).limit(4 - rows.length);
+      rows = [...rows, ...(data ?? [])];
+    }
+    const similar = rows.slice(0, 4).map((r: any) => {
+      const priceNum = typeof r.price === 'number' ? r.price : parseFloat(String(r.price ?? '0').replace(/[^0-9.]/g, ''));
+      const isRent = (r.listing_type ?? '').toLowerCase() === 'rent';
+      const bedsNum = Number(r.bedrooms) || 0;
+      const imgs: string[] = Array.isArray(r.images) ? r.images : (r.images ? [r.images] : []);
+      return {
+        id: String(r.id), title: r.title ?? '', developer: '', location: r.location ?? '',
+        community: r.community ?? '', type: r.type ?? '', status: r.status ?? 'Ready',
+        price: priceNum > 0 ? (isRent ? `AED ${priceNum.toLocaleString()} / yr` : `AED ${priceNum.toLocaleString()}`) : 'Price on Request',
+        pricePerSqft: '', beds: bedsNum === 0 ? 'Studio' : `${bedsNum} BR`,
+        baths: String(Number(r.bathrooms) || 0),
+        area: r.area_sqft ? `${Number(r.area_sqft).toLocaleString()} sqft` : '',
+        parking: '1', furnished: false, listedDate: '', images: imgs.length ? imgs : ['/images/dummy-image.png'],
+        about: '', amenities: [], agent: { name: '', role: '', phone: '', email: '', avatar: '' },
+        mortgageRate: 4.5, mapUrl: '', nearbySchools: [],
+      } as PropertyDetail;
+    });
+    this.lpd_similarProperties.set(similar);
+    this.loadSavedSimIds();
   }
 
   private async checkFavStatus(propId: number): Promise<void> {

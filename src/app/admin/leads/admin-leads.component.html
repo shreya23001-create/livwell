@@ -55,70 +55,27 @@
   }
 
   <!-- ── Stat Cards ── -->
-  <div class="leads-stats">
+  <div class="leads-stats" [style.grid-template-columns]="'repeat(' + (dataSvc.leadStatuses().length + 1) + ', 1fr)'">
     <div class="stat-card">
       <div class="stat-icon stat-icon--total">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
         </svg>
       </div>
       <div>
-        <div class="stat-value">{{ stats().total }}</div>
+        <div class="stat-value">{{ stats()['total'] }}</div>
         <div class="stat-label">Total Leads</div>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--new">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+    <div class="stat-card" *ngFor="let s of dataSvc.leadStatuses()">
+      <div class="stat-icon" [style.background]="s.color + '22'" [style.color]="s.color">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/>
         </svg>
       </div>
       <div>
-        <div class="stat-value">{{ stats().new }}</div>
-        <div class="stat-label">New</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--qualified">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-        </svg>
-      </div>
-      <div>
-        <div class="stat-value">{{ stats().qualified }}</div>
-        <div class="stat-label">Qualified</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--negotiating">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
-        </svg>
-      </div>
-      <div>
-        <div class="stat-value">{{ stats().negotiating }}</div>
-        <div class="stat-label">Negotiating</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--won">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0" />
-        </svg>
-      </div>
-      <div>
-        <div class="stat-value">{{ stats().won }}</div>
-        <div class="stat-label">Won</div>
+        <div class="stat-value">{{ stats()[s.name] ?? 0 }}</div>
+        <div class="stat-label">{{ labelStatus(s.name) }}</div>
       </div>
     </div>
   </div>
@@ -135,7 +92,7 @@
     </div>
     <div class="select-wrapper">
       <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value); onFilter()">
-        <option value="">All Statuses</option>
+        <option value="">Status</option>
         <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
       </select>
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -303,8 +260,7 @@
       <div class="form-row">
         <div class="form-field" [class.has-error]="formErrors()['phone']">
           <label>Phone *</label>
-          <input type="text" [value]="form()['phone']" (input)="updateForm({phone: $any($event.target).value})"
-            placeholder="+971 50 000 0000">
+          <app-phone-input [ngModel]="form()['phone']" (ngModelChange)="updateForm({phone: $event})" placeholder="50 000 0000"></app-phone-input>
           <span class="field-error" *ngIf="formErrors()['phone']">{{ formErrors()['phone'] }}</span>
         </div>
         <div class="form-field">
@@ -350,24 +306,48 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="form-field" [class.has-error]="formErrors()['budget']">
-          <label>Budget *</label>
+        <div class="form-field">
+          <label>Budget</label>
           <input type="text" [value]="form()['budget']" (input)="updateForm({budget: $any($event.target).value})"
             placeholder="AED 2M–3M">
-          <span class="field-error" *ngIf="formErrors()['budget']">{{ formErrors()['budget'] }}</span>
         </div>
         <div class="form-field" [class.has-error]="formErrors()['location']">
           <label>Preferred Location *</label>
-          <input type="text" [value]="form()['location']" (input)="updateForm({location: $any($event.target).value})"
-            placeholder="Dubai Marina">
+          <div class="multi-select-wrap" tabindex="-1" (focusout)="onLocationFocusOut($event)">
+            <div class="multi-select-trigger" (click)="locationDropdownOpen.set(!locationDropdownOpen())">
+              <span *ngIf="selectedLocations().length === 0" class="multi-select-placeholder">Select locations…</span>
+              <span *ngIf="selectedLocations().length > 0" class="multi-select-tags">
+                <span class="multi-tag" *ngFor="let loc of selectedLocations()">
+                  {{ loc }}
+                  <button type="button" (click)="$event.stopPropagation(); toggleLocation(loc)">×</button>
+                </span>
+              </span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="multi-select-arrow" [class.open]="locationDropdownOpen()">
+                <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
+              </svg>
+            </div>
+            <div class="multi-select-dropdown" *ngIf="locationDropdownOpen()">
+              <label *ngFor="let loc of dataSvc.locations()" class="multi-select-option">
+                <input type="checkbox" [checked]="selectedLocations().includes(loc)" (change)="toggleLocation(loc)" />
+                {{ loc }}
+              </label>
+            </div>
+          </div>
           <span class="field-error" *ngIf="formErrors()['location']">{{ formErrors()['location'] }}</span>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
           <label>Property Type</label>
-          <input type="text" [value]="form()['propertyType']"
-            (input)="updateForm({propertyType: $any($event.target).value})" placeholder="Apartment, Villa…">
+          <div class="select-wrapper">
+            <select (change)="updateForm({propertyType: $any($event.target).value})">
+              <option value="">Select type…</option>
+              <option *ngFor="let pt of dataSvc.propTypes()" [value]="pt" [selected]="form()['propertyType'] === pt">{{ pt }}</option>
+            </select>
+            <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
+            </svg>
+          </div>
         </div>
         <div class="form-field">
           <label>Assigned Agent</label>

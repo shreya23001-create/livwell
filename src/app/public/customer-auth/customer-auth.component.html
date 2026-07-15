@@ -401,8 +401,7 @@
 
             <div class="cauth-field" [class.has-error]="signUpErrors()['phone']">
               <label class="cauth-label">Phone Number</label>
-              <input type="tel" class="cauth-input" placeholder="+971 50 123 4567" [(ngModel)]="signUpForm.phone"
-                name="suPhone" (input)="clearSignUpError('phone')" autocomplete="tel">
+              <app-phone-input [(ngModel)]="signUpForm.phone" name="suPhone" placeholder="50 123 4567" [hasError]="!!signUpErrors()['phone']"></app-phone-input>
               <span *ngIf="signUpErrors()['phone']" class="cauth-field-error">{{ signUpErrors()['phone'] }}</span>
             </div>
 

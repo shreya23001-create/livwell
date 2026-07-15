@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +13,7 @@ type ForgotStep = 'email' | 'otp' | 'reset';
 @Component({
   selector: 'app-customer-auth',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SocialLoginModule, GoogleSigninButtonModule],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, RouterLink, SocialLoginModule, GoogleSigninButtonModule],
   templateUrl: './customer-auth.component.html',
   styleUrl: './customer-auth.component.scss',
 })

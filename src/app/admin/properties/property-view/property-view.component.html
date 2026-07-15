@@ -10,7 +10,7 @@
   <div class="pv-topbar">
     <button class="pv-back-btn" (click)="goBack()">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
       </svg>
       Back to Properties
     </button>
@@ -20,37 +20,33 @@
     </div>
   </div>
 
-  <!-- ── MAIN GRID ─────────────────────────────────────────── -->
-  <div class="pv-grid">
+  <!-- ── GALLERY + TITLE ROW ──────────────────────────────── -->
+  <div class="pv-hero">
 
-    <!-- ══ LEFT COLUMN ══════════════════════════════════════ -->
-    <div class="pv-left">
+    <!-- Main image -->
+    <div class="pv-gallery-main">
+      <img *ngIf="p.images?.[activeImage()]" [src]="p.images[activeImage()]" [alt]="p.title" class="pv-gallery-img">
+      <div *ngIf="!p.images?.length" class="pv-gallery-empty">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+        <span>No images uploaded</span>
+      </div>
+      <div *ngIf="(p.images?.length ?? 0) > 1" class="pv-gallery-count">{{ activeImage() + 1 }} / {{ p.images.length }}</div>
+    </div>
 
-      <!-- Image Gallery -->
-      <div class="pv-gallery">
-        <div class="pv-gallery-main">
-          <img *ngIf="p.images?.[activeImage()]" [src]="p.images[activeImage()]" [alt]="p.title" class="pv-gallery-img">
-          <div *ngIf="!p.images?.length" class="pv-gallery-empty">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
-            </svg>
-            <span>No images uploaded</span>
-          </div>
-          <div *ngIf="(p.images?.length ?? 0) > 1" class="pv-gallery-count">{{ activeImage() + 1 }} / {{ p.images.length }}</div>
-        </div>
-        <div *ngIf="(p.images?.length ?? 0) > 1" class="pv-gallery-thumbs">
-          <img *ngFor="let img of p.images; let i = index"
-            [src]="img" [alt]="'Image ' + (i+1)"
-            class="pv-gallery-thumb" [class.active]="activeImage() === i"
-            (click)="activeImage.set(i)">
-        </div>
+    <!-- Right panel: thumbs + info -->
+    <div class="pv-hero-right">
+      <!-- Thumbnails -->
+      <div *ngIf="(p.images?.length ?? 0) > 1" class="pv-gallery-thumbs">
+        <img *ngFor="let img of p.images; let i = index" [src]="img" [alt]="'Image ' + (i+1)" class="pv-gallery-thumb"
+          [class.active]="activeImage() === i" (click)="activeImage.set(i)">
       </div>
 
-      <!-- Title & Location -->
+      <!-- Title & info -->
       <div class="pv-info-card">
-        <div class="pv-title-row">
-          <h1 class="pv-title">{{ p.title }}</h1>
-        </div>
+        <h1 class="pv-title">{{ p.title }}</h1>
         <div class="pv-tags">
           <span class="pv-tag pv-tag--category">{{ p.listing_type }}</span>
           <span class="pv-tag pv-tag--type">{{ p.type }}</span>
@@ -58,341 +54,248 @@
         </div>
         <div class="pv-location" *ngIf="p.community || p.location">
           <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
           </svg>
           {{ p.community }}{{ p.community && p.location ? ', ' : '' }}{{ p.location }}
         </div>
         <div *ngIf="p.address" class="pv-address">{{ p.address }}</div>
       </div>
 
-      <!-- Specs Grid -->
-      <div class="pv-specs-card">
-        <div class="pv-spec">
-          <div class="pv-spec-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
-          </div>
-          <div class="pv-spec-val">{{ p.bedrooms === 0 ? 'Studio' : p.bedrooms }}</div>
-          <div class="pv-spec-lbl">Bedrooms</div>
-        </div>
-        <div class="pv-spec">
-          <div class="pv-spec-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5"/></svg>
-          </div>
-          <div class="pv-spec-val">{{ p.bathrooms }}</div>
-          <div class="pv-spec-lbl">Bathrooms</div>
-        </div>
-        <div class="pv-spec">
-          <div class="pv-spec-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
-          </div>
-          <div class="pv-spec-val">{{ p.area_sqft | number }}</div>
-          <div class="pv-spec-lbl">Sq. Ft.</div>
-        </div>
-        <div class="pv-spec">
-          <div class="pv-spec-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"/></svg>
-          </div>
-          <div class="pv-spec-val">{{ pricePerSqft() | number }}</div>
-          <div class="pv-spec-lbl">AED/Sqft</div>
-        </div>
-      </div>
-
-      <!-- Description -->
-      <div class="pv-section-card" *ngIf="p.description">
-        <h3 class="pv-section-title">Description</h3>
-        <p class="pv-desc">{{ p.description }}</p>
-      </div>
-
-      <!-- Amenities -->
-      <div class="pv-section-card" *ngIf="p.amenities?.length">
-        <h3 class="pv-section-title">Amenities & Features</h3>
-        <div class="pv-amenities">
-          <div *ngFor="let a of p.amenities" class="pv-amenity">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
-            </svg>
-            {{ a }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Video Tour -->
-      <div class="pv-section-card" *ngIf="p.video_url">
-        <h3 class="pv-section-title">Video Tour</h3>
-        <div class="pv-video-wrap">
-          <video *ngIf="!p.video_url?.includes('youtube') && !p.video_url?.includes('youtu.be')"
-            [src]="p.video_url" controls class="pv-video"></video>
-          <iframe *ngIf="p.video_url?.includes('youtube') || p.video_url?.includes('youtu.be')"
-            [src]="p.video_url" class="pv-video" frameborder="0" allowfullscreen></iframe>
-        </div>
-      </div>
-
-      <!-- Leads / Saved Tabs -->
-      <div class="pv-section-card">
-        <div class="pv-tabs">
-          <button class="pv-tab" [class.active]="activeTab() === 'leads'" (click)="activeTab.set('leads')">
-            Leads <span class="pv-tab-count">{{ leads().length }}</span>
-          </button>
-          <button class="pv-tab" [class.active]="activeTab() === 'saved'" (click)="activeTab.set('saved')">
-            Saved by Customers <span class="pv-tab-count">{{ saved().length }}</span>
-          </button>
-        </div>
-
-        <!-- Leads Table -->
-        <div *ngIf="activeTab() === 'leads'">
-          <div *ngIf="!leads().length" class="pv-empty-tab">No leads yet for this property.</div>
-          <div class="pv-leads-list" *ngIf="leads().length">
-            <div *ngFor="let l of leads()" class="pv-lead-row">
-              <div class="pv-lead-avatar">{{ l.name.charAt(0).toUpperCase() }}</div>
-              <div class="pv-lead-info">
-                <div class="pv-lead-name">{{ l.name }}</div>
-                <div class="pv-lead-contact">
-                  <span>{{ l.email }}</span>
-                  <span *ngIf="l.phone"> · {{ l.phone }}</span>
-                </div>
-                <div class="pv-lead-meta" *ngIf="l.notes">{{ l.notes }}</div>
-              </div>
-              <div class="pv-lead-right">
-                <span class="pv-lead-status" [style.background]="statusColor(l.status) + '18'" [style.color]="statusColor(l.status)">
-                  {{ l.status | titlecase }}
-                </span>
-                <div class="pv-lead-source">{{ sourceLabel(l.source) }}</div>
-                <div class="pv-lead-date">{{ l.created_at | date:'d MMM y' }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Saved Table -->
-        <div *ngIf="activeTab() === 'saved'">
-          <div *ngIf="!saved().length" class="pv-empty-tab">No customers have saved this property yet.</div>
-          <div class="pv-saved-list" *ngIf="saved().length">
-            <div *ngFor="let s of saved(); let i = index" class="pv-saved-row">
-              <div class="pv-lead-avatar pv-lead-avatar--purple">
-                {{ (s.profiles?.name || s.profiles?.email || '?').charAt(0).toUpperCase() }}
-              </div>
-              <div class="pv-lead-info">
-                <div class="pv-lead-name">{{ s.profiles?.name || 'Unknown Customer' }}</div>
-                <div class="pv-lead-contact" *ngIf="s.profiles?.email">{{ s.profiles!.email }}</div>
-                <div class="pv-lead-date">Saved on {{ s.created_at | date:'d MMM y, h:mm a' }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ══ RIGHT COLUMN ══════════════════════════════════════ -->
-    <div class="pv-right">
-
-      <!-- Price Card -->
-      <div class="pv-price-card">
-        <div class="pv-price-label">{{ p.listing_type === 'Rent' ? 'Annual Rent' : 'Sale Price' }}</div>
-        <div class="pv-price-value">{{ formatPrice(p.price) }}</div>
-        <div class="pv-price-sqft" *ngIf="pricePerSqft()">{{ pricePerSqft() | number }} AED / sqft</div>
-      </div>
-
-      <!-- Analytics Card -->
-      <div class="pv-analytics-card">
-        <h3 class="pv-card-title">Analytics</h3>
-        <div class="pv-analytics-grid">
-          <div class="pv-analytic">
-            <div class="pv-analytic-icon pv-analytic-icon--blue">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-            </div>
-            <div class="pv-analytic-val">{{ p.views }}</div>
-            <div class="pv-analytic-lbl">Total Views</div>
-          </div>
-          <div class="pv-analytic">
-            <div class="pv-analytic-icon pv-analytic-icon--green">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
-            </div>
-            <div class="pv-analytic-val">{{ leadStats().total }}</div>
-            <div class="pv-analytic-lbl">Total Leads</div>
-          </div>
-          <div class="pv-analytic">
-            <div class="pv-analytic-icon pv-analytic-icon--purple">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/></svg>
-            </div>
-            <div class="pv-analytic-val">{{ saved().length }}</div>
-            <div class="pv-analytic-lbl">Saved</div>
-          </div>
-          <div class="pv-analytic">
-            <div class="pv-analytic-icon pv-analytic-icon--gold">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-            </div>
-            <div class="pv-analytic-val">{{ conversionRate() }}%</div>
-            <div class="pv-analytic-lbl">Conversion</div>
-          </div>
-          <div class="pv-analytic" style="grid-column: span 2;">
-            <div class="pv-analytic-icon" style="background:rgba(239,68,68,0.1)">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="color:#ef4444"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/></svg>
-            </div>
-            <div class="pv-analytic-val">{{ p.share_count || 0 }}</div>
-            <div class="pv-analytic-lbl">Shares</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Lead Pipeline -->
-      <div class="pv-pipeline-card" *ngIf="leadStats().total">
-        <h3 class="pv-card-title">Lead Pipeline</h3>
-        <div class="pv-pipeline">
-          <div class="pv-pipe-row" *ngIf="leadStats().new">
-            <span class="pv-pipe-dot" style="background:#6366f1"></span>
-            <span class="pv-pipe-label">New</span>
-            <div class="pv-pipe-bar-wrap">
-              <div class="pv-pipe-bar" style="background:#6366f1"
-                [style.width.%]="(leadStats().new / leadStats().total) * 100"></div>
-            </div>
-            <span class="pv-pipe-count">{{ leadStats().new }}</span>
-          </div>
-          <div class="pv-pipe-row" *ngIf="leadStats().contacted">
-            <span class="pv-pipe-dot" style="background:#f59e0b"></span>
-            <span class="pv-pipe-label">Contacted</span>
-            <div class="pv-pipe-bar-wrap">
-              <div class="pv-pipe-bar" style="background:#f59e0b"
-                [style.width.%]="(leadStats().contacted / leadStats().total) * 100"></div>
-            </div>
-            <span class="pv-pipe-count">{{ leadStats().contacted }}</span>
-          </div>
-          <div class="pv-pipe-row" *ngIf="leadStats().qualified">
-            <span class="pv-pipe-dot" style="background:#3b82f6"></span>
-            <span class="pv-pipe-label">Qualified</span>
-            <div class="pv-pipe-bar-wrap">
-              <div class="pv-pipe-bar" style="background:#3b82f6"
-                [style.width.%]="(leadStats().qualified / leadStats().total) * 100"></div>
-            </div>
-            <span class="pv-pipe-count">{{ leadStats().qualified }}</span>
-          </div>
-          <div class="pv-pipe-row" *ngIf="leadStats().negotiating">
-            <span class="pv-pipe-dot" style="background:#8b5cf6"></span>
-            <span class="pv-pipe-label">Negotiating</span>
-            <div class="pv-pipe-bar-wrap">
-              <div class="pv-pipe-bar" style="background:#8b5cf6"
-                [style.width.%]="(leadStats().negotiating / leadStats().total) * 100"></div>
-            </div>
-            <span class="pv-pipe-count">{{ leadStats().negotiating }}</span>
-          </div>
-          <div class="pv-pipe-row" *ngIf="leadStats().won">
-            <span class="pv-pipe-dot" style="background:#10b981"></span>
-            <span class="pv-pipe-label">Won</span>
-            <div class="pv-pipe-bar-wrap">
-              <div class="pv-pipe-bar" style="background:#10b981"
-                [style.width.%]="(leadStats().won / leadStats().total) * 100"></div>
-            </div>
-            <span class="pv-pipe-count">{{ leadStats().won }}</span>
-          </div>
-          <div class="pv-pipe-row" *ngIf="leadStats().lost">
-            <span class="pv-pipe-dot" style="background:#ef4444"></span>
-            <span class="pv-pipe-label">Lost</span>
-            <div class="pv-pipe-bar-wrap">
-              <div class="pv-pipe-bar" style="background:#ef4444"
-                [style.width.%]="(leadStats().lost / leadStats().total) * 100"></div>
-            </div>
-            <span class="pv-pipe-count">{{ leadStats().lost }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Property Details Card -->
-      <div class="pv-details-card">
-        <h3 class="pv-card-title">Property Details</h3>
-        <div class="pv-detail-rows">
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Listing ID</span>
-            <span class="pv-detail-value">#{{ p.id }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Category</span>
-            <span class="pv-detail-value">{{ p.listing_type }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Type</span>
-            <span class="pv-detail-value">{{ p.type }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Status</span>
-            <span class="pv-detail-value">{{ p.status }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Furnishing</span>
-            <span class="pv-detail-value">{{ p.furnishing || '—' }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Bedrooms</span>
-            <span class="pv-detail-value">{{ p.bedrooms === 0 ? 'Studio' : p.bedrooms }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Bathrooms</span>
-            <span class="pv-detail-value">{{ p.bathrooms }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Area</span>
-            <span class="pv-detail-value">{{ p.area_sqft | number }} sqft</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Community</span>
-            <span class="pv-detail-value">{{ p.community || '—' }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Location</span>
-            <span class="pv-detail-value">{{ p.location || '—' }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Featured</span>
-            <span class="pv-detail-value">{{ p.is_featured ? 'Yes' : 'No' }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Images</span>
-            <span class="pv-detail-value">{{ p.images?.length || 0 }} uploaded</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Video Tour</span>
-            <span class="pv-detail-value">{{ p.video_url ? 'Yes' : 'No' }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Total Views</span>
-            <span class="pv-detail-value">{{ p.views }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Total Shares</span>
-            <span class="pv-detail-value">{{ p.share_count || 0 }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Saved By</span>
-            <span class="pv-detail-value">{{ saved().length }} customers</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Listed On</span>
-            <span class="pv-detail-value">{{ p.created_at | date:'d MMM y' }}</span>
-          </div>
-          <div class="pv-detail-row">
-            <span class="pv-detail-label">Created By</span>
-            <span class="pv-detail-value">{{ p.created_by || p.agent_name || 'Admin' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Agent Card -->
+      <!-- Assigned Agent (below title card) -->
       <div class="pv-agent-card" *ngIf="p.agent_name && p.agent_name !== '—'">
-        <h3 class="pv-card-title">Assigned Agent</h3>
         <div class="pv-agent-inner">
           <div class="pv-agent-avatar-wrap">
             <img *ngIf="p.agent_avatar" [src]="p.agent_avatar" [alt]="p.agent_name" class="pv-agent-avatar">
             <div *ngIf="!p.agent_avatar" class="pv-agent-avatar pv-agent-dummy">
-              <svg fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd"/></svg>
+              <svg fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd"
+                  d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                  clip-rule="evenodd" />
+              </svg>
             </div>
           </div>
           <div>
+            <div class="pv-agent-label">Assigned Agent</div>
             <div class="pv-agent-name">{{ p.agent_name }}</div>
             <div class="pv-agent-role">Business Associate</div>
           </div>
         </div>
       </div>
+    </div>
 
+  </div>
+
+  <!-- ── DESCRIPTION ───────────────────────────────────────── -->
+  <div class="pv-section-card" *ngIf="p.description">
+    <h3 class="pv-section-title">Description</h3>
+    <div class="pv-desc" [class.pv-desc--collapsed]="!descExpanded()" [innerHTML]="p.description"></div>
+    <button class="pv-read-more" (click)="descExpanded.set(!descExpanded())">
+      {{ descExpanded() ? 'Read less ▲' : 'Read more ▼' }}
+    </button>
+  </div>
+
+  <!-- ── AMENITIES ─────────────────────────────────────────── -->
+  <div class="pv-section-card" *ngIf="p.amenities?.length">
+    <h3 class="pv-section-title">Amenities &amp; Features</h3>
+    <div class="pv-amenities">
+      <div *ngFor="let a of amenitiesWithIcons()" class="pv-amenity">
+        <span class="pv-amenity-icon" *ngIf="a.svg" [innerHTML]="a.svg"></span>
+        <span class="pv-amenity-icon pv-amenity-icon--fallback" *ngIf="!a.svg">✓</span>
+        {{ a.name }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ANALYTICS ─────────────────────────────────────────── -->
+  <div class="pv-analytics-card">
+    <h3 class="pv-section-title">Analytics</h3>
+    <div class="pv-analytics-grid">
+      <div class="pv-analytic">
+        <div class="pv-analytic-icon pv-analytic-icon--blue">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+        </div>
+        <div class="pv-analytic-val">{{ p.views }}</div>
+        <div class="pv-analytic-lbl">Total Views</div>
+      </div>
+      <div class="pv-analytic">
+        <div class="pv-analytic-icon pv-analytic-icon--green">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+          </svg>
+        </div>
+        <div class="pv-analytic-val">{{ leadStats().total }}</div>
+        <div class="pv-analytic-lbl">Total Leads</div>
+      </div>
+      <div class="pv-analytic">
+        <div class="pv-analytic-icon pv-analytic-icon--purple">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+          </svg>
+        </div>
+        <div class="pv-analytic-val">{{ saved().length }}</div>
+        <div class="pv-analytic-lbl">Saved</div>
+      </div>
+      <div class="pv-analytic">
+        <div class="pv-analytic-icon pv-analytic-icon--gold">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </div>
+        <div class="pv-analytic-val">{{ conversionRate() }}%</div>
+        <div class="pv-analytic-lbl">Conversion</div>
+      </div>
+      <div class="pv-analytic">
+        <div class="pv-analytic-icon" style="background:rgba(239,68,68,0.1)">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="color:#ef4444">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+          </svg>
+        </div>
+        <div class="pv-analytic-val">{{ p.share_count || 0 }}</div>
+        <div class="pv-analytic-lbl">Shares</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LEAD PIPELINE ─────────────────────────────────────── -->
+  <div class="pv-section-card" *ngIf="leadStats().total">
+    <h3 class="pv-section-title">Lead Pipeline</h3>
+    <div class="pv-pipeline">
+      <div class="pv-pipe-row" *ngIf="leadStats().new">
+        <span class="pv-pipe-dot" style="background:#6366f1"></span>
+        <span class="pv-pipe-label">New</span>
+        <div class="pv-pipe-bar-wrap"><div class="pv-pipe-bar" style="background:#6366f1" [style.width.%]="(leadStats().new / leadStats().total) * 100"></div></div>
+        <span class="pv-pipe-count">{{ leadStats().new }}</span>
+      </div>
+      <div class="pv-pipe-row" *ngIf="leadStats().contacted">
+        <span class="pv-pipe-dot" style="background:#f59e0b"></span>
+        <span class="pv-pipe-label">Contacted</span>
+        <div class="pv-pipe-bar-wrap"><div class="pv-pipe-bar" style="background:#f59e0b" [style.width.%]="(leadStats().contacted / leadStats().total) * 100"></div></div>
+        <span class="pv-pipe-count">{{ leadStats().contacted }}</span>
+      </div>
+      <div class="pv-pipe-row" *ngIf="leadStats().qualified">
+        <span class="pv-pipe-dot" style="background:#3b82f6"></span>
+        <span class="pv-pipe-label">Qualified</span>
+        <div class="pv-pipe-bar-wrap"><div class="pv-pipe-bar" style="background:#3b82f6" [style.width.%]="(leadStats().qualified / leadStats().total) * 100"></div></div>
+        <span class="pv-pipe-count">{{ leadStats().qualified }}</span>
+      </div>
+      <div class="pv-pipe-row" *ngIf="leadStats().negotiating">
+        <span class="pv-pipe-dot" style="background:#8b5cf6"></span>
+        <span class="pv-pipe-label">Negotiating</span>
+        <div class="pv-pipe-bar-wrap"><div class="pv-pipe-bar" style="background:#8b5cf6" [style.width.%]="(leadStats().negotiating / leadStats().total) * 100"></div></div>
+        <span class="pv-pipe-count">{{ leadStats().negotiating }}</span>
+      </div>
+      <div class="pv-pipe-row" *ngIf="leadStats().won">
+        <span class="pv-pipe-dot" style="background:#10b981"></span>
+        <span class="pv-pipe-label">Won</span>
+        <div class="pv-pipe-bar-wrap"><div class="pv-pipe-bar" style="background:#10b981" [style.width.%]="(leadStats().won / leadStats().total) * 100"></div></div>
+        <span class="pv-pipe-count">{{ leadStats().won }}</span>
+      </div>
+      <div class="pv-pipe-row" *ngIf="leadStats().lost">
+        <span class="pv-pipe-dot" style="background:#ef4444"></span>
+        <span class="pv-pipe-label">Lost</span>
+        <div class="pv-pipe-bar-wrap"><div class="pv-pipe-bar" style="background:#ef4444" [style.width.%]="(leadStats().lost / leadStats().total) * 100"></div></div>
+        <span class="pv-pipe-count">{{ leadStats().lost }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROPERTY DETAILS ───────────────────────────────────── -->
+  <div class="pv-section-card pv-section-card--details">
+    <h3 class="pv-section-title">Property Details</h3>
+    <div class="pv-detail-rows">
+      <div class="pv-detail-row"><span class="pv-detail-label">Listing ID</span><span class="pv-detail-value">#{{ p.id }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Category</span><span class="pv-detail-value">{{ p.listing_type }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Type</span><span class="pv-detail-value">{{ p.type }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Status</span><span class="pv-detail-value">{{ p.status }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Furnishing</span><span class="pv-detail-value">{{ p.furnishing || '—' }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Bedrooms</span><span class="pv-detail-value">{{ p.bedrooms === 0 ? 'Studio' : p.bedrooms }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Bathrooms</span><span class="pv-detail-value">{{ p.bathrooms }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Area</span><span class="pv-detail-value">{{ p.area_sqft | number }} sqft</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Community</span><span class="pv-detail-value">{{ p.community || '—' }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Location</span><span class="pv-detail-value">{{ p.location || '—' }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Featured</span><span class="pv-detail-value">{{ p.is_featured ? 'Yes' : 'No' }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Images</span><span class="pv-detail-value">{{ p.images?.length || 0 }} uploaded</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Video Tour</span><span class="pv-detail-value">{{ p.video_url ? 'Yes' : 'No' }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Total Views</span><span class="pv-detail-value">{{ p.views }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Total Shares</span><span class="pv-detail-value">{{ p.share_count || 0 }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Saved By</span><span class="pv-detail-value">{{ saved().length }} customers</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Listed On</span><span class="pv-detail-value">{{ p.created_at | date:'d MMM y' }}</span></div>
+      <div class="pv-detail-row"><span class="pv-detail-label">Created By</span><span class="pv-detail-value">{{ p.created_by || p.agent_name || 'Admin' }}</span></div>
+    </div>
+  </div>
+
+
+  <!-- ── VIDEO TOUR ────────────────────────────────────────── -->
+  <div class="pv-section-card" *ngIf="p.video_url">
+    <h3 class="pv-section-title">Video Tour</h3>
+    <div class="pv-video-wrap">
+      <video *ngIf="!p.video_url?.includes('youtube') && !p.video_url?.includes('youtu.be')" [src]="p.video_url"
+        controls class="pv-video"></video>
+      <iframe *ngIf="p.video_url?.includes('youtube') || p.video_url?.includes('youtu.be')" [src]="p.video_url"
+        class="pv-video" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- ── LEADS / SAVED TABS ────────────────────────────────── -->
+  <div class="pv-section-card">
+    <div class="pv-tabs">
+      <button class="pv-tab" [class.active]="activeTab() === 'leads'" (click)="activeTab.set('leads')">
+        Leads <span class="pv-tab-count">{{ leads().length }}</span>
+      </button>
+      <button class="pv-tab" [class.active]="activeTab() === 'saved'" (click)="activeTab.set('saved')">
+        Saved by Customers <span class="pv-tab-count">{{ saved().length }}</span>
+      </button>
+    </div>
+
+    <div *ngIf="activeTab() === 'leads'">
+      <div *ngIf="!leads().length" class="pv-empty-tab">No leads yet for this property.</div>
+      <div class="pv-leads-list" *ngIf="leads().length">
+        <div *ngFor="let l of leads()" class="pv-lead-row">
+          <div class="pv-lead-avatar">{{ l.name.charAt(0).toUpperCase() }}</div>
+          <div class="pv-lead-info">
+            <div class="pv-lead-name">{{ l.name }}</div>
+            <div class="pv-lead-contact">
+              <span>{{ l.email }}</span>
+              <span *ngIf="l.phone"> · {{ l.phone }}</span>
+            </div>
+            <div class="pv-lead-meta" *ngIf="l.notes">{{ l.notes }}</div>
+          </div>
+          <div class="pv-lead-right">
+            <span class="pv-lead-status" [style.background]="statusColor(l.status) + '18'"
+              [style.color]="statusColor(l.status)">
+              {{ l.status | titlecase }}
+            </span>
+            <div class="pv-lead-source">{{ sourceLabel(l.source) }}</div>
+            <div class="pv-lead-date">{{ l.created_at | date:'d MMM y' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab() === 'saved'">
+      <div *ngIf="!saved().length" class="pv-empty-tab">No customers have saved this property yet.</div>
+      <div class="pv-saved-list" *ngIf="saved().length">
+        <div *ngFor="let s of saved()" class="pv-saved-row">
+          <div class="pv-lead-avatar pv-lead-avatar--purple">
+            {{ (s.profiles?.name || s.profiles?.email || '?').charAt(0).toUpperCase() }}
+          </div>
+          <div class="pv-lead-info">
+            <div class="pv-lead-name">{{ s.profiles?.name || 'Unknown Customer' }}</div>
+            <div class="pv-lead-contact" *ngIf="s.profiles?.email">{{ s.profiles!.email }}</div>
+            <div class="pv-lead-date">Saved on {{ s.created_at | date:'d MMM y, h:mm a' }}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

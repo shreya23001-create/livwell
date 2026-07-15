@@ -245,7 +245,7 @@
             <path d="m6 9 6 6 6-6" />
           </svg>
         </div>
-        <div class="op-faq-a" *ngIf="faq.open">{{ faq.answer }}</div>
+        <div class="op-faq-a" *ngIf="faq.open" [innerHTML]="safeHtml(faq.answer)"></div>
       </div>
     </div>
   </div>

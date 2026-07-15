@@ -3,6 +3,9 @@ import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../../shared/services/supabase.service';
 import { AuthService } from '../../../shared/services/auth.service';
+import { AdminDataService } from '../../../shared/services/admin-data.service';
+import { AMENITY_ICONS } from '../../../shared/constants/amenity-icons';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 interface PropertyDetail {
   id: number;
@@ -58,17 +61,29 @@ interface SavedRow {
   styleUrl: './property-view.component.scss',
 })
 export class PropertyViewComponent implements OnInit {
-  private sb     = inject(SupabaseService).client;
-  private auth   = inject(AuthService);
-  private route  = inject(ActivatedRoute);
-  private router = inject(Router);
+  private sb        = inject(SupabaseService).client;
+  private auth      = inject(AuthService);
+  private route     = inject(ActivatedRoute);
+  private router    = inject(Router);
+  private dataSvc   = inject(AdminDataService);
+  private sanitizer = inject(DomSanitizer);
 
   property    = signal<PropertyDetail | null>(null);
   leads       = signal<LeadRow[]>([]);
   saved       = signal<SavedRow[]>([]);
   loading     = signal(true);
-  activeImage = signal(0);
-  activeTab   = signal<'leads' | 'saved'>('leads');
+  activeImage  = signal(0);
+  activeTab    = signal<'leads' | 'saved'>('leads');
+  descExpanded = signal(false);
+
+  amenitiesWithIcons = computed<{ name: string; svg: SafeHtml | null }[]>(() => {
+    const masterMap = new Map(this.dataSvc.amenities().map(a => [a.name, a.icon]));
+    const svgMap    = new Map(AMENITY_ICONS.map(i => [i.key, i.svg]));
+    return (this.property()?.amenities ?? []).map(name => {
+      const raw = svgMap.get(masterMap.get(name) ?? '');
+      return { name, svg: raw ? this.sanitizer.bypassSecurityTrustHtml(raw) : null };
+    });
+  });
 
   leadStats = computed(() => {
     const l = this.leads();
@@ -105,7 +120,21 @@ export class PropertyViewComponent implements OnInit {
 
   private async loadProperty(id: number): Promise<void> {
     const { data } = await this.sb.from('properties').select('*').eq('id', id).single();
-    if (data) this.property.set(data as PropertyDetail);
+    if (!data) return;
+    let agentAvatar = '';
+    if (data.agent_name) {
+      const { data: prof } = await this.sb
+        .from('profiles')
+        .select('avatar_url')
+        .eq('name', data.agent_name)
+        .eq('role', 'agent')
+        .maybeSingle();
+      if (prof?.avatar_url) {
+        const av = prof.avatar_url.split('?')[0];
+        agentAvatar = /\/avatars\/[^/]+$/.test(av) ? prof.avatar_url : '';
+      }
+    }
+    this.property.set({ ...data, agent_avatar: agentAvatar } as PropertyDetail);
   }
 
   private async loadLeads(id: number): Promise<void> {

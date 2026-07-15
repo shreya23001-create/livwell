@@ -2378,6 +2378,48 @@ $gold-light: #e8c870;
   }
 }
 
+// ── Home card save / share ────────────────────────────────
+.home-card-actions {
+  display: flex; gap: 0.35rem; align-items: center;
+}
+.home-card-action-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,.88); backdrop-filter: blur(4px);
+  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: #374151; transition: all .2s; flex-shrink: 0;
+  svg { width: 15px; height: 15px; flex-shrink: 0; }
+  &:hover { background: #fff; color: #1a5c3a; }
+  &.saved { color: #e11d48; }
+}
+.home-share-toast {
+  position: absolute; top: calc(100% + 5px); right: 0;
+  background: #111827; color: #fff; font-size: .7rem; font-weight: 600;
+  padding: .25rem .6rem; border-radius: .35rem; white-space: nowrap;
+  pointer-events: none; z-index: 10;
+}
+
+// Off-plan title row with inline actions
+.offplan-name-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem;
+  .offplan-name { margin: 0; flex: 1; }
+  .home-card-actions { flex-shrink: 0; margin-top: 0.1rem; }
+}
+// Dark variant for light card backgrounds
+.home-card-action-btn--dark {
+  background: #f3f4f6;
+  color: #374151;
+  &:hover { background: #e5e7eb; color: #1a5c3a; }
+  &.saved { color: #e11d48; background: #fef2f2; }
+}
+
+// overlay positioning for all card types
+.lp-img-wrap .home-card-actions,
+.trending-img-wrap .home-card-actions,
+.offplan-img-wrap .home-card-actions,
+.home-card-actions--overlay {
+  position: absolute; top: .6rem; right: .6rem; z-index: 2;
+}
+
 /* Bottom: all text info overlaid — FAM style */
 .property-info {
   position: absolute;

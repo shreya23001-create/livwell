@@ -26,7 +26,7 @@
       </div>
 
       <div *ngIf="!jobsLoading()" class="careers-jobs">
-        <div *ngFor="let job of jobs()" class="careers-job-card">
+        <div *ngFor="let job of jobs()" class="careers-job-card" (click)="openApply(job)" style="cursor:pointer">
           <div class="careers-job-info">
             <span class="careers-job-tag">{{ job.tag }}</span>
             <h3 class="careers-job-title">{{ job.title }}</h3>
@@ -42,7 +42,7 @@
             </div>
             <p *ngIf="job.description" class="careers-job-desc">{{ job.description }}</p>
           </div>
-          <button class="careers-apply-btn" (click)="openApply(job)">Apply →</button>
+          <button class="careers-apply-btn" (click)="$event.stopPropagation(); openApply(job)">Apply →</button>
         </div>
         <div *ngIf="jobs().length === 0" class="careers-no-jobs">
           No open positions at the moment. Check back soon!
@@ -228,9 +228,7 @@
         </div>
         <div class="cj-field">
           <label class="cj-label">Phone Number *</label>
-          <input class="cj-input" [class.cj-input-error]="formErrors()['phone']"
-            type="tel" placeholder="+971 50 000 0000"
-            [value]="applyForm().phone" (input)="patchForm('phone', $any($event.target).value)" />
+          <app-phone-input [ngModel]="applyForm().phone" (ngModelChange)="patchForm('phone', $event)" name="phone" placeholder="50 000 0000" [hasError]="!!formErrors()['phone']"></app-phone-input>
           <span class="cj-error" *ngIf="formErrors()['phone']">{{ formErrors()['phone'] }}</span>
         </div>
       </div>

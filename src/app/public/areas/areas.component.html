@@ -50,9 +50,9 @@
       </div>
 
       <div class="areas-grid" *ngIf="!loading() && filtered().length > 0">
-        <div *ngFor="let a of filtered()" class="area-card">
+        <div *ngFor="let a of filtered()" class="area-card" (click)="goToArea(a)" style="cursor:pointer">
           <!-- Image -->
-          <div class="area-card__img-wrap" [routerLink]="['/properties']" [queryParams]="{location: a.name}" style="cursor:pointer">
+          <div class="area-card__img-wrap" [routerLink]="['/properties']" [queryParams]="{location: a.name}" style="cursor:pointer" (click)="$event.stopPropagation()">
             <img [src]="a.image" [alt]="a.name" class="area-card__img" loading="lazy" />
             <!-- Price badge -->
             <div class="area-card__price-badge" *ngIf="a.avgPriceSale">
@@ -72,7 +72,7 @@
             <div class="area-card__links">
               <a *ngIf="(a.propertiesForSale + a.propertiesForRent) > 0"
                 [routerLink]="['/properties']" [queryParams]="{location: a.name}"
-                class="area-card__link" (click)="$event.stopPropagation()">
+                class="area-card__link" (click)="$event.stopPropagation(); $event.preventDefault()">
                 Properties
               </a>
               <a *ngIf="(a.commercialCount ?? 0) > 0"

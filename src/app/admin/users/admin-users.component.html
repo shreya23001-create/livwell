@@ -100,7 +100,7 @@
     <div class="select-wrapper">
       <select class="usr-select" [value]="filterStatus()"
         (change)="filterStatus.set($any($event.target).value); onFilter()">
-        <option value="">All Statuses</option>
+        <option value="">Status</option>
         <option value="active">Active</option>
         <option value="pending_verification">Pending</option>
         <option value="suspended">Suspended</option>
@@ -192,39 +192,9 @@
           <!-- Last active -->
           <td class="usr-td usr-date">{{ u.lastActive | date:'d MMM y' }}</td>
 
-          <!-- Activity (agents only) -->
+          <!-- Activity -->
           <td class="usr-td">
-            <ng-container *ngIf="u.role === 'agent'; else noActivity">
-              <div class="usr-activity">
-                <span class="usr-activity-item">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                  </svg>
-                  {{ u.propertiesCount }} listings
-                </span>
-                <span class="usr-activity-item usr-activity-item--lead">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                  </svg>
-                  {{ u.leadsCount }} leads
-                </span>
-              </div>
-            </ng-container>
-            <ng-template #noActivity>
-              <span *ngIf="u.role === 'customer' && u.leadsCount" class="usr-activity-item usr-activity-item--lead">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                </svg>
-                {{ u.leadsCount }} enquiries
-              </span>
-              <span *ngIf="u.role !== 'customer' || !u.leadsCount" class="usr-no-activity">—</span>
-            </ng-template>
+            <button class="usr-details-btn" (click)="openDetails(u)">View Details</button>
           </td>
 
           <!-- Actions -->
@@ -328,8 +298,7 @@
     <div class="usr-form-row">
       <div class="usr-form-field" [class.has-error]="formErrors()['phone']">
         <label class="usr-form-label">Phone *</label>
-        <input class="usr-form-input" type="tel" placeholder="+971 50 123 4567" [value]="form()['phone'] || ''"
-          (input)="patchForm('phone', $any($event.target).value)">
+        <app-phone-input [ngModel]="form()['phone'] || ''" (ngModelChange)="patchForm('phone', $event)" placeholder="50 123 4567" [hasError]="!!formErrors()['phone']"></app-phone-input>
         <span *ngIf="formErrors()['phone']" class="usr-form-error">{{ formErrors()['phone'] }}</span>
       </div>
       <div class="usr-form-field">
@@ -371,9 +340,20 @@
     <div *ngIf="form()['role'] === 'agent' || form()['role'] === 'admin'" class="usr-form-row">
       <div class="usr-form-field">
         <label class="usr-form-label">Designation / Title</label>
-        <input class="usr-form-input" type="text" placeholder="e.g. Business Associate"
+        <input class="usr-form-input" type="text" placeholder="e.g. Property Consultant"
           [value]="form()['designation'] || ''"
           (input)="patchForm('designation', $any($event.target).value)">
+      </div>
+    </div>
+    <div *ngIf="form()['role'] === 'agent' || form()['role'] === 'admin'" class="usr-form-row">
+      <div class="usr-form-field">
+        <label class="usr-form-label">WhatsApp Number</label>
+        <app-phone-input
+          [ngModel]="form()['whatsapp_number'] || ''"
+          (ngModelChange)="patchForm('whatsapp_number', $event)"
+          placeholder="50 000 0000">
+        </app-phone-input>
+        <span class="usr-form-hint">Used for WhatsApp button on property pages</span>
       </div>
       <div class="usr-form-field">
         <label class="usr-form-label">Photo</label>
@@ -415,8 +395,7 @@
             [placeholder]="editingId() === null ? 'Min 8 characters' : ''"
             [value]="editingId() !== null ? '••••••••' : (form()['password'] || '')"
             (input)="editingId() === null ? patchForm('password', $any($event.target).value) : null"
-            [readonly]="editingId() !== null" [style.background]="editingId() !== null ? '#f9fafb' : ''"
-            [style.color]="editingId() !== null ? '#6b7280' : ''" autocomplete="new-password"
+            [readonly]="editingId() !== null" autocomplete="new-password"
             style="padding-right:2.5rem">
           <button type="button" (click)="showPassword.update(v => !v)"
             style="position:absolute;right:0.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;display:flex;align-items:center">
@@ -478,3 +457,132 @@
     <button class="usr-btn usr-btn--danger" (click)="doDelete()">Delete User</button>
   </div>
 </div>
+
+<!-- ── Details Popup ──────────────────────────────────── -->
+@if (detailsUser()) {
+<div class="udet-overlay" (click)="closeDetails()">
+  <div class="udet-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="udet-header">
+      <div class="udet-user-info">
+        <div class="udet-avatar">{{ detailsUser()!.name | slice:0:1 }}</div>
+        <div>
+          <div class="udet-name">{{ detailsUser()!.name }}</div>
+          <div class="udet-meta">{{ detailsUser()!.email }} &nbsp;·&nbsp; <span class="udet-role">{{ detailsUser()!.role }}</span></div>
+        </div>
+      </div>
+      <button class="udet-close" (click)="closeDetails()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (detailsLoading()) {
+      <div class="udet-loading">Loading...</div>
+    }
+
+    <!-- Agent / Admin view -->
+    @if (!detailsLoading() && detailsData() && (detailsUser()!.role === 'agent' || detailsUser()!.role === 'admin')) {
+      <div class="udet-body">
+
+        <!-- Stats row -->
+        <div class="udet-stats">
+          <div class="udet-stat"><span class="udet-stat-val">{{ detailsData()!.properties.length }}</span><span class="udet-stat-lbl">Properties</span></div>
+          <div class="udet-stat"><span class="udet-stat-val">{{ detailsData()!.projects.length }}</span><span class="udet-stat-lbl">Projects</span></div>
+          <div class="udet-stat"><span class="udet-stat-val">{{ detailsData()!.leads.length }}</span><span class="udet-stat-lbl">Leads</span></div>
+          <div class="udet-stat"><span class="udet-stat-val">{{ detailsData()!.members.length }}</span><span class="udet-stat-lbl">Members Added</span></div>
+        </div>
+
+        <!-- Properties -->
+        @if (detailsData()!.properties.length) {
+          <div class="udet-section">
+            <div class="udet-section-title">Properties</div>
+            <div class="udet-list">
+              @for (p of detailsData()!.properties; track p.id) {
+                <div class="udet-list-item">
+                  <span class="udet-item-name">{{ p.title }}</span>
+                  <span class="udet-badge">{{ p.type }}</span>
+                  <span class="udet-badge udet-badge--listing">{{ p.listing_type }}</span>
+                  <span class="udet-badge" [class.udet-badge--active]="p.status === 'Published'">{{ p.status }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Projects -->
+        @if (detailsData()!.projects.length) {
+          <div class="udet-section">
+            <div class="udet-section-title">Projects</div>
+            <div class="udet-list">
+              @for (p of detailsData()!.projects; track p.id) {
+                <div class="udet-list-item">
+                  <span class="udet-item-name">{{ p.name }}</span>
+                  <span class="udet-badge">{{ p.type }}</span>
+                  <span class="udet-badge" [class.udet-badge--active]="p.status === 'Published'">{{ p.status }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+
+        <!-- Members -->
+        @if (detailsData()!.members.length) {
+          <div class="udet-section">
+            <div class="udet-section-title">Members Added</div>
+            <div class="udet-list">
+              @for (m of detailsData()!.members; track m.id) {
+                <div class="udet-list-item">
+                  <span class="udet-item-name">{{ m.name }}</span>
+                  <span class="udet-badge">{{ m.role }}</span>
+                  <span class="udet-item-sub">{{ m.email }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (!detailsData()!.properties.length && !detailsData()!.projects.length && !detailsData()!.leads.length) {
+          <div class="udet-empty">No activity found for this user.</div>
+        }
+      </div>
+    }
+
+    <!-- Customer view -->
+    @if (!detailsLoading() && detailsData() && detailsUser()!.role === 'customer') {
+      <div class="udet-body">
+
+        <!-- Stats row -->
+        <div class="udet-stats">
+          <div class="udet-stat"><span class="udet-stat-val">{{ detailsData()!.enquiries.length }}</span><span class="udet-stat-lbl">Enquiries Sent</span></div>
+          <div class="udet-stat"><span class="udet-stat-val">{{ detailsData()!.properties.length }}</span><span class="udet-stat-lbl">Properties Added</span></div>
+          <div class="udet-stat"><span class="udet-stat-val">{{ detailsData()!.projects.length }}</span><span class="udet-stat-lbl">Projects Added</span></div>
+        </div>
+
+        <!-- Enquiries -->
+        @if (detailsData()!.enquiries.length) {
+          <div class="udet-section">
+            <div class="udet-section-title">Enquiries</div>
+            <div class="udet-list">
+              @for (e of detailsData()!.enquiries; track e.id) {
+                <div class="udet-list-item">
+                  <span class="udet-item-name">{{ e.property_title || e.project_title || 'General Enquiry' }}</span>
+                  <span class="udet-badge">{{ e.status }}</span>
+                  <span class="udet-item-sub">{{ e.created_at | date:'d MMM y' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (!detailsData()!.enquiries.length && !detailsData()!.properties.length && !detailsData()!.projects.length) {
+          <div class="udet-empty">No activity found for this user.</div>
+        }
+      </div>
+    }
+
+  </div>
+</div>
+}

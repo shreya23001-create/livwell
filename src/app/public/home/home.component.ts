@@ -6,6 +6,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { toProjectSlug, toPropertySlug } from '../../shared/utils/slug';
 
 interface Property {
@@ -98,8 +99,73 @@ interface NewsArticle {
 export class HomeComponent implements OnInit {
   private dataSvc = inject(AdminDataService);
   private sb      = inject(SupabaseService).client;
+  private auth    = inject(AuthService);
   private zone    = inject(NgZone);
   private router  = inject(Router);
+
+  savedPropertyIds = signal<Set<number>>(new Set());
+  savedProjectIds  = signal<Set<number>>(new Set());
+  sharePropToast   = signal<number | null>(null);
+  shareProjToast   = signal<number | null>(null);
+
+  isPropSaved(id: number): boolean { return this.savedPropertyIds().has(id); }
+  isProjSaved(id: number): boolean { return this.savedProjectIds().has(id); }
+
+  async toggleSaveProperty(id: number, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.isPropSaved(id)) {
+      await this.sb.from('saved_properties').delete().eq('user_id', userId).eq('property_id', id);
+      this.savedPropertyIds.update(s => { const n = new Set(s); n.delete(id); return n; });
+    } else {
+      await this.sb.from('saved_properties').insert({ user_id: userId, property_id: id });
+      this.savedPropertyIds.update(s => new Set(s).add(id));
+    }
+  }
+
+  async toggleSaveProject(id: number, event: Event): Promise<void> {
+    event.preventDefault(); event.stopPropagation();
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) { this.router.navigate(['/customer']); return; }
+    if (this.isProjSaved(id)) {
+      await this.sb.from('saved_projects').delete().eq('user_id', userId).eq('project_id', id);
+      this.savedProjectIds.update(s => { const n = new Set(s); n.delete(id); return n; });
+    } else {
+      await this.sb.from('saved_projects').insert({ user_id: userId, project_id: id });
+      this.savedProjectIds.update(s => new Set(s).add(id));
+    }
+  }
+
+  shareProperty(id: number, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const url = `${window.location.origin}/properties/${toPropertySlug(title, id)}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.sharePropToast.set(id);
+    setTimeout(() => this.sharePropToast.set(null), 2000);
+  }
+
+  shareProject(id: number, title: string, event: Event): void {
+    event.preventDefault(); event.stopPropagation();
+    const url = `${window.location.origin}/projects/${toProjectSlug(title, id)}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    this.shareProjToast.set(id);
+    setTimeout(() => this.shareProjToast.set(null), 2000);
+  }
+
+  private async loadSavedIds(): Promise<void> {
+    await this.auth.waitForSession();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+    const [propsRes, projsRes] = await Promise.all([
+      this.sb.from('saved_properties').select('property_id').eq('user_id', userId),
+      this.sb.from('saved_projects').select('project_id').eq('user_id', userId),
+    ]);
+    if (propsRes.data) this.savedPropertyIds.set(new Set(propsRes.data.map((r: any) => r.property_id)));
+    if (projsRes.data) this.savedProjectIds.set(new Set(projsRes.data.map((r: any) => r.project_id)));
+  }
 
   homePage     = computed(() => this.dataSvc.pages().find(p => p.id === 'home-hero'));
   heroHeadline = computed(() => this.homePage()?.heading    || 'Find Your Dream Property in Dubai');
@@ -216,7 +282,7 @@ export class HomeComponent implements OnInit {
     } else {
       const params: Record<string, string> = {};
       params['status'] = tab === 'rent' ? 'Rent' : 'Sale';
-      if (locs.length > 0)  params['location'] = locs.join(',');
+      if (locs.length > 0)  params['location'] = locs.join('|');
       else if (q)           params['q'] = q;
       this.router.navigate(['/properties'], { queryParams: params });
     }
@@ -620,6 +686,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadHomeData();
+    this.loadSavedIds();
     if (isPlatformBrowser(this.platformId)) {
       this.startSlideshow();
       this.startTestimonialRotation();

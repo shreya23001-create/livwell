@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
 
@@ -38,8 +39,9 @@ export interface FaqItem {
   styleUrl: './off-plan.component.scss',
 })
 export class OffPlanComponent implements OnInit {
-  private sb    = inject(SupabaseService).client;
-  private route = inject(ActivatedRoute);
+  private sb        = inject(SupabaseService).client;
+  private route     = inject(ActivatedRoute);
+  private sanitizer = inject(DomSanitizer);
 
   allProjects = signal<OffPlanProject[]>([]);
   loading     = signal(true);
@@ -139,6 +141,8 @@ export class OffPlanComponent implements OnInit {
   toggleFaq(index: number) {
     this.faqs = this.faqs.map((f, i) => ({ ...f, open: i === index ? !f.open : false }));
   }
+
+  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 
   readonly seoLinks = {
     dubaiProjects:     ['Downtown Dubai Projects', 'Palm Jumeirah Projects', 'Dubai Marina Projects', 'Business Bay Projects', 'Dubai Hills Projects', 'Dubai Creek Harbour', 'MBR City Projects', 'JVC Projects', 'Al Furjan Projects', 'Emaar Beachfront'],

@@ -16,7 +16,7 @@ $bg:      #f4f6fa;
 // Stats row
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
@@ -36,6 +36,7 @@ $bg:      #f4f6fa;
   &--qualified.active   { border-top-color: #16a34a; border-color: #16a34a; }
   &--negotiating.active { border-top-color: #7c3aed; border-color: #7c3aed; }
   &--won.active         { border-top-color: $green; border-color: $green; }
+  &--lost.active        { border-top-color: #dc2626; border-color: #dc2626; }
 }
 .stat-val { font-size: 1.5rem; font-weight: 800; color: $text; }
 .stat-lbl { font-size: 0.72rem; color: $muted; font-weight: 500; margin-top: 0.1rem; }
@@ -82,7 +83,16 @@ $bg:      #f4f6fa;
 .enq-info { flex: 1; min-width: 0; }
 .enq-prop {
   font-size: 0.9rem; font-weight: 700; color: $text; margin-bottom: 0.2rem;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+}
+.enq-type-badge {
+  font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.45rem;
+  border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0;
+  &--project  { background: #ede9fe; color: #7c3aed; }
+  &--property { background: #dcfce7; color: #15803d; }
+}
+.enq-category {
+  font-size: 0.75rem; color: $sub; font-weight: 500;
 }
 .enq-meta {
   display: flex; flex-wrap: wrap; gap: 0.3rem;

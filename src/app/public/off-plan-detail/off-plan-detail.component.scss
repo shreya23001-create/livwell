@@ -343,6 +343,7 @@ $text3:   #9ca3af;
   border: 1.5px solid $border; border-radius: 0.5rem;
   font-size: 0.85rem; color: $dark; background: #fff;
   outline: none; transition: border-color 0.2s;
+  &[readonly] { background: #f3f4f6; color: #6b7280; cursor: default; &:focus { border-color: $border; } }
   box-sizing: border-box; font-family: inherit;
   &::placeholder { color: $text3; }
   &:focus { border-color: $accent; }

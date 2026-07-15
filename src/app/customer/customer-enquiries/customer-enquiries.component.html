@@ -9,12 +9,18 @@
 
   <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-card stat-card--all"         (click)="filterStatus.set('all')"         [class.active]="filterStatus() === 'all'">         <div class="stat-val">{{ stats().total }}</div>       <div class="stat-lbl">Total</div></div>
-    <div class="stat-card stat-card--new"         (click)="filterStatus.set('new')"         [class.active]="filterStatus() === 'new'">         <div class="stat-val">{{ stats().new }}</div>         <div class="stat-lbl">New</div></div>
-    <div class="stat-card stat-card--contacted"   (click)="filterStatus.set('contacted')"   [class.active]="filterStatus() === 'contacted'">   <div class="stat-val">{{ stats().contacted }}</div>   <div class="stat-lbl">Contacted</div></div>
-    <div class="stat-card stat-card--qualified"   (click)="filterStatus.set('qualified')"   [class.active]="filterStatus() === 'qualified'">   <div class="stat-val">{{ stats().qualified }}</div>   <div class="stat-lbl">Qualified</div></div>
-    <div class="stat-card stat-card--negotiating" (click)="filterStatus.set('negotiating')" [class.active]="filterStatus() === 'negotiating'"> <div class="stat-val">{{ stats().negotiating }}</div> <div class="stat-lbl">Negotiating</div></div>
-    <div class="stat-card stat-card--won"         (click)="filterStatus.set('won')"         [class.active]="filterStatus() === 'won'">         <div class="stat-val">{{ stats().won }}</div>         <div class="stat-lbl">Won</div></div>
+    <div class="stat-card stat-card--all" (click)="filterStatus.set('all')" [class.active]="filterStatus() === 'all'">
+      <div class="stat-val">{{ stats()['total'] }}</div><div class="stat-lbl">Total</div>
+    </div>
+    @for (s of dataSvc.leadStatuses(); track s.name) {
+      <div class="stat-card" [class.active]="filterStatus() === s.name"
+           (click)="filterStatus.set(s.name)"
+           [style.border-top-color]="filterStatus() === s.name ? s.color : ''"
+           [style.border-color]="filterStatus() === s.name ? s.color : ''">
+        <div class="stat-val">{{ stats()[s.name] ?? 0 }}</div>
+        <div class="stat-lbl">{{ s.name.charAt(0).toUpperCase() + s.name.slice(1) }}</div>
+      </div>
+    }
   </div>
 
   <!-- List -->
@@ -38,12 +44,21 @@
             <div class="agent-avatar">{{ enq.property.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase() }}</div>
             <div class="enq-info">
               <div class="enq-prop">
+                @if (enq.isProject) {
+                  <span class="enq-type-badge enq-type-badge--project">Project</span>
+                } @else {
+                  <span class="enq-type-badge enq-type-badge--property">Property</span>
+                }
                 {{ enq.property }}
                 @if (enq.propertyId) {
                   <a [routerLink]="['/property', enq.propertyId]" (click)="$event.stopPropagation()" class="enq-prop-link">View →</a>
                 }
+                @if (enq.projectId) {
+                  <a [routerLink]="['/projects', enq.projectId]" (click)="$event.stopPropagation()" class="enq-prop-link">View →</a>
+                }
               </div>
               <div class="enq-meta">
+                @if (enq.category && !enq.isProject) { <span class="enq-category">{{ enq.category }}</span><span class="dot">·</span> }
                 @if (enq.location) { <span>{{ enq.location }}</span><span class="dot">·</span> }
                 @if (enq.budget)   { <span>Budget: {{ enq.budget }}</span><span class="dot">·</span> }
                 <span>
@@ -83,7 +98,7 @@
               @if (enq.status !== 'won' && enq.status !== 'lost' && enq.status !== 'closed') {
                 <div class="pipeline-wrap">
                   <div class="pipeline">
-                    @for (step of statusSteps; track step; let i = $index) {
+                    @for (step of statusSteps(); track step; let i = $index) {
                       <div class="pipeline-step" [class.done]="stepIndex(enq.status) > i" [class.current]="enq.status === step">
                         <div class="pipeline-dot">
                           @if (stepIndex(enq.status) > i) {
@@ -92,7 +107,7 @@
                         </div>
                         <div class="pipeline-label">{{ statusLabel(step) }}</div>
                       </div>
-                      @if (i < statusSteps.length - 1) {
+                      @if (i < statusSteps().length - 1) {
                         <div class="pipeline-line" [class.done]="stepIndex(enq.status) > i"></div>
                       }
                     }

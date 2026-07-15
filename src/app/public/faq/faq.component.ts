@@ -1,5 +1,6 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
@@ -74,7 +75,8 @@ const FALLBACK_FAQS: Faq[] = [
   styleUrl: './faq.component.scss',
 })
 export class FaqComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb        = inject(SupabaseService).client;
+  private sanitizer = inject(DomSanitizer);
 
   openId = signal<number | null>(null);
   currentPage = signal(1);
@@ -137,4 +139,6 @@ export class FaqComponent implements OnInit {
     this.activeCategory.set(cat);
     this.currentPage.set(1);
   }
+
+  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 }

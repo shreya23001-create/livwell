@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -5,6 +6,7 @@ import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { AdminDataService } from '../../shared/services/admin-data.service';
 
 interface LeadMessage {
   id: number;
@@ -51,15 +53,16 @@ const EMPTY_FORM = (): Partial<AgentLead> => ({
 @Component({
   selector: 'app-agent-leads',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, RouterModule],
   templateUrl: './agent-leads.component.html',
   styleUrl: './agent-leads.component.scss',
 })
 export class AgentLeadsComponent implements OnInit, OnDestroy {
-  private auth   = inject(AuthService);
-  private sb     = inject(SupabaseService).client;
-  private toast  = inject(ToastService);
-  private router = inject(Router);
+  private auth    = inject(AuthService);
+  private sb      = inject(SupabaseService).client;
+  private toast   = inject(ToastService);
+  private router  = inject(Router);
+  dataSvc = inject(AdminDataService);
 
   private realtimeSub: any    = null;
   private msgRealtimeSub: any = null;
@@ -90,27 +93,26 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   sendingMsg    = signal(false);
 
 
-  readonly statuses: LeadStatus[] = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
+  readonly leadStatusList = computed(() => this.dataSvc.leadStatuses().map(s => s.name as LeadStatus));
+  get statuses(): LeadStatus[] { return this.leadStatusList(); }
   readonly categories = ['Buy', 'Rent'];
   readonly sources    = ['Website', 'Referral', 'Walk-in', 'Social Media', 'Portal', 'Cold Call'];
 
-  readonly statusTimeline: { status: LeadStatus; label: string; color: string }[] = [
-    { status: 'new',         label: 'New Lead',     color: '#f59e0b' },
-    { status: 'contacted',   label: 'Contacted',    color: '#3b82f6' },
-    { status: 'qualified',   label: 'Qualified',    color: '#6366f1' },
-    { status: 'negotiating', label: 'Negotiating',  color: '#7c3aed' },
-    { status: 'won',         label: 'Won',          color: '#10b981' },
-    { status: 'lost',        label: 'Lost',         color: '#ef4444' },
-  ];
+  readonly statusTimeline = computed(() =>
+    this.dataSvc.leadStatuses().map(s => ({
+      status: s.name as LeadStatus,
+      label:  s.name.charAt(0).toUpperCase() + s.name.slice(1),
+      color:  s.color,
+    }))
+  );
 
   stats = computed(() => {
     const a = this.leads();
-    return {
-      total:  a.length,
-      new:    a.filter(l => l.status === 'new').length,
-      active: a.filter(l => ['contacted', 'qualified', 'negotiating'].includes(l.status)).length,
-      won:    a.filter(l => l.status === 'won').length,
-    };
+    const counts: Record<string, number> = { total: a.length };
+    for (const s of this.dataSvc.leadStatuses()) {
+      counts[s.name] = a.filter(l => l.status === s.name).length;
+    }
+    return counts;
   });
 
   filtered = computed(() => {
@@ -381,7 +383,8 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   }
 
   labelStatus(s: string): string {
-    return ({ new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' } as Record<string, string>)[s] ?? s;
+    const found = this.dataSvc.leadStatuses().find(ls => ls.name === s);
+    return found ? found.name.charAt(0).toUpperCase() + found.name.slice(1) : s;
   }
 
   formatPrice(n: number): string {

@@ -1,9 +1,11 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface ContactForm {
   firstName: string;
@@ -28,12 +30,21 @@ interface Office {
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, FooterComponent],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, RouterLink, FooterComponent],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
 })
 export class ContactComponent {
   private dataSvc = inject(AdminDataService);
+  private sb      = inject(SupabaseService).client;
+
+  whatsappNumber = computed(() => this.dataSvc.whatsappNumber());
+  socialLinks    = computed(() => this.dataSvc.socialLinks());
+
+  whatsappUrl = computed(() => {
+    const num = this.dataSvc.whatsappNumber().replace(/\D/g, '');
+    return num ? `https://wa.me/${num}` : null;
+  });
 
   // CMS-driven contact page content
   contactPage = computed(() => this.dataSvc.pages().find(p => p.id === 'contact-info'));
@@ -42,8 +53,10 @@ export class ContactComponent {
 
   enquiryTypes = ['Buy Property', 'Rent Property', 'Sell Property', 'Investment', 'General Enquiry'];
   activeType = signal('Buy Property');
-  submitted = signal(false);
-  formErrors = signal<Record<string, string>>({});
+  submitted    = signal(false);
+  submitting   = signal(false);
+  submitError  = signal('');
+  formErrors   = signal<Record<string, string>>({});
 
   form = signal<ContactForm>({
     firstName: '', lastName: '', email: '', phone: '',
@@ -54,7 +67,7 @@ export class ContactComponent {
     this.form.update(f => ({ ...f, [field]: value }));
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     const f = this.form();
     const e: Record<string, string> = {};
     if (!f.firstName.trim())                        e['firstName'] = 'First name is required.';
@@ -67,6 +80,28 @@ export class ContactComponent {
     if (!f.consent)                                 e['consent']   = 'You must agree to the terms.';
     this.formErrors.set(e);
     if (Object.keys(e).length) return;
+
+    this.submitting.set(true);
+    this.submitError.set('');
+
+    const { error } = await this.sb.from('admin_leads').insert({
+      name:           `${f.firstName.trim()} ${f.lastName.trim()}`.trim(),
+      email:          f.email.trim(),
+      phone:          f.phone.trim() || null,
+      property_type:  this.activeType(),
+      category:       ({ 'Buy Property': 'buy', 'Rent Property': 'rent', 'Sell Property': 'buy', 'Investment': 'invest', 'General Enquiry': 'buy' } as any)[this.activeType()] ?? 'buy',
+      notes:          `Subject: ${f.subject.trim()}\n\n${f.message.trim()}`,
+      status:         'new',
+      source:         'website',
+      assigned_agent: null,
+      agent_email:    null,
+    });
+
+    this.submitting.set(false);
+    if (error) {
+      this.submitError.set('Something went wrong. Please try again.');
+      return;
+    }
     this.submitted.set(true);
   }
 

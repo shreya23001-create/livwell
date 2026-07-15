@@ -41,7 +41,7 @@
     </div>
     <div class="select-wrapper">
       <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
-        <option value="">All Statuses</option>
+        <option value="">Status</option>
         <option *ngFor="let s of statusList" [value]="s">{{ s }}</option>
       </select>
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>

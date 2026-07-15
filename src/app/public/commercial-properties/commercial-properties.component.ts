@@ -391,7 +391,7 @@ export class CommercialPropertiesComponent implements OnInit {
         } as CommercialProperty;
       }));
     } else {
-      this.allProperties.set(this.staticProperties);
+      this.allProperties.set([]);
     }
     this.loading.set(false);
   }
@@ -496,4 +496,6 @@ export class CommercialPropertiesComponent implements OnInit {
   propertySlug(p: { title: string; id: number }): string {
     return toPropertySlug(p.title, p.id);
   }
+
+  navigateTo(commands: any[]): void { this.router.navigate(commands); }
 }

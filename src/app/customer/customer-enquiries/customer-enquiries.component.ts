@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AdminDataService } from '../../shared/services/admin-data.service';
 
 type EnqStatus = 'new' | 'contacted' | 'qualified' | 'negotiating' | 'won' | 'lost' | 'closed';
 
@@ -19,6 +20,8 @@ interface Enquiry {
   id: number;
   property: string;
   propertyId: number | null;
+  projectId: number | null;
+  category: string;
   location: string;
   budget: string;
   agent: string;
@@ -26,6 +29,7 @@ interface Enquiry {
   agentAvatar: string;
   date: string;
   status: EnqStatus;
+  isProject: boolean;
 }
 
 @Component({
@@ -36,8 +40,9 @@ interface Enquiry {
   styleUrl: './customer-enquiries.component.scss',
 })
 export class CustomerEnquiriesComponent implements OnInit, OnDestroy {
-  private auth = inject(AuthService);
-  private sb   = inject(SupabaseService).client;
+  private auth    = inject(AuthService);
+  private sb      = inject(SupabaseService).client;
+  dataSvc         = inject(AdminDataService);
 
   private realtimeSub: any = null;
   private msgRealtimeSub: any = null;
@@ -53,21 +58,21 @@ export class CustomerEnquiriesComponent implements OnInit, OnDestroy {
   newMessage   = signal<Record<number, string>>({});
   sending      = signal<Record<number, boolean>>({});
 
-  readonly statusSteps: EnqStatus[] = ['new', 'contacted', 'qualified', 'negotiating', 'won'];
+  readonly statusSteps = computed(() => this.dataSvc.leadStatuses().map(s => s.name as EnqStatus));
 
   filtered = computed(() => {
     const s = this.filterStatus();
     return s === 'all' ? this.enquiries() : this.enquiries().filter(e => e.status === s);
   });
 
-  stats = computed(() => ({
-    total:       this.enquiries().length,
-    new:         this.enquiries().filter(e => e.status === 'new').length,
-    contacted:   this.enquiries().filter(e => e.status === 'contacted').length,
-    qualified:   this.enquiries().filter(e => e.status === 'qualified').length,
-    negotiating: this.enquiries().filter(e => e.status === 'negotiating').length,
-    won:         this.enquiries().filter(e => e.status === 'won').length,
-  }));
+  stats = computed(() => {
+    const all = this.enquiries();
+    const counts: Record<string, number> = { total: all.length };
+    for (const s of this.dataSvc.leadStatuses()) {
+      counts[s.name] = all.filter(e => e.status === s.name).length;
+    }
+    return counts;
+  });
 
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
@@ -86,7 +91,7 @@ export class CustomerEnquiriesComponent implements OnInit, OnDestroy {
   private async fetchEnquiries(email: string): Promise<void> {
     const { data } = await this.sb
       .from('admin_leads')
-      .select('id, status, assigned_agent, created_at, location, property_type, property_title, property_id, budget, notes, agent_reply')
+      .select('id, status, assigned_agent, created_at, location, property_type, property_title, property_id, project_title, project_id, category, budget, notes, agent_reply')
       .eq('email', email)
       .order('created_at', { ascending: false });
 
@@ -221,17 +226,22 @@ export class CustomerEnquiriesComponent implements OnInit, OnDestroy {
 
   private mapRow(r: any, avatarMap: Record<string, string> = {}): Enquiry {
     const agent = r.assigned_agent || '';
+    const isProject = !!(r.project_title || (r.notes && /enquiry about project:/i.test(r.notes)));
+    const projectNameFromNotes = r.notes?.replace(/^Enquiry about project:\s*/i, '').split('\n')[0] || '';
     return {
       id:            r.id,
-      property:      r.property_title || r.property_type || 'General Enquiry',
-      propertyId:    r.property_id    ?? null,
-      location:      r.location       || '',
-      budget:        r.budget         || '',
+      property:      r.project_title || (isProject ? projectNameFromNotes : null) || r.property_title || r.property_type || 'General Enquiry',
+      propertyId:    r.property_id   ?? null,
+      projectId:     r.project_id    ?? null,
+      category:      r.category      || (isProject ? 'Project' : r.property_type || ''),
+      location:      r.location      || '',
+      budget:        r.budget        || '',
       agent:         agent || 'Unassigned',
       agentInitials: agent ? agent.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase() : 'UA',
       agentAvatar:   agent ? (avatarMap[agent] ?? '') : '',
       date:          new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
       status:        (r.status || 'new') as EnqStatus,
+      isProject,
     };
   }
 
@@ -249,5 +259,5 @@ export class CustomerEnquiriesComponent implements OnInit, OnDestroy {
               negotiating: 'Negotiating', won: 'Won', lost: 'Lost', closed: 'Closed' } as Record<string, string>)[s] ?? s;
   }
 
-  stepIndex(status: EnqStatus): number { return this.statusSteps.indexOf(status); }
+  stepIndex(status: EnqStatus): number { return this.statusSteps().indexOf(status); }
 }

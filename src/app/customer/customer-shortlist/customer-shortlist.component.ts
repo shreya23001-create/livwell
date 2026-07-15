@@ -167,7 +167,7 @@ export class CustomerShortlistComponent implements OnInit {
 
     await Promise.all([
       this.loadProperties(userId),
-      this.loadInterestedProjects(user?.email ?? ''),
+      this.loadInterestedProjects(userId),
     ]);
     this.loading.set(false);
   }
@@ -210,44 +210,38 @@ export class CustomerShortlistComponent implements OnInit {
       .filter(Boolean));
   }
 
-  private async loadInterestedProjects(email: string): Promise<void> {
-    if (!email) return;
-    const { data: leads } = await this.sb
-      .from('admin_leads')
+  private async loadInterestedProjects(userId: string): Promise<void> {
+    if (!userId) return;
+    const { data: saved } = await this.sb
+      .from('saved_projects')
       .select('id, project_id, created_at')
-      .eq('email', email)
-      .not('project_id', 'is', null)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
-    if (!leads || leads.length === 0) return;
+    if (!saved || saved.length === 0) return;
 
-    const projectIds = [...new Set(leads.map((r: any) => r.project_id))];
+    const projectIds = saved.map((r: any) => r.project_id);
     const { data: projects } = await this.sb
       .from('projects')
       .select('id, title, developer, location, type, price_from, price_label, beds, status, badge, images')
       .in('id', projectIds);
 
     const projectMap = new Map((projects ?? []).map((p: any) => [p.id, p]));
-    const seen = new Set<number>();
-    this.projectItems.set(leads
-      .filter((r: any) => {
-        if (seen.has(r.project_id)) return false;
-        seen.add(r.project_id);
-        return projectMap.has(r.project_id);
-      })
+    this.projectItems.set(saved
+      .filter((r: any) => projectMap.has(r.project_id))
       .map((r: any) => {
         const p = projectMap.get(r.project_id);
         return {
-          id:          p.id,
-          title:       p.title       || '',
-          developer:   p.developer   || '',
-          location:    p.location    || 'Dubai',
-          priceLabel:  p.price_label || (p.price_from ? `AED ${Number(p.price_from).toLocaleString()}` : 'Price on request'),
-          beds:        p.beds        || '',
-          status:      p.status      || 'Off-Plan',
-          badge:       p.badge       || 'Off-Plan',
-          image:       (p.images && p.images[0]) || '',
-          enquiredOn:  new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
+          id:         p.id,
+          title:      p.title      || '',
+          developer:  p.developer  || '',
+          location:   p.location   || 'Dubai',
+          priceLabel: p.price_label || (p.price_from ? `AED ${Number(p.price_from).toLocaleString()}` : 'Price on request'),
+          beds:       p.beds       || '',
+          status:     p.status     || 'Off-Plan',
+          badge:      p.badge      || 'Off-Plan',
+          image:      (p.images && p.images[0]) || '',
+          enquiredOn: new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
         };
       }));
   }

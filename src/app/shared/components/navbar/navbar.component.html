@@ -126,12 +126,12 @@
             Properties</a>
           <!-- Luxury for Sale flyout -->
           <div class="nav-dd-flyout-wrap">
-            <span class="nav-dd-item nav-dd-has-flyout">
+            <a routerLink="/luxury-properties-for-sale" [queryParams]="{intent: 'Buy'}" class="nav-dd-item nav-dd-has-flyout" (click)="closeMobileMenu()">
               Luxury Properties for Sale
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="m9 18 6-6-6-6" />
               </svg>
-            </span>
+            </a>
             <div class="nav-dd-flyout">
               <a *ngFor="let t of luxeSaleTypes()" routerLink="/luxury-properties-for-sale"
                 [queryParams]="{type: t, intent: 'Buy'}" class="nav-dd-item" (click)="closeMobileMenu()">{{ t }}s</a>
@@ -139,12 +139,12 @@
           </div>
           <!-- Luxury for Rent flyout -->
           <div class="nav-dd-flyout-wrap">
-            <span class="nav-dd-item nav-dd-has-flyout">
+            <a routerLink="/luxury-properties-for-sale" [queryParams]="{intent: 'Rent'}" class="nav-dd-item nav-dd-has-flyout" (click)="closeMobileMenu()">
               Luxury Properties for Rent
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="m9 18 6-6-6-6" />
               </svg>
-            </span>
+            </a>
             <div class="nav-dd-flyout">
               <a *ngFor="let t of luxeRentTypes()" routerLink="/luxury-properties-for-sale"
                 [queryParams]="{type: t, intent: 'Rent'}" class="nav-dd-item" (click)="closeMobileMenu()">{{ t }}s</a>

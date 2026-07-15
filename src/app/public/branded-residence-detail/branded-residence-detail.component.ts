@@ -1,3 +1,4 @@
+import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -44,7 +45,7 @@ export interface BRProperty {
 @Component({
   selector: 'app-branded-residence-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NewsletterSectionComponent, SeoLinksSectionComponent],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, RouterLink, NewsletterSectionComponent, SeoLinksSectionComponent],
   templateUrl: './branded-residence-detail.component.html',
   styleUrl: './branded-residence-detail.component.scss',
 })
@@ -76,7 +77,7 @@ export class BrandedResidenceDetailComponent implements OnInit {
   });
 
   property         = signal<BRProperty | null>(null);
-  agent            = signal<{ name: string; email: string; phone: string; avatar_url: string } | null>(null);
+  agent            = signal<{ name: string; email: string; phone: string; avatar_url: string; designation?: string; whatsapp_number?: string } | null>(null);
   loading          = signal(true);
   notFound         = signal(false);
   activeImage      = signal(0);
@@ -89,8 +90,16 @@ export class BrandedResidenceDetailComponent implements OnInit {
   shareToast       = signal(false);
 
   agentAvatar = computed(() => this.avatarError() ? '' : (this.agent()?.avatar_url ?? ''));
-  agentPhone  = computed(() => this.agent()?.phone ?? '');
-  agentEmail  = computed(() => this.agent()?.email ?? '');
+  agentPhone        = computed(() => this.agent()?.phone ?? '');
+  agentEmail        = computed(() => this.agent()?.email ?? '');
+  agentWhatsapp     = computed(() => this.agent()?.whatsapp_number ?? '');
+  agentDesignation  = computed(() => this.agent()?.designation ?? '');
+  waUnavailable     = signal(false);
+
+  showWaUnavailable(): void {
+    this.waUnavailable.set(true);
+    setTimeout(() => this.waUnavailable.set(false), 3000);
+  }
 
   inquiryName    = '';
   inquiryPhone   = '';
@@ -131,8 +140,8 @@ export class BrandedResidenceDetailComponent implements OnInit {
       const agentName = (data as BRProperty).agent_name;
       if (agentName) {
         const { data: ag } = await this.sb
-          .from('admin_users')
-          .select('name, email, phone, avatar_url')
+          .from('profiles')
+          .select('name, email, phone, avatar_url, designation, whatsapp_number')
           .eq('name', agentName)
           .maybeSingle();
         if (ag) this.agent.set(ag as any);

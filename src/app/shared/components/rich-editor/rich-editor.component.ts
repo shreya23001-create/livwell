@@ -124,7 +124,8 @@ export class RichEditorComponent implements AfterViewInit, OnChanges, OnDestroy,
     if (init) this.quill.clipboard.dangerouslyPasteHTML(init);
 
     this.quill.on('text-change', () => {
-      const html = this.quill.getSemanticHTML();
+      const raw = this.quill.getSemanticHTML();
+      const html = raw.replace(/<br\s*\/?>/gi, ' ').replace(/\s{2,}/g, ' ');
       const val = html === '<p></p>' ? '' : html;
       this.onChange(val);
       this.valueChange.emit(val);

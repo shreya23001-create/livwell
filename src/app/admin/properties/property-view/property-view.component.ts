@@ -76,6 +76,16 @@ export class PropertyViewComponent implements OnInit {
   activeTab    = signal<'leads' | 'saved'>('leads');
   descExpanded = signal(false);
 
+  safeDesc(html: string): SafeHtml {
+    const cleaned = (html ?? '')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/<\/p>\s*<p>/gi, ' ')
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/\s{2,}/g, ' ');
+    return this.sanitizer.bypassSecurityTrustHtml(cleaned);
+  }
+
   amenitiesWithIcons = computed<{ name: string; svg: SafeHtml | null }[]>(() => {
     const masterMap = new Map(this.dataSvc.amenities().map(a => [a.name, a.icon]));
     const svgMap    = new Map(AMENITY_ICONS.map(i => [i.key, i.svg]));

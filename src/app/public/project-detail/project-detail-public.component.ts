@@ -217,11 +217,14 @@ export class ProjectDetailPublicComponent implements OnInit {
     }
   }
 
-  sharePropCard(id: number, title: string, event: Event): void {
+  async sharePropCard(id: number, title: string, event: Event): Promise<void> {
     event.preventDefault(); event.stopPropagation();
     const slug = this.propSlug({ title, id });
     const url  = `${window.location.origin}/properties/${slug}`;
-    navigator.clipboard.writeText(url).catch(() => {});
+    if (navigator.share) {
+      try { await navigator.share({ title, url }); return; } catch {}
+    }
+    window.location.href = `https://wa.me/?text=${encodeURIComponent(`${title}\n${url}`)}`;
     this.propShareToastId.set(id);
     setTimeout(() => this.propShareToastId.set(null), 2000);
   }
@@ -243,7 +246,15 @@ export class ProjectDetailPublicComponent implements OnInit {
   dbFaqOpen = signal<number | null>(null);
   descExpanded = signal(false);
   toggleDbFaq(i: number): void { this.dbFaqOpen.set(this.dbFaqOpen() === i ? null : i); }
-  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
+  safeHtml(html: string): SafeHtml {
+    const cleaned = (html ?? '')
+      .replace(/&nbsp;/gi, ' ')        // non-breaking spaces → normal spaces so browser can wrap
+      .replace(/<\/p>\s*<p>/gi, ' ')   // merge consecutive <p> blocks
+      .replace(/<br\s*\/?>/gi, ' ')    // <br> tags → space
+      .replace(/\n/g, ' ')             // raw newlines → space
+      .replace(/\s{2,}/g, ' ');        // collapse double spaces
+    return this.sanitizer.bypassSecurityTrustHtml(cleaned);
+  }
 
   fpOpenIndex = signal<number | null>(null);
   toggleFpRow(i: number): void {
@@ -474,26 +485,23 @@ export class ProjectDetailPublicComponent implements OnInit {
 
     const url = isPlatformBrowser(this.platformId) ? window.location.href : '';
 
-    const text = `Hi, Please check this listing I found on LivWell Real Estate.
+    const parts = [p.title];
+    if (p.developer) parts.push(`by ${p.developer}`);
+    if (p.location)  parts.push(p.location);
+    const text = parts.join(' · ');
 
-🏡 ${p.title}
-👤 Developer: ${p.developer}
-
-${url}`;
+    const fullMsg = `${text}\n${url}`;
 
     if (isPlatformBrowser(this.platformId) && navigator.share) {
       try {
-        await navigator.share({
-          title: p.title,
-          text,
-          url
-        });
+        await navigator.share({ title: p.title, text, url });
         return;
       } catch { }
     }
 
+    // Desktop fallback: open WhatsApp with full formatted message
     if (isPlatformBrowser(this.platformId)) {
-      navigator.clipboard?.writeText(url).catch(() => { });
+      window.location.href = `https://wa.me/?text=${encodeURIComponent(fullMsg)}`;
     }
 
     this.shareToast.set(true);

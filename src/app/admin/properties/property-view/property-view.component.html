@@ -90,7 +90,7 @@
   <!-- ── DESCRIPTION ───────────────────────────────────────── -->
   <div class="pv-section-card" *ngIf="p.description">
     <h3 class="pv-section-title">Description</h3>
-    <div class="pv-desc" [class.pv-desc--collapsed]="!descExpanded()" [innerHTML]="p.description"></div>
+    <div class="pv-desc" [class.pv-desc--collapsed]="!descExpanded()" [innerHTML]="safeDesc(p.description)"></div>
     <button class="pv-read-more" (click)="descExpanded.set(!descExpanded())">
       {{ descExpanded() ? 'Read less ▲' : 'Read more ▼' }}
     </button>

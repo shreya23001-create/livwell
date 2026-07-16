@@ -6,6 +6,7 @@ import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { SocialLoginModule, GoogleSigninButtonModule, SocialAuthService, GoogleLoginProvider, SocialUser } from '@abacritt/angularx-social-login';
 import { AuthService } from '../../shared/services/auth.service';
 import { EmailService } from '../../shared/services/email.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
 type Tab = 'signin' | 'signup';
 type ForgotStep = 'email' | 'otp' | 'reset';
@@ -82,6 +83,8 @@ export class CustomerAuthComponent {
 
   private route  = inject(ActivatedRoute);
   private router = inject(Router);
+  private sb     = inject(SupabaseService).client;
+  isRecoveryMode = signal(false);
 
   constructor(private auth: AuthService, private socialAuth: SocialAuthService, private emailSvc: EmailService) {
     this.socialAuth.authState.subscribe((user: SocialUser | null) => {
@@ -93,6 +96,14 @@ export class CustomerAuthComponent {
         });
       }
     });
+
+    // Detect Supabase password recovery redirect (hash contains type=recovery)
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      this.isRecoveryMode.set(true);
+      this.forgotMode.set(true);
+      this.forgotStep.set('reset');
+    }
   }
 
   setTab(tab: Tab): void {
@@ -252,7 +263,7 @@ export class CustomerAuthComponent {
     this._startCountdown(60);
   }
 
-  submitResetPassword(): void {
+  async submitResetPassword(): Promise<void> {
     const pw = this.fpNewPassword();
     const confirm = this.fpConfirmPassword();
     if (!pw) { this.forgotError.set('Please enter a new password.'); return; }
@@ -263,12 +274,24 @@ export class CustomerAuthComponent {
     if (pw !== confirm) { this.forgotError.set('Passwords do not match.'); return; }
     this.loading.set(true);
     this.forgotError.set('');
-    setTimeout(() => {
-      this.auth.resetPassword(this.forgotEmail().trim(), pw);
+
+    if (this.isRecoveryMode()) {
+      // Recovery flow: Supabase session established from email link hash — update directly
+      const { error } = await this.sb.auth.updateUser({ password: pw });
       this.loading.set(false);
+      if (error) { this.forgotError.set('Failed to reset password. The link may have expired — please request a new one.'); return; }
       this.forgotSuccess.set('Password reset successfully! You can now sign in with your new password.');
-      this.signInForm.password = '';
-    }, 600);
+      this.isRecoveryMode.set(false);
+      this.forgotMode.set(false);
+      this.forgotStep.set('email');
+    } else {
+      setTimeout(() => {
+        this.auth.resetPassword(this.forgotEmail().trim(), pw);
+        this.loading.set(false);
+        this.forgotSuccess.set('Password reset successfully! You can now sign in with your new password.');
+        this.signInForm.password = '';
+      }, 600);
+    }
   }
 
   private _startCountdown(seconds: number): void {

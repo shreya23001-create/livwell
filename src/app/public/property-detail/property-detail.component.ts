@@ -82,11 +82,14 @@ export class PropertyDetailComponent implements OnInit {
     }
   }
 
-  shareSimCard(id: number, title: string, event: Event): void {
+  async shareSimCard(id: number, title: string, event: Event): Promise<void> {
     event.preventDefault(); event.stopPropagation();
     const slug = toPropertySlug(title, id);
     const url  = `${window.location.origin}/properties/${slug}`;
-    navigator.clipboard.writeText(url).catch(() => {});
+    if (navigator.share) {
+      try { await navigator.share({ title, url }); return; } catch {}
+    }
+    window.location.href = `https://wa.me/?text=${encodeURIComponent(`${title}\n${url}`)}`;
     this.simShareToastId.set(id);
     setTimeout(() => this.simShareToastId.set(null), 2000);
   }
@@ -180,7 +183,15 @@ export class PropertyDetailComponent implements OnInit {
 
   faqOpen = signal<number | null>(null);
   toggleFaq(i: number): void { this.faqOpen.set(this.faqOpen() === i ? null : i); }
-  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
+  safeHtml(html: string): SafeHtml {
+    const cleaned = (html ?? '')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/<\/p>\s*<p>/gi, ' ')
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/\s{2,}/g, ' ');
+    return this.sanitizer.bypassSecurityTrustHtml(cleaned);
+  }
 
   // Mortgage calculator
   mortgageDown   = signal(20);
@@ -505,12 +516,15 @@ export class PropertyDetailComponent implements OnInit {
   async shareProperty(): Promise<void> {
     const p = this.property();
     if (!p) return;
-    const url  = window.location.href;
-    const text = `${p.title} — ${this.formatPrice(p.price)}`;
+    const url   = window.location.href;
+    const parts = [p.title, this.formatPrice(p.price)];
+    if (p.community || p.location) parts.push(p.community || p.location);
+    const text = parts.join(' · ');
+    const fullMsg = `${text}\n${url}`;
     if (navigator.share) {
       try { await navigator.share({ title: p.title, text, url }); } catch {}
     } else {
-      try { await navigator.clipboard.writeText(url); } catch {}
+      window.location.href = `https://wa.me/?text=${encodeURIComponent(fullMsg)}`;
     }
     this.shareToast.set(true);
     setTimeout(() => this.shareToast.set(false), 2500);
@@ -596,7 +610,12 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   getDescription(p: Property): string {
-    if (p.description) return p.description;
+    if (p.description) return (p.description as string)
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/<\/p>\s*<p>/gi, ' ')
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/\s{2,}/g, ' ');
     return `This exceptional ${p.type.toLowerCase()} in ${p.community} offers an unparalleled living experience. ` +
       `Spanning ${p.area_sqft.toLocaleString()} sqft with ${this.formatBeds(p.bedrooms)} and ${p.bathrooms} bathrooms.`;
   }

@@ -273,6 +273,13 @@ $bg:      #f4f6fa;
   font-size: 0.72rem;
   color: $muted;
 }
+.cdash-unassigned { font-style: italic; color: #d1a03a; }
+.cdash-enq-right { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
+.cdash-enq-cat {
+  font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.45rem;
+  border-radius: 9999px; background: #f3f4f6; color: #6b7280;
+  text-transform: capitalize; white-space: nowrap;
+}
 
 // Browse card
 .cdash-browse-card {

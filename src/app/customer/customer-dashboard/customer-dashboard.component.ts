@@ -11,6 +11,8 @@ interface Enquiry {
   date: string;
   status: 'new' | 'contacted' | 'qualified' | 'closed';
   message: string;
+  category: string;
+  propertyType: string;
 }
 
 @Component({
@@ -50,7 +52,7 @@ export class CustomerDashboardComponent implements OnInit {
       this.sb.from('saved_properties').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
       this.sb.from('admin_leads').select('id', { count: 'exact', head: true }).eq('email', user.email),
       this.sb.from('admin_leads')
-        .select('id, notes, status, assigned_agent, created_at, location, property_type, property_title, project_title, property_id')
+        .select('id, notes, status, assigned_agent, created_at, location, property_type, property_title, project_title, property_id, category')
         .eq('email', user.email)
         .order('created_at', { ascending: false })
         .limit(5),
@@ -86,6 +88,8 @@ export class CustomerDashboardComponent implements OnInit {
         date:     new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
         status:   r.status || 'new',
         message:  r.notes || '',
+        category:     r.category      || '',
+        propertyType: r.property_type || '',
       })));
     }
 
@@ -108,6 +112,8 @@ export class CustomerDashboardComponent implements OnInit {
           date:     new Date(r.created_at).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
           status:   p?.status || 'Off-Plan',
           message:  '',
+          category:     p?.type || '',
+          propertyType: '',
         };
       }));
     }

@@ -168,14 +168,15 @@
         <div class="cdash-enq-row">
           <div class="cdash-enq-top">
             <span class="cdash-enq-prop">{{ enq.property }}</span>
-            <span class="cdash-enq-badge cdash-enq-badge--{{ enq.status }}">{{ statusLabel(enq.status) }}</span>
+            <div class="cdash-enq-right">
+              @if (enq.category) { <span class="cdash-enq-cat">{{ enq.category }}</span> }
+              @if (enq.category !== enq.propertyType && enq.propertyType) { <span class="cdash-enq-cat">{{ enq.propertyType }}</span> }
+            </div>
           </div>
-          @if (enq.message) {
-          <!-- <p class="cdash-enq-msg">"{{ enq.message }}"</p> -->
-          }
           <div class="cdash-enq-meta">
-            <span>Agent: {{ enq.agent }}</span>
-            <span>{{ enq.date }}</span>
+            @if (enq.agent !== 'Unassigned') { <span>{{ enq.agent }}</span> }
+            @else { <span class="cdash-unassigned">Agent being assigned</span> }
+            <span>Enquired {{ enq.date }}</span>
           </div>
         </div>
         }
@@ -190,7 +191,6 @@
           <h3 class="cdash-card-title">Saved Projects</h3>
           <p class="cdash-card-sub">Off-plan &amp; development projects</p>
         </div>
-        <a routerLink="/my/properties" class="cdash-card-link">View all →</a>
       </div>
 
       @if (loading()) {
@@ -207,7 +207,9 @@
         <div class="cdash-enq-row">
           <div class="cdash-enq-top">
             <span class="cdash-enq-prop">{{ enq.property }}</span>
-            <span class="cdash-enq-badge cdash-enq-badge--new">{{ enq.status }}</span>
+            <div class="cdash-enq-right">
+              @if (enq.category) { <span class="cdash-enq-cat">{{ enq.category }}</span> }
+            </div>
           </div>
           <div class="cdash-enq-meta">
             @if (enq.agent) { <span>{{ enq.agent }}</span> }

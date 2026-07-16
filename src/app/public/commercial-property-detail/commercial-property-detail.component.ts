@@ -215,7 +215,15 @@ export class CommercialPropertyDetailComponent implements OnInit {
   }
 
   toggleFaq(i: number): void { this.faqOpen.set(this.faqOpen() === i ? null : i); }
-  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
+  safeHtml(html: string): SafeHtml {
+    const cleaned = (html ?? '')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/<\/p>\s*<p>/gi, ' ')
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/\s{2,}/g, ' ');
+    return this.sanitizer.bypassSecurityTrustHtml(cleaned);
+  }
 
   lightboxOpen  = signal(false);
   lightboxIndex = signal(0);
@@ -557,11 +565,15 @@ export class CommercialPropertyDetailComponent implements OnInit {
   async shareProperty(): Promise<void> {
     const p = this.property();
     if (!p) return;
-    const url = window.location.href;
+    const url   = window.location.href;
+    const parts: string[] = [p.title];
+    if (p.location) parts.push(p.location);
+    const text = parts.join(' · ');
+    const fullMsg = `${text}\n${url}`;
     if (navigator.share) {
-      try { await navigator.share({ title: p.title, text: p.title, url }); } catch {}
+      try { await navigator.share({ title: p.title, text, url }); } catch {}
     } else {
-      try { await navigator.clipboard.writeText(url); } catch {}
+      window.location.href = `https://wa.me/?text=${encodeURIComponent(fullMsg)}`;
     }
     this.shareToast.set(true);
     setTimeout(() => this.shareToast.set(false), 2500);

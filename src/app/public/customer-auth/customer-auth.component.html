@@ -70,7 +70,7 @@
 
       <!-- ══ FORGOT PASSWORD FLOW ══ -->
       <ng-container *ngIf="forgotMode()">
-        <div class="cauth-fp-steps">
+        <div class="cauth-fp-steps" *ngIf="!isRecoveryMode()">
           <div class="cauth-fp-step" [class.active]="forgotStep() === 'email'"
             [class.done]="forgotStep() === 'otp' || forgotStep() === 'reset'">
             <div class="cauth-fp-dot">

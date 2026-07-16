@@ -191,7 +191,7 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   display: grid; grid-template-columns: 1fr 380px;
   gap: 2.5rem; padding-top: 2rem; padding-bottom: 5rem; align-items: start;
 }
-.pd-left { min-width: 0; }
+.pd-left { min-width: 0; overflow: hidden; }
 
 /* Price row */
 .pd-title-row {
@@ -245,7 +245,7 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   position: relative;
   max-height: 300px;
   overflow: hidden;
-  transition: max-height 0.5s ease;
+  transition: max-height 0.45s ease;
 
   &--expanded {
     max-height: 9999px;
@@ -257,8 +257,8 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 80px;
-  background: linear-gradient(to bottom, transparent, #fff);
+  height: 100px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 60%, #fff 100%);
   pointer-events: none;
 }
 
@@ -281,6 +281,11 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   color: #4b5563;
   line-height: 1.9;
   margin: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: none;
+  white-space: normal;
 
   p { margin: 0 0 0.6rem; }
   p:last-child { margin-bottom: 0; }
@@ -432,6 +437,7 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   display: flex; flex-direction: column; gap: 1rem;
   max-height: calc(100vh - 68px - 52px - 2rem);
   overflow-y: auto; scrollbar-width: thin; scrollbar-color: #e5e7eb transparent;
+  z-index: 1;
   &::-webkit-scrollbar { width: 4px; }
   &::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 2px; }
 }

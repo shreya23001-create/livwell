@@ -616,11 +616,14 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     }
   }
 
-  shareSimCard(id: string, title: string, event: Event): void {
+  async shareSimCard(id: string, title: string, event: Event): Promise<void> {
     event.preventDefault(); event.stopPropagation();
     const slug = toPropertySlug(title, parseInt(id, 10));
     const url  = `${window.location.origin}/luxury-property/${slug}`;
-    navigator.clipboard.writeText(url).catch(() => {});
+    if (navigator.share) {
+      try { await navigator.share({ title, url }); return; } catch {}
+    }
+    window.location.href = `https://wa.me/?text=${encodeURIComponent(`${title}\n${url}`)}`;
     this.simShareToastId.set(id);
     setTimeout(() => this.simShareToastId.set(null), 2000);
   }
@@ -671,7 +674,15 @@ export class LuxuryPropertyDetailComponent implements OnInit {
   }
 
   toggleFaq(i: number): void { this.faqOpen.set(this.faqOpen() === i ? null : i); }
-  safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
+  safeHtml(html: string): SafeHtml {
+    const cleaned = (html ?? '')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/<\/p>\s*<p>/gi, ' ')
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/\s{2,}/g, ' ');
+    return this.sanitizer.bypassSecurityTrustHtml(cleaned);
+  }
   private sb   = inject(SupabaseService).client;
   private auth = inject(AuthService);
 
@@ -935,11 +946,15 @@ export class LuxuryPropertyDetailComponent implements OnInit {
   async shareProperty(): Promise<void> {
     const p = this.property();
     if (!p) return;
-    const url = window.location.href;
+    const url   = window.location.href;
+    const parts: string[] = [p.title];
+    if (p.location) parts.push(p.location);
+    const text = parts.join(' · ');
+    const fullMsg = `${text}\n${url}`;
     if (navigator.share) {
-      try { await navigator.share({ title: p.title, text: p.title, url }); } catch {}
+      try { await navigator.share({ title: p.title, text, url }); } catch {}
     } else {
-      try { await navigator.clipboard.writeText(url); } catch {}
+      window.location.href = `https://wa.me/?text=${encodeURIComponent(fullMsg)}`;
     }
     this.shareToast.set(true);
     setTimeout(() => this.shareToast.set(false), 2500);

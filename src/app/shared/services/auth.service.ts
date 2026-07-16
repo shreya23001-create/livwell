@@ -197,7 +197,10 @@ export class AuthService {
 
   loginWithGoogle(googleUser: { name: string; email: string; photoUrl?: string; role?: string }): void {
     // Google OAuth handled by Supabase — this is a fallback for the social auth library
-    this.supabase.auth.signInWithOAuth({ provider: 'google' });
+    this.supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/customer` },
+    });
   }
 
   loginDirect(user: User): void {

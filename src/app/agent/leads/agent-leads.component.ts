@@ -1,5 +1,5 @@
 import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
-import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -7,6 +7,17 @@ import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+
+const DUBAI_LOCATIONS = [
+  'Downtown Dubai', 'Dubai Marina', 'Palm Jumeirah', 'Business Bay',
+  'Jumeirah Beach Residence (JBR)', 'Jumeirah Village Circle (JVC)',
+  'Jumeirah Village Triangle (JVT)', 'Arabian Ranches', 'Emirates Hills',
+  'Meydan', 'Mohammed Bin Rashid City', 'Dubai Hills Estate',
+  'Dubai Creek Harbour', 'Al Barsha', 'Deira', 'Bur Dubai',
+  'Jumeirah', 'Al Quoz', 'Dubai South', 'DIFC',
+  'Discovery Gardens', 'International City', 'Sports City',
+  'Motor City', 'Damac Hills', 'Tilal Al Ghaf',
+];
 
 interface LeadMessage {
   id: number;
@@ -45,7 +56,7 @@ const EMPTY_FORM = (): Partial<AgentLead> => ({
   name: '', email: '', phone: '', status: 'new', category: 'Buy',
   budget: '', location: '', propertyType: '', propertyTitle: '', propertyId: null,
   projectId: null, projectTitle: '',
-  source: 'Website', notes: '', agentReply: '',
+  source: 'website', notes: '', agentReply: '',
   createdDate: new Date().toISOString().slice(0, 10),
   lastContact: new Date().toISOString().slice(0, 10),
 });
@@ -96,7 +107,32 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   readonly leadStatusList = computed(() => this.dataSvc.leadStatuses().map(s => s.name as LeadStatus));
   get statuses(): LeadStatus[] { return this.leadStatusList(); }
   readonly categories = ['Buy', 'Rent'];
-  readonly sources    = ['Website', 'Referral', 'Walk-in', 'Social Media', 'Portal', 'Cold Call'];
+  readonly sources    = ['website', 'referral', 'walk_in', 'social_media', 'portal', 'cold_call'];
+  readonly sourceLabel: Record<string, string> = {
+    website: 'Website', referral: 'Referral', walk_in: 'Walk-in',
+    social_media: 'Social Media', portal: 'Portal', cold_call: 'Cold Call',
+  };
+
+  // Location dropdown
+  locDropOpen  = signal(false);
+  locSearch    = signal('');
+  filteredLocations = computed(() => {
+    const q = this.locSearch().toLowerCase();
+    return q ? DUBAI_LOCATIONS.filter(l => l.toLowerCase().includes(q)) : DUBAI_LOCATIONS;
+  });
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(e: MouseEvent) {
+    if (!(e.target as HTMLElement).closest('.loc-dropdown-wrap')) {
+      this.locDropOpen.set(false);
+    }
+  }
+
+  selectLocation(loc: string) {
+    this.updateForm({ location: loc });
+    this.locDropOpen.set(false);
+    this.locSearch.set('');
+  }
 
   readonly statusTimeline = computed(() =>
     this.dataSvc.leadStatuses().map(s => ({
@@ -319,7 +355,6 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e['email'] = 'Enter a valid email.';
     if (!f.phone?.trim())    e['phone']    = 'Required.';
     else if (!/^\+?[\d\s\-()]+$/.test(f.phone.trim()) || (f.phone.replace(/\D/g, '').length < 7 || f.phone.replace(/\D/g, '').length > 15)) e['phone'] = 'Enter a valid phone number (7–15 digits).';
-    if (!f.budget?.trim())   e['budget']   = 'Required.';
     if (!f.location?.trim()) e['location'] = 'Required.';
     this.formErrors.set(e);
     if (Object.keys(e).length) return;
@@ -333,7 +368,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       // Edit: never overwrite customer contact info
       const editPayload = {
         status: f.status || 'new', budget: f.budget!.trim(), location: f.location!.trim(),
-        property_type: f.propertyType || '', source: f.source || 'Website',
+        property_type: f.propertyType || '', source: f.source || 'website',
         notes: f.notes || '', agent_reply: f.agentReply || null,
         project_id: f.projectId || null, project_title: f.projectTitle || null,
         property_title: f.propertyTitle || null,
@@ -346,14 +381,14 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       const addPayload = {
         name: f.name!.trim(), email: f.email!.trim(), phone: f.phone!.trim(),
         status: f.status || 'new', budget: f.budget!.trim(), location: f.location!.trim(),
-        property_type: f.propertyType || '', source: f.source || 'Website',
+        property_type: f.propertyType || '', source: f.source || 'website',
         notes: f.notes || '', agent_reply: f.agentReply || null,
         project_id: f.projectId || null, project_title: f.projectTitle || null,
         property_title: f.propertyTitle || null,
         assigned_agent: agentName, agent_email: agentEmail,
       };
       const { data, error } = await this.sb.from('admin_leads').insert(addPayload).select().single();
-      if (error) { this.toast.error('Failed to add lead. Please try again.'); this.saving.set(false); return; }
+      if (error) { this.saveError.set(error.message); this.toast.error('Failed to add lead: ' + error.message); this.saving.set(false); return; }
       if (data) this.leads.update(list => [this.mapRow(data), ...list]);
     }
     this.saving.set(false);

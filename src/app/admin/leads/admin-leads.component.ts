@@ -19,6 +19,7 @@ const EMPTY_FORM = (): Partial<Lead> => ({
   budget: '', location: '', propertyType: '', assignedAgent: 'Unassigned', notes: '',
   createdDate: new Date().toISOString().slice(0, 10),
   lastContact: new Date().toISOString().slice(0, 10),
+  followUpDate: '', followUpNote: '',
 });
 
 @Component({
@@ -63,6 +64,61 @@ export class AdminLeadsComponent implements OnInit {
   showViewModal = signal(false);
   viewLead      = signal<Lead | null>(null);
 
+  // ── Tabs ─────────────────────────────────────────────
+  activeTab = signal<'dashboard' | 'leads'>('dashboard');
+
+  // ── Dashboard computed ────────────────────────────────
+  today = new Date().toISOString().slice(0, 10);
+
+  followUps = computed(() =>
+    this.leads()
+      .filter(l => l.followUpDate)
+      .sort((a, b) => a.followUpDate.localeCompare(b.followUpDate))
+  );
+
+  overdueFollowUps = computed(() =>
+    this.followUps().filter(l => l.followUpDate < this.today)
+  );
+
+  todayFollowUps = computed(() =>
+    this.followUps().filter(l => l.followUpDate === this.today)
+  );
+
+  upcomingFollowUps = computed(() =>
+    this.followUps().filter(l => l.followUpDate > this.today)
+  );
+
+  conversionRate = computed(() => {
+    const all = this.leads().length;
+    if (!all) return 0;
+    const won = this.leads().filter(l => l.status === 'won').length;
+    return Math.round((won / all) * 100);
+  });
+
+  topAgents = computed(() => {
+    const map: Record<string, { total: number; won: number }> = {};
+    for (const l of this.leads()) {
+      const ag = l.assignedAgent || 'Unassigned';
+      if (!map[ag]) map[ag] = { total: 0, won: 0 };
+      map[ag].total++;
+      if (l.status === 'won') map[ag].won++;
+    }
+    return Object.entries(map)
+      .filter(([ag]) => ag !== 'Unassigned')
+      .map(([name, v]) => ({ name, ...v }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+  });
+
+  sourceBreakdown = computed(() => {
+    const map: Record<string, number> = {};
+    for (const l of this.leads()) {
+      const src = l.source || 'website';
+      map[src] = (map[src] || 0) + 1;
+    }
+    return Object.entries(map).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count);
+  });
+
   // ── Multi-select location ─────────────────────────────
   selectedLocations = signal<string[]>([]);
   locationDropdownOpen = signal(false);
@@ -99,11 +155,25 @@ export class AdminLeadsComponent implements OnInit {
   readonly categories: LeadCategory[] = ['buy', 'rent', 'invest'];
 
   // ── Computed ──────────────────────────────────────────
+  filteredList = computed(() => {
+    const q   = this.search().toLowerCase();
+    const st  = this.filterStatus();
+    const src = this.filterSource();
+    const ag  = this.filterAgent();
+    return this.leads().filter(l => {
+      const matchQ   = !q   || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(q) || l.location.toLowerCase().includes(q);
+      const matchSt  = !st  || l.status === st;
+      const matchSrc = !src || l.source === src;
+      const matchAg  = !ag  || l.assignedAgent === ag;
+      return matchQ && matchSt && matchSrc && matchAg;
+    });
+  });
+
   stats = computed(() => {
-    const all = this.leads();
-    const counts: Record<string, number> = { total: all.length };
+    const list = this.filteredList();
+    const counts: Record<string, number> = { total: list.length };
     for (const s of this.dataSvc.leadStatuses()) {
-      counts[s.name] = all.filter(l => l.status === s.name).length;
+      counts[s.name] = list.filter(l => l.status === s.name).length;
     }
     return counts;
   });
@@ -112,23 +182,14 @@ export class AdminLeadsComponent implements OnInit {
     return this.dataSvc.leadStatuses().find(s => s.name === name)?.color ?? '#6b7280';
   }
 
+  countByStatus(status: string): number {
+    return this.leads().filter(l => l.status === status).length;
+  }
+
   filtered = computed(() => {
-    const q   = this.search().toLowerCase();
-    const st  = this.filterStatus();
-    const src = this.filterSource();
-    const ag  = this.filterAgent();
     const col = this.sortCol();
     const dir = this.sortDir();
-
-    let list = this.leads().filter(l => {
-      const matchQ   = !q   || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(q) || l.location.toLowerCase().includes(q);
-      const matchSt  = !st  || l.status === st;
-      const matchSrc = !src || l.source === src;
-      const matchAg  = !ag  || l.assignedAgent === ag;
-      return matchQ && matchSt && matchSrc && matchAg;
-    });
-
-    return [...list].sort((a, b) => {
+    return [...this.filteredList()].sort((a, b) => {
       const av = (a[col] ?? '') as string;
       const bv = (b[col] ?? '') as string;
       return dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
@@ -337,6 +398,8 @@ export class AdminLeadsComponent implements OnInit {
         notes:         r['Notes']          || '',
         createdDate:   r['Created Date']   || new Date().toISOString().slice(0, 10),
         lastContact:   r['Last Contact']   || new Date().toISOString().slice(0, 10),
+        followUpDate:  r['Follow-up Date'] || '',
+        followUpNote:  r['Follow-up Note'] || '',
       }));
 
     const err = await this.dataSvc.importLeads(toImport);
@@ -353,8 +416,8 @@ export class AdminLeadsComponent implements OnInit {
     return found ? found.name.charAt(0).toUpperCase() + found.name.slice(1) : s;
   }
 
-  labelSource(s: LeadSource): string {
-    return { website: 'Website', referral: 'Referral', walk_in: 'Walk-in', social_media: 'Social Media', portal: 'Portal', cold_call: 'Cold Call' }[s];
+  labelSource(s: string): string {
+    return ({ website: 'Website', referral: 'Referral', walk_in: 'Walk-in', social_media: 'Social Media', portal: 'Portal', cold_call: 'Cold Call' } as Record<string,string>)[s] ?? s;
   }
 
   pageNumbers(): number[] {

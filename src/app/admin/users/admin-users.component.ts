@@ -187,7 +187,7 @@ export class AdminUsersComponent {
   }
 
   openEdit(u: AdminUser): void {
-    this.form.set({ ...u, password: u.password || '' });
+    this.form.set({ ...u, password: '' }); // always blank — filled only if admin wants to change it
     this.formErrors.set({});
     this.saveError.set('');
     this.avatarPreview.set(u.avatar_url || null);
@@ -304,8 +304,22 @@ export class AdminUsersComponent {
     }
 
     const err = await this.dataSvc.saveUser(f, this.editingId());
+    if (err) { this.saving.set(false); this.toast.error(err); return; }
+
+    // If a new password was entered, update via edge function
+    if (f.password?.trim() && this.editingId()) {
+      const supabaseUrl = environment.supabase.url;
+      const anonKey     = environment.supabase.key;
+      const pwRes = await fetch(`${supabaseUrl}/functions/v1/update-user-password`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${anonKey}` },
+        body: JSON.stringify({ userId: this.editingId(), password: f.password.trim() }),
+      });
+      const pwJson = await pwRes.json().catch(() => null);
+      if (!pwRes.ok) { this.saving.set(false); this.toast.error(pwJson?.error ?? 'Failed to update password'); return; }
+    }
+
     this.saving.set(false);
-    if (err) { this.toast.error(err); return; }
     this.closeModal();
     this.toast.success(`User "${f.name}" ${isNew ? 'created' : 'updated'} successfully.`);
     const actor = this.auth.currentUser()?.email ?? 'admin';
@@ -329,6 +343,8 @@ export class AdminUsersComponent {
     if (isNew) {
       if (!f.password?.trim()) errs['password'] = 'Password is required.';
       else if (f.password.length < 8) errs['password'] = 'At least 8 characters.';
+    } else if (f.password?.trim() && f.password.length < 8) {
+      errs['password'] = 'At least 8 characters.';
     }
     return errs;
   }

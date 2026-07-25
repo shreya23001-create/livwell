@@ -392,10 +392,10 @@
         <label class="usr-form-label">Password {{ editingId() === null ? '*' : '' }}</label>
         <div style="position:relative">
           <input class="usr-form-input" [type]="showPassword() ? 'text' : 'password'"
-            [placeholder]="editingId() === null ? 'Min 8 characters' : ''"
-            [value]="editingId() !== null ? '••••••••' : (form()['password'] || '')"
-            (input)="editingId() === null ? patchForm('password', $any($event.target).value) : null"
-            [readonly]="editingId() !== null" autocomplete="new-password"
+            [placeholder]="editingId() === null ? 'Min 8 characters' : 'Leave blank to keep current password'"
+            [value]="form()['password'] || ''"
+            (input)="patchForm('password', $any($event.target).value)"
+            autocomplete="new-password"
             style="padding-right:2.5rem">
           <button type="button" (click)="showPassword.update(v => !v)"
             style="position:absolute;right:0.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;display:flex;align-items:center">
@@ -414,8 +414,7 @@
         </div>
         <span *ngIf="formErrors()['password']" class="usr-form-error">{{ formErrors()['password'] }}</span>
         <span style="font-size:0.75rem;color:#9ca3af;margin-top:0.2rem;display:block">
-          {{ editingId() !== null ? 'Password is read-only. Use Change Password to update.' : 'The user will log in with
-          this password.' }}
+          {{ editingId() !== null ? 'Leave blank to keep the current password. Enter a new one to change it.' : 'The user will log in with this password.' }}
         </span>
       </div>
     </div>

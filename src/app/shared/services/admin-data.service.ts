@@ -68,6 +68,8 @@ export interface Lead {
   notes: string;
   createdDate: string;
   lastContact: string;
+  followUpDate: string;
+  followUpNote: string;
 }
 
 // ── Master Data ───────────────────────────────────────────
@@ -351,6 +353,8 @@ export class AdminDataService {
         notes:         r.notes          || '',
         createdDate:   (r.created_at    || '').slice(0, 10),
         lastContact:   r.last_contact   || (r.created_at || '').slice(0, 10),
+        followUpDate:  r.follow_up_date || '',
+        followUpNote:  r.follow_up_note || '',
       })));
     }
     this.leadsLoading.set(false);
@@ -370,6 +374,8 @@ export class AdminDataService {
       assigned_agent: l.assignedAgent        || 'Unassigned',
       notes:          l.notes?.trim()        || null,
       last_contact:   l.lastContact          || null,
+      follow_up_date: l.followUpDate         || null,
+      follow_up_note: l.followUpNote?.trim() || null,
     };
 
     let error: any;

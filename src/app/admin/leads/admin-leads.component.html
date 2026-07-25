@@ -54,6 +54,146 @@
   <div class="leads-msg leads-msg--success">{{ importSuccess() }}</div>
   }
 
+  <!-- ── Tabs ── -->
+  <div class="leads-tabs">
+    <button class="leads-tab" [class.active]="activeTab() === 'dashboard'" (click)="activeTab.set('dashboard')">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
+      Dashboard
+    </button>
+    <button class="leads-tab" [class.active]="activeTab() === 'leads'" (click)="activeTab.set('leads')">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
+      Leads
+    </button>
+  </div>
+
+  <!-- ══ DASHBOARD TAB ══ -->
+  @if (activeTab() === 'dashboard') {
+
+  <!-- Stat Cards -->
+  <div class="leads-stats" [style.grid-template-columns]="'repeat(' + (dataSvc.leadStatuses().length + 1) + ', 1fr)'">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--total">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
+      </div>
+      <div>
+        <div class="stat-value">{{ leads().length }}</div>
+        <div class="stat-label">Total Leads</div>
+      </div>
+    </div>
+    <div class="stat-card" *ngFor="let s of dataSvc.leadStatuses()">
+      <div class="stat-icon" [style.background]="s.color + '22'" [style.color]="s.color">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg>
+      </div>
+      <div>
+        <div class="stat-value">{{ countByStatus(s.name) }}</div>
+        <div class="stat-label">{{ labelStatus(s.name) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Grid -->
+  <div class="ld-dashboard">
+
+    <!-- Conversion + Source -->
+    <div class="ld-row">
+      <div class="ld-card ld-card--sm">
+        <div class="ld-card-title">Conversion Rate</div>
+        <div class="ld-conv-wrap">
+          <div class="ld-conv-ring">
+            <svg viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e5e7eb" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1a5c3a" stroke-width="3"
+                [attr.stroke-dasharray]="conversionRate() + ', 100'"
+                stroke-dashoffset="25" stroke-linecap="round"/>
+            </svg>
+            <span class="ld-conv-pct">{{ conversionRate() }}%</span>
+          </div>
+          <div class="ld-conv-meta">
+            <div class="ld-conv-row"><span class="ld-conv-dot" style="background:#1a5c3a"></span>Won: {{ countByStatus('won') }}</div>
+            <div class="ld-conv-row"><span class="ld-conv-dot" style="background:#dc2626"></span>Lost: {{ countByStatus('lost') }}</div>
+            <div class="ld-conv-row"><span class="ld-conv-dot" style="background:#e5e7eb"></span>Total: {{ leads().length }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ld-card ld-card--sm">
+        <div class="ld-card-title">Leads by Source</div>
+        <div class="ld-source-list">
+          <div class="ld-source-row" *ngFor="let s of sourceBreakdown()">
+            <span class="ld-source-name">{{ labelSource(s.source) }}</span>
+            <div class="ld-source-bar-wrap">
+              <div class="ld-source-bar" [style.width]="(s.count / leads().length * 100) + '%'"></div>
+            </div>
+            <span class="ld-source-count">{{ s.count }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ld-card ld-card--sm">
+        <div class="ld-card-title">Top Agents</div>
+        <div class="ld-agent-list">
+          <div class="ld-agent-row" *ngFor="let a of topAgents()">
+            <div class="ld-agent-avatar">{{ a.name.charAt(0) }}</div>
+            <div class="ld-agent-info">
+              <div class="ld-agent-name">{{ a.name }}</div>
+              <div class="ld-agent-meta">{{ a.total }} leads · {{ a.won }} won</div>
+            </div>
+            <span class="ld-agent-badge">{{ a.total > 0 ? (a.won / a.total * 100 | number:'1.0-0') : 0 }}%</span>
+          </div>
+          <div *ngIf="topAgents().length === 0" class="ld-empty-sm">No agent data yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Follow-ups -->
+    <div class="ld-card">
+      <div class="ld-card-header">
+        <div class="ld-card-title">Follow-ups</div>
+        <div class="ld-fu-legend">
+          <span class="ld-fu-tag ld-fu-tag--overdue">Overdue ({{ overdueFollowUps().length }})</span>
+          <span class="ld-fu-tag ld-fu-tag--today">Today ({{ todayFollowUps().length }})</span>
+          <span class="ld-fu-tag ld-fu-tag--upcoming">Upcoming ({{ upcomingFollowUps().length }})</span>
+        </div>
+      </div>
+
+      <div *ngIf="followUps().length === 0" class="ld-empty">No follow-ups scheduled. Edit a lead to add one.</div>
+
+      <div *ngIf="followUps().length > 0" class="ld-fu-table">
+        <div class="ld-fu-head">
+          <span>Lead</span><span>Date</span><span>Note</span><span>Status</span><span>Agent</span><span>Action</span>
+        </div>
+        <div class="ld-fu-row" *ngFor="let l of followUps()"
+          [class.ld-fu-row--overdue]="l.followUpDate < today"
+          [class.ld-fu-row--today]="l.followUpDate === today">
+          <span class="ld-fu-name">
+            <strong>{{ l.name }}</strong>
+            <small>{{ l.email }}</small>
+          </span>
+          <span class="ld-fu-date">
+            <span [class.ld-fu-date--overdue]="l.followUpDate < today"
+                  [class.ld-fu-date--today]="l.followUpDate === today">
+              {{ l.followUpDate | date:'d MMM y' }}
+            </span>
+          </span>
+          <span class="ld-fu-note">{{ l.followUpNote || '—' }}</span>
+          <span><span class="lead-status-badge" [style.background]="statusColor(l.status) + '22'" [style.color]="statusColor(l.status)">{{ labelStatus(l.status) }}</span></span>
+          <span class="ld-fu-agent">{{ l.assignedAgent }}</span>
+          <span>
+            <button class="ld-fu-edit" (click)="openEdit(l); activeTab.set('leads')" title="Edit lead">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
+            </button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ld-dashboard -->
+
+  }<!-- end dashboard tab -->
+
+  <!-- ══ LEADS TAB ══ -->
+  @if (activeTab() === 'leads') {
+
   <!-- ── Stat Cards ── -->
   <div class="leads-stats" [style.grid-template-columns]="'repeat(' + (dataSvc.leadStatuses().length + 1) + ', 1fr)'">
     <div class="stat-card">
@@ -229,6 +369,8 @@
     </div>
   </div>
 
+  }<!-- end leads tab -->
+
 </div>
 
 <!-- ── Add / Edit Modal ── -->
@@ -360,6 +502,16 @@
             </svg>
           </div>
 
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Follow-up Date</label>
+          <input type="date" [value]="form()['followUpDate']" (input)="updateForm({followUpDate: $any($event.target).value})">
+        </div>
+        <div class="form-field">
+          <label>Follow-up Note</label>
+          <input type="text" [value]="form()['followUpNote']" (input)="updateForm({followUpNote: $any($event.target).value})" placeholder="e.g. Call to discuss budget">
         </div>
       </div>
       <div class="form-field form-field--full">

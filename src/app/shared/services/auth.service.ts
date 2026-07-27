@@ -121,6 +121,12 @@ export class AuthService {
     }
     if (data.user) {
       await this.loadProfileWithFallback(data.user);
+      const status = this._currentUser()?.status;
+      if (status && status !== 'active') {
+        this._currentUser.set(null);
+        await this.supabase.auth.signOut();
+        return { success: false, error: 'account_suspended' };
+      }
       return { success: true };
     }
     return { success: false, error: 'unknown' };
@@ -176,6 +182,13 @@ export class AuthService {
   async requestPasswordReset(email: string): Promise<boolean> {
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/customer?reset=true`
+    });
+    return !error;
+  }
+
+  async requestAgentPasswordReset(email: string): Promise<boolean> {
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/agent/login?reset=true`
     });
     return !error;
   }

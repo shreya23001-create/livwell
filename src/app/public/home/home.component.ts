@@ -98,15 +98,15 @@ interface NewsArticle {
 })
 export class HomeComponent implements OnInit {
   private dataSvc = inject(AdminDataService);
-  private sb      = inject(SupabaseService).client;
-  private auth    = inject(AuthService);
-  private zone    = inject(NgZone);
-  private router  = inject(Router);
+  private sb = inject(SupabaseService).client;
+  private auth = inject(AuthService);
+  private zone = inject(NgZone);
+  private router = inject(Router);
 
   savedPropertyIds = signal<Set<number>>(new Set());
-  savedProjectIds  = signal<Set<number>>(new Set());
-  sharePropToast   = signal<number | null>(null);
-  shareProjToast   = signal<number | null>(null);
+  savedProjectIds = signal<Set<number>>(new Set());
+  sharePropToast = signal<number | null>(null);
+  shareProjToast = signal<number | null>(null);
 
   isPropSaved(id: number): boolean { return this.savedPropertyIds().has(id); }
   isProjSaved(id: number): boolean { return this.savedProjectIds().has(id); }
@@ -142,7 +142,7 @@ export class HomeComponent implements OnInit {
   shareProperty(id: number, title: string, event: Event): void {
     event.preventDefault(); event.stopPropagation();
     const url = `${window.location.origin}/properties/${toPropertySlug(title, id)}`;
-    navigator.clipboard.writeText(url).catch(() => {});
+    navigator.clipboard.writeText(url).catch(() => { });
     this.sharePropToast.set(id);
     setTimeout(() => this.sharePropToast.set(null), 2000);
   }
@@ -150,7 +150,7 @@ export class HomeComponent implements OnInit {
   shareProject(id: number, title: string, event: Event): void {
     event.preventDefault(); event.stopPropagation();
     const url = `${window.location.origin}/projects/${toProjectSlug(title, id)}`;
-    navigator.clipboard.writeText(url).catch(() => {});
+    navigator.clipboard.writeText(url).catch(() => { });
     this.shareProjToast.set(id);
     setTimeout(() => this.shareProjToast.set(null), 2000);
   }
@@ -167,21 +167,21 @@ export class HomeComponent implements OnInit {
     if (projsRes.data) this.savedProjectIds.set(new Set(projsRes.data.map((r: any) => r.project_id)));
   }
 
-  homePage     = computed(() => this.dataSvc.pages().find(p => p.id === 'home-hero'));
-  heroHeadline = computed(() => this.homePage()?.heading    || 'Find Your Dream Property in Dubai');
-  heroSubline  = computed(() => this.homePage()?.subheading || 'Over 2,500 premium listings. Expert agents. End-to-end support.');
+  homePage = computed(() => this.dataSvc.pages().find(p => p.id === 'home-hero'));
+  heroHeadline = computed(() => this.homePage()?.heading || 'Find Your Dream Property in Dubai');
+  heroSubline = computed(() => this.homePage()?.subheading || 'Over 2,500 premium listings. Expert agents. End-to-end support.');
 
-  searchQuery       = signal('');
-  searchType        = signal('buy');
+  searchQuery = signal('');
+  searchType = signal('buy');
   selectedLocations = signal<string[]>([]);
 
 
   // Search dropdown
-  searchDropOpen   = signal(false);
-  searchResults    = signal<{ type: 'location' | 'property' | 'project'; id?: number; label: string; sub: string }[]>([]);
-  searchLoading    = signal(false);
+  searchDropOpen = signal(false);
+  searchResults = signal<{ type: 'location' | 'property' | 'project'; id?: number; label: string; sub: string }[]>([]);
+  searchLoading = signal(false);
   private searchTimer: any;
-  private propLocations    = signal<string[]>([]);
+  private propLocations = signal<string[]>([]);
   private projectLocations = signal<string[]>([]);
 
   private activeLocations(): string[] {
@@ -192,23 +192,18 @@ export class HomeComponent implements OnInit {
     this.searchQuery.set(value);
     clearTimeout(this.searchTimer);
     if (!value.trim()) {
-      if (this.searchType() === 'new-projects') {
-        this.loadAllProjects();
-      } else {
-        this.searchResults.set(
-          this.activeLocations().map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
-        );
-      }
-      this.searchDropOpen.set(true);
+      this.searchResults.set([]);
+      this.searchDropOpen.set(false);
       return;
     }
     this.searchLoading.set(true);
+    this.searchDropOpen.set(true);
     this.searchTimer = setTimeout(() => this.runSearch(value.trim()), 300);
   }
 
   private async runSearch(q: string): Promise<void> {
     const lower = q.toLowerCase();
-    const tab   = this.searchType();
+    const tab = this.searchType();
 
     const locMatches = this.activeLocations()
       .filter(l => l.toLowerCase().includes(lower))
@@ -228,20 +223,7 @@ export class HomeComponent implements OnInit {
 
       this.searchResults.set([...locMatches, ...projItems].slice(0, 10));
     } else {
-      const listingType = tab === 'rent' ? 'Rent' : 'Sale';
-      const { data } = await this.sb.from('properties')
-        .select('id, title, location, community, listing_type')
-        .or(`title.ilike.%${q}%,location.ilike.%${q}%,community.ilike.%${q}%`)
-        .eq('status', 'Published')
-        .eq('listing_type', listingType)
-        .limit(8);
-
-      const propItems = (data ?? []).map((p: any) => ({
-        type: 'property' as const, id: p.id,
-        label: p.title, sub: p.community || p.location || 'Property',
-      }));
-
-      this.searchResults.set([...locMatches, ...propItems].slice(0, 10));
+      this.searchResults.set(locMatches.slice(0, 10));
     }
 
     this.searchLoading.set(false);
@@ -270,35 +252,28 @@ export class HomeComponent implements OnInit {
 
   doSearch(): void {
     this.searchDropOpen.set(false);
-    const q    = this.searchQuery().trim();
-    const tab  = this.searchType();
+    const q = this.searchQuery().trim();
+    const tab = this.searchType();
     const locs = this.selectedLocations();
 
     if (tab === 'new-projects') {
       const params: Record<string, string> = {};
       if (locs.length > 0) params['q'] = locs.join(',');
-      else if (q)          params['q'] = q;
+      else if (q) params['q'] = q;
       this.router.navigate(['/projects'], Object.keys(params).length ? { queryParams: params } : {});
     } else {
       const params: Record<string, string> = {};
       params['status'] = tab === 'rent' ? 'Rent' : 'Sale';
-      if (locs.length > 0)  params['location'] = locs.join('|');
-      else if (q)           params['q'] = q;
+      if (locs.length > 0) params['location'] = locs.join('|');
+      else if (q) params['q'] = q;
       this.router.navigate(['/properties'], { queryParams: params });
     }
   }
 
   onSearchFocus(): void {
-    if (!this.searchQuery().trim()) {
-      if (this.searchType() === 'new-projects') {
-        this.loadAllProjects();
-      } else {
-        this.searchResults.set(
-          this.activeLocations().map(l => ({ type: 'location' as const, label: l, sub: 'Area / Community' }))
-        );
-      }
+    if (this.searchQuery().trim()) {
+      this.searchDropOpen.set(true);
     }
-    this.searchDropOpen.set(true);
   }
 
   private async loadAllProjects(): Promise<void> {
@@ -334,36 +309,36 @@ export class HomeComponent implements OnInit {
     const banners = this.dataSvc.banners().filter(b => b.status === 'active');
     if (banners.length) {
       return banners.map(b => ({
-        image:         b.imageUrl      || 'images/img1.jpeg',
-        project:       b.title,
-        location:      b.locationTag   || '',
-        desc:          b.subtitle,
+        image: b.imageUrl || 'images/img1.jpeg',
+        project: b.title,
+        location: b.locationTag || '',
+        desc: b.subtitle,
         startingPrice: b.startingPrice || '',
-        paymentPlan:   b.paymentPlan   || '',
+        paymentPlan: b.paymentPlan || '',
       }));
     }
     // Fallback while CMS loads
     return [
-      { image: 'images/img1.jpeg', project: 'Creek Horizon Residences',  location: 'Dubai Creek Harbour',         desc: 'Contemporary waterfront living with panoramic creek and skyline views.', startingPrice: 'AED 1.8M',  paymentPlan: '20 / 60 / 20 %' },
-      { image: 'images/img2.jpeg', project: 'Downtown Heights',           location: 'Downtown Dubai',              desc: 'Iconic residences steps from Burj Khalifa.',                              startingPrice: 'AED 2.4M',  paymentPlan: '10 / 65 / 25 %' },
-      { image: 'images/img3.jpeg', project: 'Marina Cove',                location: 'Dubai Marina',                desc: 'Elegant apartments with full marina views.',                              startingPrice: 'AED 950K',  paymentPlan: '20 / 55 / 25 %' },
+      { image: 'images/img1.jpeg', project: 'Creek Horizon Residences', location: 'Dubai Creek Harbour', desc: 'Contemporary waterfront living with panoramic creek and skyline views.', startingPrice: 'AED 1.8M', paymentPlan: '20 / 60 / 20 %' },
+      { image: 'images/img2.jpeg', project: 'Downtown Heights', location: 'Downtown Dubai', desc: 'Iconic residences steps from Burj Khalifa.', startingPrice: 'AED 2.4M', paymentPlan: '10 / 65 / 25 %' },
+      { image: 'images/img3.jpeg', project: 'Marina Cove', location: 'Dubai Marina', desc: 'Elegant apartments with full marina views.', startingPrice: 'AED 950K', paymentPlan: '20 / 55 / 25 %' },
     ];
   });
 
-  stats = [
-    { value: '2,500', label: 'Properties Listed', suffix: '+' },
-    { value: '1,800', label: 'Happy Families', suffix: '+' },
-    { value: '98', label: 'Client Satisfaction', suffix: '%' },
-    { value: '15', label: 'Years Experience', suffix: '+' },
-  ];
+  // stats = [
+  //   { value: '2,500', label: 'Properties Listed', suffix: '+' },
+  //   { value: '1,800', label: 'Happy Families', suffix: '+' },
+  //   { value: '98', label: 'Client Satisfaction', suffix: '%' },
+  //   { value: '15', label: 'Years Experience', suffix: '+' },
+  // ];
 
   featuredPropertiesLive = signal<Property[]>([]);
-  latestProjectsLive     = signal<HomeProject[]>([]);
-  offPlanProjectsLive    = signal<OffPlanCard[]>([]);
-  trendingProjectsDb     = signal<TrendingProject[]>([]);
-  topAgentsLive          = signal<HomeAgent[]>([]);
-  propertyCounts         = signal<Record<string, number>>({});
-  partnerLogos           = signal<{ url: string; name: string; link: string }[]>([]);
+  latestProjectsLive = signal<HomeProject[]>([]);
+  offPlanProjectsLive = signal<OffPlanCard[]>([]);
+  trendingProjectsDb = signal<TrendingProject[]>([]);
+  topAgentsLive = signal<HomeAgent[]>([]);
+  propertyCounts = signal<Record<string, number>>({});
+  partnerLogos = signal<{ url: string; name: string; link: string }[]>([]);
 
   displayedAgents = computed(() => this.topAgentsLive().length ? this.topAgentsLive() : this.topAgents);
 
@@ -386,22 +361,18 @@ export class HomeComponent implements OnInit {
   }
 
   private async loadLocations(): Promise<void> {
-    const [propsRes, projsRes] = await Promise.all([
-      this.sb.from('properties').select('location').eq('status', 'Published'),
-      this.sb.from('projects').select('location').eq('status', 'Published'),
-    ]);
-    const propSet  = new Set<string>();
-    const projSet  = new Set<string>();
+    // Property locations come from the Location Master (admin-managed)
+    const masterLocs = this.dataSvc.locations();
+    this.propLocations.set([...masterLocs].sort());
+
+    // Project locations still derived from the projects table
+    const { data } = await this.sb.from('projects').select('location').eq('status', 'Published');
+    const projSet = new Set<string>();
     const clean = (v: string) => v.split(',')[0].trim();
-    for (const r of (propsRes.data ?? [])) {
-      const v = clean(r.location ?? '');
-      if (v) propSet.add(v);
-    }
-    for (const r of (projsRes.data ?? [])) {
+    for (const r of (data ?? [])) {
       const v = clean(r.location ?? '');
       if (v) projSet.add(v);
     }
-    this.propLocations.set([...propSet].sort());
     this.projectLocations.set([...projSet].sort());
   }
 
@@ -425,16 +396,16 @@ export class HomeComponent implements OnInit {
 
     if (data && data.length) {
       this.featuredPropertiesLive.set(data.map((p: any) => ({
-        id:       p.id,
-        title:    p.title,
+        id: p.id,
+        title: p.title,
         location: [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
-        price:    `AED ${Number(p.price || 0).toLocaleString()}`,
-        beds:     p.bedrooms  || 0,
-        baths:    p.bathrooms || 0,
-        sqft:     Number(p.area_sqft || 0).toLocaleString(),
-        type:     p.type,
-        badge:    p.is_featured ? 'Featured' : '',
-        image:    (p.images && p.images[0]) || '/images/dummy-image.png',
+        price: `AED ${Number(p.price || 0).toLocaleString()}`,
+        beds: p.bedrooms || 0,
+        baths: p.bathrooms || 0,
+        sqft: Number(p.area_sqft || 0).toLocaleString(),
+        type: p.type,
+        badge: p.is_featured ? 'Featured' : '',
+        image: (p.images && p.images[0]) || '/images/dummy-image.png',
       })));
     }
   }
@@ -449,16 +420,16 @@ export class HomeComponent implements OnInit {
 
     if (data && data.length) {
       this.latestProjectsLive.set(data.map((p: any) => ({
-        id:           p.id,
-        name:         p.title ?? '',
-        location:     [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
-        developer:    p.developer ?? '',
-        handover:     p.completion_date ?? '',
+        id: p.id,
+        name: p.title ?? '',
+        location: [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
+        developer: p.developer ?? '',
+        handover: p.completion_date ?? '',
         startingPrice: p.price_label || (p.price_from ? `AED ${Number(p.price_from).toLocaleString()}` : ''),
-        paymentPlan:  p.payment_plan ?? '',
-        badge:        !!p.is_featured,
-        image:        (p.images && p.images[0]) || '/images/dummy-image.png',
-        slug:         toProjectSlug(p.title ?? '', p.id),
+        paymentPlan: p.payment_plan ?? '',
+        badge: !!p.is_featured,
+        image: (p.images && p.images[0]) || '/images/dummy-image.png',
+        slug: toProjectSlug(p.title ?? '', p.id),
       })));
     }
   }
@@ -483,17 +454,17 @@ export class HomeComponent implements OnInit {
 
     if (data && data.length) {
       this.offPlanProjectsLive.set(data.map((p: any) => ({
-        id:           p.id,
-        name:         p.title ?? '',
-        developer:    p.developer ?? '',
-        location:     [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
+        id: p.id,
+        name: p.title ?? '',
+        developer: p.developer ?? '',
+        location: [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
         startingPrice: p.price_label || (p.price_from ? `AED ${Number(p.price_from).toLocaleString()}` : 'Price on Request'),
-        completion:   p.completion_date ?? '',
-        type:         p.type ?? 'Apartments',
-        roi:          '',
-        image:        (p.images && p.images[0]) || '/images/dummy-image.png',
-        slug:         toProjectSlug(p.title ?? '', p.id),
-        badge:        p.badge || 'New Launch',
+        completion: p.completion_date ?? '',
+        type: p.type ?? 'Apartments',
+        roi: '',
+        image: (p.images && p.images[0]) || '/images/dummy-image.png',
+        slug: toProjectSlug(p.title ?? '', p.id),
+        badge: p.badge || 'New Launch',
       })));
     }
   }
@@ -516,14 +487,14 @@ export class HomeComponent implements OnInit {
             : priceNum > 0 ? (priceNum >= 1_000_000 ? `${(priceNum / 1_000_000).toFixed(1)}M` : `${(priceNum / 1_000).toFixed(0)}K`) : '';
 
           return {
-            id:        p.id,
-            name:      p.title ?? '',
+            id: p.id,
+            name: p.title ?? '',
             developer: p.developer ?? '',
-            price:     priceStr,
-            badge:     p.badge || 'New Launch',
-            type:      (p.trending_category ?? '').trim(),
-            image:     (p.images && p.images[0]) || '/images/dummy-image.png',
-            slug:      toProjectSlug(p.title ?? '', p.id),
+            price: priceStr,
+            badge: p.badge || 'New Launch',
+            type: (p.trending_category ?? '').trim(),
+            image: (p.images && p.images[0]) || '/images/dummy-image.png',
+            slug: toProjectSlug(p.title ?? '', p.id),
           };
         });
 
@@ -542,11 +513,11 @@ export class HomeComponent implements OnInit {
 
     if (data && data.length) {
       this.topAgentsLive.set(data.map((a: any) => ({
-        name:   a.name        ?? 'Agent',
-        role:   a.designation ?? 'Business Associate',
+        name: a.name ?? 'Agent',
+        role: a.designation ?? 'Business Associate',
         avatar: (a.avatar_url && !a.avatar_url.startsWith('data:')) ? a.avatar_url : null,
-        phone:  a.phone ?? '',
-        email:  a.email ?? '',
+        phone: a.phone ?? '',
+        email: a.email ?? '',
       })));
     }
   }
@@ -624,11 +595,11 @@ export class HomeComponent implements OnInit {
     const c = this.propertyCounts();
     return [
       { label: 'Apartments', count: c['Apartment'] ? `${c['Apartment']}` : '' },
-      { label: 'Villas',     count: c['Villa']     ? `${c['Villa']}`     : '' },
+      { label: 'Villas', count: c['Villa'] ? `${c['Villa']}` : '' },
       { label: 'Townhouses', count: c['Townhouse'] ? `${c['Townhouse']}` : '' },
-      { label: 'Offices',    count: c['Office']    ? `${c['Office']}`    : '' },
-      { label: 'Retail',     count: c['Shop']      ? `${c['Shop']}`      : '' },
-      { label: 'Plots',      count: c['Plot']      ? `${c['Plot']}`      : '' },
+      { label: 'Offices', count: c['Office'] ? `${c['Office']}` : '' },
+      { label: 'Retail', count: c['Shop'] ? `${c['Shop']}` : '' },
+      { label: 'Plots', count: c['Plot'] ? `${c['Plot']}` : '' },
     ];
   });
 
@@ -653,12 +624,12 @@ export class HomeComponent implements OnInit {
     const live = this.latestProjectsLive();
     if (live.length) return live;
     return [
-      { id: 0, name: 'Avena by Emaar',       location: 'Arabian Ranches 3',     developer: 'Emaar',    handover: 'Q1 2029', startingPrice: 'AED 3.5M',  paymentPlan: '10 / 80',       badge: true,  image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80',       slug: '' },
-      { id: 0, name: 'Avarra By Palace',      location: 'Business Bay',          developer: 'Emaar',    handover: 'Q2 2031', startingPrice: 'AED 13.6M', paymentPlan: '10 / 80 / 10',  badge: false, image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80',       slug: '' },
-      { id: 0, name: 'Binghatti Skyflame',    location: 'Majan',                 developer: 'Binghatti',handover: 'Q4 2027', startingPrice: 'AED 585K',  paymentPlan: '10 / 60 / 30',  badge: false, image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80',       slug: '' },
-      { id: 0, name: 'The Edit at d3',        location: 'Dubai Design District', developer: 'Meraas',   handover: 'Q4 2027', startingPrice: 'AED 1.9M',  paymentPlan: '20 / 55 / 25',  badge: false, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80',       slug: '' },
-      { id: 0, name: 'Creek Horizon',         location: 'Dubai Creek Harbour',   developer: 'Emaar',    handover: 'Q4 2027', startingPrice: 'AED 1.25M', paymentPlan: '20 / 60 / 20',  badge: true,  image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80',       slug: '' },
-      { id: 0, name: 'Palm Vista Residences', location: 'Palm Jebel Ali',        developer: 'Nakheel',  handover: 'Q2 2026', startingPrice: 'AED 6.8M',  paymentPlan: '15 / 55 / 30',  badge: false, image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80',       slug: '' },
+      { id: 0, name: 'Avena by Emaar', location: 'Arabian Ranches 3', developer: 'Emaar', handover: 'Q1 2029', startingPrice: 'AED 3.5M', paymentPlan: '10 / 80', badge: true, image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80', slug: '' },
+      { id: 0, name: 'Avarra By Palace', location: 'Business Bay', developer: 'Emaar', handover: 'Q2 2031', startingPrice: 'AED 13.6M', paymentPlan: '10 / 80 / 10', badge: false, image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80', slug: '' },
+      { id: 0, name: 'Binghatti Skyflame', location: 'Majan', developer: 'Binghatti', handover: 'Q4 2027', startingPrice: 'AED 585K', paymentPlan: '10 / 60 / 30', badge: false, image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80', slug: '' },
+      { id: 0, name: 'The Edit at d3', location: 'Dubai Design District', developer: 'Meraas', handover: 'Q4 2027', startingPrice: 'AED 1.9M', paymentPlan: '20 / 55 / 25', badge: false, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80', slug: '' },
+      { id: 0, name: 'Creek Horizon', location: 'Dubai Creek Harbour', developer: 'Emaar', handover: 'Q4 2027', startingPrice: 'AED 1.25M', paymentPlan: '20 / 60 / 20', badge: true, image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80', slug: '' },
+      { id: 0, name: 'Palm Vista Residences', location: 'Palm Jebel Ali', developer: 'Nakheel', handover: 'Q2 2026', startingPrice: 'AED 6.8M', paymentPlan: '15 / 55 / 30', badge: false, image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80', slug: '' },
     ];
   });
 
@@ -678,7 +649,7 @@ export class HomeComponent implements OnInit {
       .eq('key', 'partner_logos')
       .maybeSingle();
     if (data?.value) {
-      try { this.partnerLogos.set(JSON.parse(data.value)); } catch {}
+      try { this.partnerLogos.set(JSON.parse(data.value)); } catch { }
     }
   }
 
@@ -708,12 +679,12 @@ export class HomeComponent implements OnInit {
   }
 
   prevSlide(): void {
-    const len  = this.heroSlides().length || 1;
+    const len = this.heroSlides().length || 1;
     this.goToSlide((this.activeSlide() - 1 + len) % len);
   }
 
   nextSlide(): void {
-    const len  = this.heroSlides().length || 1;
+    const len = this.heroSlides().length || 1;
     this.goToSlide((this.activeSlide() + 1) % len);
   }
 
@@ -757,31 +728,31 @@ export class HomeComponent implements OnInit {
   );
 
   filteredTrendingProjects = computed(() => {
-    const tab  = this.activeTrendingTab();
+    const tab = this.activeTrendingTab();
     const live = this.trendingProjectsDb();
     if (live.length) return live.filter(p => p.type === tab);
     const fallback: TrendingProject[] = [
-      { id: 0, name: 'One at Palm Jumeirah', developer: 'Omniyat',      price: '14M',   badge: 'Ready',                    type: 'Luxury', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80', slug: '' },
-      { id: 0, name: 'Six Senses',           developer: 'Select Group', price: '12.5M', badge: '40 / 60 Payment Plan',     type: 'Luxury', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80', slug: '' },
-      { id: 0, name: 'Palm Vista Villas',    developer: 'Nakheel',      price: '6.8M',  badge: 'Ready',                    type: 'Villas', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80', slug: '' },
-      { id: 0, name: 'Emirates Hills Villa', developer: 'Emaar',        price: '22M',   badge: '20 / 80 Payment Plan',     type: 'Villas', image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80', slug: '' },
-      { id: 0, name: 'Skyline Tower',        developer: 'DAMAC',        price: '890K',  badge: '60 / 40 Payment Plan',     type: 'Flats',  image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80', slug: '' },
-      { id: 0, name: 'Creek Horizon',        developer: 'Emaar',        price: '1.25M', badge: '20 / 60 / 20 Payment Plan', type: 'Flats', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80', slug: '' },
+      { id: 0, name: 'One at Palm Jumeirah', developer: 'Omniyat', price: '14M', badge: 'Ready', type: 'Luxury', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80', slug: '' },
+      { id: 0, name: 'Six Senses', developer: 'Select Group', price: '12.5M', badge: '40 / 60 Payment Plan', type: 'Luxury', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80', slug: '' },
+      { id: 0, name: 'Palm Vista Villas', developer: 'Nakheel', price: '6.8M', badge: 'Ready', type: 'Villas', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80', slug: '' },
+      { id: 0, name: 'Emirates Hills Villa', developer: 'Emaar', price: '22M', badge: '20 / 80 Payment Plan', type: 'Villas', image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?w=600&q=80', slug: '' },
+      { id: 0, name: 'Skyline Tower', developer: 'DAMAC', price: '890K', badge: '60 / 40 Payment Plan', type: 'Flats', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80', slug: '' },
+      { id: 0, name: 'Creek Horizon', developer: 'Emaar', price: '1.25M', badge: '20 / 60 / 20 Payment Plan', type: 'Flats', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80', slug: '' },
     ];
     return fallback.filter(p => p.type === (tab || 'Luxury'));
   });
 
   guides = [
-    { title: 'Buying Guide',        subtitle: 'How to Buy Property in Dubai',      slug: 'buying-guide',         icon: '🏠', avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
-    { title: 'Buying Offplan Guide',subtitle: 'How to Buy Off Plan in Dubai',       slug: 'off-plan-guide',       icon: '🏗️', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-    { title: 'Renting Guide',       subtitle: 'How to Rent Property in Dubai',      slug: 'renting-guide',        icon: '🔑', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
-    { title: 'Selling Guide',       subtitle: 'How to Sell Property in Dubai',      slug: 'selling-guide',        icon: '💰', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
+    { title: 'Buying Guide', subtitle: 'How to Buy Property in Dubai', slug: 'buying-guide', icon: '🏠', avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
+    { title: 'Buying Offplan Guide', subtitle: 'How to Buy Off Plan in Dubai', slug: 'off-plan-guide', icon: '🏗️', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+    { title: 'Renting Guide', subtitle: 'How to Rent Property in Dubai', slug: 'renting-guide', icon: '🔑', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
+    { title: 'Selling Guide', subtitle: 'How to Sell Property in Dubai', slug: 'selling-guide', icon: '💰', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
   ];
 
   topAgents: HomeAgent[] = [
-    { name: 'Anuj Sharma',     role: 'Business Associate', avatar: 'images/Anuj.jpeg',    phone: '+971542481813', email: 'anuj@livwelldubai.ae'  },
-    { name: 'Niket Mehta',     role: 'Business Associate', avatar: 'images/Niket .jpeg',  phone: '+971585798027', email: 'niket@livwelldubai.ae' },
-    { name: 'Yash Uday Chari', role: 'Business Associate', avatar: 'images/Yash.jpeg',    phone: '+971585833629', email: 'yash@livwelldubai.ae'  },
+    { name: 'Anuj Sharma', role: 'Business Associate', avatar: 'images/Anuj.jpeg', phone: '+971542481813', email: 'anuj@livwelldubai.ae' },
+    { name: 'Niket Mehta', role: 'Business Associate', avatar: 'images/Niket .jpeg', phone: '+971585798027', email: 'niket@livwelldubai.ae' },
+    { name: 'Yash Uday Chari', role: 'Business Associate', avatar: 'images/Yash.jpeg', phone: '+971585833629', email: 'yash@livwelldubai.ae' },
   ];
 
   teamAreas = computed(() => [{

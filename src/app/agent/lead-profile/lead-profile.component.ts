@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
@@ -31,7 +31,28 @@ interface ActivityLog {
   icon: 'status' | 'message' | 'save' | 'view' | 'create';
 }
 
+interface TimelineEntry {
+  id: string;
+  action: string;
+  detail: string;
+  timestamp: string;
+  icon: 'followup' | 'status' | 'message' | 'save' | 'view' | 'create';
+  badge?: string;
+  badgeStatus?: string;
+  by?: string;
+  sortKey: number;
+}
+
 type LeadStatus = 'new' | 'contacted' | 'qualified' | 'negotiating' | 'won' | 'lost';
+
+interface FollowUpRecord {
+  id: number;
+  date: string;
+  time: string;
+  remarks: string;
+  status: string;
+  by: string;
+}
 
 interface LeadDetail {
   id: number; name: string; email: string; phone: string;
@@ -41,6 +62,9 @@ interface LeadDetail {
   source: string; notes: string; agentReply: string;
   createdDate: string; lastContact: string;
   customerId?: string | null; assignedAgent: string;
+  followUpDate?: string | null;
+  followUpNote?: string | null;
+  priority?: string;
 }
 
 @Component({
@@ -77,6 +101,56 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
   propSaveCount   = signal<number>(0);
   daysActive      = signal<number>(0);
 
+  // CRM panels
+  followUpHistory  = signal<FollowUpRecord[]>([]);
+  fuLoading        = signal(false);
+
+  unifiedTimeline = computed<TimelineEntry[]>(() => {
+    const entries: TimelineEntry[] = [];
+
+    // From follow-up history
+    for (const fu of this.followUpHistory()) {
+      const sortKey = fu.date ? new Date(fu.date).getTime() : 0;
+      entries.push({
+        id: `fu-${fu.id}`,
+        action: fu.remarks ? fu.remarks : `Status updated to ${this.labelStatus(fu.status)}`,
+        detail: fu.by ? `by ${fu.by}` : '',
+        timestamp: `${fu.date}${fu.time ? ' · ' + fu.time : ''}`,
+        icon: 'followup',
+        badge: this.labelStatus(fu.status),
+        badgeStatus: fu.status,
+        by: fu.by,
+        sortKey,
+      });
+    }
+
+    // From activity log (Lead Created, messages, status, property saves)
+    for (const log of this.activity()) {
+      const sortKey = log.timestamp ? new Date(log.timestamp).getTime() : 0;
+      entries.push({
+        id: `log-${log.id}`,
+        action: log.action,
+        detail: log.detail,
+        timestamp: log.timestamp,
+        icon: log.icon,
+        sortKey,
+      });
+    }
+
+    // Sort newest first
+    return entries.sort((a, b) => b.sortKey - a.sortKey);
+  });
+  statusUpdateVal  = signal<LeadStatus>('new');
+  priorityVal      = signal('medium');
+  statusRemarks    = signal('');
+  savingStatus     = signal(false);
+  nextFuDate       = signal('');
+  nextFuTime       = signal('');
+  nextFuNote       = signal('');
+  savingFu         = signal(false);
+
+  readonly priorities = ['low', 'medium', 'high', 'urgent'];
+
   readonly statusTimeline: { status: LeadStatus; label: string }[] = [
     { status: 'new',         label: 'New Lead'    },
     { status: 'contacted',   label: 'Contacted'   },
@@ -99,7 +173,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     this.loading.set(true);
     const { data } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id, category')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id, category, follow_up_date, follow_up_note, priority')
       .eq('id', id)
       .maybeSingle();
 
@@ -126,8 +200,15 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       lastContact:   data.created_at ? new Date(data.created_at).toISOString().slice(0, 10) : '',
       customerId:    data.customer_id    ?? null,
       assignedAgent: data.assigned_agent || '',
+      followUpDate:  data.follow_up_date ?? null,
+      followUpNote:  data.follow_up_note ?? null,
+      priority:      data.priority       || 'medium',
     };
     this.lead.set(lead);
+    this.statusUpdateVal.set(lead.status);
+    this.priorityVal.set(lead.priority || 'medium');
+    this.nextFuDate.set(lead.followUpDate || '');
+    this.nextFuNote.set(lead.followUpNote || '');
     this.loading.set(false);
 
     const created = data.created_at ? new Date(data.created_at) : new Date();
@@ -139,6 +220,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       this.loadSavedProperties(lead),
       this.loadProperty(lead),
       this.loadProject(lead),
+      this.loadFollowUpHistory(lead.id),
     ]);
     this.buildActivity();
     this.subscribeMsgs(lead.id);
@@ -324,6 +406,75 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(2)}M`;
     if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
+  }
+
+  // ── Follow-up history ──────────────────────────────────
+  private async loadFollowUpHistory(leadId: number): Promise<void> {
+    this.fuLoading.set(true);
+    const { data } = await this.sb
+      .from('lead_follow_ups')
+      .select('*')
+      .eq('lead_id', leadId)
+      .order('created_at', { ascending: false });
+    this.followUpHistory.set((data ?? []).map((r: any) => ({
+      id: r.id,
+      date: r.follow_up_date ? new Date(r.follow_up_date).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
+      time: r.follow_up_time || '',
+      remarks: r.remarks || '',
+      status: r.status || '',
+      by: r.created_by || 'Agent',
+    })));
+    this.fuLoading.set(false);
+  }
+
+  // ── Save lead status ───────────────────────────────────
+  async saveLeadStatus(): Promise<void> {
+    const lead = this.lead();
+    if (!lead) return;
+    this.savingStatus.set(true);
+    const agentEmail = this.auth.currentUser()?.email ?? '';
+    const agentName  = this.auth.currentUser()?.name  ?? '';
+    const newStatus  = this.statusUpdateVal();
+    const newPriority = this.priorityVal();
+    const remarks    = this.statusRemarks().trim();
+    const payload: any = { status: newStatus, priority: newPriority, agent_email: agentEmail };
+    const { error } = await this.sb.from('admin_leads').update(payload).eq('id', lead.id);
+    if (!error) {
+      this.lead.update(l => l ? { ...l, status: newStatus, priority: newPriority } : l);
+      await this.sb.from('lead_follow_ups').insert({
+        lead_id: lead.id,
+        remarks: remarks ? `[Status: ${newStatus}] ${remarks}` : `Status changed to ${this.labelStatus(newStatus)}`,
+        status: newStatus,
+        created_by: agentName || agentEmail,
+      });
+      this.statusRemarks.set('');
+      await this.loadFollowUpHistory(lead.id);
+      this.buildActivity();
+    }
+    this.savingStatus.set(false);
+  }
+
+  // ── Save next follow-up ────────────────────────────────
+  async saveNextFollowUp(): Promise<void> {
+    const lead = this.lead();
+    if (!lead) return;
+    const date = this.nextFuDate();
+    const time = this.nextFuTime();
+    const note = this.nextFuNote().trim();
+    if (!date) return;
+    this.savingFu.set(true);
+    const agentName  = this.auth.currentUser()?.name  ?? '';
+    const agentEmail = this.auth.currentUser()?.email ?? '';
+    await Promise.all([
+      this.sb.from('admin_leads').update({ follow_up_date: date, follow_up_note: note || null }).eq('id', lead.id),
+      this.sb.from('lead_follow_ups').insert({
+        lead_id: lead.id, follow_up_date: date, follow_up_time: time || null,
+        remarks: note || null, status: lead.status, created_by: agentName || agentEmail,
+      }),
+    ]);
+    this.lead.update(l => l ? { ...l, followUpDate: date, followUpNote: note } : l);
+    await this.loadFollowUpHistory(lead.id);
+    this.savingFu.set(false);
   }
 
   goBack(): void { this.router.navigate(['/agent/leads']); }

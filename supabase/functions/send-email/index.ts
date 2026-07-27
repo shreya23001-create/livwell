@@ -118,6 +118,71 @@ Deno.serve(async (req) => {
 
     console.log('Sending email type:', type, 'to:', data.to_email);
 
+    // Load custom SMTP config (needed for all paths)
+    const { data: smtpRow } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'smtp_config')
+      .maybeSingle();
+
+    let smtpCfg: Record<string, string> | null = null;
+    if (smtpRow?.value) {
+      try { smtpCfg = JSON.parse(smtpRow.value); } catch {}
+    }
+
+    const hasSmtp = !!(smtpCfg?.host && smtpCfg?.username && smtpCfg?.password);
+
+    // ── Newsletter blast: send to multiple recipients ──
+    if (type === 'newsletter_blast') {
+      const { campaign_id, recipients, subject: blastSubject, html: blastHtml } = data as any;
+
+      if (!Array.isArray(recipients) || recipients.length === 0) {
+        return new Response(JSON.stringify({ error: 'No recipients provided' }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      let sent = 0;
+      let failed = 0;
+
+      for (const email of recipients) {
+        try {
+          if (hasSmtp) {
+            await sendViaSmtp(smtpCfg!, email, blastSubject, blastHtml);
+          } else {
+            const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+              method: 'POST',
+              headers: { 'api-key': BREVO_API_KEY, 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                sender:      { name: 'LivWell', email: 'shreya23001@gmail.com' },
+                to:          [{ email }],
+                subject:     blastSubject,
+                htmlContent: blastHtml,
+              }),
+            });
+            if (!res.ok) failed++;
+            else sent++;
+            continue;
+          }
+          sent++;
+        } catch (e) {
+          console.error('Failed to send to', email, e);
+          failed++;
+        }
+      }
+
+      // Update campaign status in DB
+      if (campaign_id) {
+        await supabase.from('newsletter_campaigns')
+          .update({ status: 'sent', sent_at: new Date().toISOString(), sent_count: sent, failed_count: failed })
+          .eq('id', campaign_id);
+      }
+
+      return new Response(JSON.stringify({ sent, failed, total: recipients.length, via: hasSmtp ? 'smtp' : 'brevo' }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     let subject: string;
     let html: string;
 
@@ -150,20 +215,6 @@ Deno.serve(async (req) => {
       subject = interpolate(tpl.subject);
       html    = interpolate(tpl.body);
     }
-
-    // Load custom SMTP config
-    const { data: smtpRow } = await supabase
-      .from('site_settings')
-      .select('value')
-      .eq('key', 'smtp_config')
-      .maybeSingle();
-
-    let smtpCfg: Record<string, string> | null = null;
-    if (smtpRow?.value) {
-      try { smtpCfg = JSON.parse(smtpRow.value); } catch {}
-    }
-
-    const hasSmtp = !!(smtpCfg?.host && smtpCfg?.username && smtpCfg?.password);
 
     if (hasSmtp) {
       console.log('Using custom SMTP:', smtpCfg!.host);

@@ -1,4 +1,5 @@
-import { Component, HostListener, signal, OnInit, computed, inject } from '@angular/core';
+import { Component, HostListener, signal, OnInit, computed, inject, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -25,6 +26,7 @@ export class NavbarComponent implements OnInit {
   isScrolled    = signal(false);
   isAlwaysWhite = signal(false);
   mobileMenuOpen = signal(false);
+  isMobile      = signal(typeof window !== 'undefined' ? window.innerWidth < 1500 : false);
 
   // Luxe flyout types loaded from DB
   luxeSaleTypes = signal<string[]>(['Apartment', 'Villa', 'Penthouse', 'Home']);
@@ -48,6 +50,7 @@ export class NavbarComponent implements OnInit {
   ];
 
   currentYear = new Date().getFullYear();
+  get innerWidth() { return typeof window !== 'undefined' ? window.innerWidth : 0; }
 
   whatsappNumber = signal('');
   socialLinks = signal({ facebook: '', instagram: '', twitter: '', linkedin: '', youtube: '' });
@@ -61,9 +64,12 @@ export class NavbarComponent implements OnInit {
 
   private sb = inject(SupabaseService).client;
 
-  constructor(public auth: AuthService, private router: Router) {}
+  constructor(public auth: AuthService, private router: Router, @Inject(PLATFORM_ID) private platformId: object) {}
 
   ngOnInit(): void {
+    if (typeof window !== 'undefined') {
+      this.isMobile.set(window.innerWidth < 1500);
+    }
     this.checkRoute(this.router.url);
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
@@ -138,6 +144,11 @@ export class NavbarComponent implements OnInit {
   @HostListener('window:scroll')
   onScroll(): void {
     this.isScrolled.set(window.scrollY > 50);
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.isMobile.set(window.innerWidth < 1500);
   }
 
   mobileOpenSection = signal<string | null>(null);

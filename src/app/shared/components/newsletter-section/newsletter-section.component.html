@@ -52,15 +52,19 @@
                 d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
             </svg>
             <input type="email" placeholder="Enter your email address" class="nl-input" [ngModel]="newsletterEmail()"
-              (ngModelChange)="newsletterEmail.set($event)" name="nlEmail" required>
-            <button type="submit" class="nl-submit">
-              Subscribe Free
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-              </svg>
+              (ngModelChange)="newsletterEmail.set($event); newsletterError.set('')" name="nlEmail" required>
+            <button type="submit" class="nl-submit" [disabled]="subscribing()">
+              <span *ngIf="!subscribing()" style="display:inline-flex;align-items:center;gap:0.4rem">
+                Subscribe Free
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" style="width:16px;height:16px;flex-shrink:0">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </span>
+              <span *ngIf="subscribing()" class="nl-spinner"></span>
             </button>
           </div>
+          <p *ngIf="newsletterError()" class="nl-error">{{ newsletterError() }}</p>
           <p class="nl-privacy">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-3.5 h-3.5">

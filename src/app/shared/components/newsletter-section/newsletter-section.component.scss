@@ -181,6 +181,25 @@
   }
 }
 
+.nl-error {
+  color: #fca5a5;
+  font-size: 0.78rem;
+  text-align: center;
+  margin: -0.5rem 0 0.5rem;
+}
+
+.nl-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: nl-spin .7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes nl-spin { to { transform: rotate(360deg); } }
+
 .nl-privacy {
   display: flex;
   align-items: center;

@@ -1,5 +1,5 @@
 import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
@@ -37,26 +37,9 @@ export class AgentProfileComponent implements OnInit {
   profileError  = signal('');
   profileErrors = signal<Record<string, string>>({});
 
-  // ── Password fields ──────────────────────────────────
-  pwForm        = { newPw: '', confirm: '' };
-  showNewPw     = signal(false);
-  showConfirmPw = signal(false);
-  pwSaved       = signal(false);
-  pwError       = signal('');
-  pwErrors      = signal<Record<string, string>>({});
-
-  passwordStrength = computed(() => {
-    const p = this.pwForm.newPw;
-    if (!p) return 0;
-    let s = 0;
-    if (p.length >= 8)          s++;
-    if (/[A-Z]/.test(p))        s++;
-    if (/[0-9]/.test(p))        s++;
-    if (/[^A-Za-z0-9]/.test(p)) s++;
-    return s;
-  });
-  readonly strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-  readonly strengthColors = ['', '#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
+  // ── Password reset ───────────────────────────────────
+  pwResetSent   = signal(false);
+  pwResetError  = signal('');
 
   // ── Notification preferences (localStorage) ─────────
   notifications = {
@@ -116,7 +99,7 @@ export class AgentProfileComponent implements OnInit {
   setTab(tab: Tab): void {
     this.activeTab.set(tab);
     this.profileSaved.set(false); this.profileError.set('');
-    this.pwSaved.set(false);      this.pwError.set('');
+    this.pwResetSent.set(false);  this.pwResetError.set('');
     this.notifSaved.set(false);
   }
 
@@ -171,22 +154,15 @@ export class AgentProfileComponent implements OnInit {
     this.toast.success('Profile updated successfully.');
   }
 
-  async changePassword(): Promise<void> {
-    const errs: Record<string, string> = {};
-    if (!this.pwForm.newPw)                          errs['newPw']  = 'New password is required.';
-    else if (this.pwForm.newPw.length < 8)           errs['newPw']  = 'At least 8 characters.';
-    else if (!/[A-Z]/.test(this.pwForm.newPw))       errs['newPw']  = 'Must contain one uppercase letter.';
-    else if (!/[0-9]/.test(this.pwForm.newPw))       errs['newPw']  = 'Must contain one number.';
-    if (!this.pwForm.confirm)                        errs['confirm'] = 'Please confirm your new password.';
-    else if (this.pwForm.confirm !== this.pwForm.newPw) errs['confirm'] = 'Passwords do not match.';
-    this.pwErrors.set(errs);
-    if (Object.keys(errs).length) return;
-
-    this.pwError.set('');
-    const { error } = await this.sb.auth.updateUser({ password: this.pwForm.newPw });
-    if (error) { this.toast.error('Failed to update password. Please try again.'); return; }
-    this.pwForm = { newPw: '', confirm: '' };
-    this.toast.success('Password changed successfully.');
+  async sendPasswordResetEmail(): Promise<void> {
+    const email = this.profile().email;
+    if (!email) { this.pwResetError.set('No email address found for your account.'); return; }
+    this.pwResetError.set('');
+    const { error } = await this.sb.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/agent/login?reset=true`,
+    });
+    if (error) { this.pwResetError.set('Failed to send reset email. Please try again.'); return; }
+    this.pwResetSent.set(true);
   }
 
   saveNotifications(): void {
@@ -196,5 +172,4 @@ export class AgentProfileComponent implements OnInit {
   }
 
   clearProfileError(f: string): void { this.profileErrors.update(e => { const n = {...e}; delete n[f]; return n; }); }
-  clearPwError(f: string): void      { this.pwErrors.update(e => { const n = {...e}; delete n[f]; return n; }); }
 }

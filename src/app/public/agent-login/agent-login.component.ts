@@ -1,11 +1,12 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { SocialLoginModule, GoogleSigninButtonModule, SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { AuthService } from '../../shared/services/auth.service';
+import { SupabaseService } from '../../shared/services/supabase.service';
 
-type ForgotStep = 'email' | 'otp' | 'reset';
+type ForgotStep = 'email' | 'sent' | 'reset';
 
 @Component({
   selector: 'app-agent-login',
@@ -23,35 +24,21 @@ export class AgentLoginComponent {
   serverError  = signal('');
   attemptsLeft = signal<number | null>(null);
 
-  // ── Forgot Password ──────────────────────────────────
-  forgotMode  = signal(false);
-  forgotStep  = signal<ForgotStep>('email');
-  forgotEmail = signal('');
-  forgotOtp   = signal('');
-  private _generatedOtp = '';
+  private sb = inject(SupabaseService).client;
 
-  showNewPw     = signal(false);
-  showConfirmPw = signal(false);
-  newPassword   = signal('');
-  confirmPassword = signal('');
+  // ── Forgot Password ──────────────────────────────────
+  forgotMode    = signal(false);
+  forgotStep    = signal<ForgotStep>('email');
+  forgotEmail   = signal('');
   forgotError   = signal('');
   forgotSuccess = signal('');
+  isRecoveryMode = signal(false);
 
-  otpResendCountdown = signal(0);
-  private _countdownTimer: ReturnType<typeof setInterval> | null = null;
-
-  passwordStrength = computed(() => {
-    const pw = this.newPassword();
-    if (!pw) return 0;
-    let score = 0;
-    if (pw.length >= 8) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    return score;
-  });
-  strengthColors = ['', '#ef4444', '#f59e0b', '#3b82f6', '#10b981'];
-  strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  // Set new password fields (recovery mode)
+  showNewPw       = signal(false);
+  showConfirmPw   = signal(false);
+  newPassword     = signal('');
+  confirmPassword = signal('');
 
   constructor(private auth: AuthService, private socialAuth: SocialAuthService) {
     this.socialAuth.authState.subscribe((user: SocialUser | null) => {
@@ -64,6 +51,14 @@ export class AgentLoginComponent {
         });
       }
     });
+
+    // Detect Supabase password recovery redirect (hash contains type=recovery)
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      this.isRecoveryMode.set(true);
+      this.forgotMode.set(true);
+      this.forgotStep.set('reset');
+    }
   }
 
   async submit(): Promise<void> {
@@ -90,10 +85,13 @@ export class AgentLoginComponent {
           this.serverError.set('Invalid email or password.');
           break;
         case 'account_locked':
-          this.serverError.set('Account locked. Try again later.');
+          this.serverError.set('Your account has been locked by the admin. Please contact support to unlock it.');
           break;
         case 'account_suspended':
-          this.serverError.set('Your account has been suspended. Please contact support.');
+          this.serverError.set('Your account has been deactivated by the admin. Please contact support.');
+          break;
+        case 'pending_verification':
+          this.serverError.set('Your account is pending approval. Please contact the admin.');
           break;
         default:
           this.serverError.set('Something went wrong. Please try again.');
@@ -110,54 +108,31 @@ export class AgentLoginComponent {
     this.forgotMode.set(true);
     this.forgotStep.set('email');
     this.forgotEmail.set('');
-    this.forgotOtp.set('');
-    this.newPassword.set('');
-    this.confirmPassword.set('');
     this.forgotError.set('');
     this.forgotSuccess.set('');
+    this.newPassword.set('');
+    this.confirmPassword.set('');
   }
 
   closeForgot(): void {
     this.forgotMode.set(false);
-    this._clearCountdown();
+    this.isRecoveryMode.set(false);
   }
 
-  submitForgotEmail(): void {
+  async submitForgotEmail(): Promise<void> {
     const email = this.forgotEmail().trim();
     if (!email) { this.forgotError.set('Please enter your email address.'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { this.forgotError.set('Enter a valid email address.'); return; }
     this.loading.set(true);
     this.forgotError.set('');
-    setTimeout(() => {
-      const exists = this.auth.requestPasswordReset(email);
-      this.loading.set(false);
-      if (!exists) { this.forgotError.set('No account found with that email address.'); return; }
-      this._generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      console.info(`[Demo OTP for ${email}]: ${this._generatedOtp}`);
-      this.forgotStep.set('otp');
-      this._startCountdown(60);
-    }, 700);
+    const sent = await this.auth.requestAgentPasswordReset(email);
+    this.loading.set(false);
+    if (!sent) { this.forgotError.set('Could not send reset email. Please try again.'); return; }
+    this.forgotStep.set('sent');
   }
 
-  submitOtp(): void {
-    const entered = this.forgotOtp().trim();
-    if (!entered) { this.forgotError.set('Please enter the OTP code.'); return; }
-    if (entered !== this._generatedOtp) { this.forgotError.set('Incorrect OTP. Please try again.'); return; }
-    this.forgotError.set('');
-    this.forgotStep.set('reset');
-    this._clearCountdown();
-  }
-
-  resendOtp(): void {
-    this._generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.info(`[Demo OTP resend for ${this.forgotEmail()}]: ${this._generatedOtp}`);
-    this.forgotOtp.set('');
-    this.forgotError.set('');
-    this._startCountdown(60);
-  }
-
-  submitResetPassword(): void {
-    const pw = this.newPassword();
+  async submitResetPassword(): Promise<void> {
+    const pw      = this.newPassword();
     const confirm = this.confirmPassword();
     if (!pw) { this.forgotError.set('Please enter a new password.'); return; }
     if (pw.length < 8 || !/[A-Z]/.test(pw) || !/[0-9]/.test(pw)) {
@@ -167,25 +142,12 @@ export class AgentLoginComponent {
     if (pw !== confirm) { this.forgotError.set('Passwords do not match.'); return; }
     this.loading.set(true);
     this.forgotError.set('');
-    setTimeout(() => {
-      this.auth.resetPassword(this.forgotEmail().trim(), pw);
-      this.loading.set(false);
-      this.forgotSuccess.set('Password reset successfully! You can now sign in with your new password.');
-      this.form.password = '';
-    }, 600);
-  }
-
-  private _startCountdown(seconds: number): void {
-    this._clearCountdown();
-    this.otpResendCountdown.set(seconds);
-    this._countdownTimer = setInterval(() => {
-      const current = this.otpResendCountdown();
-      if (current <= 1) { this.otpResendCountdown.set(0); this._clearCountdown(); }
-      else { this.otpResendCountdown.set(current - 1); }
-    }, 1000);
-  }
-
-  private _clearCountdown(): void {
-    if (this._countdownTimer) { clearInterval(this._countdownTimer); this._countdownTimer = null; }
+    const { error } = await this.sb.auth.updateUser({ password: pw });
+    this.loading.set(false);
+    if (error) { this.forgotError.set('Failed to reset password. The link may have expired — please request a new one.'); return; }
+    this.forgotSuccess.set('Password reset successfully! You can now sign in with your new password.');
+    this.isRecoveryMode.set(false);
+    this.forgotMode.set(false);
+    this.forgotStep.set('email');
   }
 }

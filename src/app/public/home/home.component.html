@@ -55,7 +55,7 @@
       <!-- Tabs -->
       <div class="hero-tabs">
         <button *ngFor="let tab of searchTabs" class="hero-tab" [class.active]="searchType() === tab.value"
-          (click)="searchType.set(tab.value); onSearchInput(searchQuery())">
+          (click)="searchType.set(tab.value); searchDropOpen.set(false); searchResults.set([])">
           {{ tab.label }}
         </button>
       </div>
@@ -71,10 +71,12 @@
           <div class="hero-loc-tags" *ngIf="selectedLocations().length > 0">
             <span class="hero-loc-tag" *ngFor="let loc of selectedLocations()">
               {{ loc }}
-              <button type="button" class="hero-loc-tag-x" (mousedown)="$event.preventDefault(); removeLocation(loc)">×</button>
+              <button type="button" class="hero-loc-tag-x"
+                (mousedown)="$event.preventDefault(); removeLocation(loc)">×</button>
             </span>
           </div>
-          <input type="text" class="hero-search-input" [placeholder]="selectedLocations().length > 0 ? 'Add another location…' : 'Search area, community or project…'"
+          <input type="text" class="hero-search-input"
+            [placeholder]="searchType() === 'new-projects' ? 'Search by Project Name' : (selectedLocations().length > 0 ? 'Add another location…' : 'Area, Community, Location')"
             [ngModel]="searchQuery()" (ngModelChange)="onSearchInput($event)" (focus)="onSearchFocus()"
             (blur)="closeSearchDrop()" (keydown.enter)="doSearch()" />
         </div>
@@ -95,7 +97,9 @@
           <div class="hero-sdrop-empty">No results found</div>
           } @else {
           @for (item of searchResults(); track item.label) {
-          <button class="hero-sdrop-item" [class.selected]="item.type === 'location' && selectedLocations().includes(item.label)" (mousedown)="$event.preventDefault(); selectResult(item)">
+          <button class="hero-sdrop-item"
+            [class.selected]="item.type === 'location' && selectedLocations().includes(item.label)"
+            (mousedown)="$event.preventDefault(); selectResult(item)">
             <span class="hero-sdrop-icon">
               @if (item.type === 'location') {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -119,7 +123,8 @@
               <span class="hero-sdrop-sub">{{ item.sub }}</span>
             </span>
             @if (item.type === 'location' && selectedLocations().includes(item.label)) {
-            <svg class="hero-sdrop-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <svg class="hero-sdrop-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
             }
@@ -133,11 +138,28 @@
       <!-- Quick chips -->
       <div class="hero-chips">
         <span class="hero-chip-label">Popular:</span>
-        <a routerLink="/properties" class="hero-chip">Apartments</a>
-        <a routerLink="/properties" class="hero-chip">Villas</a>
-        <a routerLink="/properties" class="hero-chip">Townhouses</a>
-        <a routerLink="/properties" class="hero-chip">Off-Plan</a>
-        <a routerLink="/properties" class="hero-chip">Palm Jumeirah</a>
+        <ng-container *ngIf="searchType() !== 'new-projects'">
+          <a routerLink="/properties"
+             [queryParams]="{type:'Apartment', status: searchType() === 'rent' ? 'Rent' : 'Sale'}"
+             class="hero-chip">Apartments</a>
+          <a routerLink="/properties"
+             [queryParams]="{type:'Villa', status: searchType() === 'rent' ? 'Rent' : 'Sale'}"
+             class="hero-chip">Villas</a>
+          <a routerLink="/properties"
+             [queryParams]="{type:'Townhouse', status: searchType() === 'rent' ? 'Rent' : 'Sale'}"
+             class="hero-chip">Townhouses</a>
+          <a routerLink="/projects" class="hero-chip">Off-Plan</a>
+          <a routerLink="/properties"
+             [queryParams]="{location:'Palm Jumeirah', status: searchType() === 'rent' ? 'Rent' : 'Sale'}"
+             class="hero-chip">Palm Jumeirah</a>
+        </ng-container>
+        <ng-container *ngIf="searchType() === 'new-projects'">
+          <a routerLink="/projects" [queryParams]="{type:'Apartment'}" class="hero-chip">Apartment Projects</a>
+          <a routerLink="/projects" [queryParams]="{type:'Villa'}" class="hero-chip">Villa Projects</a>
+          <a routerLink="/projects" [queryParams]="{handover:'2025'}" class="hero-chip">Ready 2025</a>
+          <a routerLink="/projects" [queryParams]="{handover:'2026'}" class="hero-chip">Ready 2026</a>
+          <a routerLink="/projects" [queryParams]="{location:'Downtown Dubai'}" class="hero-chip">Downtown Dubai</a>
+        </ng-container>
       </div>
     </div>
   </div>
@@ -177,7 +199,7 @@
     </div>
 
     <!-- Stats strip -->
-    <div class="hero-stats-strip">
+    <!-- <div class="hero-stats-strip">
       <div class="hero-stat-item">
         <span class="hero-stat-num">2,500<sup>+</sup></span>
         <span class="hero-stat-lbl">Listings</span>
@@ -197,7 +219,7 @@
         <span class="hero-stat-num">98<sup>%</sup></span>
         <span class="hero-stat-lbl">Satisfaction</span>
       </div>
-    </div>
+    </div> -->
 
   </div>
 
@@ -306,23 +328,20 @@
       <div class="trust-dev-logos">
         <!-- Dynamic logos from admin -->
         <ng-container *ngIf="partnerLogos().length > 0">
-          <ng-container *ngFor="let logo of partnerLogos()">
-            <a *ngIf="logo.link" [href]="logo.link" target="_blank" rel="noopener noreferrer" class="dev-logo-box dev-logo-box--link">
-              <img [src]="logo.url" [alt]="logo.name" class="dev-logo-img">
-            </a>
-            <div *ngIf="!logo.link" class="dev-logo-box">
-              <img [src]="logo.url" [alt]="logo.name" class="dev-logo-img">
-            </div>
-          </ng-container>
+          <a *ngFor="let logo of partnerLogos()"
+            [routerLink]="['/developers', logo.name.toLowerCase().replace(/\\s+/g, '-')]"
+            class="dev-logo-box dev-logo-box--link">
+            <img [src]="logo.url" [alt]="logo.name" class="dev-logo-img">
+          </a>
         </ng-container>
         <!-- Fallback hardcoded logos -->
         <ng-container *ngIf="partnerLogos().length === 0">
-          <div class="dev-logo-box"><img src="images/emaar.png" alt="Emaar" class="dev-logo-img"></div>
-          <div class="dev-logo-box"><img src="images/binghatti.png" alt="Binghatti" class="dev-logo-img"></div>
-          <div class="dev-logo-box"><img src="images/dubai_property.png" alt="Dubai Properties" class="dev-logo-img"></div>
-          <div class="dev-logo-box"><img src="images/damac.png" alt="DAMAC" class="dev-logo-img"></div>
-          <div class="dev-logo-box"><img src="images/meraas.png" alt="Meraas" class="dev-logo-img"></div>
-          <div class="dev-logo-box"><img src="images/azizi.png" alt="Azizi" class="dev-logo-img"></div>
+          <a [routerLink]="['/developers', 'binghatti']" class="dev-logo-box dev-logo-box--link"><img src="images/binghatti.png" alt="Binghatti" class="dev-logo-img"></a>
+          <a [routerLink]="['/developers', 'damac']" class="dev-logo-box dev-logo-box--link"><img src="images/damac.png" alt="DAMAC" class="dev-logo-img"></a>
+          <a [routerLink]="['/developers', 'dubai-properties']" class="dev-logo-box dev-logo-box--link"><img src="images/dubai_property.png" alt="Dubai Properties" class="dev-logo-img"></a>
+          <a [routerLink]="['/developers', 'meraas']" class="dev-logo-box dev-logo-box--link"><img src="images/meraas.png" alt="Meraas" class="dev-logo-img"></a>
+          <a [routerLink]="['/developers', 'azizi']" class="dev-logo-box dev-logo-box--link"><img src="images/azizi.png" alt="Azizi" class="dev-logo-img"></a>
+          <a [routerLink]="['/developers', 'emaar']" class="dev-logo-box dev-logo-box--link"><img src="images/emaar.png" alt="Emaar" class="dev-logo-img"></a>
         </ng-container>
       </div>
     </div>
@@ -356,7 +375,8 @@
     <!-- Scrollable cards track -->
     <div class="lp-track-wrap">
       <div class="lp-track" #lpTrack>
-        <div *ngFor="let p of latestProjects()" class="lp-card" (click)="navigateTo(p.id ? ['/projects', p.slug] : ['/off-plan'])" style="cursor:pointer">
+        <div *ngFor="let p of latestProjects()" class="lp-card"
+          (click)="navigateTo(p.id ? ['/projects', p.slug] : ['/off-plan'])" style="cursor:pointer">
           <!-- Image -->
           <div class="lp-img-wrap">
             <img [src]="p.image" [alt]="p.name" class="lp-img"
@@ -365,16 +385,18 @@
             <div *ngIf="p.badge" class="lp-hot-dot"></div>
             <div *ngIf="p.id" class="home-card-actions">
               <button class="home-card-action-btn" [class.saved]="isProjSaved(p.id)"
-                [title]="isProjSaved(p.id) ? 'Remove from saved' : 'Save'"
-                (click)="toggleSaveProject(p.id, $event)">
-                <svg viewBox="0 0 24 24" [attr.fill]="isProjSaved(p.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                [title]="isProjSaved(p.id) ? 'Remove from saved' : 'Save'" (click)="toggleSaveProject(p.id, $event)">
+                <svg viewBox="0 0 24 24" [attr.fill]="isProjSaved(p.id) ? 'currentColor' : 'none'" stroke="currentColor"
+                  stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                 </svg>
               </button>
               <div style="position:relative">
                 <button class="home-card-action-btn" title="Share" (click)="shareProject(p.id, p.name, $event)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                   </svg>
                 </button>
                 <div *ngIf="shareProjToast() === p.id" class="home-share-toast">Link copied!</div>
@@ -404,7 +426,8 @@
             </div>
             <div class="lp-divider"></div>
             <p class="lp-handover">Handover in {{ p.handover }}</p>
-            <a [routerLink]="p.id ? ['/projects', p.slug] : ['/off-plan']" class="lp-price-btn" (click)="$event.stopPropagation()">from {{ p.startingPrice
+            <a [routerLink]="p.id ? ['/projects', p.slug] : ['/off-plan']" class="lp-price-btn"
+              (click)="$event.stopPropagation()">from {{ p.startingPrice
               }}</a>
           </div>
         </div>
@@ -539,8 +562,8 @@
     </div>
     <div class="trending-controls">
       <div class="trending-tabs">
-        <button *ngFor="let tab of trendingTabs()" class="trending-tab" [class.active]="activeTrendingTab() === tab.value"
-          (click)="activeTrendingTab.set(tab.value)">
+        <button *ngFor="let tab of trendingTabs()" class="trending-tab"
+          [class.active]="activeTrendingTab() === tab.value" (click)="activeTrendingTab.set(tab.value)">
           {{ tab.label }}
         </button>
       </div>
@@ -571,16 +594,18 @@
           </span>
           <div *ngIf="p.id" class="home-card-actions home-card-actions--overlay">
             <button class="home-card-action-btn" [class.saved]="isProjSaved(p.id)"
-              [title]="isProjSaved(p.id) ? 'Remove from saved' : 'Save'"
-              (click)="toggleSaveProject(p.id, $event)">
-              <svg viewBox="0 0 24 24" [attr.fill]="isProjSaved(p.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+              [title]="isProjSaved(p.id) ? 'Remove from saved' : 'Save'" (click)="toggleSaveProject(p.id, $event)">
+              <svg viewBox="0 0 24 24" [attr.fill]="isProjSaved(p.id) ? 'currentColor' : 'none'" stroke="currentColor"
+                stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
               </svg>
             </button>
             <div style="position:relative">
               <button class="home-card-action-btn" title="Share" (click)="shareProject(p.id, p.name, $event)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                 </svg>
               </button>
               <div *ngIf="shareProjToast() === p.id" class="home-share-toast">Link copied!</div>
@@ -640,66 +665,70 @@
 
     <div class="fp-track-wrap">
       <div class="properties-grid" #featPropTrack>
-      <a *ngFor="let property of featuredPropertiesLive(); let i = index" [routerLink]="['/properties', propertySlug(property)]"
-        class="property-card">
+        <a *ngFor="let property of featuredPropertiesLive(); let i = index"
+          [routerLink]="['/properties', propertySlug(property)]" class="property-card">
 
-        <!-- Full image fills the card -->
-        <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy"
-          (error)="$any($event.target).src='/images/dummy-image.png'">
+          <!-- Full image fills the card -->
+          <img [src]="property.image" [alt]="property.title" class="property-image" loading="lazy"
+            (error)="$any($event.target).src='/images/dummy-image.png'">
 
-        <!-- Gradient overlay darkens bottom -->
-        <div class="property-overlay"></div>
+          <!-- Gradient overlay darkens bottom -->
+          <div class="property-overlay"></div>
 
-        <!-- Top row: badge + type + favourite + share -->
-        <div class="property-top">
-          <div class="property-badges">
-            <span *ngIf="property.badge" class="property-badge" [ngClass]="'badge-' + property.badge.toLowerCase()">
-              {{ property.badge }}
-            </span>
-            <span class="property-type">{{ property.type }}</span>
-          </div>
-          <div class="home-card-actions">
-            <button class="home-card-action-btn" [class.saved]="isPropSaved(property.id)"
-              [title]="isPropSaved(property.id) ? 'Remove from saved' : 'Save'"
-              (click)="toggleSaveProperty(property.id, $event)">
-              <svg viewBox="0 0 24 24" [attr.fill]="isPropSaved(property.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-              </svg>
-            </button>
-            <div style="position:relative">
-              <button class="home-card-action-btn" title="Share" (click)="shareProperty(property.id, property.title, $event)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/>
+          <!-- Top row: badge + type + favourite + share -->
+          <div class="property-top">
+            <div class="property-badges">
+              <span *ngIf="property.badge" class="property-badge" [ngClass]="'badge-' + property.badge.toLowerCase()">
+                {{ property.badge }}
+              </span>
+              <span class="property-type">{{ property.type }}</span>
+            </div>
+            <div class="home-card-actions">
+              <button class="home-card-action-btn" [class.saved]="isPropSaved(property.id)"
+                [title]="isPropSaved(property.id) ? 'Remove from saved' : 'Save'"
+                (click)="toggleSaveProperty(property.id, $event)">
+                <svg viewBox="0 0 24 24" [attr.fill]="isPropSaved(property.id) ? 'currentColor' : 'none'"
+                  stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                 </svg>
               </button>
-              <div *ngIf="sharePropToast() === property.id" class="home-share-toast">Link copied!</div>
+              <div style="position:relative">
+                <button class="home-card-action-btn" title="Share"
+                  (click)="shareProperty(property.id, property.title, $event)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                  </svg>
+                </button>
+                <div *ngIf="sharePropToast() === property.id" class="home-share-toast">Link copied!</div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Bottom: all text info overlaid on image — FAM style -->
-        <div class="property-info">
-          <div class="property-price">{{ property.price }}</div>
-          <h3 class="property-title">{{ property.title }}</h3>
-          <div class="property-location">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-            </svg>
-            {{ property.location }}
+          <!-- Bottom: all text info overlaid on image — FAM style -->
+          <div class="property-info">
+            <div class="property-price">{{ property.price }}</div>
+            <h3 class="property-title">{{ property.title }}</h3>
+            <div class="property-location">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+              </svg>
+              {{ property.location }}
+            </div>
+            <div class="property-specs">
+              <span class="spec">{{ property.beds }} Beds</span>
+              <span class="spec-dot">·</span>
+              <span class="spec">{{ property.baths }} Baths</span>
+              <span class="spec-dot">·</span>
+              <span class="spec">{{ property.sqft }}</span>
+            </div>
           </div>
-          <div class="property-specs">
-            <span class="spec">{{ property.beds }} Beds</span>
-            <span class="spec-dot">·</span>
-            <span class="spec">{{ property.baths }} Baths</span>
-            <span class="spec-dot">·</span>
-            <span class="spec">{{ property.sqft }}</span>
-          </div>
-        </div>
-      </a>
-    </div>
+        </a>
+      </div>
     </div>
 
     <div class="fp-nav lp-nav">
@@ -739,88 +768,94 @@
     </div>
 
     <div class="offplan-track-wrap">
-    <div class="offplan-grid" #offplanTrack>
-      <div *ngFor="let project of offPlanProjects(); let i = index" class="offplan-card" (click)="navigateTo(project.id ? ['/projects', project.slug] : ['/off-plan'])" style="cursor:pointer">
-        <div class="offplan-img-wrap">
-          <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy"
-            (error)="$any($event.target).src='/images/dummy-image.png'">
-          <div class="offplan-overlay"></div>
-          <div class="offplan-top-badges">
-            <span class="offplan-badge">{{ project.badge }}</span>
-            <span class="offplan-type-badge">{{ project.type }}</span>
+      <div class="offplan-grid" #offplanTrack>
+        <div *ngFor="let project of offPlanProjects(); let i = index" class="offplan-card"
+          (click)="navigateTo(project.id ? ['/projects', project.slug] : ['/off-plan'])" style="cursor:pointer">
+          <div class="offplan-img-wrap">
+            <img [src]="project.image" [alt]="project.name" class="offplan-img" loading="lazy"
+              (error)="$any($event.target).src='/images/dummy-image.png'">
+            <div class="offplan-overlay"></div>
+            <div class="offplan-top-badges">
+              <span class="offplan-badge">{{ project.badge }}</span>
+              <span class="offplan-type-badge">{{ project.type }}</span>
+            </div>
+            <div class="offplan-roi-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+              </svg>
+              {{ project.roi }}
+            </div>
           </div>
-          <div class="offplan-roi-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-              stroke="currentColor" class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
-            </svg>
-            {{ project.roi }}
-          </div>
-        </div>
 
-        <div class="offplan-body">
-          <div class="offplan-developer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-              stroke="currentColor" class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-            </svg>
-            {{ project.developer }}
-          </div>
-          <div class="offplan-name-row">
-            <h3 class="offplan-name">{{ project.name }}</h3>
-            <div *ngIf="project.id" class="home-card-actions">
-              <button class="home-card-action-btn home-card-action-btn--dark" [class.saved]="isProjSaved(project.id)"
-                [title]="isProjSaved(project.id) ? 'Remove from saved' : 'Save'"
-                (click)="toggleSaveProject(project.id, $event)">
-                <svg viewBox="0 0 24 24" [attr.fill]="isProjSaved(project.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                </svg>
-              </button>
-              <div style="position:relative">
-                <button class="home-card-action-btn home-card-action-btn--dark" title="Share" (click)="shareProject(project.id, project.name, $event)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/>
+          <div class="offplan-body">
+            <div class="offplan-developer">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+              </svg>
+              {{ project.developer }}
+            </div>
+            <div class="offplan-name-row">
+              <h3 class="offplan-name">{{ project.name }}</h3>
+              <div *ngIf="project.id" class="home-card-actions">
+                <button class="home-card-action-btn home-card-action-btn--dark" [class.saved]="isProjSaved(project.id)"
+                  [title]="isProjSaved(project.id) ? 'Remove from saved' : 'Save'"
+                  (click)="toggleSaveProject(project.id, $event)">
+                  <svg viewBox="0 0 24 24" [attr.fill]="isProjSaved(project.id) ? 'currentColor' : 'none'"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                   </svg>
                 </button>
-                <div *ngIf="shareProjToast() === project.id" class="home-share-toast">Link copied!</div>
+                <div style="position:relative">
+                  <button class="home-card-action-btn home-card-action-btn--dark" title="Share"
+                    (click)="shareProject(project.id, project.name, $event)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                    </svg>
+                  </button>
+                  <div *ngIf="shareProjToast() === project.id" class="home-share-toast">Link copied!</div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="offplan-location">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-              stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-            </svg>
-            {{ project.location }}
-          </div>
-          <div class="offplan-details">
-            <div class="offplan-detail-item">
-              <span class="offplan-detail-label">Starting From</span>
-              <span class="offplan-detail-value">{{ project.startingPrice }}</span>
-            </div>
-            <div class="offplan-detail-divider"></div>
-            <div class="offplan-detail-item">
-              <span class="offplan-detail-label">Completion</span>
-              <span class="offplan-detail-value">{{ project.completion }}</span>
-            </div>
-          </div>
-          <div class="offplan-actions">
-            <a [routerLink]="project.id ? ['/projects', project.slug] : ['/off-plan']" class="offplan-cta" (click)="$event.stopPropagation()">
-              View Project
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+            <div class="offplan-location">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
               </svg>
-            </a>
-            <!-- <a routerLink="/contact" class="offplan-enquire">Enquire Now</a> -->
+              {{ project.location }}
+            </div>
+            <div class="offplan-details">
+              <div class="offplan-detail-item">
+                <span class="offplan-detail-label">Starting From</span>
+                <span class="offplan-detail-value">{{ project.startingPrice }}</span>
+              </div>
+              <div class="offplan-detail-divider"></div>
+              <div class="offplan-detail-item">
+                <span class="offplan-detail-label">Completion</span>
+                <span class="offplan-detail-value">{{ project.completion }}</span>
+              </div>
+            </div>
+            <div class="offplan-actions">
+              <a [routerLink]="project.id ? ['/projects', project.slug] : ['/off-plan']" class="offplan-cta"
+                (click)="$event.stopPropagation()">
+                View Project
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </a>
+              <!-- <a routerLink="/contact" class="offplan-enquire">Enquire Now</a> -->
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
 
     <div class="offplan-nav lp-nav">
@@ -1023,48 +1058,48 @@
     </div>
 
     <div class="agents-carousel-wrap">
-    <div class="agents-grid">
-      <!-- Original set -->
-      <div *ngFor="let agent of displayedAgents(); let i = index" class="agent-card animate-on-scroll"
-        [class]="'delay-' + (i * 100 + 100)">
-        <div class="agent-avatar-wrap">
-          <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
-          <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">
-            {{ initials(agent.name) }}
+      <div class="agents-grid">
+        <!-- Original set -->
+        <div *ngFor="let agent of displayedAgents(); let i = index" class="agent-card animate-on-scroll"
+          [class]="'delay-' + (i * 100 + 100)">
+          <div class="agent-avatar-wrap">
+            <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
+            <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">
+              {{ initials(agent.name) }}
+            </div>
+            <div class="agent-rating">★ 5.0</div>
           </div>
-          <div class="agent-rating">★ 5.0</div>
+          <h3 class="agent-name">{{ agent.name }}</h3>
+          <p class="agent-role">{{ agent.role }}</p>
+          <div class="agent-contact-info">
+            <a [href]="'https://wa.me/' + agent.phone" target="_blank" rel="noopener"
+              class="agent-contact-line agent-contact-line--wa">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+              </svg>
+              {{ agent.phone }}
+            </a>
+            <a [href]="'mailto:' + agent.email" class="agent-contact-line">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+              {{ agent.email }}
+            </a>
+          </div>
         </div>
-        <h3 class="agent-name">{{ agent.name }}</h3>
-        <p class="agent-role">{{ agent.role }}</p>
-        <div class="agent-contact-info">
-          <a [href]="'https://wa.me/' + agent.phone" target="_blank" rel="noopener"
-            class="agent-contact-line agent-contact-line--wa">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
-            </svg>
-            {{ agent.phone }}
-          </a>
-          <a [href]="'mailto:' + agent.email" class="agent-contact-line">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-            </svg>
-            {{ agent.email }}
-          </a>
+        <!-- Duplicate set for seamless loop on mobile only -->
+        <div *ngFor="let agent of displayedAgents()" class="agent-card agent-card-duplicate" aria-hidden="true">
+          <div class="agent-avatar-wrap">
+            <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
+            <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">{{ initials(agent.name) }}</div>
+            <div class="agent-rating">★ 5.0</div>
+          </div>
+          <h3 class="agent-name">{{ agent.name }}</h3>
+          <p class="agent-role">{{ agent.role }}</p>
         </div>
       </div>
-      <!-- Duplicate set for seamless loop on mobile only -->
-      <div *ngFor="let agent of displayedAgents()" class="agent-card agent-card-duplicate" aria-hidden="true">
-        <div class="agent-avatar-wrap">
-          <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
-          <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">{{ initials(agent.name) }}</div>
-          <div class="agent-rating">★ 5.0</div>
-        </div>
-        <h3 class="agent-name">{{ agent.name }}</h3>
-        <p class="agent-role">{{ agent.role }}</p>
-      </div>
-    </div>
     </div>
 
     <div class="text-center mt-12 animate-on-scroll">
@@ -1092,9 +1127,11 @@
         <blockquote class="testimonial-text" [innerHTML]="testimonials()[activeTestimonial()].text"></blockquote>
         <div class="testimonial-author">
           @if (testimonials()[activeTestimonial()].avatar) {
-            <img [src]="testimonials()[activeTestimonial()].avatar" [alt]="testimonials()[activeTestimonial()].name" class="testimonial-avatar">
+          <img [src]="testimonials()[activeTestimonial()].avatar" [alt]="testimonials()[activeTestimonial()].name"
+            class="testimonial-avatar">
           } @else {
-            <div class="testimonial-avatar testimonial-avatar--initials">{{ initials(testimonials()[activeTestimonial()].name) }}</div>
+          <div class="testimonial-avatar testimonial-avatar--initials">{{
+            initials(testimonials()[activeTestimonial()].name) }}</div>
           }
           <div>
             <div class="testimonial-name">{{ testimonials()[activeTestimonial()].name }}</div>

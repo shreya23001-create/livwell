@@ -407,6 +407,16 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
   color: $gold;
 }
 
+.pd-badge-by-developer {
+  padding: 0.2rem 0.7rem;
+  border-radius: 2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
 .pd-title {
   font-family: $font-display;
   font-size: clamp(1.4rem, 2.5vw, 2rem);
@@ -949,6 +959,12 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
     width: 20px;
     height: 20px;
   }
+}
+
+.pd-nl-error {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  color: #f87171;
 }
 
 /* Similar properties */

@@ -61,8 +61,18 @@ export class AdminLeadsComponent implements OnInit {
   deleteTarget    = signal<Lead | null>(null);
 
   // ── View Modal (from notification) ───────────────────
-  showViewModal = signal(false);
-  viewLead      = signal<Lead | null>(null);
+  showViewModal  = signal(false);
+  viewLead       = signal<Lead | null>(null);
+  viewTab        = signal<'overview' | 'followup' | 'activity'>('overview');
+
+  leadAuditLogs = computed(() => {
+    const lead = this.viewLead();
+    if (!lead) return [];
+    const name = lead.name.toLowerCase();
+    return this.dataSvc.auditLogs().filter(log =>
+      log.module === 'lead' && log.detail.toLowerCase().includes(name)
+    );
+  });
 
   // ── Tabs ─────────────────────────────────────────────
   activeTab = signal<'dashboard' | 'leads'>('dashboard');
@@ -118,6 +128,33 @@ export class AdminLeadsComponent implements OnInit {
     }
     return Object.entries(map).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count);
   });
+
+  categoryBreakdown = computed(() => {
+    const map: Record<string, number> = { buy: 0, rent: 0, invest: 0 };
+    for (const l of this.leads()) map[l.category || 'buy']++;
+    const total = this.leads().length || 1;
+    return Object.entries(map).map(([cat, count]) => ({ cat, count, pct: Math.round(count / total * 100) }));
+  });
+
+  pipelineStages = computed(() => {
+    const order: LeadStatus[] = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
+    const total = this.leads().length || 1;
+    return order.map(s => ({
+      status: s,
+      count: this.leads().filter(l => l.status === s).length,
+      pct: Math.round(this.leads().filter(l => l.status === s).length / total * 100),
+      color: this.dataSvc.leadStatuses().find(x => x.name === s)?.color ?? '#6b7280',
+    }));
+  });
+
+  leadsThisMonth = computed(() => {
+    const m = new Date().toISOString().slice(0, 7);
+    return this.leads().filter(l => (l.createdDate || '').startsWith(m)).length;
+  });
+
+  activeLeads = computed(() =>
+    this.leads().filter(l => !['won','lost'].includes(l.status)).length
+  );
 
   // ── Multi-select location ─────────────────────────────
   selectedLocations = signal<string[]>([]);
@@ -186,6 +223,13 @@ export class AdminLeadsComponent implements OnInit {
     return this.leads().filter(l => l.status === status).length;
   }
 
+  isPastStage(stage: string, currentStatus: string): boolean {
+    const order = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
+    const si = order.indexOf(stage);
+    const ci = order.indexOf(currentStatus);
+    return si < ci && currentStatus !== 'lost';
+  }
+
   filtered = computed(() => {
     const col = this.sortCol();
     const dir = this.sortDir();
@@ -247,6 +291,7 @@ export class AdminLeadsComponent implements OnInit {
 
   openView(lead: Lead): void {
     this.viewLead.set(lead);
+    this.viewTab.set('overview');
     this.showViewModal.set(true);
   }
 

@@ -315,7 +315,7 @@ export class AdminDataService {
   }
 
   async toggleUserStatus(id: string, currentStatus: UserStatus): Promise<void> {
-    const next: UserStatus = currentStatus === 'active' ? 'suspended' : 'active';
+    const next: UserStatus = currentStatus === 'active' ? 'inactive' : 'active';
     await this.sb.from('profiles').update({ status: next }).eq('id', id);
     await this.loadUsers();
   }

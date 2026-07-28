@@ -354,6 +354,10 @@ $radius: 10px;
 .wi-cta-section {
   background: linear-gradient(135deg, #0d1f15 0%, $green 100%);
   padding: 4rem 0;
+
+  @media (max-width: 600px) {
+    padding: 2.5rem 0;
+  }
 }
 
 .wi-cta-inner {
@@ -362,6 +366,12 @@ $radius: 10px;
   justify-content: space-between;
   gap: 2rem;
   flex-wrap: wrap;
+
+  @media (max-width: 700px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
 }
 
 .wi-cta-title {
@@ -385,6 +395,11 @@ $radius: 10px;
   gap: 0.75rem;
   flex-wrap: wrap;
   flex-shrink: 0;
+
+  @media (max-width: 700px) {
+    width: 100%;
+    flex-direction: column;
+  }
 }
 
 .wi-cta-btn {
@@ -394,6 +409,12 @@ $radius: 10px;
   font-weight: 700;
   text-decoration: none;
   transition: all 0.2s;
+  text-align: center;
+
+  @media (max-width: 700px) {
+    width: 100%;
+    box-sizing: border-box;
+  }
 
   &--primary {
     background: $gold;

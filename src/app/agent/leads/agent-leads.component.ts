@@ -50,7 +50,11 @@ export interface AgentLead {
   lastContact: string;
   createdDate: string;
   customerId?: string | null;
+  followUpDate?: string | null;
+  followUpNote?: string | null;
+  priority?: string;
 }
+
 
 const EMPTY_FORM = (): Partial<AgentLead> => ({
   name: '', email: '', phone: '', status: 'new', category: 'Buy',
@@ -59,6 +63,7 @@ const EMPTY_FORM = (): Partial<AgentLead> => ({
   source: 'website', notes: '', agentReply: '',
   createdDate: new Date().toISOString().slice(0, 10),
   lastContact: new Date().toISOString().slice(0, 10),
+  priority: 'medium',
 });
 
 @Component({
@@ -102,6 +107,8 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   msgLoading    = signal(false);
   newMessage    = signal('');
   sendingMsg    = signal(false);
+
+  readonly priorities = ['low', 'medium', 'high', 'urgent'];
 
 
   readonly leadStatusList = computed(() => this.dataSvc.leadStatuses().map(s => s.name as LeadStatus));
@@ -187,13 +194,13 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   private async fetchLeads(agentEmail: string, agentName: string): Promise<void> {
     const { data: byEmail } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id, follow_up_date, follow_up_note, priority')
       .eq('agent_email', agentEmail)
       .order('created_at', { ascending: false });
 
     const { data: byName } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, agent_email, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id, follow_up_date, follow_up_note, priority')
       .eq('assigned_agent', agentName)
       .is('agent_email', null)
       .order('created_at', { ascending: false });
@@ -243,6 +250,9 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       lastContact:   r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '',
       createdDate:   r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '',
       customerId:    r.customer_id    ?? null,
+      followUpDate:  r.follow_up_date ?? null,
+      followUpNote:  r.follow_up_note ?? null,
+      priority:      r.priority       || 'medium',
     };
   }
 
@@ -429,7 +439,11 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     return `AED ${n.toLocaleString()}`;
   }
 
-  // ── Customer Profile Page ───────────────────────────────
+  // ── Open lead detail page ─────────────────────────────
+  openDetail(l: AgentLead): void {
+    this.router.navigate(['/agent/leads', l.id]);
+  }
+
   openProfile(l: AgentLead): void {
     this.router.navigate(['/agent/leads', l.id]);
   }

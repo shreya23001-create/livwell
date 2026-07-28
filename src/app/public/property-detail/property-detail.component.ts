@@ -28,6 +28,7 @@ interface Property {
   furnishing: string;
   images: string[];
   is_featured: boolean;
+  by_developer: boolean;
   agent_name: string;
   created_at: string;
   views: number;
@@ -228,7 +229,26 @@ export class PropertyDetailComponent implements OnInit {
   // Newsletter
   newsletterEmail     = signal('');
   newsletterSubmitted = signal(false);
-  subscribeNewsletter(): void { if (this.newsletterEmail()) this.newsletterSubmitted.set(true); }
+  newsletterError     = signal('');
+  subscribing         = signal(false);
+
+  async subscribeNewsletter(): Promise<void> {
+    const email = this.newsletterEmail().trim();
+    if (!email) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.newsletterError.set('Please enter a valid email address.');
+      return;
+    }
+    this.subscribing.set(true);
+    this.newsletterError.set('');
+    const { error } = await this.sb.from('newsletter_subscribers').upsert(
+      { email, status: 'subscribed' },
+      { onConflict: 'email' }
+    );
+    this.subscribing.set(false);
+    if (error) { this.newsletterError.set('Something went wrong. Please try again.'); return; }
+    this.newsletterSubmitted.set(true);
+  }
 
   // Inquiry form — pre-fill from logged-in user if available
   inquiryForm_name    = '';
@@ -560,6 +580,7 @@ export class PropertyDetailComponent implements OnInit {
     furnishing:   p.furnishing   || '',
     images:       (() => { const raw: string[] = Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? JSON.parse(p.images) : []); const clean = raw.filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); const real = clean.filter((u: string) => !u.includes('/images/')); const local = clean.filter((u: string) => u.includes('/images/')); return [...real, ...local]; })(),
     is_featured:  p.is_featured  || false,
+    by_developer: p.by_developer || false,
     agent_name:   ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
     created_at:   p.created_at   || '',
     views:        p.views        || 0,

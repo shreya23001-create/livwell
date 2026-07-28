@@ -177,6 +177,52 @@ $white: #ffffff;
       background: #f3e8ff;
     }
   }
+
+  &--disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+    position: relative;
+
+    &.lp-cta--wa-missing {
+      pointer-events: auto;
+      cursor: default;
+
+      &:hover .lp-cta-tooltip {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+.lp-cta-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #111827;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.375rem;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  pointer-events: none;
+  z-index: 10;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #111827;
+  }
 }
 
 // ── Main Grid ─────────────────────────────────────────────────
@@ -1134,4 +1180,227 @@ $white: #ffffff;
     color: #991b1b;
     border: 1px solid #fecaca;
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CRM GRID — Lead Info / Follow-Up History / Status / Timeline
+// ══════════════════════════════════════════════════════════════
+
+.crm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.crm-left, .crm-right {
+  display: flex; flex-direction: column; gap: 1.25rem;
+}
+
+// Priority badge in card header
+.crm-priority-badge {
+  margin-left: auto;
+  font-size: 0.72rem; font-weight: 700;
+  padding: 0.1rem 0.55rem; border-radius: 999px;
+  &.crm-priority--low    { background: #f0fdf4; color: #4f46e5; }
+  &.crm-priority--medium { background: #fffbeb; color: #b45309; }
+  &.crm-priority--high   { background: #fef2f2; color: #dc2626; }
+  &.crm-priority--urgent { background: #dc2626; color: #fff; }
+}
+
+// Count badge
+.crm-count-badge {
+  margin-left: auto;
+  background: #6366f1; color: #fff;
+  font-size: 0.65rem; font-weight: 700;
+  padding: 0.05rem 0.45rem; border-radius: 999px;
+}
+
+// Lead info grid (2 col)
+.crm-info-card { }
+.crm-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem; margin-bottom: 0.875rem;
+}
+.crm-info-row { display: flex; flex-direction: column; gap: 0.08rem; }
+.crm-lbl {
+  font-size: 0.67rem; color: $muted; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.crm-val {
+  font-size: 0.83rem; color: $text;
+  &--bold      { font-weight: 700; }
+  &--link      { color: #6366f1; text-decoration: none; &:hover { text-decoration: underline; } }
+  &--highlight { color: #6366f1; font-weight: 700; }
+}
+
+// Notes
+.crm-notes {
+  border-top: 1px solid $border; padding-top: 0.75rem; margin-top: 0.25rem;
+}
+.crm-notes-lbl {
+  font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: $muted; margin-bottom: 0.3rem;
+}
+.crm-notes-body {
+  font-size: 0.83rem; color: $sub; line-height: 1.55;
+  white-space: pre-wrap; word-break: break-word;
+}
+
+// Follow-up history table
+.crm-fu-wrap { overflow-x: auto; }
+.crm-fu-table {
+  width: 100%; border-collapse: collapse; font-size: 0.79rem; min-width: 360px;
+  thead tr { background: #f8f9fb; }
+  th {
+    padding: 0.45rem 0.6rem; text-align: left; font-size: 0.68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; color: $muted; white-space: nowrap;
+    border-bottom: 1px solid $border;
+  }
+  tbody tr { border-bottom: 1px solid $border; &:last-child { border-bottom: none; } &:hover { background: #fafbfc; } }
+  td { padding: 0.5rem 0.6rem; color: $text; vertical-align: middle; }
+  .fu-date  { white-space: nowrap; }
+  .fu-time  { color: $muted; white-space: nowrap; }
+  .fu-remarks { color: $sub; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fu-by    { color: $muted; white-space: nowrap; }
+}
+
+// Empty / loading
+.crm-empty {
+  text-align: center; color: $muted; font-size: 0.83rem; padding: 1.25rem 0;
+}
+
+// CRM form fields (status update / next FU)
+.crm-form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.875rem;
+}
+.crm-form-field {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  &--full { margin-bottom: 0.875rem; }
+  label { font-size: 0.78rem; font-weight: 600; color: $sub; }
+  input, select, textarea {
+    border: 1px solid $border; border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem; font-size: 0.83rem; color: $text;
+    outline: none; background: #fff; width: 100%; box-sizing: border-box;
+    font-family: inherit; transition: border-color 0.15s;
+    &:focus { border-color: #6366f1; }
+  }
+  textarea { resize: vertical; }
+}
+
+.crm-save-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: #6366f1; color: #fff; border: none; border-radius: 0.5rem;
+  padding: 0.55rem 1.25rem; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  transition: background 0.15s;
+  &:hover:not(:disabled) { background: #4f46e5; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+.crm-btn-outline {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: #fff; color: $sub; border: 1px solid $border;
+  border-radius: 0.5rem; padding: 0.55rem 1.1rem; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: background 0.15s;
+  &:hover { background: #f3f4f6; }
+}
+.crm-fu-btn-row { display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+// Activity timeline
+/* ── Unified Activity Timeline ─────────────────── */
+.utl-count {
+  margin-left: auto;
+  background: #6366f1;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  line-height: 1.4;
+}
+
+.utl-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  padding: 2rem 0; color: $muted; text-align: center;
+  svg { opacity: 0.3; }
+  p { font-size: 0.82rem; margin: 0; }
+}
+
+.utl-list {
+  display: flex; flex-direction: column;
+  max-height: 420px; overflow-y: auto;
+  padding-right: 0.25rem;
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb { background: $border; border-radius: 3px; }
+}
+
+.utl-item {
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  padding: 0.5rem 0;
+}
+
+.utl-dot-col {
+  display: flex; flex-direction: column; align-items: center;
+  flex-shrink: 0; width: 28px;
+}
+
+.utl-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; position: relative; z-index: 1;
+
+  &--followup { background: rgba(99, 102, 241, .12); color: #6366f1; }
+  &--create   { background: rgba(16, 185, 129, .12); color: #10b981; }
+  &--message  { background: rgba(59, 130, 246, .12);  color: #3b82f6; }
+  &--status   { background: rgba(217, 119, 6, .12);   color: #d97706; }
+  &--save     { background: rgba(239, 68, 68, .12);   color: #ef4444; }
+  &--view     { background: rgba(26, 92, 58, .12);    color: $green;  }
+}
+
+.utl-line {
+  width: 2px; flex: 1; min-height: 12px;
+  background: $border; margin-top: 3px;
+}
+
+.utl-body {
+  flex: 1; min-width: 0; padding-bottom: 0.5rem;
+  border-bottom: 1px solid $border;
+  .utl-item--last & { border-bottom: none; }
+}
+
+.utl-action {
+  font-size: 0.83rem; font-weight: 600; color: $text; line-height: 1.35;
+}
+
+.utl-meta {
+  display: flex; align-items: center; gap: 0.35rem; margin-top: 0.25rem; flex-wrap: wrap;
+}
+
+.utl-badge {
+  font-size: 0.63rem; font-weight: 700; border-radius: 999px;
+  padding: 0.1rem 0.45rem; text-transform: capitalize; white-space: nowrap;
+  &--new         { background: #f0f9ff; color: #0369a1; }
+  &--contacted   { background: #eff6ff; color: #2563eb; }
+  &--qualified   { background: #f0fdf4; color: #16a34a; }
+  &--negotiating { background: #fff7ed; color: #c2410c; }
+  &--won         { background: #f0fdf4; color: #15803d; }
+  &--lost        { background: #fef2f2; color: #dc2626; }
+  &--default     { background: #f3f4f6; color: #6b7280; }
+}
+
+.utl-detail {
+  font-size: 0.75rem; color: $muted;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px;
+}
+
+.utl-time {
+  font-size: 0.7rem; color: #9ca3af; margin-top: 0.2rem;
+}
+
+// select-wrapper inside CRM forms (reuse from agent-leads, define locally)
+.select-wrapper { position: relative; display: block; width: 100%; }
+.select-wrapper select {
+  appearance: none; -webkit-appearance: none; padding-right: 2.25rem; width: 100%; cursor: pointer;
+}
+.dropdown-icon {
+  position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; pointer-events: none; color: #6b7280;
 }

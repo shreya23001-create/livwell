@@ -38,6 +38,7 @@
       <div class="pd-badges-row">
         <span class="pd-badge-type">{{ p.type }}</span>
         <span class="pd-badge-sale" [class.rent]="p.listing_type === 'Rent'">For {{ p.listing_type }}</span>
+        <span *ngIf="p.by_developer" class="pd-badge-by-developer">By Developer</span>
         <span *ngIf="p.is_featured" class="pd-badge-featured">Featured</span>
       </div>
       <div class="pd-title-actions-row">
@@ -251,59 +252,8 @@
         </div>
       </div>
 
-      <!-- Mortgage Calculator -->
-      <div class="pd-section">
-        <h2 class="pd-section-title">Mortgage Calculator</h2>
-        <div class="pd-mortgage">
-          <div class="pd-mortgage-fields">
-            <div class="pd-mortgage-field">
-              <label>Property Value (AED)</label>
-              <input type="number" [ngModel]="mortgagePrice()" (ngModelChange)="mortgagePrice.set($event)" />
-            </div>
-            <div class="pd-mortgage-field">
-              <label>Down Payment ({{ mortgageDown() }}%)</label>
-              <input type="range" min="5" max="80" step="5" [ngModel]="mortgageDown()"
-                (ngModelChange)="mortgageDown.set($event)" />
-              <div class="pd-range-labels"><span>5%</span><span>{{ mortgageDown() }}%</span><span>80%</span></div>
-            </div>
-            <div class="pd-mortgage-field">
-              <label>Loan Period ({{ mortgagePeriod() }} years)</label>
-              <input type="range" min="5" max="25" step="1" [ngModel]="mortgagePeriod()"
-                (ngModelChange)="mortgagePeriod.set($event)" />
-              <div class="pd-range-labels"><span>5 yrs</span><span>{{ mortgagePeriod() }} yrs</span><span>25 yrs</span>
-              </div>
-            </div>
-            <div class="pd-mortgage-field">
-              <label>Interest Rate ({{ mortgageRate() }}% p.a.)</label>
-              <input type="range" min="1" max="12" step="0.1" [ngModel]="mortgageRate()"
-                (ngModelChange)="mortgageRate.set($event)" />
-              <div class="pd-range-labels"><span>1%</span><span>{{ mortgageRate() }}%</span><span>12%</span></div>
-            </div>
-          </div>
-          <div class="pd-mortgage-result">
-            <div class="pd-mortgage-label">Monthly Payment</div>
-            <div class="pd-mortgage-amount">{{ formatPrice(monthlyPayment()) }}</div>
-            <div class="pd-mortgage-note">{{ mortgageDown() }}% down · {{ mortgagePeriod() }} yrs · {{ mortgageRate()
-              }}% p.a.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Purchase Costs -->
-      <div class="pd-section" *ngIf="p.listing_type === 'Sale'">
-        <h2 class="pd-section-title">Estimated Purchase Costs</h2>
-        <div class="pd-costs-table">
-          <div *ngFor="let c of purchaseCosts()" class="pd-cost-row">
-            <span class="pd-cost-label">{{ c.label }}</span>
-            <span class="pd-cost-amount">{{ formatPrice(c.amount) }}</span>
-          </div>
-          <div class="pd-cost-row total">
-            <span class="pd-cost-label">Total Upfront Cost</span>
-            <span class="pd-cost-amount">{{ formatPrice(totalPurchaseCost()) }}</span>
-          </div>
-        </div>
-        <p class="pd-cost-note">* Estimates only. Consult a licensed professional.</p>
-      </div>
+      <!-- Mortgage Calculator — hidden -->
+      <!-- Purchase Costs — hidden -->
 
       <!-- Video -->
       <div class="pd-section" *ngIf="property()?.video_url">
@@ -355,9 +305,12 @@
           <h3 class="pd-nl-title">Stay updated on Dubai's property market</h3>
           <form class="pd-nl-form" (ngSubmit)="subscribeNewsletter()" (submit)="$event.preventDefault()">
             <input type="email" placeholder="Your email address" class="pd-nl-input" [ngModel]="newsletterEmail()"
-              (ngModelChange)="newsletterEmail.set($event)" name="pdNlEmail" required />
-            <button type="submit" class="pd-nl-btn">Subscribe</button>
+              (ngModelChange)="newsletterEmail.set($event); newsletterError.set('')" name="pdNlEmail" required />
+            <button type="submit" class="pd-nl-btn" [disabled]="subscribing()">
+              {{ subscribing() ? 'Subscribing…' : 'Subscribe' }}
+            </button>
           </form>
+          <p *ngIf="newsletterError()" class="pd-nl-error">{{ newsletterError() }}</p>
         </div>
         <div *ngIf="newsletterSubmitted()" class="pd-nl-success">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -470,7 +423,7 @@
               }
             </div>
           }
-          <a [href]="agentEmail() ? 'mailto:' + agentEmail() : '/contact'" class="pd-btn-email" title="Send Email">
+          <a [href]="agentEmail() ? 'mailto:' + agentEmail() : 'mailto:info@livwell.ae'" class="pd-btn-email" title="Send Email">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
             </svg>

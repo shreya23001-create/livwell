@@ -74,38 +74,6 @@
         </div>
       </div>
 
-      <!-- Gallery grid (main + 4 thumbs) -->
-      <div class="lpd-gallery-grid">
-        <div class="lpd-gallery-main" (click)="openLightbox()">
-          <img [src]="property()!.images[activeImage()]" [alt]="property()!.title" class="lpd-main-img" (error)="$any($event.target).src='/images/dummy-image.png'">
-          <span *ngIf="property()?.badge" class="lpd-badge">{{ property()?.badge }}</span>
-          <button class="lpd-nav lpd-nav-prev"
-            (click)="$event.stopPropagation(); prevImage()"
-            *ngIf="property()!.images.length > 1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-          <button class="lpd-nav lpd-nav-next"
-            (click)="$event.stopPropagation(); nextImage()"
-            *ngIf="property()!.images.length > 1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
-          <button class="lpd-view-all-btn" (click)="$event.stopPropagation(); openLightbox()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-            View all {{ property()!.images.length }} photos
-          </button>
-        </div>
-        <div class="lpd-gallery-thumbs-grid" *ngIf="property()!.images.length > 1">
-          <div *ngFor="let img of property()!.images.slice(1,5); let i = index"
-               class="lpd-thumb-cell" [class.active]="activeImage() === i+1"
-               (click)="activeImage.set(i+1)">
-            <img [src]="img" [alt]="'Photo ' + (i+2)">
-            <div *ngIf="i === 3 && property()!.images.length > 5" class="lpd-thumb-more">
-              +{{ property()!.images.length - 5 }} more
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Specs bar -->
       <div class="lpd-specs-bar">
         <div class="lpd-spec-item">
@@ -140,198 +108,104 @@
         </div>
       </div>
 
-      <!-- Two-column body -->
-      <div class="lpd-body-grid">
+      <!-- Single-column body -->
+      <div class="lpd-body-single">
 
-        <!-- LEFT COLUMN -->
-        <div class="lpd-body-left">
+        <!-- Photos -->
+        <section class="lpd-section lpd-section--gallery">
+          <h2 class="lpd-sec-title">Photos</h2>
+          <div class="lpd-gallery-grid">
+            <div class="lpd-gallery-main" (click)="openLightbox()">
+              <img [src]="property()!.images[activeImage()]" [alt]="property()!.title" class="lpd-main-img" (error)="$any($event.target).src='/images/dummy-image.png'">
+              <span *ngIf="property()?.badge" class="lpd-badge">{{ property()?.badge }}</span>
+              <button class="lpd-nav lpd-nav-prev" (click)="$event.stopPropagation(); prevImage()" *ngIf="property()!.images.length > 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button class="lpd-nav lpd-nav-next" (click)="$event.stopPropagation(); nextImage()" *ngIf="property()!.images.length > 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button class="lpd-view-all-btn" (click)="$event.stopPropagation(); openLightbox()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                View all {{ property()!.images.length }} photos
+              </button>
+            </div>
+            <div class="lpd-gallery-thumbs-grid" *ngIf="property()!.images.length > 1">
+              <div *ngFor="let img of property()!.images.slice(1,5); let i = index"
+                   class="lpd-thumb-cell" [class.active]="activeImage() === i+1"
+                   (click)="activeImage.set(i+1)">
+                <img [src]="img" [alt]="'Photo ' + (i+2)">
+                <div *ngIf="i === 3 && property()!.images.length > 5" class="lpd-thumb-more">
+                  +{{ property()!.images.length - 5 }} more
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-          <!-- About -->
-          <section class="lpd-section">
-            <h2 class="lpd-sec-title">About this property</h2>
+        <!-- About This Property -->
+        <section class="lpd-section">
+          <h2 class="lpd-sec-title">About This Property</h2>
+          <ng-container *ngIf="property()!.about; else lpd_noAbout">
             <div class="lpd-about-wrap">
               <div class="lpd-about" [class.truncated]="!aboutExpanded()" [innerHTML]="safeHtml(property()!.about)"></div>
               <button *ngIf="property()!.about.length > 320" class="lpd-read-more" (click)="aboutExpanded.set(!aboutExpanded())">
                 {{ aboutExpanded() ? 'Show less ↑' : 'Read more ↓' }}
               </button>
             </div>
-            <div class="lpd-about-details">
-              <div class="lpd-about-row"><span class="lpd-ad-lbl">Property Name</span><span class="lpd-ad-val">{{ property()!.title }}</span></div>
-              <div class="lpd-about-row"><span class="lpd-ad-lbl">Developer</span><span class="lpd-ad-val">{{ property()!.developer }}</span></div>
-              <div class="lpd-about-row"><span class="lpd-ad-lbl">Location</span><span class="lpd-ad-val">{{ property()!.location }}, Dubai</span></div>
-              <div class="lpd-about-row"><span class="lpd-ad-lbl">Community</span><span class="lpd-ad-val">{{ property()!.community }}</span></div>
-              <div class="lpd-about-row"><span class="lpd-ad-lbl">Property Type</span><span class="lpd-ad-val">{{ property()!.type }}</span></div>
-              <div class="lpd-about-row"><span class="lpd-ad-lbl">Status</span><span class="lpd-ad-val">{{ property()!.status }}</span></div>
+          </ng-container>
+          <ng-template #lpd_noAbout>
+            <p class="lpd-no-about">Contact our agent for full details about this property.</p>
+          </ng-template>
+        </section>
+
+        <!-- Property Details -->
+        <section class="lpd-section">
+          <h2 class="lpd-sec-title">Property Details</h2>
+          <div class="lpd-about-details">
+            <div class="lpd-about-row"><span class="lpd-ad-lbl">Property Name</span><span class="lpd-ad-val">{{ property()!.title }}</span></div>
+            <div class="lpd-about-row" *ngIf="property()!.developer"><span class="lpd-ad-lbl">Developer</span><span class="lpd-ad-val">{{ property()!.developer }}</span></div>
+            <div class="lpd-about-row"><span class="lpd-ad-lbl">Location</span><span class="lpd-ad-val">{{ property()!.location }}, Dubai</span></div>
+            <div class="lpd-about-row" *ngIf="property()!.community"><span class="lpd-ad-lbl">Community</span><span class="lpd-ad-val">{{ property()!.community }}</span></div>
+            <div class="lpd-about-row"><span class="lpd-ad-lbl">Property Type</span><span class="lpd-ad-val">{{ property()!.type }}</span></div>
+            <div class="lpd-about-row"><span class="lpd-ad-lbl">Bedrooms</span><span class="lpd-ad-val">{{ property()!.beds }}</span></div>
+            <div class="lpd-about-row"><span class="lpd-ad-lbl">Bathrooms</span><span class="lpd-ad-val">{{ property()!.baths }}</span></div>
+            <div class="lpd-about-row" *ngIf="property()!.area"><span class="lpd-ad-lbl">Area</span><span class="lpd-ad-val">{{ property()!.area }}</span></div>
+            <div class="lpd-about-row"><span class="lpd-ad-lbl">Status</span><span class="lpd-ad-val">{{ property()!.status }}</span></div>
+            <div class="lpd-about-row"><span class="lpd-ad-lbl">Furnished</span><span class="lpd-ad-val">{{ property()!.furnished ? 'Yes' : 'No' }}</span></div>
+            <div class="lpd-about-row"><span class="lpd-ad-lbl">Listed</span><span class="lpd-ad-val">{{ property()!.listedDate }}</span></div>
+          </div>
+        </section>
+
+        <!-- Amenities & Features -->
+        <section class="lpd-section" *ngIf="property()!.amenities?.length">
+          <h2 class="lpd-sec-title">Amenities & Features</h2>
+          <div class="lpd-amenities">
+            <div *ngFor="let a of property()!.amenities" class="lpd-amenity">
+              <div class="lpd-amenity-icon" [innerHTML]="getAmenityIcon(a)"></div>
+              <span>{{ a }}</span>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <!-- Mortgage Calculator -->
-          <section class="lpd-section">
-            <h2 class="lpd-sec-title">Mortgage Calculator</h2>
-            <div class="lpd-mortgage">
-              <div class="lpd-mortgage-fields">
-                <div class="lpd-mortgage-field">
-                  <label>Property Value (AED)</label>
-                  <input type="number" [ngModel]="mortgageAmount()" (ngModelChange)="mortgageAmount.set($event)" />
-                </div>
-                <div class="lpd-mortgage-field">
-                  <label>Down Payment ({{ mortgageDown() }}%)</label>
-                  <input type="range" min="5" max="80" step="5" [ngModel]="mortgageDown()" (ngModelChange)="mortgageDown.set($event)" />
-                  <div class="lpd-range-labels"><span>5%</span><span>{{ mortgageDown() }}%</span><span>80%</span></div>
-                </div>
-                <div class="lpd-mortgage-field">
-                  <label>Loan Period ({{ mortgageYears() }} years)</label>
-                  <input type="range" min="5" max="25" step="1" [ngModel]="mortgageYears()" (ngModelChange)="mortgageYears.set($event)" />
-                  <div class="lpd-range-labels"><span>5 yrs</span><span>{{ mortgageYears() }} yrs</span><span>25 yrs</span></div>
-                </div>
-                <div class="lpd-mortgage-field">
-                  <label>Interest Rate ({{ mortgageRate() }}% p.a.)</label>
-                  <input type="range" min="1" max="12" step="0.1" [ngModel]="mortgageRate()" (ngModelChange)="mortgageRate.set($event)" />
-                  <div class="lpd-range-labels"><span>1%</span><span>{{ mortgageRate() }}%</span><span>12%</span></div>
-                </div>
-              </div>
-              <div class="lpd-mortgage-result">
-                <div class="lpd-mortgage-label">Monthly Payment</div>
-                <div class="lpd-mortgage-amount">{{ formatCurrency(monthlyPayment()) }}</div>
-                <div class="lpd-mortgage-note">{{ mortgageDown() }}% down · {{ mortgageYears() }} yrs · {{ mortgageRate() }}% p.a.</div>
-              </div>
-            </div>
-          </section>
+        <!-- Location -->
+        <section class="lpd-section">
+          <h2 class="lpd-sec-title">Location</h2>
+          <div class="lpd-map">
+            <iframe [src]="safeMapUrl()" width="100%" height="340" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </section>
 
-          <!-- Estimated Purchase Costs -->
-          <section class="lpd-section">
-            <h2 class="lpd-sec-title">Estimated Purchase Costs</h2>
-            <div class="lpd-costs-table">
-              <div *ngFor="let c of lpd_purchaseCosts()" class="lpd-cost-row">
-                <span class="lpd-cost-label">{{ c.label }}</span>
-                <span class="lpd-cost-amount">{{ formatCurrency(c.amount) }}</span>
-              </div>
-              <div class="lpd-cost-row lpd-cost-total">
-                <span class="lpd-cost-label">Total Upfront Cost</span>
-                <span class="lpd-cost-amount">{{ formatCurrency(lpd_totalPurchaseCost()) }}</span>
-              </div>
-            </div>
-            <p class="lpd-cost-note">* Estimates only. Consult a licensed professional.</p>
-          </section>
-
-          <!-- Amenities -->
-          <section class="lpd-section">
-            <h2 class="lpd-sec-title">Amenities</h2>
-            <div class="lpd-amenities">
-              <div *ngFor="let a of property()!.amenities" class="lpd-amenity">
-                <div class="lpd-amenity-icon" [innerHTML]="getAmenityIcon(a)"></div>
-                <span>{{ a }}</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- Map -->
-          <section class="lpd-section" *ngIf="property()!.mapUrl">
-            <h2 class="lpd-sec-title">{{ property()!.community }} location</h2>
-            <div class="lpd-map">
-              <iframe [src]="safeMapUrl()" width="100%" height="380" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
-          </section>
-
-          <!-- Nearby Schools -->
-          <section class="lpd-section" *ngIf="property()!.nearbySchools.length > 0">
-            <h2 class="lpd-sec-title">Nearby schools</h2>
-            <div class="lpd-schools">
-              <div *ngFor="let s of property()!.nearbySchools" class="lpd-school">
-                <div class="lpd-school-ico">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                </div>
-                <div class="lpd-school-body">
-                  <div class="lpd-school-name">{{ s.name }}</div>
-                  <div class="lpd-school-dist">{{ s.distance }} away</div>
-                </div>
-                <div class="lpd-school-rating">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  <span>{{ s.rating }}</span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- FAQs -->
-          <section class="lpd-section" *ngIf="property()!.faqs && property()!.faqs!.length > 0">
-            <h2 class="lpd-sec-title">Frequently Asked Questions</h2>
-            <div class="lpd-faq-list">
-              <div class="lpd-faq-item" *ngFor="let faq of property()!.faqs; let i = index"
-                (click)="toggleFaq(i)" [class.open]="faqOpen() === i">
-                <div class="lpd-faq-q">
-                  {{ faq.question }}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-                </div>
-                <div class="lpd-faq-a" *ngIf="faqOpen() === i" [innerHTML]="safeHtml(faq.answer)"></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Similar Properties -->
-          <section class="lpd-section" *ngIf="lpd_similarProperties().length > 0">
-            <h2 class="lpd-sec-title">Similar Properties</h2>
-            <div class="lpd-similar-grid">
-              <a *ngFor="let sp of lpd_similarProperties()" [routerLink]="['/luxury-property', lpd_propertySlug(sp)]" class="lpd-sim-card">
-                <div class="lpd-sim-img-wrap">
-                  <img [src]="sp.images[0] || '/images/dummy-image.png'" [alt]="sp.title" class="lpd-sim-img" loading="lazy"
-                    (error)="$any($event.target).src='/images/dummy-image.png'" />
-                  <span class="lpd-sim-badge">{{ sp.status }}</span>
-                  <div class="lpd-sim-actions">
-                    <button class="lpd-sim-action-btn" [class.saved]="isSimSaved(sp.id)"
-                      [title]="isSimSaved(sp.id) ? 'Remove from saved' : 'Save property'"
-                      (click)="toggleSimSave(sp.id, $event)">
-                      <svg viewBox="0 0 24 24" [attr.fill]="isSimSaved(sp.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                      </svg>
-                    </button>
-                    <div style="position:relative">
-                      <button class="lpd-sim-action-btn" title="Share" (click)="shareSimCard(sp.id, sp.title, $event)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/>
-                        </svg>
-                      </button>
-                      <div *ngIf="simShareToastId() === sp.id" class="lpd-sim-share-toast">Link copied!</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="lpd-sim-body">
-                  <div class="lpd-sim-price">{{ sp.price }}</div>
-                  <div class="lpd-sim-title">{{ sp.title }}</div>
-                  <div class="lpd-sim-specs">
-                    <span>{{ sp.beds }}</span>
-                    <span> · {{ sp.baths }} Ba</span>
-                    <span *ngIf="sp.area"> · {{ sp.area }}</span>
-                  </div>
-                  <div class="lpd-sim-loc">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd" />
-                    </svg>
-                    {{ sp.community || sp.location }}
-                  </div>
-                </div>
-              </a>
-            </div>
-          </section>
-
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div class="lpd-body-right">
-
-          <!-- Agent card -->
+        <!-- Agent & Enquiry -->
+        <section class="lpd-section lpd-section--contact">
           <div class="lpd-agent-card">
             <div class="lpd-agent-header">
               <div class="lpd-agent-avatar-wrap">
                 <ng-container *ngIf="property()!.agent.avatar; else lpd_agentDummy">
-                  <img [src]="property()!.agent.avatar" [alt]="property()!.agent.name" class="lpd-agent-img"
-                    (error)="property()!.agent.avatar = ''" />
+                  <img [src]="property()!.agent.avatar" [alt]="property()!.agent.name" class="lpd-agent-img" (error)="property()!.agent.avatar = ''" />
                 </ng-container>
                 <ng-template #lpd_agentDummy>
                   <div class="lpd-agent-dummy">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                      <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" /></svg>
                   </div>
                 </ng-template>
               </div>
@@ -341,12 +215,9 @@
                 <div class="lpd-agent-company">Livwell Real Estate LLC</div>
               </div>
             </div>
-
             <div class="lpd-contact-btns">
               <a [href]="'tel:' + agentPhone()" class="lpd-btn-call" title="Call">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" /></svg>
               </a>
               <ng-container *ngIf="agentWhatsapp(); else lpd_waUnavail">
                 <a [href]="'https://wa.me/' + agentWhatsapp().replace('+','')" target="_blank" rel="noopener" class="lpd-btn-whatsapp" title="WhatsApp">
@@ -361,15 +232,11 @@
                   <div class="lpd-wa-toast" *ngIf="waUnavailable()">WhatsApp number not available</div>
                 </div>
               </ng-template>
-              <a [href]="agentEmail() ? 'mailto:' + agentEmail() : '/contact'" class="lpd-btn-email" title="Send Email">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                </svg>
+              <a [href]="agentEmail() ? 'mailto:' + agentEmail() : 'mailto:info@livwell.ae'" class="lpd-btn-email" title="Send Email">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
               </a>
             </div>
           </div>
-
-          <!-- Send Enquiry card -->
           <div class="lpd-inquiry-card">
             <div class="lpd-inquiry-title">Send Enquiry</div>
             <input type="text" class="lpd-input" placeholder="Your Name *" [(ngModel)]="lpd_inquiryName" />
@@ -380,8 +247,67 @@
               {{ lpd_enquirySent() ? 'Sent!' : lpd_enquirySending() ? 'Sending…' : 'Send Enquiry' }}
             </button>
           </div>
+        </section>
 
-        </div>
+        <!-- Similar Properties -->
+        <section class="lpd-section" *ngIf="lpd_similarProperties().length > 0">
+          <h2 class="lpd-sec-title">Similar Properties</h2>
+          <div class="lpd-similar-grid">
+            <a *ngFor="let sp of lpd_similarProperties()" [routerLink]="['/luxury-property', lpd_propertySlug(sp)]" class="lpd-sim-card">
+              <div class="lpd-sim-img-wrap">
+                <img [src]="sp.images[0] || '/images/dummy-image.png'" [alt]="sp.title" class="lpd-sim-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'" />
+                <span class="lpd-sim-badge">{{ sp.status }}</span>
+                <div class="lpd-sim-actions">
+                  <button class="lpd-sim-action-btn" [class.saved]="isSimSaved(sp.id)" [title]="isSimSaved(sp.id) ? 'Remove from saved' : 'Save property'" (click)="toggleSimSave(sp.id, $event)">
+                    <svg viewBox="0 0 24 24" [attr.fill]="isSimSaved(sp.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/></svg>
+                  </button>
+                  <div style="position:relative">
+                    <button class="lpd-sim-action-btn" title="Share" (click)="shareSimCard(sp.id, sp.title, $event)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/></svg>
+                    </button>
+                    <div *ngIf="simShareToastId() === sp.id" class="lpd-sim-share-toast">Link copied!</div>
+                  </div>
+                </div>
+              </div>
+              <div class="lpd-sim-body">
+                <div class="lpd-sim-price">{{ sp.price }}</div>
+                <div class="lpd-sim-title">{{ sp.title }}</div>
+                <div class="lpd-sim-specs"><span>{{ sp.beds }}</span><span> · {{ sp.baths }} Ba</span><span *ngIf="sp.area"> · {{ sp.area }}</span></div>
+                <div class="lpd-sim-loc">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd" /></svg>
+                  {{ sp.community || sp.location }}
+                </div>
+              </div>
+              <div class="lpd-sim-footer">
+                <div class="lpd-sim-agent">
+                  <ng-container *ngIf="sp.agent?.avatar; else lpd_simDummy">
+                    <img [src]="sp.agent.avatar" [alt]="sp.agent.name" class="lpd-sim-agent-img" (error)="$any($event.target).style.display='none'" />
+                  </ng-container>
+                  <ng-template #lpd_simDummy>
+                    <div class="lpd-sim-agent-dummy">
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd"/></svg>
+                    </div>
+                  </ng-template>
+                  <span class="lpd-sim-agent-name">{{ sp.agent?.name || 'LivWell Agent' }}</span>
+                </div>
+                <div class="lpd-sim-contact-btns" (click)="$event.preventDefault()">
+                  <a [href]="sp.agent?.phone ? 'tel:' + sp.agent.phone : 'tel:+97143000000'" class="lpd-sim-contact-btn call" title="Call">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.9 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.9 6.9l1.08-1.08a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.73 2.02z"/></svg>
+                    Call
+                  </a>
+                  <a [href]="sp.agent?.whatsapp ? 'https://wa.me/' + sp.agent!.whatsapp!.replace('+','') : (sp.agent?.phone ? 'https://wa.me/' + sp.agent!.phone!.replace('+','') : '#')" target="_blank" rel="noopener" class="lpd-sim-contact-btn whatsapp" title="WhatsApp">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                    WhatsApp
+                  </a>
+                  <a [href]="sp.agent?.email ? 'mailto:' + sp.agent.email : 'mailto:info@livwell.ae'" class="lpd-sim-contact-btn email" title="Email">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Email
+                  </a>
+                </div>
+              </div>
+            </a>
+          </div>
+        </section>
 
       </div>
     </div>

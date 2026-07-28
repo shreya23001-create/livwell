@@ -885,7 +885,7 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     if (loc) {
       const locField = community ? 'community' : 'location';
       const { data } = await this.sb.from('properties')
-        .select('id, title, type, price, listing_type, area_sqft, bedrooms, bathrooms, images, community, location, status')
+        .select('id, title, type, price, listing_type, area_sqft, bedrooms, bathrooms, images, community, location, status, agent_name')
         .eq('is_luxury', true).eq('status', 'Published').eq(locField, loc)
         .neq('id', currentId).order('created_at', { ascending: false }).limit(4);
       rows = data ?? [];
@@ -893,17 +893,40 @@ export class LuxuryPropertyDetailComponent implements OnInit {
     if (rows.length < 3) {
       const ids = [currentId, ...rows.map((r: any) => r.id)];
       const { data } = await this.sb.from('properties')
-        .select('id, title, type, price, listing_type, area_sqft, bedrooms, bathrooms, images, community, location, status')
+        .select('id, title, type, price, listing_type, area_sqft, bedrooms, bathrooms, images, community, location, status, agent_name')
         .eq('is_luxury', true).eq('status', 'Published').eq('type', type)
         .not('id', 'in', `(${ids.join(',')})`)
         .order('created_at', { ascending: false }).limit(4 - rows.length);
       rows = [...rows, ...(data ?? [])];
     }
-    const similar = rows.slice(0, 4).map((r: any) => {
+    const sliced = rows.slice(0, 4);
+
+    // Fetch agent profiles for similar cards
+    const agentNames = [...new Set(sliced.map((r: any) => r.agent_name).filter(Boolean))];
+    let agentProfileMap: Record<string, { phone: string; email: string; avatar: string; whatsapp: string }> = {};
+    if (agentNames.length) {
+      const { data: profs } = await this.sb.from('profiles')
+        .select('name, phone, email, avatar_url, whatsapp_number')
+        .in('name', agentNames);
+      if (profs) {
+        for (const prof of profs) {
+          const av = prof.avatar_url ?? '';
+          agentProfileMap[prof.name] = {
+            phone: prof.phone ?? '',
+            email: prof.email ?? '',
+            avatar: (av && !av.startsWith('data:')) ? av : '',
+            whatsapp: prof.whatsapp_number ?? '',
+          };
+        }
+      }
+    }
+
+    const similar = sliced.map((r: any) => {
       const priceNum = typeof r.price === 'number' ? r.price : parseFloat(String(r.price ?? '0').replace(/[^0-9.]/g, ''));
       const isRent = (r.listing_type ?? '').toLowerCase() === 'rent';
       const bedsNum = Number(r.bedrooms) || 0;
       const imgs: string[] = Array.isArray(r.images) ? r.images : (r.images ? [r.images] : []);
+      const prof = agentProfileMap[r.agent_name] ?? { phone: '', email: '', avatar: '', whatsapp: '' };
       return {
         id: String(r.id), title: r.title ?? '', developer: '', location: r.location ?? '',
         community: r.community ?? '', type: r.type ?? '', status: r.status ?? 'Ready',
@@ -912,7 +935,8 @@ export class LuxuryPropertyDetailComponent implements OnInit {
         baths: String(Number(r.bathrooms) || 0),
         area: r.area_sqft ? `${Number(r.area_sqft).toLocaleString()} sqft` : '',
         parking: '1', furnished: false, listedDate: '', images: imgs.length ? imgs : ['/images/dummy-image.png'],
-        about: '', amenities: [], agent: { name: '', role: '', phone: '', email: '', avatar: '' },
+        about: '', amenities: [],
+        agent: { name: r.agent_name ?? '', role: 'Property Consultant', phone: prof.phone, email: prof.email, avatar: prof.avatar, whatsapp: prof.whatsapp },
         mortgageRate: 4.5, mapUrl: '', nearbySchools: [],
       } as PropertyDetail;
     });

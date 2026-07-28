@@ -158,6 +158,19 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     { status: 'negotiating', label: 'Negotiating' },
   ];
 
+  waHref(phone: string): string {
+    const digits = phone?.replace(/[^\d+]/g, '').replace(/^\+/, '');
+    return digits ? `https://wa.me/${digits}` : '';
+  }
+
+  hasPhone(phone: string): boolean {
+    return !!(phone?.trim());
+  }
+
+  hasEmail(email: string): boolean {
+    return !!(email?.trim());
+  }
+
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
     const id = Number(this.route.snapshot.paramMap.get('id'));

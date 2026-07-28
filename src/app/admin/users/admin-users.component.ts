@@ -452,11 +452,13 @@ export class AdminUsersComponent {
 
   // ── Helpers ───────────────────────────────────────────
   roleLabel(r: UserRole): string {
-    return { super_admin: 'Super Admin', admin: 'Admin', agent: 'Agent', customer: 'Customer' }[r];
+    const map: Record<UserRole, string> = { super_admin: 'Super Admin', admin: 'Admin', agent: 'Agent', customer: 'Customer' };
+    return map[r] ?? r;
   }
 
   statusLabel(s: UserStatus): string {
-    return { active: 'Active', pending_verification: 'Pending', suspended: 'Suspended', locked: 'Locked' }[s];
+    const map: Record<UserStatus, string> = { active: 'Active', inactive: 'Inactive', pending_verification: 'Pending', suspended: 'Suspended', locked: 'Locked' };
+    return map[s] ?? s;
   }
 
   initials(name: string): string {
@@ -464,7 +466,8 @@ export class AdminUsersComponent {
   }
 
   avatarColor(role: UserRole): string {
-    return { super_admin: '#7c3aed', admin: '#6366f1', agent: '#6366f1', customer: '#2563eb' }[role];
+    const map: Record<UserRole, string> = { super_admin: '#7c3aed', admin: '#6366f1', agent: '#6366f1', customer: '#2563eb' };
+    return map[role] ?? '#6366f1';
   }
 
   pages(): number[] {
@@ -477,5 +480,5 @@ export class AdminUsersComponent {
   }
 
   readonly roleList:   UserRole[]   = ['admin', 'agent'];
-  readonly statusList: UserStatus[] = ['active', 'pending_verification', 'suspended', 'locked'];
+  readonly statusList: UserStatus[] = ['active', 'inactive'];
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -77,17 +77,20 @@ export class ProjectsPublicComponent implements OnInit {
     if (data) this.savedIds.set(new Set(data.map((r: any) => r.project_id)));
   }
 
-  allProjects = signal<Project[]>([]);
-  loading     = signal(true);
+  allProjects     = signal<Project[]>([]);
+  loading         = signal(true);
+  noResultsNotice = signal(false);
 
   searchQuery      = signal('');
   selectedType     = signal('All');
+  selectedLocation = signal('All');
   selectedHandover = signal('All');
   sortBy           = signal('newest');
   currentPage      = signal(1);
   readonly pageSize = 9;
 
-  readonly projectTypes  = ['All', 'Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Home', 'Mixed', 'Duplex'];
+  readonly projectTypes    = ['All', 'Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Home', 'Mixed', 'Duplex'];
+  readonly locationOptions = ['All', 'Downtown Dubai', 'Palm Jumeirah', 'Dubai Marina', 'Business Bay', 'Dubai Hills Estate', 'Dubai Creek Harbour', 'MBR City', 'JVC', 'Al Furjan', 'Emaar Beachfront', 'Jumeirah Village Circle', 'Arabian Ranches', 'Meydan', 'Al Barsha', 'DIFC', 'Dubai South'];
   readonly handoverOptions = ['All', 'Q1 2026', 'Q2 2026', 'Q3 2026', 'Q4 2026', 'Q1 2027', 'Q2 2027', 'Q3 2027', 'Q4 2027', '2028', '2029+'];
 
   filteredProjects = computed(() => {
@@ -112,6 +115,7 @@ export class ProjectsPublicComponent implements OnInit {
       }
     }
     if (this.selectedType() !== 'All') list = list.filter(p => p.type === this.selectedType());
+    if (this.selectedLocation() !== 'All') list = list.filter(p => (p.community ?? p.location ?? '').toLowerCase().includes(this.selectedLocation().toLowerCase()) || (p.location ?? '').toLowerCase().includes(this.selectedLocation().toLowerCase()));
     if (this.selectedHandover() !== 'All') list = list.filter(p => (p.completion_date ?? '').includes(this.selectedHandover()));
     const sort = this.sortBy();
     if (sort === 'price_asc')  list = list.sort((a, b) => (a.price_from ?? 0) - (b.price_from ?? 0));
@@ -148,6 +152,24 @@ export class ProjectsPublicComponent implements OnInit {
     luxury:     this.allProjects().filter(p => p.is_luxury || p.is_ultra_luxury).length,
     minPrice:   this.formatPrice(Math.min(...this.allProjects().map(p => p.price_from ?? 0).filter(n => n > 0))),
   }));
+
+  constructor() {
+    effect(() => {
+      if (!this.loading() && this.totalResults() === 0 && this.allProjects().length > 0) {
+        this.noResultsNotice.set(true);
+        this.clearSearch();
+        setTimeout(() => this.noResultsNotice.set(false), 4000);
+      }
+    });
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
+    this.selectedType.set('All');
+    this.selectedLocation.set('All');
+    this.selectedHandover.set('All');
+    this.currentPage.set(1);
+  }
 
   async ngOnInit() {
     // Subscribe so query params apply even if component was already active

@@ -33,155 +33,163 @@
 
       <div class="lpfs-dd-row">
 
-      <!-- Buy / Rent -->
-      <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'intent'">
-        <button class="lpfs-dd-btn" (click)="toggleDropdown('intent'); $event.stopPropagation()">
-          {{ interestedTo() }}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <div class="lpfs-dd-panel" (click)="$event.stopPropagation()">
-          <p class="lpfs-dd-label">Interested to</p>
-          <div class="lpfs-toggle-row">
-            <button class="lpfs-toggle-btn" [class.active]="interestedTo() === 'Buy'" (click)="setIntent('Buy')">Buy</button>
-            <button class="lpfs-toggle-btn" [class.active]="interestedTo() === 'Rent'" (click)="setIntent('Rent')">Rent</button>
-          </div>
-          <div class="lpfs-dd-actions">
-            <button class="lpfs-dd-reset" (click)="setIntent('Buy')">Reset</button>
-            <button class="lpfs-dd-done" (click)="closeDropdown('intent')">Done</button>
-          </div>
-        </div>
-      </div>
+        <!-- Row A: Buy/Rent + Type -->
+        <div class="lpfs-dd-subrow lpfs-dd-subrow--a">
 
-      <div class="lpfs-divider-v"></div>
-
-      <!-- Property Type -->
-      <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'type'">
-        <button class="lpfs-dd-btn" (click)="toggleDropdown('type'); $event.stopPropagation()">
-          {{ typeLabel() }}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <div class="lpfs-dd-panel" (click)="$event.stopPropagation()">
-          <p class="lpfs-dd-label">Property Type</p>
-          <div class="lpfs-chip-grid">
-            <button *ngFor="let t of propertyTypes" class="lpfs-chip"
-              [class.active]="activeType() === t" (click)="activeType.set(t)">
-              {{ t === 'Any' ? 'Any' : t + 's' }}
+          <!-- Buy / Rent -->
+          <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'intent'">
+            <button class="lpfs-dd-btn" (click)="toggleDropdown('intent'); $event.stopPropagation()">
+              {{ interestedTo() }}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
             </button>
-          </div>
-          <div class="lpfs-dd-actions">
-            <button class="lpfs-dd-reset" (click)="activeType.set('Any')">Reset</button>
-            <button class="lpfs-dd-done" (click)="closeDropdown('type')">Done</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="lpfs-divider-v"></div>
-
-      <!-- Price -->
-      <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'price'">
-        <button class="lpfs-dd-btn" (click)="toggleDropdown('price'); $event.stopPropagation()">
-          {{ priceLabel() }}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <div class="lpfs-dd-panel lpfs-dd-panel--price" (click)="$event.stopPropagation()">
-          <p class="lpfs-dd-label">Price (AED)</p>
-          <div class="lpfs-range-row">
-            <div class="lpfs-range-field">
-              <label>Min</label>
-              <input type="number" placeholder="0" [value]="priceMin()" (input)="priceMin.set($any($event.target).value)" />
-            </div>
-            <span class="lpfs-range-dash">–</span>
-            <div class="lpfs-range-field">
-              <label>Max</label>
-              <input type="number" placeholder="Any" [value]="priceMax()" (input)="priceMax.set($any($event.target).value)" />
-            </div>
-          </div>
-          <div class="lpfs-dd-actions">
-            <button class="lpfs-dd-reset" (click)="priceMin.set(''); priceMax.set('')">Reset</button>
-            <button class="lpfs-dd-done" (click)="closeDropdown('price')">Done</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="lpfs-divider-v"></div>
-
-      <div class="lpfs-divider-v"></div>
-
-      <!-- More Filters -->
-      <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'more'">
-        <button class="lpfs-dd-btn lpfs-dd-btn--filters" (click)="toggleDropdown('more'); $event.stopPropagation()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
-          </svg>
-          More
-          <span *ngIf="activeFiltersCount() > 0" class="lpfs-filter-badge">{{ activeFiltersCount() }}</span>
-        </button>
-        <div class="lpfs-dd-panel lpfs-dd-panel--more" (click)="$event.stopPropagation()">
-
-          <!-- Size (sqft) -->
-          <p class="lpfs-dd-label">Size (sqft)</p>
-          <div class="lpfs-range-row">
-            <div class="lpfs-range-field">
-              <label>Min</label>
-              <input type="number" placeholder="Any" [value]="sizeMin()" (input)="sizeMin.set($any($event.target).value)" />
-            </div>
-            <span class="lpfs-range-dash">–</span>
-            <div class="lpfs-range-field">
-              <label>Max</label>
-              <input type="number" placeholder="Any" [value]="sizeMax()" (input)="sizeMax.set($any($event.target).value)" />
+            <div class="lpfs-dd-panel" (click)="$event.stopPropagation()">
+              <p class="lpfs-dd-label">Interested to</p>
+              <div class="lpfs-toggle-row">
+                <button class="lpfs-toggle-btn" [class.active]="interestedTo() === 'Buy'" (click)="setIntent('Buy')">Buy</button>
+                <button class="lpfs-toggle-btn" [class.active]="interestedTo() === 'Rent'" (click)="setIntent('Rent')">Rent</button>
+              </div>
+              <div class="lpfs-dd-actions">
+                <button class="lpfs-dd-reset" (click)="setIntent('Buy')">Reset</button>
+                <button class="lpfs-dd-done" (click)="closeDropdown('intent')">Done</button>
+              </div>
             </div>
           </div>
 
-          <!-- View -->
-          <p class="lpfs-dd-label" style="margin-top:1rem">View</p>
-          <select class="lpfs-select" [value]="activeView()" (change)="activeView.set($any($event.target).value)">
-            <option *ngFor="let v of viewOptions" [value]="v">{{ v }}</option>
-          </select>
+          <div class="lpfs-divider-v"></div>
 
-          <!-- Ref No -->
-          <p class="lpfs-dd-label" style="margin-top:1rem">Ref. No.</p>
-          <input type="text" class="lpfs-text-input" placeholder="e.g. COM-001"
-            [value]="refNo()" (input)="refNo.set($any($event.target).value)" />
-
-          <!-- Features -->
-          <p class="lpfs-dd-label" style="margin-top:1rem">Features</p>
-          <div class="lpfs-checkbox-grid">
-            <label class="lpfs-checkbox">
-              <input type="checkbox" [checked]="filterReducedPrice()" (change)="filterReducedPrice.set($any($event.target).checked)" />
-              <span>Reduced Price</span>
-            </label>
-            <label class="lpfs-checkbox">
-              <input type="checkbox" [checked]="filterWaterfront()" (change)="filterWaterfront.set($any($event.target).checked)" />
-              <span>Waterfront</span>
-            </label>
-            <label class="lpfs-checkbox">
-              <input type="checkbox" [checked]="filterBeachfront()" (change)="filterBeachfront.set($any($event.target).checked)" />
-              <span>Beachfront</span>
-            </label>
-            <label class="lpfs-checkbox">
-              <input type="checkbox" [checked]="filterFurnished()" (change)="filterFurnished.set($any($event.target).checked)" />
-              <span>Furnished</span>
-            </label>
-            <label class="lpfs-checkbox">
-              <input type="checkbox" [checked]="filter360Tour()" (change)="filter360Tour.set($any($event.target).checked)" />
-              <span>360° Tour</span>
-            </label>
+          <!-- Property Type -->
+          <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'type'">
+            <button class="lpfs-dd-btn" (click)="toggleDropdown('type'); $event.stopPropagation()">
+              {{ typeLabel() }}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="lpfs-dd-panel" (click)="$event.stopPropagation()">
+              <p class="lpfs-dd-label">Property Type</p>
+              <div class="lpfs-chip-grid">
+                <button *ngFor="let t of propertyTypes" class="lpfs-chip"
+                  [class.active]="activeType() === t" (click)="activeType.set(t)">
+                  {{ t === 'Any' ? 'Any' : t + 's' }}
+                </button>
+              </div>
+              <div class="lpfs-dd-actions">
+                <button class="lpfs-dd-reset" (click)="activeType.set('Any')">Reset</button>
+                <button class="lpfs-dd-done" (click)="closeDropdown('type')">Done</button>
+              </div>
+            </div>
           </div>
 
-          <div class="lpfs-dd-actions">
-            <button class="lpfs-dd-reset" (click)="resetMoreFilters()">Reset</button>
-            <button class="lpfs-dd-done" (click)="closeDropdown('more')">Done</button>
-          </div>
-        </div>
-      </div>
+        </div><!-- end row A -->
 
-      <!-- Search Button -->
-      <button class="lpfs-search-btn" (click)="openDropdown.set(null)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        Search
-      </button>
+        <!-- Row B: Price + More + Search -->
+        <div class="lpfs-dd-subrow lpfs-dd-subrow--b">
+
+          <!-- Price -->
+          <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'price'">
+            <button class="lpfs-dd-btn" (click)="toggleDropdown('price'); $event.stopPropagation()">
+              {{ priceLabel() }}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="lpfs-dd-panel lpfs-dd-panel--price" (click)="$event.stopPropagation()">
+              <p class="lpfs-dd-label">Price (AED)</p>
+              <div class="lpfs-range-row">
+                <div class="lpfs-range-field">
+                  <label>Min</label>
+                  <input type="number" placeholder="0" [value]="priceMin()" (input)="priceMin.set($any($event.target).value)" />
+                </div>
+                <span class="lpfs-range-dash">–</span>
+                <div class="lpfs-range-field">
+                  <label>Max</label>
+                  <input type="number" placeholder="Any" [value]="priceMax()" (input)="priceMax.set($any($event.target).value)" />
+                </div>
+              </div>
+              <div class="lpfs-dd-actions">
+                <button class="lpfs-dd-reset" (click)="priceMin.set(''); priceMax.set('')">Reset</button>
+                <button class="lpfs-dd-done" (click)="closeDropdown('price')">Done</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lpfs-divider-v"></div>
+
+          <!-- More Filters -->
+          <div class="lpfs-dd-wrap" [class.open]="openDropdown() === 'more'">
+            <button class="lpfs-dd-btn lpfs-dd-btn--filters" (click)="toggleDropdown('more'); $event.stopPropagation()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+              </svg>
+              More
+              <span *ngIf="activeFiltersCount() > 0" class="lpfs-filter-badge">{{ activeFiltersCount() }}</span>
+            </button>
+            <div class="lpfs-dd-panel lpfs-dd-panel--more" (click)="$event.stopPropagation()">
+
+              <!-- Size (sqft) -->
+              <p class="lpfs-dd-label">Size (sqft)</p>
+              <div class="lpfs-range-row">
+                <div class="lpfs-range-field">
+                  <label>Min</label>
+                  <input type="number" placeholder="Any" [value]="sizeMin()" (input)="sizeMin.set($any($event.target).value)" />
+                </div>
+                <span class="lpfs-range-dash">–</span>
+                <div class="lpfs-range-field">
+                  <label>Max</label>
+                  <input type="number" placeholder="Any" [value]="sizeMax()" (input)="sizeMax.set($any($event.target).value)" />
+                </div>
+              </div>
+
+              <!-- View -->
+              <p class="lpfs-dd-label" style="margin-top:1rem">View</p>
+              <select class="lpfs-select" [value]="activeView()" (change)="activeView.set($any($event.target).value)">
+                <option *ngFor="let v of viewOptions" [value]="v">{{ v }}</option>
+              </select>
+
+              <!-- Ref No -->
+              <p class="lpfs-dd-label" style="margin-top:1rem">Ref. No.</p>
+              <input type="text" class="lpfs-text-input" placeholder="e.g. COM-001"
+                [value]="refNo()" (input)="refNo.set($any($event.target).value)" />
+
+              <!-- Features -->
+              <p class="lpfs-dd-label" style="margin-top:1rem">Features</p>
+              <div class="lpfs-checkbox-grid">
+                <label class="lpfs-checkbox">
+                  <input type="checkbox" [checked]="filterReducedPrice()" (change)="filterReducedPrice.set($any($event.target).checked)" />
+                  <span>Reduced Price</span>
+                </label>
+                <label class="lpfs-checkbox">
+                  <input type="checkbox" [checked]="filterWaterfront()" (change)="filterWaterfront.set($any($event.target).checked)" />
+                  <span>Waterfront</span>
+                </label>
+                <label class="lpfs-checkbox">
+                  <input type="checkbox" [checked]="filterBeachfront()" (change)="filterBeachfront.set($any($event.target).checked)" />
+                  <span>Beachfront</span>
+                </label>
+                <label class="lpfs-checkbox">
+                  <input type="checkbox" [checked]="filterFurnished()" (change)="filterFurnished.set($any($event.target).checked)" />
+                  <span>Furnished</span>
+                </label>
+                <label class="lpfs-checkbox">
+                  <input type="checkbox" [checked]="filter360Tour()" (change)="filter360Tour.set($any($event.target).checked)" />
+                  <span>360° Tour</span>
+                </label>
+              </div>
+
+              <div class="lpfs-dd-actions">
+                <button class="lpfs-dd-reset" (click)="resetMoreFilters()">Reset</button>
+                <button class="lpfs-dd-done" (click)="closeDropdown('more')">Done</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lpfs-divider-v"></div>
+
+          <!-- Search Button -->
+          <button class="lpfs-search-btn" (click)="openDropdown.set(null)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            Search
+          </button>
+
+        </div><!-- end row B -->
 
       </div><!-- end lpfs-dd-row -->
 

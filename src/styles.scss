@@ -630,3 +630,44 @@ router-outlet+* {
     background-position: 200% 0;
   }
 }
+/* ── Navbar mobile responsive (global to bypass ViewEncapsulation) ── */
+@media (max-width: 1500px) {
+  app-navbar .nav-links,
+  app-navbar .nav-actions { display: none !important; }
+  app-navbar .nav-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    justify-content: space-between !important;
+  }
+  app-navbar .hamburger {
+    display: flex !important;
+    flex-direction: column !important;
+    margin-left: auto !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-radius: 0.4rem !important;
+    padding: 0.45rem 0.55rem !important;
+    gap: 5px !important;
+    flex: 0 0 auto !important;
+    border: none !important;
+    cursor: pointer !important;
+  }
+  app-navbar .hamburger span {
+    background: #fff !important;
+    display: block !important;
+    width: 22px !important;
+    height: 2.5px !important;
+    border-radius: 2px !important;
+  }
+  app-navbar .navbar.scrolled .hamburger {
+    background: rgba(0, 0, 0, 0.1) !important;
+  }
+  app-navbar .navbar.scrolled .hamburger span {
+    background: #1a1a2e !important;
+  }
+}
+@media (min-width: 1501px) {
+  app-navbar .nav-links  { display: flex !important; }
+  app-navbar .nav-actions { display: flex !important; }
+  app-navbar .hamburger  { display: none !important; }
+}

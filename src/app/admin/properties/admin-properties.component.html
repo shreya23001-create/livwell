@@ -189,9 +189,9 @@
 
             <!-- Property info -->
             <td class="prop-td">
-              <div class="prop-cell-title">
+              <div class="prop-cell-name-wrap">
                 <span class="prop-featured-dot" *ngIf="p.is_featured" title="Featured"></span>
-                {{ p.title }}
+                <div class="prop-cell-title" [title]="p.title">{{ p.title }}</div>
               </div>
               <div class="prop-cell-meta">
                 <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -614,6 +614,14 @@
         Mark as Luxury Property (appears in Luxe section)
       </label>
       <span class="prop-check-hint">Category (Sale/Rent) is taken from the Category field above</span>
+    </div>
+    <div class="prop-form-field prop-form-field--check">
+      <label class="prop-check-label">
+        <input type="checkbox" [(ngModel)]="draft.by_developer">
+        <span class="prop-check-box"></span>
+        Listed By Developer
+      </label>
+      <span class="prop-check-hint">Shows a "By Developer" badge on the property page — legally required for developer-listed properties</span>
     </div>
 
   </div>

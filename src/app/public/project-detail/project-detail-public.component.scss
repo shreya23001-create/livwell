@@ -1126,22 +1126,56 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
   margin: 0 0 0.5rem;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.pd-prop-specs {
-  display: flex; align-items: center; gap: 0.35rem;
-  flex-wrap: wrap; font-size: 0.78rem; color: #374151;
+.pd-prop-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
   margin-bottom: 0.4rem;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
-.pd-spec-item { display: flex; align-items: center; gap: 0.2rem; }
-.pd-spec-sep { color: #d1d5db; }
+.pd-prop-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex: 1;
+  justify-content: center;
+  padding: 0.38rem 0.25rem;
+  min-width: 0;
+  svg { flex-shrink: 0; color: #6b7280; }
+}
+.pd-prop-stat__val {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pd-prop-stat__lbl {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+.pd-prop-stat-div {
+  width: 1px;
+  align-self: stretch;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
 .pd-prop-sub-label { font-size: 0.78rem; color: #9ca3af; margin-bottom: 0.3rem; }
 .pd-prop-location {
   display: flex; align-items: center; gap: 0.25rem;
   font-size: 0.78rem; color: #e53935; font-weight: 500;
 }
 .pd-prop-footer {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex;
+  flex-direction: column;
   padding: 0.65rem 1rem;
   border-top: 1px solid #f3f4f6;
+  gap: 0.55rem;
 }
 .pd-prop-agent { display: flex; align-items: center; gap: 0.5rem; }
 .pd-prop-agent-avatar-wrap { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
@@ -1153,11 +1187,13 @@ $font-body:    'Plus Jakarta Sans', -apple-system, sans-serif;
 .pd-prop-agent-name { font-size: 0.78rem; font-weight: 600; color: #374151; }
 .pd-prop-contact-btns { display: flex; gap: 0.35rem; }
 .pd-prop-contact-btn {
-  display: flex; align-items: center; gap: 0.3rem;
-  padding: 0.3rem 0.55rem; border-radius: 0.4rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+  flex: 1;
+  padding: 0.35rem 0.4rem; border-radius: 0.4rem;
   font-size: 0.72rem; font-weight: 600; text-decoration: none;
   border: 1.5px solid;
   transition: all 0.15s;
+  white-space: nowrap;
   &.call { border-color: #16a34a; color: #16a34a; &:hover { background: #16a34a; color: #fff; } }
   &.whatsapp { border-color: #25d366; color: #25d366; &:hover { background: #25d366; color: #fff; } }
   &.email { border-color: #dc2626; color: #dc2626; &:hover { background: #dc2626; color: #fff; } }

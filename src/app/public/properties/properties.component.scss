@@ -303,7 +303,25 @@
   text-transform: uppercase;
   color: #6b7280;
   margin-bottom: 0.75rem;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #1a5c3a;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 /* Status toggle */
@@ -877,6 +895,22 @@
     background: #3730a3;
     transform: translateY(-1px);
   }
+}
+
+/* ── No Results Notice ──────────────────────────────── */
+.no-results-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #92400e;
+  margin-bottom: 1rem;
+
+  svg { flex-shrink: 0; color: #d97706; }
 }
 
 /* =====================================================

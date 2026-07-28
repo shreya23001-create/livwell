@@ -987,32 +987,107 @@ $white: #fff;
   font-size: 0.95rem;
 }
 
+// ── Row wrappers: transparent on desktop, rows on mobile ──
+.lpfs-row1 { display: contents; }
+.lpfs-row2 { display: contents; }
+
 // ── Responsive ────────────────────────────────────────────
 @media (max-width: 768px) {
   .lpfs-searchbar {
-    flex-wrap: wrap;
+    flex-direction: column;
     border-radius: 0.75rem;
+    overflow: visible;
+    gap: 0;
   }
 
-  .lpfs-search-input-wrap {
-    padding: 0.5rem 1rem;
-  }
+  // Row 1: search input + Buy/Rent — one full-width row
+  .lpfs-row1 {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid #e5e7eb;
 
-  .lpfs-divider-v {
-    display: none;
-  }
+    .lpfs-search-input-wrap {
+      flex: 1;
+      min-width: 0;
+      padding: 0.55rem 0.75rem;
+    }
 
-  .lpfs-dd-btn {
-    padding: 0.6rem 0.85rem;
-    font-size: 0.8rem;
-  }
+    .lpfs-divider-v {
+      display: block;
+      width: 1px;
+      height: 36px;
+      background: #e5e7eb;
+      flex-shrink: 0;
+    }
 
-  .lpfs-dd-panel {
-    min-width: 280px;
+    .lpfs-dd-wrap { flex-shrink: 0; }
+    .lpfs-dd-btn { padding: 0.6rem 0.75rem; font-size: 0.8rem; white-space: nowrap; }
 
-    &--more {
-      right: 0;
+    // Panel opens downward, clamp to viewport width
+    .lpfs-dd-panel {
+      top: 100%;
       left: auto;
+      right: 0;
+      min-width: 240px;
+      max-width: calc(100vw - 1.5rem);
+    }
+  }
+
+  // Row 2: Type | Beds | Price | Filters | Search — all visible, equal flex
+  .lpfs-row2 {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .lpfs-dd-wrap {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+    }
+
+    .lpfs-divider-v {
+      display: block;
+      width: 1px;
+      height: 36px;
+      background: #e5e7eb;
+      flex-shrink: 0;
+    }
+
+    .lpfs-dd-btn {
+      padding: 0.6rem 0.3rem;
+      font-size: 0.72rem;
+      white-space: nowrap;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .lpfs-search-btn {
+      flex-shrink: 0;
+      margin: 0.35rem 0.4rem;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.75rem;
+      border-radius: 0.4rem;
+      white-space: nowrap;
+    }
+
+    // Dropdown panels — clamp so they don't overflow screen
+    .lpfs-dd-panel {
+      top: 100%;
+      min-width: 240px;
+      max-width: calc(100vw - 1.5rem);
+      left: 0;
+      right: auto;
+
+      &--more {
+        left: auto;
+        right: 0;
+      }
+
+      &--price {
+        left: 0;
+        right: auto;
+      }
     }
   }
 }

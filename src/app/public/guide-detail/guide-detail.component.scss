@@ -178,6 +178,7 @@ $border: #e5e7eb;
   border-radius: 16px;
   padding: 2rem 2.5rem;
   display: flex;
+  overflow: hidden;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
@@ -223,6 +224,26 @@ $border: #e5e7eb;
   white-space: nowrap;
   transition: background 0.15s;
   &:hover { background: rgba(255,255,255,0.2); }
+}
+
+@media (max-width: 600px) {
+  .gd-cta-box {
+    flex-direction: column;
+    padding: 1.5rem 1.25rem;
+    gap: 1rem;
+  }
+
+  .gd-cta-btns {
+    flex-direction: column;
+    width: 100%;
+
+    .gd-btn-primary,
+    .gd-btn-secondary {
+      width: 100%;
+      text-align: center;
+      white-space: normal;
+    }
+  }
 }
 
 /* ── Sidebar ── */

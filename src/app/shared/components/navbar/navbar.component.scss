@@ -1119,10 +1119,17 @@
   }
 }
 
+/* Desktop: ensure hamburger hidden and nav visible above 1500px */
+@media (min-width: 1501px) {
+  .hamburger { display: none !important; }
+  .nav-links  { display: flex !important; }
+  .nav-actions { display: flex !important; }
+}
+
 /* =============================================
    RESPONSIVE
    ============================================= */
-@media (max-width: 1024px) {
+@media (max-width: 1500px) {
   .nav-links {
     display: none !important;
   }

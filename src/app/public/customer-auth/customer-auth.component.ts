@@ -140,13 +140,13 @@ export class CustomerAuthComponent {
           this.signInServerError.set('Invalid email or password.');
           break;
         case 'account_locked':
-          this.signInServerError.set('Account locked. Try again later.');
+          this.signInServerError.set('Your account has been locked by the admin. Please contact support to unlock it.');
           break;
         case 'account_suspended':
-          this.signInServerError.set('Your account has been suspended. Please contact support.');
+          this.signInServerError.set('Your account has been deactivated by the admin. Please contact support.');
           break;
         case 'pending_verification':
-          this.signInServerError.set('Please verify your email before signing in.');
+          this.signInServerError.set('Your account is pending approval. Please contact the admin.');
           break;
         default:
           this.signInServerError.set('Something went wrong. Please try again.');

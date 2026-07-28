@@ -19,14 +19,49 @@ $white:  #fff;
 .prj-hero-sub { color: rgba(255,255,255,.75); font-size: clamp(.95rem, 2vw, 1.1rem); max-width: 640px; margin: 0 auto 2.5rem; }
 
 .prj-search-bar {
-  display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; max-width: 900px; margin: 0 auto;
-  background: rgba(255,255,255,.1); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.2);
-  border-radius: 1rem; padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: $white;
+  border-radius: .75rem;
+  padding: .5rem;
+  max-width: 900px;
+  margin: 0 auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,.25);
+  @media (max-width: 768px) { flex-wrap: wrap; gap: .5rem; padding: .75rem; }
 }
-.prj-search-input-wrap { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 220px; svg { color: rgba(255,255,255,.6); } }
-.prj-search-input { border: none; background: none; outline: none; color: #fff; font-size: .9rem; width: 100%; &::placeholder { color: rgba(255,255,255,.55); } }
-.prj-search-clear { background: none; border: none; cursor: pointer; color: rgba(255,255,255,.7); display: flex; align-items: center; padding: 0 .25rem; flex-shrink: 0; &:hover { color: #fff; } }
-.prj-search-select { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: .5rem; color: #fff; padding: .45rem .875rem; font-size: .85rem; cursor: pointer; outline: none; option { color: $text; background: $white; } }
+.prj-search-input-wrap {
+  flex: 1; min-width: 200px;
+  display: flex; align-items: center; gap: .5rem;
+  padding: 0 .75rem; color: #9ca3af;
+}
+.prj-search-input {
+  flex: 1; border: none; outline: none;
+  font-size: .9rem; color: $text; background: transparent;
+  &::placeholder { color: #9ca3af; }
+}
+.prj-search-clear {
+  background: none; border: none; cursor: pointer; color: #9ca3af;
+  display: flex; align-items: center; padding: 0 .25rem; flex-shrink: 0;
+  &:hover { color: $text; }
+}
+.prj-search-select {
+  border: none; border-left: 1px solid #e8e8e8; outline: none;
+  padding: .5rem .75rem; font-size: .85rem; color: #374151;
+  background: transparent; cursor: pointer; white-space: nowrap;
+  @media (max-width: 768px) { border-left: none; border: 1px solid #e8e8e8; border-radius: .4rem; flex: 1; min-width: 120px; }
+}
+.prj-search-btn {
+  display: flex; align-items: center; gap: .4rem;
+  padding: .65rem 1.5rem;
+  background: $gold; color: $white;
+  border: none; border-radius: .5rem;
+  font-size: .9rem; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  transition: background .2s; flex-shrink: 0;
+  &:hover { background: darken($gold, 8%); }
+  @media (max-width: 768px) { width: 100%; justify-content: center; }
+}
 
 /* ── Stats ───────────────────────────────────────── */
 .prj-stats-strip { background: $white; border-bottom: 1px solid $border; padding: 1.5rem 0; }
@@ -51,6 +86,7 @@ $white:  #fff;
 /* ── Grid ────────────────────────────────────────── */
 .prj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; @media(max-width:1024px){ grid-template-columns: repeat(2,1fr); } @media(max-width:640px){ grid-template-columns: 1fr; } }
 .prj-empty { grid-column: 1/-1; text-align: center; color: $muted; padding: 4rem; svg { display: block; margin: 0 auto 1rem; opacity: .35; } }
+.prj-no-results-notice { grid-column: 1/-1; display: flex; align-items: center; gap: .5rem; padding: .75rem 1rem; background: #fef3c7; border: 1px solid #fbbf24; border-radius: .5rem; font-size: .875rem; color: #92400e; svg { flex-shrink: 0; color: #d97706; } }
 
 /* ── Card ────────────────────────────────────────── */
 .prj-card {

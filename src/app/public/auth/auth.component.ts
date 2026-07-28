@@ -92,10 +92,13 @@ export class AuthComponent {
           this.serverError.set('Invalid email or password.');
           break;
         case 'account_locked':
-          this.serverError.set('Account locked. Try again later.');
+          this.serverError.set('Your account has been locked by the admin. Please contact support to unlock it.');
           break;
         case 'account_suspended':
-          this.serverError.set('Your account has been suspended. Please contact support.');
+          this.serverError.set('Your account has been deactivated by the admin. Please contact support.');
+          break;
+        case 'pending_verification':
+          this.serverError.set('Your account is pending approval. Please contact the admin.');
           break;
         default:
           this.serverError.set('Something went wrong. Please try again.');

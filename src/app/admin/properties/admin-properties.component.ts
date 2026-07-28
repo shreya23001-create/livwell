@@ -39,6 +39,7 @@ export interface Property {
   views:           number;
   is_featured:     boolean;
   is_luxury:       boolean;
+  by_developer:    boolean;
   description:     string;
   address:         string;
   furnishing:      string;
@@ -52,7 +53,7 @@ const EMPTY_FORM = (): Partial<Property> => ({
   title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
   price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', project_name: '', address: '', description: '',
-  furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, is_luxury: false, images: [],
+  furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, is_luxury: false, by_developer: false, images: [],
   amenities: [], video_url: '', faqs: [],
 });
 
@@ -451,6 +452,7 @@ export class AdminPropertiesComponent implements OnInit {
       agent_id:        null,
       is_featured:     f.is_featured   ?? false,
       is_luxury:       f.is_luxury     ?? false,
+      by_developer:    f.by_developer  ?? false,
       images:          this.uploadedImages().length > 0 ? this.uploadedImages() : (f.images ?? []),
       amenities:       f.amenities ?? [],
       video_url:       f.video_url?.trim() || null,

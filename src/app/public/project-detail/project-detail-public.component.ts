@@ -114,7 +114,7 @@ export class ProjectDetailPublicComponent implements OnInit {
     id: number; title: string; price: number; price_label: string;
     type: string; bedrooms: number; bathrooms: number; area_sqft: string; images: string[];
     listing_type: string; community: string; location: string; badge: string; views: number;
-    agent_name: string; agent_phone: string;
+    agent_name: string; agent_phone: string; agent_email: string; agent_avatar: string;
   }[]>([]);
   propCarouselIndex = signal(0);
 
@@ -408,12 +408,18 @@ export class ProjectDetailPublicComponent implements OnInit {
       // Fetch agent phones in one query
       const agentNames = [...new Set(data.map((p: any) => p.agent_name).filter(Boolean))];
       let agentPhoneMap: Record<string, string> = {};
+      let agentEmailMap: Record<string, string> = {};
+      let agentAvatarMap: Record<string, string> = {};
       if (agentNames.length > 0) {
         const { data: agents } = await this.sb
           .from('profiles')
-          .select('name, phone')
+          .select('name, phone, email, avatar_url')
           .in('name', agentNames);
-        if (agents) agents.forEach((a: any) => { agentPhoneMap[a.name] = a.phone ?? ''; });
+        if (agents) agents.forEach((a: any) => {
+          agentPhoneMap[a.name] = a.phone ?? '';
+          agentEmailMap[a.name] = a.email ?? '';
+          agentAvatarMap[a.name] = a.avatar_url ?? '';
+        });
       }
 
       this.projectProperties.set(data.map((p: any) => ({
@@ -421,6 +427,8 @@ export class ProjectDetailPublicComponent implements OnInit {
         images: Array.isArray(p.images) ? p.images.filter((u: string) => u && !u.includes('unsplash.com')) : [],
         area_sqft: p.area_sqft ? p.area_sqft.toLocaleString() : '',
         agent_phone: agentPhoneMap[p.agent_name] ?? '',
+        agent_email: agentEmailMap[p.agent_name] ?? '',
+        agent_avatar: agentAvatarMap[p.agent_name] ?? '',
       })));
       this.loadSavedPropIds();
     }

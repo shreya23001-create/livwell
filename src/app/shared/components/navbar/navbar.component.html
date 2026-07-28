@@ -126,7 +126,8 @@
             Properties</a>
           <!-- Luxury for Sale flyout -->
           <div class="nav-dd-flyout-wrap">
-            <a routerLink="/luxury-properties-for-sale" [queryParams]="{intent: 'Buy'}" class="nav-dd-item nav-dd-has-flyout" (click)="closeMobileMenu()">
+            <a routerLink="/luxury-properties-for-sale" [queryParams]="{intent: 'Buy'}"
+              class="nav-dd-item nav-dd-has-flyout" (click)="closeMobileMenu()">
               Luxury Properties for Sale
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="m9 18 6-6-6-6" />
@@ -139,7 +140,8 @@
           </div>
           <!-- Luxury for Rent flyout -->
           <div class="nav-dd-flyout-wrap">
-            <a routerLink="/luxury-properties-for-sale" [queryParams]="{intent: 'Rent'}" class="nav-dd-item nav-dd-has-flyout" (click)="closeMobileMenu()">
+            <a routerLink="/luxury-properties-for-sale" [queryParams]="{intent: 'Rent'}"
+              class="nav-dd-item nav-dd-has-flyout" (click)="closeMobileMenu()">
               Luxury Properties for Rent
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="m9 18 6-6-6-6" />
@@ -325,7 +327,11 @@
         <img src="images/livwell fav logo.png" alt="Livwell" class="mob-logo-img">
       </a>
       <button class="mob-close-btn" (click)="closeMobileMenu()" aria-label="Close menu">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
       </button>
     </div>
 
@@ -335,21 +341,32 @@
       <!-- Projects -->
       <a routerLink="/projects" class="mob-nav-link" (click)="closeMobileMenu()">
         Projects
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
       </a>
 
       <!-- Buy -->
       <div class="mob-section">
         <button class="mob-section-btn" (click)="toggleSection('buy')" [class.open]="mobileOpenSection() === 'buy'">
           Buy
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
         <div class="mob-section-body" [class.open]="mobileOpenSection() === 'buy'">
-          <a routerLink="/properties" [queryParams]="{type:'Apartment',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Apartments for Sale</a>
-          <a routerLink="/properties" [queryParams]="{type:'Villa',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Villas for Sale</a>
-          <a routerLink="/properties" [queryParams]="{type:'Townhouse',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Townhouses for Sale</a>
-          <a routerLink="/properties" [queryParams]="{type:'Plot',status:'Sale',plotType:'Residential'}" class="mob-sub-link" (click)="closeMobileMenu()">Residential Plots</a>
-          <a routerLink="/properties" [queryParams]="{status:'Sale'}" class="mob-sub-link mob-sub-link--all" (click)="closeMobileMenu()">All Properties for Sale →</a>
+          <a routerLink="/properties" [queryParams]="{type:'Apartment',status:'Sale'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Apartments for Sale</a>
+          <a routerLink="/properties" [queryParams]="{type:'Villa',status:'Sale'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Villas for Sale</a>
+          <a routerLink="/properties" [queryParams]="{type:'Townhouse',status:'Sale'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Townhouses for Sale</a>
+          <a routerLink="/properties" [queryParams]="{type:'Plot',status:'Sale',plotType:'Residential'}"
+            class="mob-sub-link" (click)="closeMobileMenu()">Residential Plots</a>
+          <a routerLink="/properties" [queryParams]="{status:'Sale'}" class="mob-sub-link mob-sub-link--all"
+            (click)="closeMobileMenu()">All Properties for Sale →</a>
         </div>
       </div>
 
@@ -357,13 +374,20 @@
       <div class="mob-section">
         <button class="mob-section-btn" (click)="toggleSection('rent')" [class.open]="mobileOpenSection() === 'rent'">
           Rent
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
         <div class="mob-section-body" [class.open]="mobileOpenSection() === 'rent'">
-          <a routerLink="/properties" [queryParams]="{type:'Apartment',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Apartments for Rent</a>
-          <a routerLink="/properties" [queryParams]="{type:'Villa',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Villas for Rent</a>
-          <a routerLink="/properties" [queryParams]="{type:'Townhouse',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Townhouses for Rent</a>
-          <a routerLink="/properties" [queryParams]="{status:'Rent'}" class="mob-sub-link mob-sub-link--all" (click)="closeMobileMenu()">All Properties for Rent →</a>
+          <a routerLink="/properties" [queryParams]="{type:'Apartment',status:'Rent'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Apartments for Rent</a>
+          <a routerLink="/properties" [queryParams]="{type:'Villa',status:'Rent'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Villas for Rent</a>
+          <a routerLink="/properties" [queryParams]="{type:'Townhouse',status:'Rent'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Townhouses for Rent</a>
+          <a routerLink="/properties" [queryParams]="{status:'Rent'}" class="mob-sub-link mob-sub-link--all"
+            (click)="closeMobileMenu()">All Properties for Rent →</a>
         </div>
       </div>
 
@@ -371,42 +395,63 @@
       <div class="mob-section">
         <button class="mob-section-btn" (click)="toggleSection('luxe')" [class.open]="mobileOpenSection() === 'luxe'">
           Luxe
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
         <div class="mob-section-body" [class.open]="mobileOpenSection() === 'luxe'">
           <a routerLink="/luxury-projects" class="mob-sub-link" (click)="closeMobileMenu()">Luxury Projects</a>
-          <a routerLink="/ultra-luxury-projects" class="mob-sub-link" (click)="closeMobileMenu()">Ultra Luxury Projects</a>
+          <a routerLink="/ultra-luxury-projects" class="mob-sub-link" (click)="closeMobileMenu()">Ultra Luxury
+            Projects</a>
           <a routerLink="/branded-residences" class="mob-sub-link" (click)="closeMobileMenu()">Branded Residences</a>
-          <a routerLink="/luxury-properties-for-sale" class="mob-sub-link" (click)="closeMobileMenu()">Luxury Properties</a>
+          <a routerLink="/luxury-properties-for-sale" class="mob-sub-link" (click)="closeMobileMenu()">Luxury
+            Properties</a>
         </div>
       </div>
 
       <!-- Commercial -->
       <div class="mob-section">
-        <button class="mob-section-btn" (click)="toggleSection('commercial')" [class.open]="mobileOpenSection() === 'commercial'">
+        <button class="mob-section-btn" (click)="toggleSection('commercial')"
+          [class.open]="mobileOpenSection() === 'commercial'">
           Commercial
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
         <div class="mob-section-body" [class.open]="mobileOpenSection() === 'commercial'">
-          <a routerLink="/commercial" [queryParams]="{type:'Office',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Offices for Sale</a>
-          <a routerLink="/commercial" [queryParams]="{type:'Office',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Offices for Rent</a>
-          <a routerLink="/commercial" [queryParams]="{type:'Shop',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Shops for Sale</a>
-          <a routerLink="/commercial" [queryParams]="{type:'Shop',status:'Rent'}" class="mob-sub-link" (click)="closeMobileMenu()">Shops for Rent</a>
-          <a routerLink="/commercial" [queryParams]="{type:'Plot',status:'Sale'}" class="mob-sub-link" (click)="closeMobileMenu()">Plots for Sale</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Office',status:'Sale'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Offices for Sale</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Office',status:'Rent'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Offices for Rent</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Shop',status:'Sale'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Shops for Sale</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Shop',status:'Rent'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Shops for Rent</a>
+          <a routerLink="/commercial" [queryParams]="{type:'Plot',status:'Sale'}" class="mob-sub-link"
+            (click)="closeMobileMenu()">Plots for Sale</a>
         </div>
       </div>
 
       <!-- About -->
       <a routerLink="/about" class="mob-nav-link" (click)="closeMobileMenu()">
         About Us
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
       </a>
 
       <!-- Explore -->
       <div class="mob-section">
-        <button class="mob-section-btn" (click)="toggleSection('explore')" [class.open]="mobileOpenSection() === 'explore'">
+        <button class="mob-section-btn" (click)="toggleSection('explore')"
+          [class.open]="mobileOpenSection() === 'explore'">
           Explore
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
         <div class="mob-section-body" [class.open]="mobileOpenSection() === 'explore'">
           <a routerLink="/areas" class="mob-sub-link" (click)="closeMobileMenu()">Areas</a>
@@ -418,7 +463,10 @@
       <div class="mob-section">
         <button class="mob-section-btn" (click)="toggleSection('more')" [class.open]="mobileOpenSection() === 'more'">
           More
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
         <div class="mob-section-body" [class.open]="mobileOpenSection() === 'more'">
           <a routerLink="/news" class="mob-sub-link" (click)="closeMobileMenu()">News</a>
@@ -434,24 +482,28 @@
     <!-- Drawer footer -->
     <div class="mob-drawer-footer">
       @if (auth.isLoggedIn()) {
-        <div class="mob-user-row">
-          <div class="mob-user-avatar">{{ auth.currentUser()?.name?.charAt(0)?.toUpperCase() }}</div>
-          <div class="mob-user-info">
-            <span class="mob-user-name">{{ auth.currentUser()?.name }}</span>
-            <span class="mob-user-email">{{ auth.currentUser()?.email }}</span>
-          </div>
+      <div class="mob-user-row">
+        <div class="mob-user-avatar">{{ auth.currentUser()?.name?.charAt(0)?.toUpperCase() }}</div>
+        <div class="mob-user-info">
+          <span class="mob-user-name">{{ auth.currentUser()?.name }}</span>
+          <span class="mob-user-email">{{ auth.currentUser()?.email }}</span>
         </div>
-        @if (auth.isAdmin()) {
-          <a routerLink="/admin/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">Admin Dashboard</a>
-        } @else if (auth.isAgent()) {
-          <a routerLink="/agent/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">Agent Dashboard</a>
-        } @else {
-          <a routerLink="/my/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">My Dashboard</a>
-        }
-        <button class="mob-footer-btn mob-footer-btn--danger" (click)="auth.logout(); closeMobileMenu()">Logout</button>
+      </div>
+      @if (auth.isAdmin()) {
+      <a routerLink="/admin/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">Admin
+        Dashboard</a>
+      } @else if (auth.isAgent()) {
+      <a routerLink="/agent/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">Agent
+        Dashboard</a>
       } @else {
-        <a routerLink="/customer" class="mob-footer-btn mob-footer-btn--primary" (click)="closeMobileMenu()">Sign In</a>
-        <a routerLink="/" fragment="business-associates" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">Our Business Associates</a>
+      <a routerLink="/my/dashboard" class="mob-footer-btn mob-footer-btn--outline" (click)="closeMobileMenu()">My
+        Dashboard</a>
+      }
+      <button class="mob-footer-btn mob-footer-btn--danger" (click)="auth.logout(); closeMobileMenu()">Logout</button>
+      } @else {
+      <a routerLink="/customer" class="mob-footer-btn mob-footer-btn--primary" (click)="closeMobileMenu()">Sign In</a>
+      <a routerLink="/" fragment="business-associates" class="mob-footer-btn mob-footer-btn--outline"
+        (click)="closeMobileMenu()">Our Business Associates</a>
       }
     </div>
 
@@ -551,12 +603,12 @@
       <div class="footer-legal">
         <a routerLink="/privacy-policy">Privacy Policy</a>
         <a routerLink="/terms-of-use">Terms of Use</a>
-        <a routerLink="/contact">Sitemap</a>
+        <!-- <a routerLink="/contact">Sitemap</a> -->
       </div>
       <div class="footer-socials">
         <a [href]="socialLinks().instagram || '#'" [attr.target]="socialLinks().instagram ? '_blank' : null"
-           [attr.rel]="socialLinks().instagram ? 'noopener noreferrer' : null"
-           class="footer-social-btn" aria-label="Instagram">
+          [attr.rel]="socialLinks().instagram ? 'noopener noreferrer' : null" class="footer-social-btn"
+          aria-label="Instagram">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
             <circle cx="12" cy="12" r="4" />
@@ -564,31 +616,31 @@
           </svg>
         </a>
         <a [href]="socialLinks().linkedin || '#'" [attr.target]="socialLinks().linkedin ? '_blank' : null"
-           [attr.rel]="socialLinks().linkedin ? 'noopener noreferrer' : null"
-           class="footer-social-btn" aria-label="LinkedIn">
+          [attr.rel]="socialLinks().linkedin ? 'noopener noreferrer' : null" class="footer-social-btn"
+          aria-label="LinkedIn">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z" />
             <circle cx="4" cy="4" r="2" />
           </svg>
         </a>
         <a [href]="socialLinks().twitter || '#'" [attr.target]="socialLinks().twitter ? '_blank' : null"
-           [attr.rel]="socialLinks().twitter ? 'noopener noreferrer' : null"
-           class="footer-social-btn" aria-label="X (Twitter)">
+          [attr.rel]="socialLinks().twitter ? 'noopener noreferrer' : null" class="footer-social-btn"
+          aria-label="X (Twitter)">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
           </svg>
         </a>
         <a [href]="socialLinks().facebook || '#'" [attr.target]="socialLinks().facebook ? '_blank' : null"
-           [attr.rel]="socialLinks().facebook ? 'noopener noreferrer' : null"
-           class="footer-social-btn" aria-label="Facebook">
+          [attr.rel]="socialLinks().facebook ? 'noopener noreferrer' : null" class="footer-social-btn"
+          aria-label="Facebook">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
           </svg>
         </a>
         <a [href]="socialLinks().youtube || '#'" [attr.target]="socialLinks().youtube ? '_blank' : null"
-           [attr.rel]="socialLinks().youtube ? 'noopener noreferrer' : null"
-           class="footer-social-btn" aria-label="YouTube">
+          [attr.rel]="socialLinks().youtube ? 'noopener noreferrer' : null" class="footer-social-btn"
+          aria-label="YouTube">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58zM9.75 15.02V8.98L15.5 12l-5.75 3.02z" />
@@ -600,9 +652,7 @@
 </footer>
 
 <!-- ── WhatsApp Floating Button ── -->
-<a class="wa-fab"
-  [href]="whatsappHref"
-  target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+<a class="wa-fab" [href]="whatsappHref" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
   <svg viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M16 .5C7.44.5.5 7.44.5 16c0 2.75.72 5.44 2.1 7.82L.5 31.5l7.88-2.06A15.46 15.46 0 0 0 16 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5Zm0 28.4a12.9 12.9 0 0 1-6.58-1.8l-.47-.28-4.68 1.22 1.25-4.56-.31-.48A12.9 12.9 0 0 1 3.1 16C3.1 9.06 8.56 3.1 16 3.1S28.9 9.06 28.9 16 23.44 28.9 16 28.9Zm7.06-9.68c-.38-.2-2.27-1.12-2.62-1.24-.35-.13-.6-.2-.86.2s-.99 1.24-1.21 1.49c-.22.26-.44.29-.82.1a10.37 10.37 0 0 1-3.05-1.88 11.4 11.4 0 0 1-2.11-2.63c-.22-.38 0-.58.17-.77.16-.17.38-.44.57-.66.18-.22.24-.38.37-.63.12-.25.06-.47-.03-.66-.1-.2-.86-2.07-1.18-2.83-.31-.74-.63-.64-.86-.65l-.73-.01c-.25 0-.66.09-1 .47s-1.33 1.3-1.33 3.17 1.36 3.68 1.55 3.93c.2.25 2.68 4.1 6.5 5.75.91.39 1.62.63 2.17.8.91.29 1.74.25 2.4.15.73-.11 2.27-.93 2.59-1.83.32-.9.32-1.66.22-1.82-.09-.16-.35-.25-.73-.45Z" />

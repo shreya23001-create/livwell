@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, signal, computed, PLATFORM_ID, Inject, inject } from '@angular/core';
+﻿import { Component, OnInit, signal, computed, effect, PLATFORM_ID, Inject, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -35,6 +35,7 @@ export interface PropertyListing {
   agentName: string;
   agentAvatar: string;
   agentPhone: string;
+  agentEmail: string;
 }
 
 @Component({
@@ -52,12 +53,14 @@ export class PropertiesComponent implements OnInit {
   viewMode = signal<'grid' | 'list' | 'map'>('grid');
   showFilters = signal(typeof window !== 'undefined' ? window.innerWidth > 768 : true);
   isLoading = signal(false);
+  noResultsNotice = signal(false);
   currentPage = signal(1);
   pageSize = 9;
 
   // ── Filter State ─────────────────────────────────────────────
   searchQuery = signal('');
   selectedType = signal('');
+  selectedTypes = signal<string[]>([]);
   selectedStatus = signal('');
   selectedLocations = signal<string[]>([]);
   minPrice = signal<number | null>(null);
@@ -153,7 +156,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Gym', 'Concierge', 'Balcony', 'Parking'],
       views: 1842, postedDate: '2026-05-10', lat: 25.1972, lng: 55.2744,
-      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567',
+      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567', agentEmail: '',
     },
     {
       id: 2, title: 'Modern Villa with Private Pool', location: 'Palm Jumeirah, Dubai', community: 'Palm Jumeirah',
@@ -166,7 +169,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Gym', 'Beach Access', 'Parking', 'Security', 'BBQ Area'],
       views: 3210, postedDate: '2026-05-08', lat: 25.1124, lng: 55.1390,
-      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678',
+      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678', agentEmail: '',
     },
     {
       id: 3, title: 'Beachfront Apartment Sea Views', location: 'JBR Walk, Dubai Marina', community: 'JBR',
@@ -179,7 +182,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Gym', 'Beach Access', 'Balcony', 'Parking'],
       views: 987, postedDate: '2026-05-12', lat: 25.0777, lng: 55.1328,
-      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789',
+      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789', agentEmail: '',
     },
     {
       id: 4, title: 'Contemporary Townhouse Family Living', location: 'Arabian Ranches, Dubai', community: 'Arabian Ranches',
@@ -192,7 +195,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Kids Play Area', 'Security', 'Parking', 'BBQ Area'],
       views: 654, postedDate: '2026-05-06', lat: 25.0501, lng: 55.2607,
-      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890',
+      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890', agentEmail: '',
     },
     {
       id: 5, title: 'Sky View Studio Business Bay', location: 'Business Bay, Dubai', community: 'Business Bay',
@@ -205,7 +208,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Gym', 'Concierge', 'Parking', 'Balcony'],
       views: 1543, postedDate: '2026-05-14', lat: 25.1867, lng: 55.2640,
-      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567',
+      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567', agentEmail: '',
     },
     {
       id: 6, title: 'Heritage Mansion Emirates Hills', location: 'Emirates Hills, Dubai', community: 'Emirates Hills',
@@ -218,7 +221,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Golf Course', 'Gym', 'Security', 'Concierge', 'Maid Room', 'Parking', 'BBQ Area'],
       views: 4120, postedDate: '2026-04-28', lat: 25.0798, lng: 55.1699,
-      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678',
+      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678', agentEmail: '',
     },
     {
       id: 7, title: 'Marina View 1BR Apartment', location: 'Dubai Marina', community: 'Dubai Marina',
@@ -231,7 +234,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Gym', 'Marina View', 'Balcony', 'Parking'],
       views: 2890, postedDate: '2026-05-15', lat: 25.0782, lng: 55.1401,
-      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789',
+      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789', agentEmail: '',
     },
     {
       id: 8, title: '3BR Townhouse Dubai Hills', location: 'Dubai Hills Estate, Dubai', community: 'Dubai Hills Estate',
@@ -244,7 +247,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Kids Play Area', 'Security', 'Parking'],
       views: 432, postedDate: '2026-05-13', lat: 25.1124, lng: 55.2233,
-      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890',
+      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890', agentEmail: '',
     },
     {
       id: 9, title: 'Premium Office Space Business Bay', location: 'Business Bay, Dubai', community: 'Business Bay',
@@ -257,7 +260,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Parking', 'Concierge', 'Security', 'Gym'],
       views: 765, postedDate: '2026-05-11', lat: 25.1881, lng: 55.2644,
-      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678',
+      agentName: 'Ahmed Hassan', agentAvatar: '', agentPhone: '+971 50 234 5678', agentEmail: '',
     },
     {
       id: 10, title: '2BR Apartment JVC with Pool', location: 'Jumeirah Village Circle, Dubai', community: 'Jumeirah Village Circle',
@@ -270,7 +273,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Gym', 'Kids Play Area', 'Parking'],
       views: 312, postedDate: '2026-05-09', lat: 25.0609, lng: 55.2097,
-      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789',
+      agentName: 'Priya Sharma', agentAvatar: '', agentPhone: '+971 50 345 6789', agentEmail: '',
     },
     {
       id: 11, title: 'Stunning 4BR Meydan Villa', location: 'Meydan, Dubai', community: 'Meydan',
@@ -283,7 +286,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Swimming Pool', 'Golf Course', 'Security', 'Parking', 'Maid Room'],
       views: 891, postedDate: '2026-05-07', lat: 25.1605, lng: 55.3119,
-      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567',
+      agentName: 'Sarah Al-Mansouri', agentAvatar: '', agentPhone: '+971 50 123 4567', agentEmail: '',
     },
     {
       id: 12, title: 'Retail Space Ground Floor JBR', location: 'JBR, Dubai Marina', community: 'JBR',
@@ -295,7 +298,7 @@ export class PropertiesComponent implements OnInit {
       ],
       amenities: ['Parking', 'Security'],
       views: 244, postedDate: '2026-05-05', lat: 25.0790, lng: 55.1320,
-      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890',
+      agentName: 'Michael Chen', agentAvatar: '', agentPhone: '+971 50 456 7890', agentEmail: '',
     },
   ];
 
@@ -311,7 +314,10 @@ export class PropertiesComponent implements OnInit {
         p.type.toLowerCase().includes(q)
       );
     }
-    if (this.selectedType()) {
+    const selTypes = this.selectedTypes();
+    if (selTypes.length) {
+      result = result.filter(p => selTypes.some(t => p.type.toLowerCase() === t.toLowerCase()));
+    } else if (this.selectedType()) {
       const t = this.selectedType().toLowerCase();
       result = result.filter(p => p.type.toLowerCase() === t || p.type.toLowerCase().includes(t));
     }
@@ -409,7 +415,7 @@ export class PropertiesComponent implements OnInit {
 
   activeFiltersCount = computed(() => {
     let count = 0;
-    if (this.selectedType()) count++;
+    count += this.selectedTypes().length || (this.selectedType() ? 1 : 0);
     if (this.selectedStatus()) count++;
     count += this.selectedLocations().length;
     if (this.minPrice() !== null || this.maxPrice() !== null) count++;
@@ -445,12 +451,20 @@ export class PropertiesComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: object
-  ) {}
+  ) {
+    effect(() => {
+      if (!this.isLoading() && this.totalResults() === 0 && this.allProperties().length > 0) {
+        this.noResultsNotice.set(true);
+        this.clearFilters();
+        setTimeout(() => this.noResultsNotice.set(false), 4000);
+      }
+    });
+  }
 
   async ngOnInit(): Promise<void> {
     this.auth.waitForSession().then(() => this.loadSavedIds());
     this.route.queryParams.subscribe(params => {
-      if (params['type'])      this.selectedType.set(params['type']);
+      if (params['type'])      { this.selectedType.set(params['type']); this.selectedTypes.set([params['type']]); }
       if (params['status'])    this.selectedStatus.set(params['status']);
       if (params['location'])  { this.selectedLocations.set(params['location'].split('|').map((l: string) => l.trim()).filter(Boolean)); }
       if (params['q'])         this.searchQuery.set(params['q']);
@@ -479,11 +493,11 @@ export class PropertiesComponent implements OnInit {
     if (!error && data && data.length > 0) {
       // Build a name→{avatar, phone} map from profiles for all unique agent names
       const uniqueNames = [...new Set(data.map((p: any) => p.agent_name).filter(Boolean))] as string[];
-      const agentMap: Record<string, { avatar: string; phone: string }> = {};
+      const agentMap: Record<string, { avatar: string; phone: string; email: string }> = {};
       if (uniqueNames.length) {
         const { data: profiles } = await this.sb
           .from('profiles')
-          .select('name, avatar_url, phone')
+          .select('name, avatar_url, phone, email')
           .in('name', uniqueNames)
           .eq('role', 'agent')
           .eq('status', 'active');
@@ -494,13 +508,14 @@ export class PropertiesComponent implements OnInit {
             agentMap[pr.name] = {
               avatar: isProfilePhoto ? (pr.avatar_url ?? '') : '',
               phone:  pr.phone ?? '',
+              email:  pr.email ?? '',
             };
           }
         }
       }
 
       this.allProperties.set(data.map((p: any) => {
-        const ag = agentMap[p.agent_name] ?? { avatar: '', phone: '' };
+        const ag = agentMap[p.agent_name] ?? { avatar: '', phone: '', email: '' };
         return {
           id:           p.id,
           title:        p.title        ?? '',
@@ -527,6 +542,7 @@ export class PropertiesComponent implements OnInit {
           agentName:    ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
           agentAvatar:  ag.avatar,
           agentPhone:   ag.phone,
+          agentEmail:   ag.email,
         };
       }));
     } else {
@@ -557,6 +573,7 @@ export class PropertiesComponent implements OnInit {
   clearFilters(): void {
     this.searchQuery.set('');
     this.selectedType.set('');
+    this.selectedTypes.set([]);
     this.selectedStatus.set('');
     this.selectedLocations.set([]);
     this.locationSearch.set('');

@@ -2225,3 +2225,172 @@ $prd-w: 820px;
   color: $muted;
   flex-wrap: wrap;
 }
+
+// ══ Leads tabs ═══════════════════════════════════════════════
+.leads-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid $border;
+  margin-bottom: 1.25rem;
+}
+.leads-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: $sub;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  svg { width: 0.9rem; height: 0.9rem; }
+  &.active { color: $accent; border-bottom-color: $accent; }
+  &:hover:not(.active) { color: $text; }
+}
+.leads-tab-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #ef4444;
+  color: #fff;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  margin-left: 0.2rem;
+}
+
+// ══ Follow-up Tab ════════════════════════════════════════════
+.afu-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.afu-kpi {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  background: #fff;
+  border: 1.5px solid $border;
+  border-radius: 0.875rem;
+  padding: 1rem 1.125rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &:hover { border-color: $accent; }
+  &--active { border-color: $accent; box-shadow: 0 0 0 3px #e0e7ff; }
+}
+.afu-kpi-icon {
+  width: 2.5rem; height: 2.5rem;
+  border-radius: 0.625rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  svg { width: 1.2rem; height: 1.2rem; }
+  &--all      { background: #eff6ff; color: #3b82f6; }
+  &--overdue  { background: #fef2f2; color: #ef4444; }
+  &--today    { background: #fffbeb; color: #d97706; }
+  &--upcoming { background: #f0fdf4; color: #16a34a; }
+}
+.afu-kpi-val { font-size: 1.5rem; font-weight: 800; color: $text; line-height: 1; }
+.afu-kpi-lbl {
+  font-size: 0.72rem; font-weight: 600; color: $sub;
+  text-transform: uppercase; letter-spacing: 0.04em; margin-top: 0.2rem;
+}
+
+.afu-list-wrap { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.afu-empty {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.5rem; padding: 4rem 2rem; color: $muted; text-align: center;
+  background: #fff; border: 1.5px solid $border; border-radius: 0.875rem;
+  svg { width: 3rem; height: 3rem; opacity: 0.3; }
+  p { font-size: 0.85rem; margin: 0; }
+}
+.afu-spin {
+  width: 2.5rem; height: 2.5rem; opacity: 0.7;
+  animation: afuSpin 0.8s linear infinite;
+}
+@keyframes afuSpin { to { transform: rotate(360deg); } }
+
+.afu-card {
+  display: flex; align-items: flex-start; gap: 1rem;
+  background: #fff; border: 1.5px solid $border;
+  border-radius: 0.875rem; padding: 1rem 1.25rem;
+  transition: border-color 0.15s;
+  &:hover { border-color: $accent; }
+  &--overdue  { border-left: 3px solid #ef4444; background: #fff5f5; }
+  &--today    { border-left: 3px solid #f59e0b; background: #fffbeb; }
+  &--upcoming { border-left: 3px solid #16a34a; background: #f0fdf4; }
+}
+.afu-card-date {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; min-width: 3.5rem; flex-shrink: 0; padding-top: 0.1rem;
+}
+.afu-card-day  { font-size: 1.75rem; font-weight: 800; color: $text; line-height: 1; }
+.afu-card-mon  { font-size: 0.68rem; font-weight: 600; color: $sub; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 0.1rem; }
+.afu-card-time { font-size: 0.7rem; font-weight: 600; color: $accent; margin-top: 0.15rem; }
+.afu-card-label {
+  font-size: 0.62rem; font-weight: 700; padding: 0.15rem 0.4rem;
+  border-radius: 999px; margin-top: 0.35rem;
+  &.overdue  { background: #fef2f2; color: #dc2626; }
+  &.today    { background: #fffbeb; color: #92400e; }
+  &.upcoming { background: #eff6ff; color: #2563eb; }
+}
+.afu-card-main { flex: 1; min-width: 0; }
+.afu-card-top  { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.5rem; }
+.afu-card-av {
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: $accent; color: #fff;
+  font-size: 0.75rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.afu-card-name {
+  font-size: 0.925rem; font-weight: 700; color: $text; cursor: pointer;
+  &:hover { color: $accent; text-decoration: underline; }
+}
+.afu-card-contact { font-size: 0.75rem; color: $sub; margin-top: 0.15rem; }
+.afu-sep { margin: 0 0.25rem; color: $muted; }
+.afu-card-note {
+  display: flex; align-items: flex-start; gap: 0.4rem;
+  font-size: 0.8rem; color: $sub; line-height: 1.5; margin-bottom: 0.35rem;
+  svg { width: 0.85rem; height: 0.85rem; flex-shrink: 0; margin-top: 0.15rem; color: $muted; }
+}
+.afu-card-meta {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.72rem; color: $muted;
+  svg { width: 0.78rem; height: 0.78rem; flex-shrink: 0; }
+}
+.afu-meta-sep { color: $border; }
+.afu-card-right {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; flex-shrink: 0;
+}
+.afu-badge {
+  font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem;
+  border-radius: 999px; white-space: nowrap;
+  &--new         { background: #eff6ff; color: #2563eb; }
+  &--contacted   { background: #fefce8; color: #ca8a04; }
+  &--qualified   { background: #f0fdf4; color: #16a34a; }
+  &--negotiating { background: #faf5ff; color: #7c3aed; }
+  &--won         { background: #d1fae5; color: #065f46; }
+  &--lost        { background: #fef2f2; color: #dc2626; }
+  &--cat         { background: #f3f4f6; color: $sub; }
+  &--fu          { text-transform: capitalize; }
+  &--fu-pending  { background: #fefce8; color: #b45309; }
+  &--fu-done, &--fu-completed { background: #f0fdf4; color: #15803d; }
+  &--fu-missed   { background: #fef2f2; color: #dc2626; }
+  &--fu-cancelled { background: #f3f4f6; color: $sub; }
+}
+.afu-view-btn {
+  font-size: 0.72rem; font-weight: 600; color: $accent;
+  background: #eff0fe; border: 1.5px solid #c7d2fe;
+  border-radius: 0.4rem; padding: 0.3rem 0.7rem;
+  cursor: pointer; margin-top: 0.25rem; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+  &:hover { background: $accent; color: #fff; border-color: $accent; }
+}
+
+@media (max-width: 900px) {
+  .afu-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+  .afu-card { flex-direction: column; }
+  .afu-card-right { flex-direction: row; flex-wrap: wrap; align-items: center; }
+}

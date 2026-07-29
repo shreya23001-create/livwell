@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
@@ -70,7 +71,7 @@ interface LeadDetail {
 @Component({
   selector: 'app-lead-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './lead-profile.component.html',
   styleUrl: './lead-profile.component.scss',
 })
@@ -148,6 +149,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
   nextFuTime       = signal('');
   nextFuNote       = signal('');
   savingFu         = signal(false);
+  readonly todayIso = new Date().toISOString().slice(0, 10);
 
   readonly priorities = ['low', 'medium', 'high', 'urgent'];
 
@@ -220,8 +222,9 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     this.lead.set(lead);
     this.statusUpdateVal.set(lead.status);
     this.priorityVal.set(lead.priority || 'medium');
-    this.nextFuDate.set(lead.followUpDate || '');
-    this.nextFuNote.set(lead.followUpNote || '');
+    this.nextFuDate.set('');
+    this.nextFuTime.set('');
+    this.nextFuNote.set('');
     this.loading.set(false);
 
     const created = data.created_at ? new Date(data.created_at) : new Date();
@@ -400,6 +403,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     const { error } = await this.sb.from('admin_leads').update({ status: newStatus, agent_email: agentEmail }).eq('id', lead.id);
     if (!error) {
       this.lead.update(l => l ? { ...l, status: newStatus } : l);
+      this.statusUpdateVal.set(newStatus);
       this.buildActivity();
     }
     this.updatingStatus.set(false);
@@ -486,6 +490,9 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       }),
     ]);
     this.lead.update(l => l ? { ...l, followUpDate: date, followUpNote: note } : l);
+    this.nextFuDate.set('');
+    this.nextFuTime.set('');
+    this.nextFuNote.set('');
     await this.loadFollowUpHistory(lead.id);
     this.savingFu.set(false);
   }

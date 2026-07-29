@@ -1,0 +1,256 @@
+$accent: #6366f1;
+$border: #e5e7eb;
+$text:   #111827;
+$sub:    #6b7280;
+$muted:  #9ca3af;
+$light:  #f4f6fa;
+
+.alp-page {
+  padding: 1.75rem 2rem;
+}
+
+// ── Loader ────────────────────────────────────────────────────
+.alp-loader {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 3rem; color: $sub; font-size: 0.88rem;
+}
+.alp-spin {
+  width: 1.25rem; height: 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Header ────────────────────────────────────────────────────
+.alp-back {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1.5px solid $border;
+  border-radius: 0.5rem; padding: 0.45rem 0.875rem;
+  font-size: 0.82rem; font-weight: 600; color: $sub;
+  cursor: pointer; margin-bottom: 1.25rem;
+  transition: all 0.15s;
+  svg { flex-shrink: 0; }
+  &:hover { border-color: $accent; color: $accent; }
+}
+
+.alp-header-main {
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap; margin-bottom: 1.5rem;
+}
+
+.alp-avatar {
+  width: 3rem; height: 3rem; border-radius: 50%;
+  background: $accent; color: #fff;
+  font-size: 1.2rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.alp-name {
+  font-size: 1.35rem; font-weight: 800; color: $text; margin: 0 0 0.2rem;
+}
+.alp-meta {
+  font-size: 0.8rem; color: $sub;
+  display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;
+}
+.alp-dot { color: $muted; }
+
+.alp-badges { display: flex; gap: 0.5rem; align-items: center; margin-left: auto; flex-shrink: 0; }
+
+.alp-status-badge {
+  font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  &--new         { background: #eff6ff; color: #2563eb; }
+  &--contacted   { background: #fefce8; color: #ca8a04; }
+  &--qualified   { background: #f0fdf4; color: #16a34a; }
+  &--negotiating { background: #faf5ff; color: #7c3aed; }
+  &--won         { background: #f0fdf4; color: #166534; }
+  &--lost        { background: #fef2f2; color: #dc2626; }
+}
+.alp-cat-badge {
+  font-size: 0.72rem; font-weight: 600; padding: 0.25rem 0.7rem;
+  border-radius: 999px; background: #f3f4f6; color: $sub;
+}
+
+// ── Tabs ──────────────────────────────────────────────────────
+.alp-tabs {
+  display: flex; gap: 0; border-bottom: 2px solid $border;
+  margin-bottom: 1.5rem;
+}
+.alp-tab {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.83rem; font-weight: 600; color: $sub;
+  background: none; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  svg { width: 0.9rem; height: 0.9rem; }
+  &.active { color: $accent; border-bottom-color: $accent; }
+  &:hover:not(.active) { color: $text; }
+}
+.alp-tab-badge {
+  font-size: 0.65rem; font-weight: 700;
+  background: $accent; color: #fff;
+  padding: 0.1rem 0.4rem; border-radius: 999px; min-width: 1.1rem; text-align: center;
+}
+
+// ── Body ──────────────────────────────────────────────────────
+.alp-body {
+  background: #fff;
+  border: 1.5px solid $border;
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+}
+
+// ── Section title ─────────────────────────────────────────────
+.alp-section-title {
+  font-size: 0.7rem; font-weight: 700; color: $muted;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 0.875rem;
+}
+
+// ── Facts grid ────────────────────────────────────────────────
+.alp-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+.alp-fact {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  background: $light; border-radius: 0.625rem; padding: 0.75rem;
+}
+.alp-fact-icon {
+  width: 2rem; height: 2rem; border-radius: 0.375rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  svg { width: 1rem; height: 1rem; }
+}
+.alp-fact-label { font-size: 0.68rem; font-weight: 600; color: $muted; text-transform: uppercase; letter-spacing: 0.04em; }
+.alp-fact-value { font-size: 0.88rem; font-weight: 600; color: $text; margin-top: 0.15rem; }
+
+// ── Pipeline ──────────────────────────────────────────────────
+.alp-pipeline {
+  position: relative;
+  display: flex; gap: 0; align-items: flex-start;
+  padding: 0.5rem 0 0.25rem;
+}
+.alp-pipeline-line {
+  position: absolute; top: 1rem; left: 1rem; right: 1rem;
+  height: 2px; background: $border; z-index: 0;
+}
+.alp-stage {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 0.4rem; position: relative; z-index: 1;
+}
+.alp-stage-dot {
+  width: 0.875rem; height: 0.875rem; border-radius: 50%;
+  border: 2px solid $border; background: #fff;
+  transition: background 0.2s, border-color 0.2s;
+}
+.alp-stage.active .alp-stage-dot  { border-color: transparent; }
+.alp-stage.passed .alp-stage-dot  { background: #d1fae5; border-color: #10b981; }
+.alp-stage-label {
+  font-size: 0.68rem; font-weight: 500; color: $muted; white-space: nowrap;
+}
+.alp-stage.active .alp-stage-label { color: $text; font-weight: 700; }
+.alp-stage.passed .alp-stage-label { color: #10b981; }
+
+// ── Notes ─────────────────────────────────────────────────────
+.alp-notes {
+  font-size: 0.85rem; color: $text; line-height: 1.65;
+  background: $light; border-radius: 0.625rem; padding: 0.875rem 1rem;
+}
+
+// ── Empty state ───────────────────────────────────────────────
+.alp-empty {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.5rem; padding: 3rem; color: $muted; text-align: center;
+  svg { width: 2.5rem; height: 2.5rem; opacity: 0.35; }
+  p { font-size: 0.85rem; margin: 0; }
+}
+
+// ── Follow-up cards ───────────────────────────────────────────
+.alp-fu-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.alp-fu-card {
+  border: 1.5px solid $border; border-radius: 0.875rem;
+  padding: 1rem 1.125rem; background: #fff;
+  &--overdue { border-color: #fca5a5; background: #fff5f5; }
+  &--today   { border-color: #fcd34d; background: #fffbeb; }
+}
+.alp-fu-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;
+}
+.alp-fu-label {
+  font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;
+  &.overdue  { background: #fef2f2; color: #dc2626; }
+  &.today    { background: #fffbeb; color: #92400e; }
+  &.upcoming { background: #eff6ff; color: #2563eb; }
+}
+.alp-fu-num { font-size: 0.72rem; font-weight: 600; color: $muted; }
+.alp-fu-date { font-size: 1rem; font-weight: 700; color: $text; margin-bottom: 0.5rem; }
+.alp-fu-time { font-size: 0.82rem; font-weight: 500; color: $sub; }
+.alp-fu-note {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  font-size: 0.83rem; color: $sub; margin-bottom: 0.625rem; line-height: 1.5;
+  svg { width: 0.9rem; height: 0.9rem; color: $muted; flex-shrink: 0; margin-top: 0.1rem; }
+}
+.alp-fu-agent {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.78rem; color: $sub;
+  strong { color: $text; }
+}
+.alp-fu-av {
+  width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  background: #e0e7ff; color: $accent;
+  font-size: 0.65rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+// ── Activity timeline ─────────────────────────────────────────
+.alp-timeline { display: flex; flex-direction: column; }
+
+.alp-tl-item {
+  display: flex;
+  gap: 0.75rem;
+  padding-bottom: 1.25rem;
+  position: relative;
+
+  &:last-child { padding-bottom: 0; }
+  &:last-child .alp-tl-line { display: none; }
+}
+
+.alp-tl-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 1.25rem;
+}
+
+.alp-tl-dot {
+  width: 0.7rem; height: 0.7rem; border-radius: 50%;
+  background: $muted; flex-shrink: 0; margin-top: 0.25rem;
+  &--success { background: #10b981; }
+  &--warning { background: #f59e0b; }
+  &--error   { background: #ef4444; }
+}
+
+.alp-tl-line {
+  flex: 1; width: 1px; background: $border; margin-top: 0.35rem;
+}
+
+.alp-tl-content { flex: 1; padding-top: 0.05rem; min-width: 0; }
+.alp-tl-action  { font-size: 0.83rem; font-weight: 600; color: $text; }
+.alp-tl-detail  { font-size: 0.78rem; color: $sub; margin-top: 0.1rem; }
+.alp-tl-meta    { display: flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; color: $muted; margin-top: 0.2rem; flex-wrap: wrap; }
+.alp-tl-sep     { color: $border; }
+
+// ── Responsive ────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .alp-page { padding: 1rem; }
+  .alp-facts { grid-template-columns: 1fr; }
+  .alp-header-main { gap: 0.75rem; }
+  .alp-badges { margin-left: 0; }
+}

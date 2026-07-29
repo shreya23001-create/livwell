@@ -7,6 +7,7 @@ import { SupabaseService } from '../../shared/services/supabase.service';
 interface RecentLead { name: string; interest: string; status: string; date: string; isProject: boolean; }
 interface MyProperty { id: number; name: string; location: string; price: string; type: string; status: string; }
 interface MyProject  { id: number; name: string; developer: string; location: string; price: string; type: string; badge: string; }
+interface FollowUp   { id: number; name: string; date: string; note: string; status: string; overdue: boolean; today: boolean; }
 
 @Component({
   selector: 'app-agent-dashboard',
@@ -31,6 +32,11 @@ export class AgentDashboardComponent implements OnInit {
   recentLeads    = signal<RecentLead[]>([]);
   myProperties   = signal<MyProperty[]>([]);
   myProjects     = signal<MyProject[]>([]);
+  followUps      = signal<FollowUp[]>([]);
+  overdueCount   = signal(0);
+  todayCount     = signal(0);
+
+  readonly todayIso = new Date().toISOString().slice(0, 10);
 
   greeting(): string {
     const h = new Date().getHours();
@@ -57,11 +63,11 @@ export class AgentDashboardComponent implements OnInit {
 
     const [byEmailRes, byNameRes, propsRes, projectsRes] = await Promise.all([
       this.sb.from('admin_leads')
-        .select('id, name, status, location, property_type, property_title, project_title, budget, created_at')
+        .select('id, name, status, location, property_type, property_title, project_title, budget, created_at, follow_up_date, follow_up_note')
         .eq('agent_email', agentEmail)
         .order('created_at', { ascending: false }),
       this.sb.from('admin_leads')
-        .select('id, name, status, location, property_type, property_title, project_title, budget, created_at')
+        .select('id, name, status, location, property_type, property_title, project_title, budget, created_at, follow_up_date, follow_up_note')
         .eq('assigned_agent', agentName)
         .is('agent_email', null)
         .order('created_at', { ascending: false }),
@@ -85,6 +91,24 @@ export class AgentDashboardComponent implements OnInit {
     this.newLeads.set(leadsAll.filter((l: any) => l.status === 'new').length);
     this.activeDeals.set(leadsAll.filter((l: any) => ['contacted', 'qualified', 'negotiating'].includes(l.status)).length);
     this.wonLeads.set(leadsAll.filter((l: any) => l.status === 'won').length);
+
+    // Follow-ups: upcoming + overdue (exclude won/lost)
+    const tod = this.todayIso;
+    const fuLeads = leadsAll
+      .filter((l: any) => l.follow_up_date && !['won', 'lost'].includes(l.status))
+      .sort((a: any, b: any) => a.follow_up_date.localeCompare(b.follow_up_date))
+      .map((l: any) => ({
+        id:      l.id,
+        name:    l.name || 'Unknown',
+        date:    l.follow_up_date,
+        note:    l.follow_up_note || '',
+        status:  l.status,
+        overdue: l.follow_up_date < tod,
+        today:   l.follow_up_date === tod,
+      }));
+    this.followUps.set(fuLeads);
+    this.overdueCount.set(fuLeads.filter((f: FollowUp) => f.overdue).length);
+    this.todayCount.set(fuLeads.filter((f: FollowUp) => f.today).length);
 
     this.recentLeads.set(leadsAll.slice(0, 5).map((l: any) => ({
       name:      l.name || 'Unknown',

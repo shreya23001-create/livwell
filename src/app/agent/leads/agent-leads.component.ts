@@ -110,6 +110,32 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
 
   readonly priorities = ['low', 'medium', 'high', 'urgent'];
 
+  // ── Tabs ─────────────────────────────────────────────
+  activeTab  = signal<'leads' | 'followup'>('leads');
+  fuFilter   = signal<'all' | 'overdue' | 'today' | 'upcoming'>('all');
+  today      = new Date().toISOString().slice(0, 10);
+
+  // All follow-up records from lead_follow_ups enriched with lead info
+  allFollowUpRecords        = signal<any[]>([]);
+  allFollowUpRecordsLoading = signal(false);
+
+  followUps = computed(() =>
+    this.leads().filter(l => l.followUpDate).sort((a, b) => (a.followUpDate ?? '').localeCompare(b.followUpDate ?? ''))
+  );
+
+  overdueFollowUps  = computed(() => this.allFollowUpRecords().filter(r => r.follow_up_date < this.today));
+  todayFollowUps    = computed(() => this.allFollowUpRecords().filter(r => r.follow_up_date === this.today));
+  upcomingFollowUps = computed(() => this.allFollowUpRecords().filter(r => r.follow_up_date > this.today));
+
+  filteredFollowUps = computed(() => {
+    const f   = this.fuFilter();
+    const all = this.allFollowUpRecords();
+    if (f === 'overdue')  return all.filter(r => r.follow_up_date < this.today);
+    if (f === 'today')    return all.filter(r => r.follow_up_date === this.today);
+    if (f === 'upcoming') return all.filter(r => r.follow_up_date > this.today);
+    return all;
+  });
+
 
   readonly leadStatusList = computed(() => this.dataSvc.leadStatuses().map(s => s.name as LeadStatus));
   get statuses(): LeadStatus[] { return this.leadStatusList(); }
@@ -183,7 +209,26 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     const agentEmail = user.email;
     const agentName  = user.name;
     await this.fetchLeads(agentEmail, agentName);
+    this.loadAllFollowUps();
     this.subscribeRealtime(agentEmail, agentName);
+  }
+
+  async loadAllFollowUps(): Promise<void> {
+    this.allFollowUpRecordsLoading.set(true);
+    const leadIds = this.leads().map(l => l.id);
+    if (!leadIds.length) { this.allFollowUpRecordsLoading.set(false); return; }
+    const { data } = await this.sb
+      .from('lead_follow_ups')
+      .select('*')
+      .in('lead_id', leadIds)
+      .order('follow_up_date', { ascending: true });
+    if (data?.length) {
+      const leadsMap = new Map(this.leads().map(l => [l.id, l]));
+      this.allFollowUpRecords.set(data.map(r => ({ ...r, lead: leadsMap.get(r.lead_id) ?? null })));
+    } else {
+      this.allFollowUpRecords.set([]);
+    }
+    this.allFollowUpRecordsLoading.set(false);
   }
 
   ngOnDestroy(): void {

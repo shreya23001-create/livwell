@@ -215,16 +215,26 @@
             <table class="crm-fu-table">
               <thead><tr><th>Date</th><th>Time</th><th>Remarks</th><th>Status</th><th>By</th></tr></thead>
               <tbody>
-                <tr *ngFor="let fu of followUpHistory()">
+                <tr *ngFor="let fu of followUpHistory().slice(0, 7)">
                   <td class="fu-date">{{ fu.date }}</td>
                   <td class="fu-time">{{ fu.time || '—' }}</td>
-                  <td class="fu-remarks">{{ fu.remarks || '—' }}</td>
+                  <td class="fu-remarks">
+                    <span class="fu-remark-cell" [title]="fu.remarks || ''"
+                      [routerLink]="['/agent/leads', lead()!.id, 'followups']">
+                      {{ fu.remarks || '—' }}
+                    </span>
+                  </td>
                   <td><span class="badge badge--{{ fu.status }}" style="font-size:0.68rem;padding:0.1rem 0.45rem">{{ labelStatus(fu.status) }}</span></td>
                   <td class="fu-by">{{ fu.by }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <a *ngIf="followUpHistory().length > 7"
+            [routerLink]="['/agent/leads', lead()!.id, 'followups']"
+            class="crm-fu-view-all">
+            View all {{ followUpHistory().length }} follow-ups →
+          </a>
           }
         </div>
 
@@ -284,7 +294,7 @@
             <div class="crm-form-field">
               <label>Lead Status</label>
               <div class="select-wrapper">
-                <select [value]="statusUpdateVal()" (change)="statusUpdateVal.set($any($event.target).value)">
+                <select [ngModel]="statusUpdateVal()" (ngModelChange)="statusUpdateVal.set($event)">
                   @for (s of statusTimeline; track s.status) {
                     <option [value]="s.status">{{ s.label }}</option>
                   }
@@ -297,7 +307,7 @@
             <div class="crm-form-field">
               <label>Priority</label>
               <div class="select-wrapper">
-                <select [value]="priorityVal()" (change)="priorityVal.set($any($event.target).value)">
+                <select [ngModel]="priorityVal()" (ngModelChange)="priorityVal.set($event)">
                   <option *ngFor="let p of priorities" [value]="p">{{ p | titlecase }}</option>
                 </select>
                 <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
@@ -326,7 +336,7 @@
           <div class="crm-form-row">
             <div class="crm-form-field">
               <label>Date</label>
-              <input type="date" [value]="nextFuDate()" (change)="nextFuDate.set($any($event.target).value)">
+              <input type="date" [value]="nextFuDate()" [min]="todayIso" (change)="nextFuDate.set($any($event.target).value)">
             </div>
             <div class="crm-form-field">
               <label>Time</label>

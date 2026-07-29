@@ -180,6 +180,31 @@ $bg:      #f4f6fa;
     &::placeholder { color: $muted; }
   }
 }
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  padding: 0 0.75rem;
+  height: 38px;
+
+  svg { width: 0.95rem; height: 0.95rem; color: $muted; flex-shrink: 0; }
+
+  input[type="date"] {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.8rem;
+    color: $text;
+    cursor: pointer;
+    padding: 0;
+    width: 110px;
+  }
+}
+.date-filter-sep { font-size: 0.8rem; color: $muted; }
+
 .leads-filters select {
   background: #fff;
   border: 1px solid $border;
@@ -1507,6 +1532,37 @@ $bg:      #f4f6fa;
   justify-content: center;
 }
 
+// Follow-up history list (all records)
+.ld-fu-history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.ld-fu-history-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.875rem;
+  padding: 1rem 1.125rem;
+  background: #fff;
+  &.ld-dw-fu-card--overdue { border-color: #fca5a5; background: #fff5f5; }
+  &.ld-dw-fu-card--today   { border-color: #fcd34d; background: #fffbeb; }
+}
+.ld-fu-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.ld-fu-history-num {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9ca3af;
+}
+.ld-fu-time {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
 // Activity timeline
 .ld-dw-timeline {
   display: flex;
@@ -1576,4 +1632,223 @@ $bg:      #f4f6fa;
   gap: 0.625rem;
   flex-shrink: 0;
   background: #fff;
+}
+
+// ══ Follow-up Tab ════════════════════════════════════════════
+
+// ── KPI Strip ────────────────────────────────────────────────
+.fu-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.fu-kpi {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  background: #fff;
+  border: 1.5px solid $border;
+  border-radius: 0.875rem;
+  padding: 1rem 1.125rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &:hover { border-color: $accent; }
+  &--active { border-color: $accent; box-shadow: 0 0 0 3px #e0e7ff; }
+}
+
+.fu-kpi-icon {
+  width: 2.5rem; height: 2.5rem;
+  border-radius: 0.625rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  svg { width: 1.2rem; height: 1.2rem; }
+  &--all      { background: #eff6ff; color: #3b82f6; }
+  &--overdue  { background: #fef2f2; color: #ef4444; }
+  &--today    { background: #fffbeb; color: #d97706; }
+  &--upcoming { background: #f0fdf4; color: #16a34a; }
+}
+
+.fu-kpi-val {
+  font-size: 1.5rem; font-weight: 800; color: $text; line-height: 1;
+}
+.fu-kpi-lbl {
+  font-size: 0.72rem; font-weight: 600; color: $subtext;
+  text-transform: uppercase; letter-spacing: 0.04em; margin-top: 0.2rem;
+}
+
+// ── Follow-up list ────────────────────────────────────────────
+.fu-list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fu-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4rem 2rem;
+  color: $muted;
+  text-align: center;
+  background: #fff;
+  border: 1.5px solid $border;
+  border-radius: 0.875rem;
+  svg { width: 3rem; height: 3rem; opacity: 0.3; }
+  p { font-size: 0.85rem; margin: 0; }
+}
+
+.fu-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #fff;
+  border: 1.5px solid $border;
+  border-radius: 0.875rem;
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s;
+  &:hover { border-color: $accent; }
+  &--overdue  { border-left: 3px solid #ef4444; background: #fff5f5; }
+  &--today    { border-left: 3px solid #f59e0b; background: #fffbeb; }
+  &--upcoming { border-left: 3px solid #16a34a; background: #f0fdf4; }
+}
+
+.fu-card-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 3.5rem;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
+}
+.fu-card-day {
+  font-size: 1.75rem; font-weight: 800; color: $text; line-height: 1;
+}
+.fu-card-mon {
+  font-size: 0.68rem; font-weight: 600; color: $subtext; text-transform: uppercase;
+  letter-spacing: 0.04em; margin-top: 0.1rem;
+}
+.fu-card-time {
+  font-size: 0.7rem; font-weight: 600; color: $accent; margin-top: 0.15rem;
+}
+.fu-card-label {
+  font-size: 0.62rem; font-weight: 700; padding: 0.15rem 0.4rem;
+  border-radius: 999px; margin-top: 0.35rem;
+  &.overdue  { background: #fef2f2; color: #dc2626; }
+  &.today    { background: #fffbeb; color: #92400e; }
+  &.upcoming { background: #eff6ff; color: #2563eb; }
+}
+
+.fu-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.fu-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.fu-card-av {
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: $accent; color: #fff;
+  font-size: 0.75rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.fu-card-name {
+  font-size: 0.925rem; font-weight: 700; color: $text;
+  cursor: pointer;
+  &:hover { color: $accent; text-decoration: underline; }
+}
+
+.fu-card-contact {
+  font-size: 0.75rem; color: $subtext; margin-top: 0.15rem;
+}
+
+.fu-sep { margin: 0 0.25rem; color: $muted; }
+
+.fu-card-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: $subtext;
+  line-height: 1.5;
+  margin-bottom: 0.35rem;
+  svg { width: 0.85rem; height: 0.85rem; flex-shrink: 0; margin-top: 0.15rem; color: $muted; }
+}
+.fu-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  color: $muted;
+  svg { width: 0.78rem; height: 0.78rem; flex-shrink: 0; }
+}
+.fu-meta-sep { color: $border; }
+
+.fu-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.fu-badge {
+  font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem;
+  border-radius: 999px; white-space: nowrap;
+  &--new         { background: #eff6ff; color: #2563eb; }
+  &--contacted   { background: #fefce8; color: #ca8a04; }
+  &--qualified   { background: #f0fdf4; color: #16a34a; }
+  &--negotiating { background: #faf5ff; color: #7c3aed; }
+  &--won         { background: #d1fae5; color: #065f46; }
+  &--lost        { background: #fef2f2; color: #dc2626; }
+  &--cat         { background: #f3f4f6; color: $subtext; }
+  // follow-up record status
+  &--fu-status   { text-transform: capitalize; }
+  &--fu-pending  { background: #fefce8; color: #b45309; }
+  &--fu-done     { background: #f0fdf4; color: #15803d; }
+  &--fu-completed { background: #f0fdf4; color: #15803d; }
+  &--fu-missed   { background: #fef2f2; color: #dc2626; }
+  &--fu-cancelled { background: #f3f4f6; color: $subtext; }
+}
+
+.fu-spin {
+  width: 2.5rem; height: 2.5rem; opacity: 0.7;
+  animation: fuSpin 0.8s linear infinite;
+}
+@keyframes fuSpin { to { transform: rotate(360deg); } }
+
+.fu-card-agent {
+  display: flex; align-items: center; gap: 0.35rem;
+  font-size: 0.72rem; color: $subtext; margin-top: 0.1rem;
+}
+
+.fu-agent-av {
+  width: 1.25rem; height: 1.25rem; border-radius: 50%;
+  background: #e0e7ff; color: $accent;
+  font-size: 0.6rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.fu-view-btn {
+  font-size: 0.72rem; font-weight: 600; color: $accent;
+  background: #eff0fe; border: 1.5px solid #c7d2fe;
+  border-radius: 0.4rem; padding: 0.3rem 0.7rem;
+  cursor: pointer; margin-top: 0.25rem; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+  &:hover { background: $accent; color: #fff; border-color: $accent; }
+}
+
+@media (max-width: 900px) {
+  .fu-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+  .fu-card { flex-direction: column; }
+  .fu-card-right { flex-direction: row; flex-wrap: wrap; align-items: center; }
 }

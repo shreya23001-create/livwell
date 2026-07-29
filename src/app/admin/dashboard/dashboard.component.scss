@@ -64,59 +64,108 @@ $light:  #f4f6fa;
 // ── KPI Cards ────────────────────────────────────────────
 .dash-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.125rem;
+  margin-bottom: 1.75rem;
 }
+
 .dash-kpi {
+  position: relative;
   background: #fff;
-  border-radius: 0.875rem;
-  padding: 1.25rem 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  border-radius: 1rem;
   border: 1px solid $border;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: default;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.09);
+  }
 }
+
+// top accent stripe
+.dash-kpi-accent {
+  height: 4px;
+  width: 100%;
+}
+.dash-kpi--blue   .dash-kpi-accent { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.dash-kpi--teal   .dash-kpi-accent { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
+.dash-kpi--gold   .dash-kpi-accent { background: linear-gradient(90deg, #f59e0b, #fcd34d); }
+.dash-kpi--green  .dash-kpi-accent { background: linear-gradient(90deg, #16a34a, #4ade80); }
+.dash-kpi--purple .dash-kpi-accent { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+.dash-kpi--orange .dash-kpi-accent { background: linear-gradient(90deg, #ea580c, #fb923c); }
+
+.dash-kpi-inner {
+  padding: 1rem 1.125rem 1.125rem;
+}
+
+.dash-kpi-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.625rem;
+}
+
+.dash-kpi-label {
+  font-size: 0.72rem;
+  color: $muted;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  flex: 1;
+  padding-right: 0.5rem;
+}
+
 .dash-kpi-icon {
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 0.625rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  svg { width: 1.3rem; height: 1.3rem; }
+  svg { width: 1.1rem; height: 1.1rem; }
 }
-.dash-kpi--blue .dash-kpi-icon   { background: #eff6ff; color: #3b82f6; }
-.dash-kpi--teal .dash-kpi-icon   { background: #f0fdfa; color: #0d9488; }
-.dash-kpi--gold .dash-kpi-icon   { background: #fefce8; color: #6366f1; }
-.dash-kpi--green .dash-kpi-icon  { background: #f0fdf4; color: #6366f1; }
-.dash-kpi--purple .dash-kpi-icon { background: #f5f3ff; color: #8b5cf6; }
+.dash-kpi--blue   .dash-kpi-icon { background: #eff6ff; color: #3b82f6; }
+.dash-kpi--teal   .dash-kpi-icon { background: #f0fdfa; color: #0d9488; }
+.dash-kpi--gold   .dash-kpi-icon { background: #fffbeb; color: #d97706; }
+.dash-kpi--green  .dash-kpi-icon { background: #f0fdf4; color: #16a34a; }
+.dash-kpi--purple .dash-kpi-icon { background: #f5f3ff; color: #7c3aed; }
+.dash-kpi--orange .dash-kpi-icon { background: #fff7ed; color: #ea580c; }
 
-.dash-kpi-label {
-  font-size: 0.78rem;
-  color: $muted;
-  font-weight: 500;
-  margin-bottom: 0.2rem;
-}
 .dash-kpi-value {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: 2rem;
+  font-weight: 900;
   color: $text;
-  line-height: 1.1;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
 }
-.dash-kpi-change {
+
+.dash-kpi-footer {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-top: 0.2rem;
-  svg { width: 0.75rem; height: 0.75rem; }
-  &.up  { color: #16a34a; }
-  &.down{ color: #dc2626; }
+  justify-content: space-between;
 }
+
+.dash-kpi-sub {
+  font-size: 0.72rem;
+  color: $muted;
+  font-weight: 500;
+}
+
+.dash-kpi-arrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.dash-kpi--blue   .dash-kpi-arrow { color: #3b82f6; }
+.dash-kpi--teal   .dash-kpi-arrow { color: #0d9488; }
+.dash-kpi--gold   .dash-kpi-arrow { color: #d97706; }
+.dash-kpi--green  .dash-kpi-arrow { color: #16a34a; }
+.dash-kpi--purple .dash-kpi-arrow { color: #7c3aed; }
+.dash-kpi--orange .dash-kpi-arrow { color: #ea580c; }
 
 // ── Card base ────────────────────────────────────────────
 .dash-card {
@@ -479,6 +528,9 @@ $light:  #f4f6fa;
 }
 
 // ── Responsive ───────────────────────────────────────────
+@media (max-width: 1400px) {
+  .dash-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 1200px) {
   .dash-kpi-grid { grid-template-columns: repeat(3, 1fr); }
   .dash-charts-row { grid-template-columns: 1fr; }

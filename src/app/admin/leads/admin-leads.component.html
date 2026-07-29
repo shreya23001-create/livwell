@@ -10,7 +10,8 @@
       <!-- Sample -->
       <button class="btn-ghost" (click)="downloadSampleExcel()" title="Download sample Excel template">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
         </svg>
         Sample Excel
       </button>
@@ -57,12 +58,27 @@
   <!-- ── Tabs ── -->
   <div class="leads-tabs">
     <button class="leads-tab" [class.active]="activeTab() === 'dashboard'" (click)="activeTab.set('dashboard')">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+      </svg>
       Dashboard
     </button>
     <button class="leads-tab" [class.active]="activeTab() === 'leads'" (click)="activeTab.set('leads')">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+      </svg>
       Leads
+    </button>
+    <button class="leads-tab" [class.active]="activeTab() === 'followup'"
+      (click)="activeTab.set('followup'); fuFilter.set('all')">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+      </svg>
+      Follow-up
+      <span class="leads-tab-badge" *ngIf="overdueFollowUps().length > 0">{{ overdueFollowUps().length }} overdue</span>
     </button>
   </div>
 
@@ -74,7 +90,10 @@
 
     <div class="ld-kpi ld-kpi--total">
       <div class="ld-kpi-icon">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+        </svg>
       </div>
       <div class="ld-kpi-body">
         <div class="ld-kpi-value">{{ leads().length }}</div>
@@ -84,7 +103,10 @@
 
     <div class="ld-kpi ld-kpi--active">
       <div class="ld-kpi-icon">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+        </svg>
       </div>
       <div class="ld-kpi-body">
         <div class="ld-kpi-value">{{ activeLeads() }}</div>
@@ -94,7 +116,10 @@
 
     <div class="ld-kpi ld-kpi--won">
       <div class="ld-kpi-icon">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+        </svg>
       </div>
       <div class="ld-kpi-body">
         <div class="ld-kpi-value">{{ countByStatus('won') }}</div>
@@ -105,7 +130,10 @@
 
     <div class="ld-kpi ld-kpi--month">
       <div class="ld-kpi-icon">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+        </svg>
       </div>
       <div class="ld-kpi-body">
         <div class="ld-kpi-value">{{ leadsThisMonth() }}</div>
@@ -115,7 +143,10 @@
 
     <div class="ld-kpi ld-kpi--followup">
       <div class="ld-kpi-icon">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+        </svg>
       </div>
       <div class="ld-kpi-body">
         <div class="ld-kpi-value">{{ followUps().length }}</div>
@@ -142,9 +173,7 @@
           <div class="ld-funnel-row" *ngFor="let stage of pipelineStages()">
             <div class="ld-funnel-label">{{ labelStatus(stage.status) }}</div>
             <div class="ld-funnel-track">
-              <div class="ld-funnel-fill"
-                [style.width]="(stage.pct || 0) + '%'"
-                [style.background]="stage.color">
+              <div class="ld-funnel-fill" [style.width]="(stage.pct || 0) + '%'" [style.background]="stage.color">
               </div>
             </div>
             <div class="ld-funnel-count">
@@ -165,12 +194,11 @@
           <div class="ld-cat-item ld-cat-item--buy" *ngFor="let c of categoryBreakdown()">
             <div class="ld-cat-donut">
               <svg viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="14" fill="none" stroke="#f3f4f6" stroke-width="4"/>
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#f3f4f6" stroke-width="4" />
                 <circle cx="18" cy="18" r="14" fill="none"
                   [style.stroke]="c.cat === 'buy' ? '#2a78d6' : c.cat === 'rent' ? '#1baf7a' : '#eda100'"
-                  stroke-width="4"
-                  [attr.stroke-dasharray]="c.pct + ' 100'"
-                  stroke-dashoffset="25" stroke-linecap="round"/>
+                  stroke-width="4" [attr.stroke-dasharray]="c.pct + ' 100'" stroke-dashoffset="25"
+                  stroke-linecap="round" />
               </svg>
               <span class="ld-cat-pct">{{ c.pct }}%</span>
             </div>
@@ -188,10 +216,9 @@
         <div class="ld-conv2">
           <div class="ld-conv2-ring">
             <svg viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e5e7eb" stroke-width="3.5"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e5e7eb" stroke-width="3.5" />
               <circle cx="18" cy="18" r="15.9" fill="none" stroke="#2a78d6" stroke-width="3.5"
-                [attr.stroke-dasharray]="conversionRate() + ' 100'"
-                stroke-dashoffset="25" stroke-linecap="round"/>
+                [attr.stroke-dasharray]="conversionRate() + ' 100'" stroke-dashoffset="25" stroke-linecap="round" />
             </svg>
             <div class="ld-conv2-center">
               <div class="ld-conv2-pct">{{ conversionRate() }}%</div>
@@ -235,15 +262,15 @@
             <div class="ld-src-info">
               <div class="ld-src-name">{{ labelSource(s.source) }}</div>
               <div class="ld-src-track">
-                <div class="ld-src-fill"
-                  [style.width]="(leads().length ? s.count / leads().length * 100 : 0) + '%'"
+                <div class="ld-src-fill" [style.width]="(leads().length ? s.count / leads().length * 100 : 0) + '%'"
                   [style.background]="['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#4a3aa7'][i] || '#6b7280'">
                 </div>
               </div>
             </div>
             <div class="ld-src-meta">
               <span class="ld-src-n">{{ s.count }}</span>
-              <span class="ld-src-pct">{{ leads().length ? (s.count / leads().length * 100 | number:'1.0-0') : 0 }}%</span>
+              <span class="ld-src-pct">{{ leads().length ? (s.count / leads().length * 100 | number:'1.0-0') : 0
+                }}%</span>
             </div>
           </div>
           <div *ngIf="sourceBreakdown().length === 0" class="ld-empty-sm">No lead data yet</div>
@@ -258,17 +285,20 @@
         </div>
         <div class="ld-agents">
           <div class="ld-agent" *ngFor="let a of topAgents(); let i = index">
-            <div class="ld-agent-rank" [class.ld-agent-rank--gold]="i===0" [class.ld-agent-rank--silver]="i===1" [class.ld-agent-rank--bronze]="i===2">{{ i + 1 }}</div>
+            <div class="ld-agent-rank" [class.ld-agent-rank--gold]="i===0" [class.ld-agent-rank--silver]="i===1"
+              [class.ld-agent-rank--bronze]="i===2">{{ i + 1 }}</div>
             <div class="ld-agent-av">{{ a.name.charAt(0).toUpperCase() }}</div>
             <div class="ld-agent-info">
               <div class="ld-agent-name">{{ a.name }}</div>
               <div class="ld-agent-bar-wrap">
-                <div class="ld-agent-bar" [style.width]="(topAgents()[0]?.total ? a.total / topAgents()[0].total * 100 : 0) + '%'"></div>
+                <div class="ld-agent-bar"
+                  [style.width]="(topAgents()[0]?.total ? a.total / topAgents()[0].total * 100 : 0) + '%'"></div>
               </div>
             </div>
             <div class="ld-agent-stats">
               <div class="ld-agent-total">{{ a.total }} leads</div>
-              <div class="ld-agent-won">{{ a.won }} won · {{ a.total > 0 ? (a.won / a.total * 100 | number:'1.0-0') : 0 }}%</div>
+              <div class="ld-agent-won">{{ a.won }} won · {{ a.total > 0 ? (a.won / a.total * 100 | number:'1.0-0') : 0
+                }}%</div>
             </div>
           </div>
           <div *ngIf="topAgents().length === 0" class="ld-empty-sm">No agent data yet</div>
@@ -285,33 +315,39 @@
       <span class="ld-panel-title">Follow-up Schedule</span>
       <div class="ld-fu-chips">
         <span class="ld-fu-chip ld-fu-chip--overdue">
-          <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+          <svg viewBox="0 0 8 8">
+            <circle cx="4" cy="4" r="4" fill="currentColor" />
+          </svg>
           Overdue&nbsp;<strong>{{ overdueFollowUps().length }}</strong>
         </span>
         <span class="ld-fu-chip ld-fu-chip--today">
-          <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+          <svg viewBox="0 0 8 8">
+            <circle cx="4" cy="4" r="4" fill="currentColor" />
+          </svg>
           Today&nbsp;<strong>{{ todayFollowUps().length }}</strong>
         </span>
         <span class="ld-fu-chip ld-fu-chip--upcoming">
-          <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+          <svg viewBox="0 0 8 8">
+            <circle cx="4" cy="4" r="4" fill="currentColor" />
+          </svg>
           Upcoming&nbsp;<strong>{{ upcomingFollowUps().length }}</strong>
         </span>
       </div>
     </div>
 
     <div *ngIf="followUps().length === 0" class="ld-fu-empty">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+      </svg>
       <p>No follow-ups scheduled yet.<br><small>Edit any lead to set a follow-up date.</small></p>
     </div>
 
     <div class="ld-fu-list" *ngIf="followUps().length > 0">
-      <div class="ld-fu-item"
-        *ngFor="let l of followUps()"
-        [class.ld-fu-item--overdue]="l.followUpDate < today"
+      <div class="ld-fu-item" *ngFor="let l of followUps()" [class.ld-fu-item--overdue]="l.followUpDate < today"
         [class.ld-fu-item--today]="l.followUpDate === today">
 
-        <div class="ld-fu-urgency"
-          [class.ld-fu-urgency--overdue]="l.followUpDate < today"
+        <div class="ld-fu-urgency" [class.ld-fu-urgency--overdue]="l.followUpDate < today"
           [class.ld-fu-urgency--today]="l.followUpDate === today"
           [class.ld-fu-urgency--upcoming]="l.followUpDate > today">
         </div>
@@ -329,12 +365,16 @@
         </div>
 
         <div class="ld-fu-badges">
-          <span class="ld-status-pip" [style.background]="statusColor(l.status) + '22'" [style.color]="statusColor(l.status)">{{ labelStatus(l.status) }}</span>
+          <span class="ld-status-pip" [style.background]="statusColor(l.status) + '22'"
+            [style.color]="statusColor(l.status)">{{ labelStatus(l.status) }}</span>
           <span class="ld-fu-agent-tag">{{ l.assignedAgent }}</span>
         </div>
 
         <button class="ld-fu-btn" (click)="openEdit(l); activeTab.set('leads')" title="Edit lead">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+          </svg>
         </button>
 
       </div>
@@ -350,8 +390,10 @@
   <div class="leads-stats" [style.grid-template-columns]="'repeat(' + (dataSvc.leadStatuses().length + 1) + ', 1fr)'">
     <div class="stat-card">
       <div class="stat-icon stat-icon--total">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
         </svg>
       </div>
       <div>
@@ -361,8 +403,9 @@
     </div>
     <div class="stat-card" *ngFor="let s of dataSvc.leadStatuses()">
       <div class="stat-icon" [style.background]="s.color + '22'" [style.color]="s.color">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor">
+          <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none" />
         </svg>
       </div>
       <div>
@@ -408,6 +451,17 @@
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="m6 9 6 6 6-6" />
       </svg>
+    </div>
+    <div class="date-filter">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+      </svg>
+      <input type="date" [value]="filterDateFrom()" (change)="filterDateFrom.set($any($event.target).value); onFilter()"
+        title="From date">
+      <span class="date-filter-sep">—</span>
+      <input type="date" [value]="filterDateTo()" (change)="filterDateTo.set($any($event.target).value); onFilter()"
+        title="To date">
     </div>
   </div>
 
@@ -458,7 +512,7 @@
       <tbody>
         <tr *ngFor="let lead of paginated()">
           <td>
-            <div class="lead-name lead-name--link" (click)="openView(lead)">{{ lead.name }}</div>
+            <div class="lead-name lead-name--link" [routerLink]="['/admin/leads', lead.id]">{{ lead.name }}</div>
             <div class="lead-email">{{ lead.email }}</div>
             <div class="lead-phone">{{ lead.phone }}</div>
           </td>
@@ -523,6 +577,153 @@
 
   }<!-- end leads tab -->
 
+  <!-- ══ FOLLOW-UP TAB ══ -->
+  @if (activeTab() === 'followup') {
+
+  <!-- 4 KPI cards -->
+  <div class="fu-kpi-strip">
+    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'all'" (click)="fuFilter.set('all')">
+      <div class="fu-kpi-icon fu-kpi-icon--all">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+      </div>
+      <div class="fu-kpi-body">
+        <div class="fu-kpi-val">{{ allFollowUpRecords().length }}</div>
+        <div class="fu-kpi-lbl">All Follow-ups</div>
+      </div>
+    </div>
+    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'overdue'" (click)="fuFilter.set('overdue')">
+      <div class="fu-kpi-icon fu-kpi-icon--overdue">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+        </svg>
+      </div>
+      <div class="fu-kpi-body">
+        <div class="fu-kpi-val">{{ overdueFollowUps().length }}</div>
+        <div class="fu-kpi-lbl">Overdue</div>
+      </div>
+    </div>
+    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'today'" (click)="fuFilter.set('today')">
+      <div class="fu-kpi-icon fu-kpi-icon--today">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+      </div>
+      <div class="fu-kpi-body">
+        <div class="fu-kpi-val">{{ todayFollowUps().length }}</div>
+        <div class="fu-kpi-lbl">Due Today</div>
+      </div>
+    </div>
+    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'upcoming'" (click)="fuFilter.set('upcoming')">
+      <div class="fu-kpi-icon fu-kpi-icon--upcoming">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+        </svg>
+      </div>
+      <div class="fu-kpi-body">
+        <div class="fu-kpi-val">{{ upcomingFollowUps().length }}</div>
+        <div class="fu-kpi-lbl">Upcoming</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Follow-up list -->
+  <div class="fu-list-wrap">
+
+    <!-- Loading -->
+    <div *ngIf="allFollowUpRecordsLoading()" class="fu-empty">
+      <svg class="fu-spin" fill="none" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="#e5e7eb" stroke-width="2" />
+        <path d="M12 2a10 10 0 0 1 10 10" stroke="#6366f1" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <p>Loading follow-ups…</p>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!allFollowUpRecordsLoading() && filteredFollowUps().length === 0" class="fu-empty">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+      </svg>
+      <p>No follow-ups in this category.</p>
+    </div>
+
+    <div class="fu-card" *ngFor="let r of filteredFollowUps()" [class.fu-card--overdue]="r.follow_up_date < today"
+      [class.fu-card--today]="r.follow_up_date === today" [class.fu-card--upcoming]="r.follow_up_date > today">
+
+      <!-- Date column -->
+      <div class="fu-card-date">
+        <div class="fu-card-day">{{ r.follow_up_date | date:'d' }}</div>
+        <div class="fu-card-mon">{{ r.follow_up_date | date:'MMM yyyy' }}</div>
+        <div class="fu-card-time" *ngIf="r.follow_up_time">{{ r.follow_up_time }}</div>
+        <span class="fu-card-label" [class.overdue]="r.follow_up_date < today"
+          [class.today]="r.follow_up_date === today" [class.upcoming]="r.follow_up_date > today">
+          {{ r.follow_up_date < today ? 'Overdue' : r.follow_up_date===today ? 'Today' : 'Upcoming' }} </span>
+      </div>
+
+      <!-- Lead info -->
+      <div class="fu-card-main">
+        <div class="fu-card-top">
+          <div class="fu-card-av">{{ r.lead?.name?.charAt(0)?.toUpperCase() ?? '?' }}</div>
+          <div>
+            <div class="fu-card-name" [routerLink]="r.lead ? ['/admin/leads', r.lead.id] : []">
+              {{ r.lead?.name ?? 'Unknown Lead' }}
+            </div>
+            <div class="fu-card-contact">
+              <span *ngIf="r.lead?.email">{{ r.lead.email }}</span>
+              <span *ngIf="r.lead?.email && r.lead?.phone" class="fu-sep">·</span>
+              <span *ngIf="r.lead?.phone">{{ r.lead.phone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remarks / note -->
+        <div class="fu-card-note" *ngIf="r.remarks">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+          </svg>
+          {{ r.remarks }}
+        </div>
+
+        <!-- Created by + date -->
+        <div class="fu-card-meta">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+          <span>{{ r.created_by || 'Unknown' }}</span>
+          <span class="fu-meta-sep">·</span>
+          <span>Added {{ r.created_at | date:'d MMM yyyy' }}</span>
+        </div>
+      </div>
+
+      <!-- Right badges -->
+      <div class="fu-card-right">
+        <!-- Follow-up status from lead_follow_ups -->
+        <span class="fu-badge fu-badge--fu-status fu-badge--fu-{{ r.status }}">{{ r.status | titlecase }}</span>
+        <!-- Lead status -->
+        <span *ngIf="r.lead" class="fu-badge fu-badge--{{ r.lead.status }}">{{ labelStatus(r.lead.status) }}</span>
+        <!-- Category -->
+        <span *ngIf="r.lead" class="fu-badge fu-badge--cat">{{ r.lead.category | titlecase }}</span>
+        <!-- Assigned agent -->
+        <div class="fu-card-agent" *ngIf="r.lead">
+          <div class="fu-agent-av">{{ r.lead.assignedAgent === 'Unassigned' ? '?' : r.lead.assignedAgent.charAt(0) }}
+          </div>
+          <span>{{ r.lead.assignedAgent }}</span>
+        </div>
+        <button *ngIf="r.lead" [routerLink]="['/admin/leads', r.lead.id]" class="fu-view-btn">View</button>
+      </div>
+
+    </div>
+  </div>
+
+  }<!-- end followup tab -->
+
 </div>
 
 <!-- ── Add / Edit Modal ── -->
@@ -554,7 +755,8 @@
       <div class="form-row">
         <div class="form-field" [class.has-error]="formErrors()['phone']">
           <label>Phone *</label>
-          <app-phone-input [ngModel]="form()['phone']" (ngModelChange)="updateForm({phone: $event})" placeholder="50 000 0000"></app-phone-input>
+          <app-phone-input [ngModel]="form()['phone']" (ngModelChange)="updateForm({phone: $event})"
+            placeholder="50 000 0000"></app-phone-input>
           <span class="field-error" *ngIf="formErrors()['phone']">{{ formErrors()['phone'] }}</span>
         </div>
         <div class="form-field">
@@ -616,7 +818,8 @@
                   <button type="button" (click)="$event.stopPropagation(); toggleLocation(loc)">×</button>
                 </span>
               </span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="multi-select-arrow" [class.open]="locationDropdownOpen()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="multi-select-arrow"
+                [class.open]="locationDropdownOpen()">
                 <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
               </svg>
             </div>
@@ -636,7 +839,8 @@
           <div class="select-wrapper">
             <select (change)="updateForm({propertyType: $any($event.target).value})">
               <option value="">Select type…</option>
-              <option *ngFor="let pt of dataSvc.propTypes()" [value]="pt" [selected]="form()['propertyType'] === pt">{{ pt }}</option>
+              <option *ngFor="let pt of dataSvc.propTypes()" [value]="pt" [selected]="form()['propertyType'] === pt">{{
+                pt }}</option>
             </select>
             <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
               <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2.5" />
@@ -659,16 +863,19 @@
       <div class="form-row">
         <div class="form-field">
           <label>Follow-up Date</label>
-          <input type="date" [value]="form()['followUpDate']" (input)="updateForm({followUpDate: $any($event.target).value})">
+          <input type="date" [value]="form()['followUpDate']"
+            (input)="updateForm({followUpDate: $any($event.target).value})">
         </div>
         <div class="form-field">
           <label>Follow-up Note</label>
-          <input type="text" [value]="form()['followUpNote']" (input)="updateForm({followUpNote: $any($event.target).value})" placeholder="e.g. Call to discuss budget">
+          <input type="text" [value]="form()['followUpNote']"
+            (input)="updateForm({followUpNote: $any($event.target).value})" placeholder="e.g. Call to discuss budget">
         </div>
       </div>
       <div class="form-field form-field--full">
         <label>Notes</label>
-        <app-rich-editor [placeholder]="'Any additional notes…'" [initialValue]="form()['notes'] || ''" (valueChange)="updateForm({notes: $event})"></app-rich-editor>
+        <app-rich-editor [placeholder]="'Any additional notes…'" [initialValue]="form()['notes'] || ''"
+          (valueChange)="updateForm({notes: $event})"></app-rich-editor>
       </div>
     </div>
     <div class="modal-footer">
@@ -695,44 +902,63 @@
           <div class="ld-drawer-name">{{ lead.name }}</div>
           <div class="ld-drawer-contacts">
             <a [href]="'mailto:' + lead.email" class="ld-contact-chip">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
               {{ lead.email }}
             </a>
             <a [href]="'tel:' + lead.phone" class="ld-contact-chip">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 6.75Z"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 6.75Z" />
+              </svg>
               {{ lead.phone }}
             </a>
           </div>
         </div>
         <div class="ld-drawer-status-wrap">
-          <span class="ld-drawer-status-badge" [style.background]="statusColor(lead.status) + '1a'" [style.color]="statusColor(lead.status)" [style.border-color]="statusColor(lead.status) + '44'">
+          <span class="ld-drawer-status-badge" [style.background]="statusColor(lead.status) + '1a'"
+            [style.color]="statusColor(lead.status)" [style.border-color]="statusColor(lead.status) + '44'">
             <span class="ld-drawer-status-dot" [style.background]="statusColor(lead.status)"></span>
             {{ labelStatus(lead.status) }}
           </span>
-          <span class="ld-drawer-cat-badge ld-drawer-cat-badge--{{ lead.category }}">{{ lead.category | titlecase }}</span>
+          <span class="ld-drawer-cat-badge ld-drawer-cat-badge--{{ lead.category }}">{{ lead.category | titlecase
+            }}</span>
         </div>
       </div>
 
       <!-- Tab Bar -->
       <div class="ld-drawer-tabs">
         <button class="ld-drawer-tab" [class.active]="viewTab() === 'overview'" (click)="viewTab.set('overview')">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
           Overview
         </button>
         <button class="ld-drawer-tab" [class.active]="viewTab() === 'followup'" (click)="viewTab.set('followup')">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+          </svg>
           Follow-up
-          <span class="ld-drawer-tab-badge" *ngIf="lead.followUpDate">1</span>
+          <span class="ld-drawer-tab-badge" *ngIf="viewFollowUps().length > 0">{{ viewFollowUps().length }}</span>
+          <span class="ld-drawer-tab-badge" *ngIf="viewFollowUps().length === 0 && lead.followUpDate">1</span>
         </button>
         <button class="ld-drawer-tab" [class.active]="viewTab() === 'activity'" (click)="viewTab.set('activity')">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
           Activity
           <span class="ld-drawer-tab-badge" *ngIf="leadAuditLogs().length">{{ leadAuditLogs().length }}</span>
         </button>
       </div>
 
       <button class="ld-drawer-close" (click)="closeViewModal()">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
 
@@ -747,7 +973,10 @@
         <div class="ld-dw-facts">
           <div class="ld-dw-fact">
             <div class="ld-dw-fact-icon" style="background:#eff6ff;color:#2a78d6">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
             </div>
             <div>
               <div class="ld-dw-fact-label">Budget</div>
@@ -756,7 +985,11 @@
           </div>
           <div class="ld-dw-fact">
             <div class="ld-dw-fact-icon" style="background:#f0fdf4;color:#1baf7a">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+              </svg>
             </div>
             <div>
               <div class="ld-dw-fact-label">Location</div>
@@ -765,7 +998,10 @@
           </div>
           <div class="ld-dw-fact">
             <div class="ld-dw-fact-icon" style="background:#fff7ed;color:#eb6834">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+              </svg>
             </div>
             <div>
               <div class="ld-dw-fact-label">Property Type</div>
@@ -774,7 +1010,10 @@
           </div>
           <div class="ld-dw-fact">
             <div class="ld-dw-fact-icon" style="background:#faf5ff;color:#7c3aed">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
+              </svg>
             </div>
             <div>
               <div class="ld-dw-fact-label">Source</div>
@@ -783,7 +1022,10 @@
           </div>
           <div class="ld-dw-fact">
             <div class="ld-dw-fact-icon" style="background:#eef2ff;color:#6366f1">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
             </div>
             <div>
               <div class="ld-dw-fact-label">Assigned Agent</div>
@@ -792,7 +1034,10 @@
           </div>
           <div class="ld-dw-fact">
             <div class="ld-dw-fact-icon" style="background:#f9fafb;color:#6b7280">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+              </svg>
             </div>
             <div>
               <div class="ld-dw-fact-label">Created</div>
@@ -801,7 +1046,10 @@
           </div>
           <div class="ld-dw-fact">
             <div class="ld-dw-fact-icon" style="background:#f9fafb;color:#6b7280">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
             </div>
             <div>
               <div class="ld-dw-fact-label">Last Contact</div>
@@ -813,9 +1061,7 @@
         <!-- Pipeline position -->
         <div class="ld-dw-section-title" style="margin-top:1.25rem">Pipeline Stage</div>
         <div class="ld-dw-pipeline">
-          <div class="ld-dw-stage"
-            *ngFor="let s of pipelineStages()"
-            [class.active]="s.status === lead.status"
+          <div class="ld-dw-stage" *ngFor="let s of pipelineStages()" [class.active]="s.status === lead.status"
             [class.passed]="isPastStage(s.status, lead.status)">
             <div class="ld-dw-stage-dot" [style.background]="s.status === lead.status ? s.color : ''"></div>
             <div class="ld-dw-stage-label">{{ labelStatus(s.status) }}</div>
@@ -833,30 +1079,68 @@
 
       <!-- ── FOLLOW-UP TAB ── -->
       <div *ngIf="viewTab() === 'followup'">
-        <div *ngIf="!lead.followUpDate" class="ld-dw-empty">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+
+        <!-- No follow-up at all -->
+        <div *ngIf="!lead.followUpDate && viewFollowUps().length === 0 && !viewFollowUpsLoad()" class="ld-dw-empty">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+          </svg>
           <p>No follow-up scheduled.<br><small>Edit this lead to set a date.</small></p>
           <button class="btn-primary btn--sm" (click)="closeViewModal(); openEdit(lead)">Schedule Follow-up</button>
         </div>
 
-        <div *ngIf="lead.followUpDate" class="ld-dw-fu-card"
+        <!-- History from lead_follow_ups table (richer data) -->
+        <div *ngIf="viewFollowUps().length > 0" class="ld-fu-history">
+          <div *ngFor="let fu of viewFollowUps(); let i = index" class="ld-fu-history-card"
+            [class.ld-dw-fu-card--overdue]="fu.follow_up_date < today"
+            [class.ld-dw-fu-card--today]="fu.follow_up_date === today">
+            <div class="ld-fu-history-header">
+              <span class="ld-dw-fu-label" [class.overdue]="fu.follow_up_date < today"
+                [class.today]="fu.follow_up_date === today" [class.upcoming]="fu.follow_up_date > today">
+                {{ fu.follow_up_date < today ? 'Past' : fu.follow_up_date===today ? 'Due Today' : 'Upcoming' }} </span>
+                  <span class="ld-fu-history-num">#{{ viewFollowUps().length - i }}</span>
+            </div>
+            <div class="ld-dw-fu-date">
+              {{ fu.follow_up_date | date:'EEEE, d MMMM y' }}
+              <span *ngIf="fu.follow_up_time" class="ld-fu-time"> · {{ fu.follow_up_time }}</span>
+            </div>
+            <div class="ld-dw-fu-note" *ngIf="fu.remarks">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+              </svg>
+              {{ fu.remarks }}
+            </div>
+            <div class="ld-dw-fu-agent" *ngIf="fu.created_by">
+              <div class="ld-dw-fu-agent-av">{{ fu.created_by?.charAt(0) || '?' }}</div>
+              By <strong>{{ fu.created_by }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fallback: show lead's own follow_up_date when history table is empty/blocked -->
+        <div *ngIf="viewFollowUps().length === 0 && lead.followUpDate" class="ld-dw-fu-card"
           [class.ld-dw-fu-card--overdue]="lead.followUpDate < today"
           [class.ld-dw-fu-card--today]="lead.followUpDate === today">
           <div class="ld-dw-fu-card-header">
-            <span class="ld-dw-fu-label"
-              [class.overdue]="lead.followUpDate < today"
-              [class.today]="lead.followUpDate === today"
-              [class.upcoming]="lead.followUpDate > today">
-              {{ lead.followUpDate < today ? 'Overdue' : lead.followUpDate === today ? 'Due Today' : 'Upcoming' }}
-            </span>
-            <button class="ld-dw-fu-edit-btn" (click)="closeViewModal(); openEdit(lead)">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
-              Edit
-            </button>
+            <span class="ld-dw-fu-label" [class.overdue]="lead.followUpDate < today"
+              [class.today]="lead.followUpDate === today" [class.upcoming]="lead.followUpDate > today">
+              {{ lead.followUpDate < today ? 'Overdue' : lead.followUpDate===today ? 'Due Today' : 'Upcoming' }} </span>
+                <button class="ld-dw-fu-edit-btn" (click)="closeViewModal(); openEdit(lead)">
+                  <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                  </svg>
+                  Edit
+                </button>
           </div>
           <div class="ld-dw-fu-date">{{ lead.followUpDate | date:'EEEE, d MMMM y' }}</div>
           <div class="ld-dw-fu-note" *ngIf="lead.followUpNote">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+            </svg>
             {{ lead.followUpNote }}
           </div>
           <div class="ld-dw-fu-agent">
@@ -864,20 +1148,22 @@
             Assigned to <strong>{{ lead.assignedAgent || 'Unassigned' }}</strong>
           </div>
         </div>
+
       </div><!-- /followup -->
 
       <!-- ── ACTIVITY TAB ── -->
       <div *ngIf="viewTab() === 'activity'">
         <div *ngIf="leadAuditLogs().length === 0" class="ld-dw-empty">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
           <p>No activity logged yet.<br><small>Actions on this lead will appear here.</small></p>
         </div>
 
         <div class="ld-dw-timeline" *ngIf="leadAuditLogs().length > 0">
           <div class="ld-dw-tl-item" *ngFor="let log of leadAuditLogs()">
             <div class="ld-dw-tl-line"></div>
-            <div class="ld-dw-tl-dot"
-              [class.ld-dw-tl-dot--success]="log.status === 'success'"
+            <div class="ld-dw-tl-dot" [class.ld-dw-tl-dot--success]="log.status === 'success'"
               [class.ld-dw-tl-dot--warning]="log.status === 'warning'"
               [class.ld-dw-tl-dot--error]="log.status === 'error'">
             </div>
@@ -900,7 +1186,10 @@
     <div class="ld-drawer-footer">
       <button class="btn-ghost" (click)="closeViewModal()">Close</button>
       <button class="btn-primary" (click)="closeViewModal(); openEdit(lead)">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+        </svg>
         Edit Lead
       </button>
     </div>

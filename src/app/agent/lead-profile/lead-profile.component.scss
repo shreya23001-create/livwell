@@ -1247,10 +1247,10 @@ $white: #ffffff;
 }
 
 // Follow-up history table
-.crm-fu-wrap { overflow-x: auto; }
+.crm-fu-wrap { overflow-x: auto; max-height: 280px; overflow-y: auto; }
 .crm-fu-table {
   width: 100%; border-collapse: collapse; font-size: 0.79rem; min-width: 360px;
-  thead tr { background: #f8f9fb; }
+  thead tr { background: #f8f9fb; position: sticky; top: 0; z-index: 1; }
   th {
     padding: 0.45rem 0.6rem; text-align: left; font-size: 0.68rem; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.06em; color: $muted; white-space: nowrap;
@@ -1260,8 +1260,20 @@ $white: #ffffff;
   td { padding: 0.5rem 0.6rem; color: $text; vertical-align: middle; }
   .fu-date  { white-space: nowrap; }
   .fu-time  { color: $muted; white-space: nowrap; }
-  .fu-remarks { color: $sub; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fu-remarks { max-width: 200px; }
+  .fu-remark-cell {
+    display: block; color: $sub; max-width: 200px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+    cursor: pointer; text-decoration: none;
+    &:hover { color: #6366f1; text-decoration: underline; }
+  }
   .fu-by    { color: $muted; white-space: nowrap; }
+}
+
+.crm-fu-view-all {
+  display: block; text-align: right; font-size: 0.78rem; font-weight: 600;
+  color: #6366f1; text-decoration: none; margin-top: 0.5rem;
+  &:hover { text-decoration: underline; }
 }
 
 // Empty / loading

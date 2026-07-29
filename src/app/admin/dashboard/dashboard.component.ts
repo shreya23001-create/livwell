@@ -16,7 +16,8 @@ export class DashboardComponent {
   private dataSvc  = inject(AdminDataService);
   private sb       = inject(SupabaseService).client;
 
-  readonly today = new Date();
+  readonly today    = new Date();
+  readonly todayIso = new Date().toISOString().slice(0, 10);
 
   // ── Live signals from service ─────────────────────────
   leads = this.dataSvc.leads;
@@ -26,15 +27,19 @@ export class DashboardComponent {
   propertiesPublished = signal(0);
   projectsCount       = signal(0);
   projectsPublished   = signal(0);
+  followUpTotal       = signal(0);
+  followUpOverdue     = signal(0);
+  followUpToday       = signal(0);
 
   constructor() {
     this.loadStats();
   }
 
   private async loadStats(): Promise<void> {
-    const [propRes, projRes] = await Promise.all([
+    const [propRes, projRes, fuRes] = await Promise.all([
       this.sb.from('properties').select('status'),
       this.sb.from('projects').select('status'),
+      this.sb.from('admin_leads').select('follow_up_date, status').not('follow_up_date', 'is', null),
     ]);
     if (propRes.data) {
       this.propertiesCount.set(propRes.data.length);
@@ -43,6 +48,12 @@ export class DashboardComponent {
     if (projRes.data) {
       this.projectsCount.set(projRes.data.length);
       this.projectsPublished.set(projRes.data.filter((p: any) => p.status === 'Published').length);
+    }
+    if (fuRes.data) {
+      const active = fuRes.data.filter((l: any) => !['won', 'lost'].includes(l.status));
+      this.followUpTotal.set(active.length);
+      this.followUpOverdue.set(active.filter((l: any) => l.follow_up_date < this.todayIso).length);
+      this.followUpToday.set(active.filter((l: any) => l.follow_up_date === this.todayIso).length);
     }
   }
 
@@ -54,13 +65,17 @@ export class DashboardComponent {
     const agents  = users.filter(u => u.role === 'agent' && u.status === 'active').length;
     const won     = leads.filter(l => l.status === 'won').length;
     const conv    = leads.length > 0 ? ((won / leads.length) * 100).toFixed(1) : '0.0';
+    const overdue = this.followUpOverdue();
+    const todayCnt = this.followUpToday();
+    const fuSub   = overdue > 0 ? `${overdue} overdue` : todayCnt > 0 ? `${todayCnt} due today` : 'All on track';
 
     return [
-      { label: 'Total Properties', value: String(this.propertiesCount()), sub: `${this.propertiesPublished()} published`, icon: 'home',     color: 'blue'   },
-      { label: 'Total Projects',   value: String(this.projectsCount()),   sub: `${this.projectsPublished()} published`,  icon: 'projects', color: 'teal'   },
+      { label: 'Total Properties', value: String(this.propertiesCount()), sub: `${this.propertiesPublished()} published`, icon: 'home',      color: 'blue'   },
+      { label: 'Total Projects',   value: String(this.projectsCount()),   sub: `${this.projectsPublished()} published`,  icon: 'projects',  color: 'teal'   },
       { label: 'Active Leads',     value: String(active),                  sub: `${leads.filter(l=>l.status==='new').length} new today`,   icon: 'leads',   color: 'gold'   },
       { label: 'Active Agents',    value: String(agents),                  sub: `${users.filter(u=>u.role==='agent').length} total`,        icon: 'agents',  color: 'green'  },
       { label: 'Conversion Rate',  value: `${conv}%`,                      sub: `${won} deals won`,                                         icon: 'revenue', color: 'purple' },
+      { label: 'Follow-Ups',       value: String(this.followUpTotal()),    sub: fuSub,                                                       icon: 'calendar', color: 'orange' },
     ];
   });
 

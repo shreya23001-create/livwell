@@ -2,7 +2,7 @@ import { PhoneInputComponent } from '../../shared/components/phone-input/phone-i
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { AdminDataService, LeadStatus, LeadSource, LeadCategory, Lead } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
@@ -25,7 +25,7 @@ const EMPTY_FORM = (): Partial<Lead> => ({
 @Component({
   selector: 'app-admin-leads',
   standalone: true,
-  imports: [PhoneInputComponent, CommonModule, FormsModule, RichEditorComponent],
+  imports: [PhoneInputComponent, CommonModule, FormsModule, RichEditorComponent, RouterModule],
   templateUrl: './admin-leads.component.html',
   styleUrl: './admin-leads.component.scss',
 })
@@ -49,6 +49,16 @@ export class AdminLeadsComponent implements OnInit {
   page         = signal(1);
   pageSize     = 10;
 
+  // ── Date filter — default: rolling last 1 month ───────
+  private static defaultDateFrom(): string {
+    const d = new Date(); d.setMonth(d.getMonth() - 1); return d.toISOString().slice(0, 10);
+  }
+  private static defaultDateTo(): string {
+    return new Date().toISOString().slice(0, 10);
+  }
+  filterDateFrom = signal(AdminLeadsComponent.defaultDateFrom());
+  filterDateTo   = signal(AdminLeadsComponent.defaultDateTo());
+
   // ── Modal ─────────────────────────────────────────────
   showModal       = signal(false);
   isEdit          = signal(false);
@@ -61,9 +71,11 @@ export class AdminLeadsComponent implements OnInit {
   deleteTarget    = signal<Lead | null>(null);
 
   // ── View Modal (from notification) ───────────────────
-  showViewModal  = signal(false);
-  viewLead       = signal<Lead | null>(null);
-  viewTab        = signal<'overview' | 'followup' | 'activity'>('overview');
+  showViewModal     = signal(false);
+  viewLead          = signal<Lead | null>(null);
+  viewTab           = signal<'overview' | 'followup' | 'activity'>('overview');
+  viewFollowUps     = signal<any[]>([]);
+  viewFollowUpsLoad = signal(false);
 
   leadAuditLogs = computed(() => {
     const lead = this.viewLead();
@@ -75,7 +87,22 @@ export class AdminLeadsComponent implements OnInit {
   });
 
   // ── Tabs ─────────────────────────────────────────────
-  activeTab = signal<'dashboard' | 'leads'>('dashboard');
+  activeTab    = signal<'dashboard' | 'leads' | 'followup'>('dashboard');
+  fuFilter     = signal<'all' | 'overdue' | 'today' | 'upcoming'>('all');
+
+  // All follow-up records from lead_follow_ups table (enriched with lead info)
+  allFollowUpRecords = signal<any[]>([]);
+  allFollowUpRecordsLoading = signal(false);
+
+  filteredFollowUps = computed(() => {
+    const f = this.fuFilter();
+    const all = this.allFollowUpRecords();
+    const today = this.today;
+    if (f === 'overdue')  return all.filter(r => r.follow_up_date < today);
+    if (f === 'today')    return all.filter(r => r.follow_up_date === today);
+    if (f === 'upcoming') return all.filter(r => r.follow_up_date > today);
+    return all;
+  });
 
   // ── Dashboard computed ────────────────────────────────
   today = new Date().toISOString().slice(0, 10);
@@ -87,15 +114,15 @@ export class AdminLeadsComponent implements OnInit {
   );
 
   overdueFollowUps = computed(() =>
-    this.followUps().filter(l => l.followUpDate < this.today)
+    this.allFollowUpRecords().filter(r => r.follow_up_date < this.today)
   );
 
   todayFollowUps = computed(() =>
-    this.followUps().filter(l => l.followUpDate === this.today)
+    this.allFollowUpRecords().filter(r => r.follow_up_date === this.today)
   );
 
   upcomingFollowUps = computed(() =>
-    this.followUps().filter(l => l.followUpDate > this.today)
+    this.allFollowUpRecords().filter(r => r.follow_up_date > this.today)
   );
 
   conversionRate = computed(() => {
@@ -193,16 +220,21 @@ export class AdminLeadsComponent implements OnInit {
 
   // ── Computed ──────────────────────────────────────────
   filteredList = computed(() => {
-    const q   = this.search().toLowerCase();
-    const st  = this.filterStatus();
-    const src = this.filterSource();
-    const ag  = this.filterAgent();
+    const q    = this.search().toLowerCase();
+    const st   = this.filterStatus();
+    const src  = this.filterSource();
+    const ag   = this.filterAgent();
+    const from = this.filterDateFrom();
+    const to   = this.filterDateTo();
     return this.leads().filter(l => {
-      const matchQ   = !q   || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(q) || l.location.toLowerCase().includes(q);
-      const matchSt  = !st  || l.status === st;
-      const matchSrc = !src || l.source === src;
-      const matchAg  = !ag  || l.assignedAgent === ag;
-      return matchQ && matchSt && matchSrc && matchAg;
+      const matchQ    = !q   || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(q) || l.location.toLowerCase().includes(q);
+      const matchSt   = !st  || l.status === st;
+      const matchSrc  = !src || l.source === src;
+      const matchAg   = !ag  || l.assignedAgent === ag;
+      const date      = l.createdDate || '';
+      const matchFrom = !from || date >= from;
+      const matchTo   = !to   || date <= to;
+      return matchQ && matchSt && matchSrc && matchAg && matchFrom && matchTo;
     });
   });
 
@@ -256,6 +288,7 @@ export class AdminLeadsComponent implements OnInit {
   onFilter(): void { this.page.set(1); }
 
   ngOnInit(): void {
+    this.loadAllFollowUps();
     const leadIdParam = this.route.snapshot.queryParamMap.get('lead');
     if (leadIdParam) {
       const id = Number(leadIdParam);
@@ -264,6 +297,27 @@ export class AdminLeadsComponent implements OnInit {
         if (lead) this.openView(lead);
       }, 800);
     }
+  }
+
+  async loadAllFollowUps(): Promise<void> {
+    this.allFollowUpRecordsLoading.set(true);
+    const { data } = await this.sb
+      .from('lead_follow_ups')
+      .select('*')
+      .order('follow_up_date', { ascending: true });
+    if (data?.length) {
+      // Enrich with lead info from loaded leads
+      const leadsMap = new Map(this.leads().map(l => [l.id, l]));
+      this.allFollowUpRecords.set(
+        data.map(r => ({
+          ...r,
+          lead: leadsMap.get(r.lead_id) ?? null,
+        }))
+      );
+    } else {
+      this.allFollowUpRecords.set([]);
+    }
+    this.allFollowUpRecordsLoading.set(false);
   }
 
   // ── Modal ─────────────────────────────────────────────
@@ -292,7 +346,20 @@ export class AdminLeadsComponent implements OnInit {
   openView(lead: Lead): void {
     this.viewLead.set(lead);
     this.viewTab.set('overview');
+    this.viewFollowUps.set([]);
     this.showViewModal.set(true);
+    this.loadViewFollowUps(lead.id);
+  }
+
+  private async loadViewFollowUps(leadId: number): Promise<void> {
+    this.viewFollowUpsLoad.set(true);
+    const { data, error } = await this.sb
+      .from('lead_follow_ups')
+      .select('*')
+      .eq('lead_id', leadId)
+      .order('created_at', { ascending: false });
+    this.viewFollowUps.set(data ?? []);
+    this.viewFollowUpsLoad.set(false);
   }
 
   closeViewModal(): void { this.showViewModal.set(false); }
@@ -425,12 +492,15 @@ export class AdminLeadsComponent implements OnInit {
       'Social Media': 'social_media', 'Portal': 'portal', 'Cold Call': 'cold_call',
     };
 
-    const toImport = rows
+    const normalisePhone = (p: string) => p.replace(/[\s\-().+]/g, '');
+
+    // Step 1: map all valid rows
+    const mapped = rows
       .filter(r => r['Name']?.toString().trim())
       .map(r => ({
         name:          r['Name']           || '',
         email:         r['Email']          || '',
-        phone:         r['Phone']          || '',
+        phone:         r['Phone']?.toString().trim() || '',
         status:        statusMap[r['Status']]   ?? 'new',
         source:        sourceMap[r['Source']]   ?? 'website',
         category:      (['buy','rent','invest'].includes(r['Category']) ? r['Category'] : 'buy') as LeadCategory,
@@ -445,9 +515,45 @@ export class AdminLeadsComponent implements OnInit {
         followUpNote:  r['Follow-up Note'] || '',
       }));
 
+    // Step 2: deduplicate within the file by phone (keep first occurrence)
+    const seenInFile = new Set<string>();
+    const afterFileDedupe = mapped.filter(r => {
+      const key = normalisePhone(r.phone);
+      if (!key || seenInFile.has(key)) return false;
+      seenInFile.add(key);
+      return true;
+    });
+    const fileDupeCount = mapped.length - afterFileDedupe.length;
+
+    // Step 3: deduplicate against existing leads in DB by phone
+    const existingPhones = new Set(
+      this.leads().map(l => normalisePhone(l.phone)).filter(Boolean)
+    );
+    const toImport = afterFileDedupe.filter(r => !existingPhones.has(normalisePhone(r.phone)));
+    const dbDupeCount = afterFileDedupe.length - toImport.length;
+
+    if (!toImport.length) {
+      const msg = [
+        fileDupeCount ? `${fileDupeCount} duplicate(s) removed from file` : '',
+        dbDupeCount   ? `${dbDupeCount} already exist in the system`       : '',
+      ].filter(Boolean).join(', ');
+      this.toast.error(`Nothing to import. ${msg}.`);
+      this.importing.set(false);
+      input.value = '';
+      return;
+    }
+
     const err = await this.dataSvc.importLeads(toImport);
-    if (err) this.toast.error('Import failed: ' + err);
-    else     this.toast.success(`${toImport.length} lead(s) imported successfully.`);
+    if (err) {
+      this.toast.error('Import failed: ' + err);
+    } else {
+      const parts = [
+        `${toImport.length} lead(s) imported`,
+        fileDupeCount ? `${fileDupeCount} duplicate(s) in file skipped` : '',
+        dbDupeCount   ? `${dbDupeCount} already in system skipped`      : '',
+      ].filter(Boolean);
+      this.toast.success(parts.join(' · '));
+    }
 
     this.importing.set(false);
     input.value = '';

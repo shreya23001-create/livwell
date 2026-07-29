@@ -1,0 +1,118 @@
+$accent: #6366f1;
+$border: #e5e7eb;
+$text: #111827;
+$sub: #6b7280;
+$muted: #9ca3af;
+$bg: #f4f6fa;
+
+.lfu-page {
+  padding: 1.75rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.lfu-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.lfu-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: 1.5px solid $border;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.875rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $sub;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-top: 0.2rem;
+  transition: all 0.15s;
+
+  &:hover { border-color: $accent; color: $accent; }
+}
+
+.lfu-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: $text;
+  margin: 0 0 0.2rem;
+}
+
+.lfu-sub {
+  font-size: 0.82rem;
+  color: $sub;
+  margin: 0;
+}
+
+.lfu-card {
+  background: #fff;
+  border: 1.5px solid $border;
+  border-radius: 0.875rem;
+  overflow: hidden;
+}
+
+.lfu-empty {
+  padding: 3rem;
+  text-align: center;
+  color: $muted;
+  font-size: 0.88rem;
+}
+
+.lfu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+
+  thead tr {
+    background: #f8f9fb;
+    border-bottom: 1.5px solid $border;
+  }
+
+  th {
+    padding: 0.65rem 0.875rem;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: $sub;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid $border;
+    transition: background 0.1s;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: #fafafa; }
+  }
+
+  td { padding: 0.65rem 0.875rem; color: $text; vertical-align: middle; }
+}
+
+.lfu-num   { color: $muted; font-size: 0.75rem; width: 36px; }
+.lfu-date  { white-space: nowrap; font-weight: 500; }
+.lfu-time  { color: $sub; white-space: nowrap; }
+.lfu-remarks { color: $sub; max-width: 400px; word-break: break-word; line-height: 1.5; }
+.lfu-by    { color: $muted; white-space: nowrap; font-size: 0.78rem; }
+
+.lfu-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 20px;
+  white-space: nowrap;
+
+  &--new         { background: #eff6ff; color: #2563eb; }
+  &--contacted   { background: #f0fdf4; color: #15803d; }
+  &--qualified   { background: #faf5ff; color: #7c3aed; }
+  &--negotiating { background: #fff7ed; color: #c2410c; }
+  &--won         { background: #f0fdf4; color: #166534; }
+  &--lost        { background: #fef2f2; color: #dc2626; }
+}

@@ -1,0 +1,48 @@
+<div class="lfu-page">
+
+  <div class="lfu-header">
+    <button class="lfu-back" (click)="goBack()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to Lead
+    </button>
+    <div>
+      <h1 class="lfu-title">Follow-Up History</h1>
+      <p class="lfu-sub">{{ leadName() }} · {{ records().length }} records</p>
+    </div>
+  </div>
+
+  <div class="lfu-card">
+    @if (loading()) {
+      <div class="lfu-empty">Loading…</div>
+    } @else if (records().length === 0) {
+      <div class="lfu-empty">No follow-up records found.</div>
+    } @else {
+      <table class="lfu-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Remarks</th>
+            <th>Status</th>
+            <th>By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of records(); let i = index">
+            <td class="lfu-num">{{ i + 1 }}</td>
+            <td class="lfu-date">{{ r.date }}</td>
+            <td class="lfu-time">{{ r.time }}</td>
+            <td class="lfu-remarks">{{ r.remarks }}</td>
+            <td>
+              <span *ngIf="r.status" class="lfu-badge lfu-badge--{{ r.status }}">{{ labelStatus(r.status) }}</span>
+              <span *ngIf="!r.status">—</span>
+            </td>
+            <td class="lfu-by">{{ r.by }}</td>
+          </tr>
+        </tbody>
+      </table>
+    }
+  </div>
+
+</div>

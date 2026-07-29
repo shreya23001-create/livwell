@@ -303,11 +303,9 @@ export class AdminLeadsComponent implements OnInit {
     const f = this.form();
     const errs: Record<string, string> = {};
     if (!f.name?.trim())     errs['name']     = 'Name is required.';
-    if (!f.email?.trim())    errs['email']    = 'Email is required.';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errs['email'] = 'Enter a valid email.';
+    if (f.email?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errs['email'] = 'Enter a valid email.';
     if (!f.phone?.trim())    errs['phone']    = 'Phone is required.';
     else if (!/^\+?[\d\s\-()]+$/.test(f.phone.trim()) || (f.phone.replace(/\D/g, '').length < 7 || f.phone.replace(/\D/g, '').length > 15)) errs['phone'] = 'Enter a valid phone number (7–15 digits).';
-    if (!f.location?.trim()) errs['location'] = 'Location is required.';
     this.formErrors.set(errs);
     if (Object.keys(errs).length) return;
 

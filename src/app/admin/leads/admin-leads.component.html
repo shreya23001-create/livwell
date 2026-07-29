@@ -545,7 +545,7 @@
           <span class="field-error" *ngIf="formErrors()['name']">{{ formErrors()['name'] }}</span>
         </div>
         <div class="form-field" [class.has-error]="formErrors()['email']">
-          <label>Email *</label>
+          <label>Email</label>
           <input type="email" [value]="form()['email']" (input)="updateForm({email: $any($event.target).value})"
             placeholder="james@example.com">
           <span class="field-error" *ngIf="formErrors()['email']">{{ formErrors()['email'] }}</span>
@@ -606,7 +606,7 @@
             placeholder="AED 2M–3M">
         </div>
         <div class="form-field" [class.has-error]="formErrors()['location']">
-          <label>Preferred Location *</label>
+          <label>Preferred Location</label>
           <div class="multi-select-wrap" tabindex="-1" (focusout)="onLocationFocusOut($event)">
             <div class="multi-select-trigger" (click)="locationDropdownOpen.set(!locationDropdownOpen())">
               <span *ngIf="selectedLocations().length === 0" class="multi-select-placeholder">Select locations…</span>

@@ -201,7 +201,7 @@
             <span class="field-error" *ngIf="formErrors()['name']">{{ formErrors()['name'] }}</span>
           </div>
           <div class="form-field" [class.has-error]="formErrors()['email']">
-            <label>Email *</label>
+            <label>Email</label>
             <input type="email" [value]="form()['email']" (input)="updateForm({email:$any($event.target).value})"
               placeholder="email@example.com">
             <span class="field-error" *ngIf="formErrors()['email']">{{ formErrors()['email'] }}</span>
@@ -278,7 +278,7 @@
             placeholder="AED 2M (optional)">
         </div>
         <div class="form-field" [class.has-error]="formErrors()['location']">
-          <label>Location *</label>
+          <label>Location</label>
           <div class="loc-dropdown-wrap" style="position:relative">
             <div class="loc-dropdown-trigger" (click)="locDropOpen.set(!locDropOpen())"
               style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;border:1.5px solid #e5e7eb;border-radius:0.5rem;cursor:pointer;background:#fff;font-size:0.85rem;min-height:2.25rem"

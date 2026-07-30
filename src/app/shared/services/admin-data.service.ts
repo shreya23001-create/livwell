@@ -381,8 +381,33 @@ export class AdminDataService {
     let error: any;
     if (editingId !== null) {
       ({ error } = await this.sb.from('admin_leads').update(payload).eq('id', editingId));
+      // If follow_up_date changed, insert a new record into lead_follow_ups
+      if (!error && l.followUpDate) {
+        const existingLead = this.leads().find(ld => ld.id === editingId);
+        if (existingLead?.followUpDate !== l.followUpDate) {
+          await this.sb.from('lead_follow_ups').insert({
+            lead_id:        editingId,
+            follow_up_date: l.followUpDate,
+            remarks:        l.followUpNote?.trim() || null,
+            status:         l.status || 'new',
+            created_by:     'Admin',
+          });
+        }
+      }
     } else {
-      ({ error } = await this.sb.from('admin_leads').insert(payload));
+      const { data: inserted, error: insErr } = await this.sb
+        .from('admin_leads').insert(payload).select('id').single();
+      error = insErr;
+      // Insert into lead_follow_ups if follow_up_date was set on create
+      if (!insErr && inserted?.id && l.followUpDate) {
+        await this.sb.from('lead_follow_ups').insert({
+          lead_id:        inserted.id,
+          follow_up_date: l.followUpDate,
+          remarks:        l.followUpNote?.trim() || null,
+          status:         l.status || 'new',
+          created_by:     'Admin',
+        });
+      }
     }
 
     if (error) return error.message;
@@ -418,9 +443,24 @@ export class AdminDataService {
       assigned_agent: l.assignedAgent  || 'Unassigned',
       notes:          l.notes          || null,
       last_contact:   l.lastContact    || null,
+      follow_up_date: l.followUpDate   || null,
+      follow_up_note: l.followUpNote   || null,
     }));
-    const { error } = await this.sb.from('admin_leads').insert(rows);
+    const { data: inserted, error } = await this.sb.from('admin_leads').insert(rows).select('id, follow_up_date, follow_up_note, status');
     if (error) return error.message;
+
+    // Insert follow_up records for any imported leads that have a follow_up_date
+    const fuRows = (inserted ?? [])
+      .filter((r: any) => r.follow_up_date)
+      .map((r: any) => ({
+        lead_id:        r.id,
+        follow_up_date: r.follow_up_date,
+        remarks:        r.follow_up_note || null,
+        status:         r.status || 'new',
+        created_by:     'Import',
+      }));
+    if (fuRows.length) await this.sb.from('lead_follow_ups').insert(fuRows);
+
     await this.loadLeads();
     return null;
   }

@@ -14,16 +14,15 @@ let _id = 0;
 export class ToastService {
   toasts = signal<Toast[]>([]);
 
-  private add(type: ToastType, message: string, duration = 3500): void {
+  private add(type: ToastType, message: string): void {
     const id = ++_id;
     this.toasts.update(list => [...list, { id, type, message }]);
-    setTimeout(() => this.dismiss(id), duration);
   }
 
-  success(message: string, duration?: number): void { this.add('success', message, duration); }
-  error(message: string, duration?: number): void   { this.add('error',   message, duration ?? 5000); }
-  info(message: string, duration?: number): void    { this.add('info',    message, duration); }
-  warning(message: string, duration?: number): void { this.add('warning', message, duration); }
+  success(message: string): void { this.add('success', message); }
+  error(message: string): void   { this.add('error',   message); }
+  info(message: string): void    { this.add('info',    message); }
+  warning(message: string): void { this.add('warning', message); }
 
   dismiss(id: number): void {
     this.toasts.update(list => list.filter(t => t.id !== id));

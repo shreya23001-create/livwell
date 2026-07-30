@@ -90,39 +90,161 @@ export class AdminLeadsComponent implements OnInit {
   activeTab    = signal<'dashboard' | 'leads' | 'followup'>('dashboard');
   fuFilter     = signal<'all' | 'overdue' | 'today' | 'upcoming'>('all');
 
-  // All follow-up records from lead_follow_ups table (enriched with lead info)
-  allFollowUpRecords = signal<any[]>([]);
+  // ── Edit Follow-up Modal ──────────────────────────────
+  showEditFuModal = signal(false);
+  editFuRecord    = signal<any>(null);
+  editFuDate      = signal('');
+  editFuTime      = signal('');
+  editFuRemarks   = signal('');
+  editFuStatus    = signal('new');
+  savingEditFu    = signal(false);
+  readonly fuStatusOptions = ['new','contacted','qualified','negotiating','won','lost','pending','missed'];
+
+  openEditFu(r: any): void {
+    this.editFuRecord.set(r);
+    this.editFuDate.set(r.follow_up_date ?? '');
+    this.editFuTime.set(r.follow_up_time ?? '');
+    this.editFuRemarks.set(r.remarks ?? '');
+    this.editFuStatus.set(r.status ?? 'new');
+    this.showEditFuModal.set(true);
+  }
+
+  closeEditFuModal(): void { this.showEditFuModal.set(false); this.editFuRecord.set(null); }
+
+  async saveEditFu(): Promise<void> {
+    const rec = this.editFuRecord();
+    if (!rec) return;
+    const date    = this.editFuDate().trim();
+    const time    = this.editFuTime().trim();
+    const remarks = this.editFuRemarks().trim();
+    const status  = this.editFuStatus();
+    if (!date) { this.toast.error('Date is required.'); return; }
+    this.savingEditFu.set(true);
+    const isFallback = rec.id?.toString().startsWith('fallback-');
+    let error: any = null;
+    if (isFallback) {
+      const res = await this.sb.from('lead_follow_ups').insert({
+        lead_id: rec.lead_id, follow_up_date: date,
+        follow_up_time: time || null, remarks: remarks || null,
+        status, created_by: 'Admin',
+      });
+      error = res.error;
+      if (!error) {
+        await this.sb.from('admin_leads')
+          .update({ follow_up_date: date, follow_up_note: remarks || null })
+          .eq('id', rec.lead_id);
+      }
+    } else {
+      const res = await this.sb.from('lead_follow_ups').update({
+        follow_up_date: date, follow_up_time: time || null,
+        remarks: remarks || null, status,
+      }).eq('id', rec.id);
+      error = res.error;
+      if (!error) {
+        const latest = this.allFollowUpRecords()
+          .filter(x => x.lead_id === rec.lead_id)
+          .sort((a, b) => (b.follow_up_date ?? '').localeCompare(a.follow_up_date ?? ''))[0];
+        if (latest?.id === rec.id) {
+          await this.sb.from('admin_leads')
+            .update({ follow_up_date: date, follow_up_note: remarks || null })
+            .eq('id', rec.lead_id);
+        }
+      }
+    }
+    if (error) {
+      this.toast.error('Failed to save follow-up.');
+    } else {
+      this.toast.success('Follow-up saved.');
+      this.showEditFuModal.set(false);
+      this.editFuRecord.set(null);
+      await this.loadAllFollowUps();
+    }
+    this.savingEditFu.set(false);
+  }
+
+  // Raw rows fetched from DB — enriched reactively via computed below
+  private rawFollowUpRows = signal<any[]>([]);
   allFollowUpRecordsLoading = signal(false);
 
-  filteredFollowUps = computed(() => {
-    const f = this.fuFilter();
-    const all = this.allFollowUpRecords();
-    const today = this.today;
-    if (f === 'overdue')  return all.filter(r => r.follow_up_date < today);
-    if (f === 'today')    return all.filter(r => r.follow_up_date === today);
-    if (f === 'upcoming') return all.filter(r => r.follow_up_date > today);
-    return all;
+  allFollowUpRecords = computed(() => {
+    const rows = this.rawFollowUpRows();
+    const leadsMap = new Map(this.leads().map(l => [l.id, l]));
+    const records: any[] = rows.map(r => ({ ...r, lead: leadsMap.get(r.lead_id) ?? null }));
+    // Fallback: leads with follow_up_date on admin_leads but no row in lead_follow_ups
+    const leadsWithHistory = new Set(rows.map(r => r.lead_id));
+    for (const lead of this.leads()) {
+      if (lead.followUpDate && !leadsWithHistory.has(lead.id)) {
+        records.push({
+          id: `fallback-${lead.id}`, lead_id: lead.id,
+          follow_up_date: lead.followUpDate, follow_up_time: null,
+          remarks: lead.followUpNote || null, status: lead.status,
+          created_by: 'Admin', created_at: lead.createdDate, lead,
+        });
+      }
+    }
+    return records.sort((a, b) => (a.follow_up_date ?? '').localeCompare(b.follow_up_date ?? ''));
   });
 
   // ── Dashboard computed ────────────────────────────────
   today = new Date().toISOString().slice(0, 10);
 
+  private dedupeByLead(records: any[], prefer: 'latest' | 'earliest'): any[] {
+    const byLead = new Map<number, any>();
+    for (const r of records) {
+      const existing = byLead.get(r.lead_id);
+      const rd = r.follow_up_date ?? '';
+      const ed = existing?.follow_up_date ?? '';
+      const wins = prefer === 'latest'
+        ? (rd > ed || (rd === ed && (r.created_at ?? '') > (existing?.created_at ?? '')))
+        : (rd < ed || (rd === ed && (r.created_at ?? '') > (existing?.created_at ?? '')));
+      if (!existing || wins) byLead.set(r.lead_id, r);
+    }
+    return Array.from(byLead.values())
+      .sort((a, b) => (a.follow_up_date ?? '').localeCompare(b.follow_up_date ?? ''));
+  }
+
+  // Lead IDs whose latest follow-up is upcoming — exclude from overdue/today
+  private leadsWithUpcoming = computed(() => {
+    const latest = this.dedupeByLead(
+      this.allFollowUpRecords().filter(r => r.follow_up_date), 'latest'
+    );
+    return new Set(latest.filter(r => r.follow_up_date > this.today).map(r => r.lead_id));
+  });
+
+  overdueFollowUps = computed(() => this.dedupeByLead(
+    this.allFollowUpRecords().filter(r =>
+      r.follow_up_date && r.follow_up_date < this.today &&
+      !this.leadsWithUpcoming().has(r.lead_id)
+    ), 'latest'
+  ));
+
+  todayFollowUps = computed(() => this.dedupeByLead(
+    this.allFollowUpRecords().filter(r =>
+      r.follow_up_date === this.today &&
+      !this.leadsWithUpcoming().has(r.lead_id)
+    ), 'latest'
+  ));
+
+  upcomingFollowUps = computed(() => this.dedupeByLead(
+    this.allFollowUpRecords().filter(r => r.follow_up_date && r.follow_up_date > this.today), 'earliest'
+  ));
+
+  latestFollowUpPerLead = computed(() => this.dedupeByLead(
+    this.allFollowUpRecords().filter(r => r.follow_up_date), 'latest'
+  ));
+
+  filteredFollowUps = computed(() => {
+    const f = this.fuFilter();
+    if (f === 'overdue')  return this.overdueFollowUps();
+    if (f === 'today')    return this.todayFollowUps();
+    if (f === 'upcoming') return this.upcomingFollowUps();
+    return this.latestFollowUpPerLead();
+  });
+
   followUps = computed(() =>
     this.leads()
       .filter(l => l.followUpDate)
       .sort((a, b) => a.followUpDate.localeCompare(b.followUpDate))
-  );
-
-  overdueFollowUps = computed(() =>
-    this.allFollowUpRecords().filter(r => r.follow_up_date < this.today)
-  );
-
-  todayFollowUps = computed(() =>
-    this.allFollowUpRecords().filter(r => r.follow_up_date === this.today)
-  );
-
-  upcomingFollowUps = computed(() =>
-    this.allFollowUpRecords().filter(r => r.follow_up_date > this.today)
   );
 
   conversionRate = computed(() => {
@@ -232,8 +354,8 @@ export class AdminLeadsComponent implements OnInit {
       const matchSrc  = !src || l.source === src;
       const matchAg   = !ag  || l.assignedAgent === ag;
       const date      = l.createdDate || '';
-      const matchFrom = !from || date >= from;
-      const matchTo   = !to   || date <= to;
+      const matchFrom = q || !from || date >= from;
+      const matchTo   = q || !to   || date <= to;
       return matchQ && matchSt && matchSrc && matchAg && matchFrom && matchTo;
     });
   });
@@ -305,18 +427,7 @@ export class AdminLeadsComponent implements OnInit {
       .from('lead_follow_ups')
       .select('*')
       .order('follow_up_date', { ascending: true });
-    if (data?.length) {
-      // Enrich with lead info from loaded leads
-      const leadsMap = new Map(this.leads().map(l => [l.id, l]));
-      this.allFollowUpRecords.set(
-        data.map(r => ({
-          ...r,
-          lead: leadsMap.get(r.lead_id) ?? null,
-        }))
-      );
-    } else {
-      this.allFollowUpRecords.set([]);
-    }
+    this.rawFollowUpRows.set(data ?? []);
     this.allFollowUpRecordsLoading.set(false);
   }
 
@@ -453,9 +564,12 @@ export class AdminLeadsComponent implements OnInit {
   }
 
   downloadSampleExcel(): void {
+    const today = new Date().toISOString().slice(0, 10);
     const sample = [
-      { 'Name': 'John Smith', 'Email': 'john@example.com', 'Phone': '+971501234567', 'Status': 'New', 'Source': 'Website', 'Category': 'buy', 'Budget': 'AED 2,000,000', 'Location': 'Dubai Marina', 'Property Type': 'Apartment', 'Assigned Agent': 'Unassigned', 'Notes': 'Looking for 2BR', 'Created Date': '2026-06-01', 'Last Contact': '2026-06-01' },
-      { 'Name': 'Sara Ali', 'Email': 'sara@example.com', 'Phone': '+971509876543', 'Status': 'Contacted', 'Source': 'Referral', 'Category': 'rent', 'Budget': 'AED 120,000', 'Location': 'Business Bay', 'Property Type': 'Office', 'Assigned Agent': 'Unassigned', 'Notes': '', 'Created Date': '2026-06-02', 'Last Contact': '2026-06-03' },
+      { 'Name': 'Sample Lead A', 'Email': 'sample.a@example.com', 'Phone': '+971521110001', 'Status': 'New', 'Source': 'Website', 'Category': 'buy', 'Budget': 'AED 2,000,000', 'Location': 'Dubai Marina', 'Property Type': 'Apartment', 'Assigned Agent': 'Unassigned', 'Notes': 'Looking for 2BR', 'Created Date': today, 'Last Contact': today },
+      { 'Name': 'Sample Lead B', 'Email': 'sample.b@example.com', 'Phone': '+971521110002', 'Status': 'Contacted', 'Source': 'Referral', 'Category': 'rent', 'Budget': 'AED 120,000', 'Location': 'Business Bay', 'Property Type': 'Office', 'Assigned Agent': 'Unassigned', 'Notes': 'Needs office space', 'Created Date': today, 'Last Contact': today },
+      { 'Name': 'Sample Lead C', 'Email': 'sample.c@example.com', 'Phone': '+971521110003', 'Status': 'New', 'Source': 'Cold Call', 'Category': 'invest', 'Budget': 'AED 5,000,000', 'Location': 'Downtown Dubai', 'Property Type': 'Villa', 'Assigned Agent': 'Unassigned', 'Notes': 'Investor looking for ROI', 'Created Date': today, 'Last Contact': today },
+      { 'Name': 'Sample Lead D (dup phone)', 'Email': 'sample.d@example.com', 'Phone': '+971521110001', 'Status': 'New', 'Source': 'Website', 'Category': 'buy', 'Budget': 'AED 1,800,000', 'Location': 'JBR', 'Property Type': 'Apartment', 'Assigned Agent': 'Unassigned', 'Notes': 'Same phone as Lead A — this row will be used', 'Created Date': today, 'Last Contact': today },
     ];
     const ws = XLSX.utils.json_to_sheet(sample);
     const wb = XLSX.utils.book_new();
@@ -515,28 +629,30 @@ export class AdminLeadsComponent implements OnInit {
         followUpNote:  r['Follow-up Note'] || '',
       }));
 
-    // Step 2: deduplicate within the file by phone (keep first occurrence)
-    const seenInFile = new Set<string>();
-    const afterFileDedupe = mapped.filter(r => {
+    // Step 2: deduplicate within the file by phone (keep last occurrence)
+    const phoneToRow = new Map<string, typeof mapped[0]>();
+    for (const r of mapped) {
       const key = normalisePhone(r.phone);
-      if (!key || seenInFile.has(key)) return false;
-      seenInFile.add(key);
-      return true;
-    });
+      if (key) phoneToRow.set(key, r); // overwrite keeps last
+    }
+    const noPhone = mapped.filter(r => !normalisePhone(r.phone));
+    const afterFileDedupe = [...phoneToRow.values(), ...noPhone];
     const fileDupeCount = mapped.length - afterFileDedupe.length;
 
     // Step 3: deduplicate against existing leads in DB by phone
     const existingPhones = new Set(
       this.leads().map(l => normalisePhone(l.phone)).filter(Boolean)
     );
+    const dbDupes  = afterFileDedupe.filter(r =>  existingPhones.has(normalisePhone(r.phone)));
     const toImport = afterFileDedupe.filter(r => !existingPhones.has(normalisePhone(r.phone)));
-    const dbDupeCount = afterFileDedupe.length - toImport.length;
+    const dbDupeCount = dbDupes.length;
 
     if (!toImport.length) {
+      const dupeNames = dbDupes.map(r => r.name).join(', ');
       const msg = [
         fileDupeCount ? `${fileDupeCount} duplicate(s) removed from file` : '',
-        dbDupeCount   ? `${dbDupeCount} already exist in the system`       : '',
-      ].filter(Boolean).join(', ');
+        dbDupeCount   ? `${dbDupeCount} already in system (${dupeNames})` : '',
+      ].filter(Boolean).join(' · ');
       this.toast.error(`Nothing to import. ${msg}.`);
       this.importing.set(false);
       input.value = '';
@@ -547,10 +663,11 @@ export class AdminLeadsComponent implements OnInit {
     if (err) {
       this.toast.error('Import failed: ' + err);
     } else {
+      const dupeNames = dbDupes.map(r => r.name).join(', ');
       const parts = [
         `${toImport.length} lead(s) imported`,
-        fileDupeCount ? `${fileDupeCount} duplicate(s) in file skipped` : '',
-        dbDupeCount   ? `${dbDupeCount} already in system skipped`      : '',
+        fileDupeCount ? `${fileDupeCount} in-file duplicate(s) skipped` : '',
+        dbDupeCount   ? `${dbDupeCount} already in system skipped (${dupeNames})` : '',
       ].filter(Boolean);
       this.toast.success(parts.join(' · '));
     }

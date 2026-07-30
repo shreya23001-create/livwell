@@ -7,6 +7,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+import * as XLSX from 'xlsx';
 
 const DUBAI_LOCATIONS = [
   'Downtown Dubai', 'Dubai Marina', 'Palm Jumeirah', 'Business Bay',
@@ -119,21 +120,197 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   allFollowUpRecords        = signal<any[]>([]);
   allFollowUpRecordsLoading = signal(false);
 
+  // ── Edit follow-up modal ──────────────────────────────
+  showEditFuModal  = signal(false);
+  editFuRecord     = signal<any>(null);
+  editFuDate       = signal('');
+  editFuTime       = signal('');
+  editFuRemarks    = signal('');
+  editFuStatus     = signal('');
+  savingEditFu     = signal(false);
+  readonly fuStatusOptions = ['pending', 'done', 'missed', 'cancelled'];
+
+  // ── Import ────────────────────────────────────────────
+  importing = signal(false);
+
+  downloadSampleExcel(): void {
+    const today = new Date().toISOString().slice(0, 10);
+    const sample = [
+      { 'Name': 'Sample Lead A', 'Email': 'sample.a@example.com', 'Phone': '+971521110001', 'Status': 'New',       'Source': 'Website',  'Category': 'buy',    'Budget': 'AED 2,000,000', 'Location': 'Dubai Marina',     'Property Type': 'Apartment', 'Notes': '', 'Created Date': today },
+      { 'Name': 'Sample Lead B', 'Email': 'sample.b@example.com', 'Phone': '+971521110002', 'Status': 'Contacted', 'Source': 'Referral', 'Category': 'rent',   'Budget': 'AED 120,000',   'Location': 'Business Bay',     'Property Type': 'Office',    'Notes': 'Needs office space', 'Created Date': today },
+      { 'Name': 'Sample Lead C', 'Email': 'sample.c@example.com', 'Phone': '+971521110003', 'Status': 'New',       'Source': 'Cold Call','Category': 'invest', 'Budget': 'AED 5,000,000', 'Location': 'Downtown Dubai',   'Property Type': 'Villa',     'Notes': 'Investor', 'Created Date': today },
+      { 'Name': 'Sample Lead D (dup of A)', 'Email': 'sample.d@example.com', 'Phone': '+971521110001', 'Status': 'New', 'Source': 'Website', 'Category': 'buy', 'Budget': 'AED 2,200,000', 'Location': 'JBR', 'Property Type': 'Apartment', 'Notes': 'Same phone as A — this row wins', 'Created Date': today },
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Leads');
+    XLSX.writeFile(wb, 'livwell-leads-sample.xlsx');
+  }
+
+  async importFromExcel(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    this.importing.set(true);
+
+    const buffer = await input.files[0].arrayBuffer();
+    const wb     = XLSX.read(buffer, { type: 'array' });
+    const rows   = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) as any[];
+    input.value  = '';
+
+    if (!rows.length) { this.toast.error('No data found in the file.'); this.importing.set(false); return; }
+
+    const statusMap: Record<string, string> = {
+      'New': 'new', 'Contacted': 'contacted', 'Qualified': 'qualified',
+      'Negotiating': 'negotiating', 'Won': 'won', 'Lost': 'lost',
+    };
+    const sourceMap: Record<string, string> = {
+      'Website': 'website', 'Referral': 'referral', 'Walk-in': 'walk_in',
+      'Social Media': 'social_media', 'Portal': 'portal', 'Cold Call': 'cold_call',
+    };
+    const normalisePhone = (p: string) => p?.toString().replace(/[\s\-().+]/g, '') ?? '';
+    const agentName  = this.auth.currentUser()?.name  ?? '';
+    const agentEmail = this.auth.currentUser()?.email ?? '';
+    const today      = new Date().toISOString().slice(0, 10);
+
+    // Map rows
+    const mapped = rows
+      .filter(r => r['Name']?.toString().trim())
+      .map(r => ({
+        name:          r['Name']          || '',
+        email:         r['Email']         || '',
+        phone:         r['Phone']?.toString().trim() || '',
+        status:        statusMap[r['Status']]  ?? 'new',
+        source:        sourceMap[r['Source']]  ?? 'website',
+        category:      (['buy','rent','invest'].includes(r['Category']) ? r['Category'] : 'buy'),
+        budget:        r['Budget']        || '',
+        location:      r['Location']      || '',
+        propertyType:  r['Property Type'] || '',
+        assignedAgent: agentName || 'Unassigned',
+        notes:         r['Notes']         || '',
+        createdDate:   r['Created Date']  || today,
+        lastContact:   r['Created Date']  || today,
+        followUpDate:  r['Follow-up Date'] || '',
+        followUpNote:  r['Follow-up Note'] || '',
+      }));
+
+    // Dedup within file — last occurrence per phone wins
+    const phoneToRow = new Map<string, typeof mapped[0]>();
+    for (const r of mapped) {
+      const key = normalisePhone(r.phone);
+      if (key) phoneToRow.set(key, r);
+    }
+    const noPhone = mapped.filter(r => !normalisePhone(r.phone));
+    const afterFileDedupe = [...phoneToRow.values(), ...noPhone];
+    const fileDupeCount = mapped.length - afterFileDedupe.length;
+
+    // Dedup against existing leads in DB
+    const existingPhones = new Set(this.leads().map(l => normalisePhone(l.phone)).filter(Boolean));
+    const dbDupes  = afterFileDedupe.filter(r =>  existingPhones.has(normalisePhone(r.phone)));
+    const toImport = afterFileDedupe.filter(r => !existingPhones.has(normalisePhone(r.phone)));
+    const dbDupeCount = dbDupes.length;
+
+    if (!toImport.length) {
+      const dupeNames = dbDupes.map(r => r.name).join(', ');
+      const msg = [
+        fileDupeCount ? `${fileDupeCount} duplicate(s) removed from file` : '',
+        dbDupeCount   ? `${dbDupeCount} already in system (${dupeNames})` : '',
+      ].filter(Boolean).join(' · ');
+      this.toast.error(`Nothing to import. ${msg}.`);
+      this.importing.set(false);
+      return;
+    }
+
+    // Insert into admin_leads
+    const rows2insert = toImport.map(l => ({
+      name: l.name, email: l.email || null, phone: l.phone || null,
+      status: l.status, source: l.source, category: l.category,
+      budget: l.budget || null, location: l.location || null,
+      property_type: l.propertyType || null, notes: l.notes || null,
+      assigned_agent: agentName, agent_email: agentEmail,
+      created_at: l.createdDate ? new Date(l.createdDate).toISOString() : new Date().toISOString(),
+      follow_up_date: l.followUpDate || null, follow_up_note: l.followUpNote || null,
+    }));
+
+    const { data: inserted, error } = await this.sb.from('admin_leads').insert(rows2insert).select('id, follow_up_date, follow_up_note, status');
+    if (error) {
+      this.toast.error('Import failed: ' + error.message);
+      this.importing.set(false);
+      return;
+    }
+
+    // Insert lead_follow_ups for any with follow_up_date
+    const fuRows = (inserted ?? [])
+      .filter((r: any) => r.follow_up_date)
+      .map((r: any) => ({ lead_id: r.id, follow_up_date: r.follow_up_date, remarks: r.follow_up_note || null, status: r.status || 'new', created_by: agentName || agentEmail }));
+    if (fuRows.length) await this.sb.from('lead_follow_ups').insert(fuRows);
+
+    const dupeNames = dbDupes.map(r => r.name).join(', ');
+    const parts = [
+      `${toImport.length} lead(s) imported`,
+      fileDupeCount ? `${fileDupeCount} in-file duplicate(s) skipped` : '',
+      dbDupeCount   ? `${dbDupeCount} already in system skipped (${dupeNames})` : '',
+    ].filter(Boolean);
+    this.toast.success(parts.join(' · '));
+
+    const user = this.auth.currentUser();
+    if (user) await this.fetchLeads(user.email ?? '', user.name ?? '');
+    this.importing.set(false);
+  }
+
   followUps = computed(() =>
     this.leads().filter(l => l.followUpDate).sort((a, b) => (a.followUpDate ?? '').localeCompare(b.followUpDate ?? ''))
   );
 
-  overdueFollowUps  = computed(() => this.allFollowUpRecords().filter(r => r.follow_up_date < this.today));
-  todayFollowUps    = computed(() => this.allFollowUpRecords().filter(r => r.follow_up_date === this.today));
-  upcomingFollowUps = computed(() => this.allFollowUpRecords().filter(r => r.follow_up_date > this.today));
+  // Deduplicate records by lead — keep the "best" record per lead for each bucket.
+  // all/overdue: most recent date (latest overdue); today: latest created; upcoming: earliest date.
+  private dedupeByLead(records: any[], prefer: 'latest' | 'earliest'): any[] {
+    const byLead = new Map<number, any>();
+    for (const r of records) {
+      const existing = byLead.get(r.lead_id);
+      const rd = r.follow_up_date ?? '';
+      const ed = existing?.follow_up_date ?? '';
+      const wins = prefer === 'latest'
+        ? (rd > ed || (rd === ed && (r.created_at ?? '') > (existing?.created_at ?? '')))
+        : (rd < ed || (rd === ed && (r.created_at ?? '') > (existing?.created_at ?? '')));
+      if (!existing || wins) byLead.set(r.lead_id, r);
+    }
+    return Array.from(byLead.values())
+      .sort((a, b) => (a.follow_up_date ?? '').localeCompare(b.follow_up_date ?? ''));
+  }
+
+  // Lead IDs whose latest follow-up is upcoming — exclude from overdue/today
+  private leadsWithUpcoming = computed(() => {
+    const latest = this.dedupeByLead(
+      this.allFollowUpRecords().filter(r => r.follow_up_date), 'latest'
+    );
+    return new Set(latest.filter(r => r.follow_up_date > this.today).map(r => r.lead_id));
+  });
+
+  overdueFollowUps  = computed(() => this.dedupeByLead(
+    this.allFollowUpRecords().filter(r =>
+      r.follow_up_date && r.follow_up_date < this.today &&
+      !this.leadsWithUpcoming().has(r.lead_id)
+    ), 'latest'
+  ));
+  todayFollowUps    = computed(() => this.dedupeByLead(
+    this.allFollowUpRecords().filter(r =>
+      r.follow_up_date === this.today &&
+      !this.leadsWithUpcoming().has(r.lead_id)
+    ), 'latest'
+  ));
+  upcomingFollowUps = computed(() => this.dedupeByLead(
+    this.allFollowUpRecords().filter(r => r.follow_up_date && r.follow_up_date > this.today), 'earliest'
+  ));
+  latestFollowUpPerLead = computed(() => this.dedupeByLead(
+    this.allFollowUpRecords().filter(r => r.follow_up_date), 'latest'
+  ));
 
   filteredFollowUps = computed(() => {
-    const f   = this.fuFilter();
-    const all = this.allFollowUpRecords();
-    if (f === 'overdue')  return all.filter(r => r.follow_up_date < this.today);
-    if (f === 'today')    return all.filter(r => r.follow_up_date === this.today);
-    if (f === 'upcoming') return all.filter(r => r.follow_up_date > this.today);
-    return all;
+    const f = this.fuFilter();
+    if (f === 'overdue')  return this.overdueFollowUps();
+    if (f === 'today')    return this.todayFollowUps();
+    if (f === 'upcoming') return this.upcomingFollowUps();
+    return this.latestFollowUpPerLead();
   });
 
 
@@ -222,12 +399,30 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       .select('*')
       .in('lead_id', leadIds)
       .order('follow_up_date', { ascending: true });
-    if (data?.length) {
-      const leadsMap = new Map(this.leads().map(l => [l.id, l]));
-      this.allFollowUpRecords.set(data.map(r => ({ ...r, lead: leadsMap.get(r.lead_id) ?? null })));
-    } else {
-      this.allFollowUpRecords.set([]);
+
+    const leadsMap = new Map(this.leads().map(l => [l.id, l]));
+    const records: any[] = (data ?? []).map(r => ({ ...r, lead: leadsMap.get(r.lead_id) ?? null }));
+
+    // Leads that have a follow_up_date on admin_leads but no row in lead_follow_ups yet
+    const leadsWithHistory = new Set((data ?? []).map((r: any) => r.lead_id));
+    for (const lead of this.leads()) {
+      if (lead.followUpDate && !leadsWithHistory.has(lead.id)) {
+        records.push({
+          id:             `fallback-${lead.id}`,
+          lead_id:        lead.id,
+          follow_up_date: lead.followUpDate,
+          follow_up_time: null,
+          remarks:        lead.followUpNote || null,
+          status:         lead.status,
+          created_by:     'Admin',
+          created_at:     lead.createdDate,
+          lead,
+        });
+      }
     }
+
+    records.sort((a, b) => (a.follow_up_date ?? '').localeCompare(b.follow_up_date ?? ''));
+    this.allFollowUpRecords.set(records);
     this.allFollowUpRecordsLoading.set(false);
   }
 
@@ -489,6 +684,77 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
 
   openProfile(l: AgentLead): void {
     this.router.navigate(['/agent/leads', l.id]);
+  }
+
+  // ── Edit follow-up ────────────────────────────────────
+  openEditFu(r: any): void {
+    this.editFuRecord.set(r);
+    this.editFuDate.set(r.follow_up_date ?? '');
+    this.editFuTime.set(r.follow_up_time ?? '');
+    this.editFuRemarks.set(r.remarks ?? '');
+    this.editFuStatus.set(r.status ?? 'pending');
+    this.showEditFuModal.set(true);
+  }
+
+  closeEditFuModal(): void { this.showEditFuModal.set(false); this.editFuRecord.set(null); }
+
+  async saveEditFu(): Promise<void> {
+    const rec = this.editFuRecord();
+    if (!rec) return;
+    const date    = this.editFuDate().trim();
+    const time    = this.editFuTime().trim();
+    const remarks = this.editFuRemarks().trim();
+    const status  = this.editFuStatus();
+    if (!date) { this.toast.error('Date is required.'); return; }
+    this.savingEditFu.set(true);
+    const isFallback = rec.id?.toString().startsWith('fallback-');
+    let error: any = null;
+    if (isFallback) {
+      // No real row exists — insert one and sync admin_leads
+      const agentName = this.auth.currentUser()?.name || this.auth.currentUser()?.email || 'Agent';
+      const res = await this.sb.from('lead_follow_ups').insert({
+        lead_id:        rec.lead_id,
+        follow_up_date: date,
+        follow_up_time: time || null,
+        remarks:        remarks || null,
+        status,
+        created_by:     agentName,
+      });
+      error = res.error;
+      if (!error) {
+        await this.sb.from('admin_leads')
+          .update({ follow_up_date: date, follow_up_note: remarks || null })
+          .eq('id', rec.lead_id);
+      }
+    } else {
+      const res = await this.sb.from('lead_follow_ups').update({
+        follow_up_date: date,
+        follow_up_time: time || null,
+        remarks:        remarks || null,
+        status,
+      }).eq('id', rec.id);
+      error = res.error;
+      if (!error) {
+        // Also sync admin_leads.follow_up_date if this is the latest for that lead
+        const latest = this.allFollowUpRecords()
+          .filter(x => x.lead_id === rec.lead_id)
+          .sort((a, b) => (b.follow_up_date ?? '').localeCompare(a.follow_up_date ?? ''))[0];
+        if (latest?.id === rec.id) {
+          await this.sb.from('admin_leads')
+            .update({ follow_up_date: date, follow_up_note: remarks || null })
+            .eq('id', rec.lead_id);
+        }
+      }
+    }
+    if (error) {
+      this.toast.error('Failed to save follow-up.');
+    } else {
+      this.toast.success('Follow-up saved.');
+      this.showEditFuModal.set(false);
+      this.editFuRecord.set(null);
+      await this.loadAllFollowUps();
+    }
+    this.savingEditFu.set(false);
   }
 
   private fmtDate(ts: string): string {

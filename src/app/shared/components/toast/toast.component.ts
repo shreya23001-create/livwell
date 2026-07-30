@@ -9,7 +9,10 @@ import { ToastService } from '../../services/toast.service';
   template: `
     <div class="toast-stack">
       @for (t of toast.toasts(); track t.id) {
-        <div class="toast toast--{{ t.type }}" (click)="toast.dismiss(t.id)">
+        <div class="toast toast--{{ t.type }}"
+          (click)="toast.dismiss(t.id)"
+          (mouseenter)="pause(t.id)"
+          (mouseleave)="resume(t.id)">
           <span class="toast-icon">
             @if (t.type === 'success') { ✓ }
             @else if (t.type === 'error') { ✕ }
@@ -48,6 +51,8 @@ import { ToastService } from '../../services/toast.service';
       cursor: pointer;
       animation: toast-in 0.22s ease;
       line-height: 1.4;
+      transition: opacity 0.15s;
+      &:hover { opacity: 0.95; }
     }
     @keyframes toast-in {
       from { opacity: 0; transform: translateX(60px); }
@@ -69,4 +74,52 @@ import { ToastService } from '../../services/toast.service';
 })
 export class ToastComponent {
   toast = inject(ToastService);
+
+  // track remaining time and timer handle per toast id
+  private timers   = new Map<number, ReturnType<typeof setTimeout>>();
+  private remaining = new Map<number, number>();
+  private started  = new Map<number, number>();
+
+  ngDoCheck(): void {
+    // start timers for new toasts that aren't tracked yet
+    for (const t of this.toast.toasts()) {
+      if (!this.remaining.has(t.id)) {
+        this.remaining.set(t.id, 10000);
+        this.startTimer(t.id);
+      }
+    }
+    // clean up entries for dismissed toasts
+    const activeIds = new Set(this.toast.toasts().map(t => t.id));
+    for (const id of this.remaining.keys()) {
+      if (!activeIds.has(id)) {
+        clearTimeout(this.timers.get(id));
+        this.timers.delete(id);
+        this.remaining.delete(id);
+        this.started.delete(id);
+      }
+    }
+  }
+
+  pause(id: number): void {
+    clearTimeout(this.timers.get(id));
+    const start = this.started.get(id);
+    if (start !== undefined) {
+      const elapsed = Date.now() - start;
+      const rem = (this.remaining.get(id) ?? 10000) - elapsed;
+      this.remaining.set(id, Math.max(0, rem));
+    }
+    this.timers.delete(id);
+    this.started.delete(id);
+  }
+
+  resume(id: number): void {
+    this.startTimer(id);
+  }
+
+  private startTimer(id: number): void {
+    const rem = this.remaining.get(id) ?? 10000;
+    this.started.set(id, Date.now());
+    const handle = setTimeout(() => this.toast.dismiss(id), rem);
+    this.timers.set(id, handle);
+  }
 }

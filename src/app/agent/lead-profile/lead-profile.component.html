@@ -188,12 +188,18 @@
             <div class="crm-info-row"><span class="crm-lbl">Created</span><span class="crm-val">{{ l.createdDate }}</span></div>
             <div class="crm-info-row">
               <span class="crm-lbl">Next Follow-up</span>
-              <span class="crm-val" [class.crm-val--highlight]="l.followUpDate">{{ l.followUpDate || '—' }}</span>
+              <span class="crm-val" [class.crm-val--highlight]="l.followUpDate">
+                {{ l.followUpDate ? (l.followUpDate | date:'d MMM y') : '—' }}
+              </span>
+            </div>
+            <div class="crm-info-row" *ngIf="l.followUpNote">
+              <span class="crm-lbl">Follow-up Note</span>
+              <span class="crm-val">{{ l.followUpNote }}</span>
             </div>
           </div>
           <div class="crm-notes" *ngIf="l.notes">
             <div class="crm-notes-lbl">Notes</div>
-            <div class="crm-notes-body">{{ l.notes }}</div>
+            <div class="crm-notes-body" [innerHTML]="l.notes"></div>
           </div>
         </div>
 
@@ -555,7 +561,7 @@
             @for (msg of messages(); track msg.id) {
               <div class="lp-chat-msg" [class.lp-chat-msg--mine]="msg.senderRole === 'agent'" [class.lp-chat-msg--theirs]="msg.senderRole === 'customer'">
                 <div class="lp-chat-sender">{{ msg.senderName }}</div>
-                <div class="lp-chat-bubble">{{ msg.content }}</div>
+                <div class="lp-chat-bubble" [innerHTML]="msg.content"></div>
                 <div class="lp-chat-meta">{{ msg.createdAt }}</div>
               </div>
             }

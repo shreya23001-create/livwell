@@ -333,7 +333,8 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     log.push({ id: n++, action: 'Lead Created', detail: `Enquiry via ${lead.source}`, timestamp: lead.createdDate, icon: 'create' });
     if (lead.propertyTitle) log.push({ id: n++, action: 'Property Interest', detail: lead.propertyTitle, timestamp: lead.createdDate, icon: 'view' });
     this.messages().forEach(m => {
-      log.push({ id: n++, action: m.senderRole === 'agent' ? 'Agent Replied' : 'Customer Message', detail: m.content.slice(0, 90) + (m.content.length > 90 ? '…' : ''), timestamp: m.createdAt, icon: 'message' });
+      const plain = m.content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+      log.push({ id: n++, action: m.senderRole === 'agent' ? 'Agent Replied' : 'Customer Message', detail: plain.slice(0, 90) + (plain.length > 90 ? '…' : ''), timestamp: m.createdAt, icon: 'message' });
     });
     if (lead.status !== 'new') log.push({ id: n++, action: 'Status Updated', detail: `Changed to: ${this.labelStatus(lead.status)}`, timestamp: lead.lastContact, icon: 'status' });
     this.savedProperties().forEach(s => {
@@ -433,14 +434,29 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       .select('*')
       .eq('lead_id', leadId)
       .order('created_at', { ascending: false });
-    this.followUpHistory.set((data ?? []).map((r: any) => ({
+    const rows = (data ?? []).map((r: any) => ({
       id: r.id,
       date: r.follow_up_date ? new Date(r.follow_up_date).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
       time: r.follow_up_time || '',
       remarks: r.remarks || '',
       status: r.status || '',
       by: r.created_by || 'Agent',
-    })));
+    }));
+    // Fallback: if no history rows but lead has a follow_up_date, show it
+    if (rows.length === 0) {
+      const lead = this.lead();
+      if (lead?.followUpDate) {
+        rows.push({
+          id: -1,
+          date: new Date(lead.followUpDate).toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' }),
+          time: '',
+          remarks: lead.followUpNote || '',
+          status: lead.status,
+          by: 'Admin',
+        });
+      }
+    }
+    this.followUpHistory.set(rows);
     this.fuLoading.set(false);
   }
 

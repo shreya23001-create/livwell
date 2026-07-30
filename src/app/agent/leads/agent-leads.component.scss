@@ -20,6 +20,31 @@ $bg: #f4f6fa;
   margin-bottom: 1.5rem;
 }
 
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-outline-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+  &:hover { border-color: #6366f1; color: #6366f1; background: #f5f3ff; }
+  &.btn-loading { opacity: 0.7; pointer-events: none; }
+}
+
 .page-title {
   font-size: 1.5rem;
   font-weight: 800;
@@ -2344,9 +2369,21 @@ $prd-w: 820px;
   font-size: 0.75rem; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
+.afu-name-row {
+  display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+}
 .afu-card-name {
   font-size: 0.925rem; font-weight: 700; color: $text; cursor: pointer;
   &:hover { color: $accent; text-decoration: underline; }
+}
+.afu-latest-pill {
+  font-size: 0.6rem; font-weight: 700; padding: 0.1rem 0.4rem;
+  border-radius: 999px; background: #e0e7ff; color: $accent;
+  white-space: nowrap; flex-shrink: 0;
+}
+.afu-total-count {
+  font-size: 0.62rem; font-weight: 600; color: $muted;
+  white-space: nowrap; flex-shrink: 0;
 }
 .afu-card-contact { font-size: 0.75rem; color: $sub; margin-top: 0.15rem; }
 .afu-sep { margin: 0 0.25rem; color: $muted; }
@@ -2380,13 +2417,33 @@ $prd-w: 820px;
   &--fu-missed   { background: #fef2f2; color: #dc2626; }
   &--fu-cancelled { background: #f3f4f6; color: $sub; }
 }
+.afu-card-actions {
+  display: flex; gap: 0.4rem; align-items: center; margin-top: 0.25rem;
+}
+.afu-edit-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.72rem; font-weight: 600; color: $sub;
+  background: #f3f4f6; border: 1.5px solid $border;
+  border-radius: 0.4rem; padding: 0.3rem 0.65rem;
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  svg { width: 0.72rem; height: 0.72rem; flex-shrink: 0; }
+  &:hover { background: #e0e7ff; border-color: $accent; color: $accent; }
+}
 .afu-view-btn {
   font-size: 0.72rem; font-weight: 600; color: $accent;
   background: #eff0fe; border: 1.5px solid #c7d2fe;
   border-radius: 0.4rem; padding: 0.3rem 0.7rem;
-  cursor: pointer; margin-top: 0.25rem; white-space: nowrap;
+  cursor: pointer; white-space: nowrap;
   transition: background 0.15s, border-color 0.15s;
   &:hover { background: $accent; color: #fff; border-color: $accent; }
+}
+.efu-lead-name {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.875rem; font-weight: 700; color: $text;
+  background: #f4f6fa; border-radius: 0.5rem; padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  svg { width: 0.9rem; height: 0.9rem; color: $accent; flex-shrink: 0; }
 }
 
 @media (max-width: 900px) {

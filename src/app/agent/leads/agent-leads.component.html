@@ -4,12 +4,23 @@
       <h1 class="page-title">My Leads</h1>
       <p class="page-sub">Manage your assigned leads</p>
     </div>
-    <button class="btn-primary" (click)="openAdd()">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-      </svg>
-      Add Lead
-    </button>
+    <div class="page-header-actions">
+      <button class="btn-outline-sm" (click)="downloadSampleExcel()" title="Download sample Excel">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Sample Excel
+      </button>
+      <label class="btn-outline-sm" [class.btn-loading]="importing()" title="Import leads from Excel">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        {{ importing() ? 'Importing…' : 'Import Excel' }}
+        <input type="file" accept=".xlsx,.xls" (change)="importFromExcel($event)" style="display:none">
+      </label>
+      <button class="btn-primary" (click)="openAdd()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Lead
+      </button>
+    </div>
   </div>
 
   <!-- Tabs -->
@@ -200,8 +211,8 @@
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
       </div>
       <div class="afu-kpi-body">
-        <div class="afu-kpi-val">{{ allFollowUpRecords().length }}</div>
-        <div class="afu-kpi-lbl">All Follow-ups</div>
+        <div class="afu-kpi-val">{{ latestFollowUpPerLead().length }}</div>
+        <div class="afu-kpi-lbl">Leads with Follow-up</div>
       </div>
     </div>
     <div class="afu-kpi" [class.afu-kpi--active]="fuFilter() === 'overdue'" (click)="fuFilter.set('overdue')">
@@ -270,9 +281,18 @@
       <div class="afu-card-main">
         <div class="afu-card-top">
           <div class="afu-card-av">{{ r.lead?.name?.charAt(0)?.toUpperCase() ?? '?' }}</div>
-          <div>
-            <div class="afu-card-name" [routerLink]="r.lead ? ['/agent/leads', r.lead.id] : []">
-              {{ r.lead?.name ?? 'Unknown Lead' }}
+          <div style="flex:1;min-width:0">
+            <div class="afu-name-row">
+              <div class="afu-card-name" [routerLink]="r.lead ? ['/agent/leads', r.lead.id] : []">
+                {{ r.lead?.name ?? 'Unknown Lead' }}
+              </div>
+              <!-- "Latest" pill + total count shown only in All tab -->
+              <ng-container *ngIf="fuFilter() === 'all'">
+                <span class="afu-latest-pill">Latest</span>
+                <span class="afu-total-count" *ngIf="allFollowUpRecords().filter(x => x.lead_id === r.lead_id).length > 1">
+                  {{ allFollowUpRecords().filter(x => x.lead_id === r.lead_id).length }} total
+                </span>
+              </ng-container>
             </div>
             <div class="afu-card-contact">
               <span *ngIf="r.lead?.email">{{ r.lead.email }}</span>
@@ -298,7 +318,13 @@
         <span class="afu-badge afu-badge--fu afu-badge--fu-{{ r.status }}">{{ r.status | titlecase }}</span>
         <span *ngIf="r.lead" class="afu-badge afu-badge--{{ r.lead.status }}">{{ labelStatus(r.lead.status) }}</span>
         <span *ngIf="r.lead" class="afu-badge afu-badge--cat">{{ r.lead.category | titlecase }}</span>
-        <button *ngIf="r.lead" [routerLink]="['/agent/leads', r.lead.id]" class="afu-view-btn">View →</button>
+        <div class="afu-card-actions">
+          <button (click)="openEditFu(r)" class="afu-edit-btn" title="Edit follow-up">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
+            Edit
+          </button>
+          <button *ngIf="r.lead" [routerLink]="['/agent/leads', r.lead.id]" class="afu-view-btn">View →</button>
+        </div>
       </div>
 
     </div>
@@ -489,6 +515,57 @@
     <div class="modal-footer">
       <button class="btn-ghost" (click)="cancelDelete()">Cancel</button>
       <button class="btn-danger" (click)="doDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Follow-up Modal -->
+<div class="modal-overlay" *ngIf="showEditFuModal()" (click)="closeEditFuModal()">
+  <div class="modal modal--sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Follow-up</h2>
+      <button class="modal-close" (click)="closeEditFuModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="efu-lead-name" *ngIf="editFuRecord()?.lead">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+        {{ editFuRecord().lead.name }}
+      </p>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Follow-up Date *</label>
+          <input type="date" [value]="editFuDate()" (change)="editFuDate.set($any($event.target).value)">
+        </div>
+        <div class="form-field">
+          <label>Time</label>
+          <input type="time" [value]="editFuTime()" (change)="editFuTime.set($any($event.target).value)">
+        </div>
+      </div>
+      <div class="form-field form-field--full">
+        <label>Remarks</label>
+        <textarea rows="3" [value]="editFuRemarks()" (input)="editFuRemarks.set($any($event.target).value)" placeholder="Notes for this follow-up…"></textarea>
+      </div>
+      <div class="form-field form-field--full">
+        <label>Status</label>
+        <div class="select-wrapper">
+          <select [value]="editFuStatus()" (change)="editFuStatus.set($any($event.target).value)">
+            <option *ngFor="let s of fuStatusOptions" [value]="s">{{ s | titlecase }}</option>
+          </select>
+          <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" (click)="closeEditFuModal()">Cancel</button>
+      <button class="btn-primary" (click)="saveEditFu()" [disabled]="savingEditFu()">
+        {{ savingEditFu() ? 'Saving…' : 'Save Changes' }}
+      </button>
     </div>
   </div>
 </div>

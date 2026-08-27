@@ -42,19 +42,13 @@ export class AdminLeadProfileComponent implements OnInit {
     );
   });
 
-  readonly pipelineStages = [
-    { status: 'new',         label: 'New Lead'    },
-    { status: 'contacted',   label: 'Contacted'   },
-    { status: 'qualified',   label: 'Qualified'   },
-    { status: 'negotiating', label: 'Negotiating' },
-    { status: 'won',         label: 'Won'         },
-    { status: 'lost',        label: 'Lost'        },
-  ];
+  readonly pipelineStages = computed(() =>
+    this.dataSvc.leadStatuses().map(s => ({ status: s.name, label: s.name.charAt(0).toUpperCase() + s.name.slice(1) }))
+  );
 
-  readonly stageColors: Record<string, string> = {
-    new: '#f59e0b', contacted: '#3b82f6', qualified: '#10b981',
-    negotiating: '#8b5cf6', won: '#6366f1', lost: '#ef4444',
-  };
+  stageColor(s: string): string {
+    return this.dataSvc.leadStatuses().find(x => x.name === s)?.color ?? '#6b7280';
+  }
 
   async ngOnInit(): Promise<void> {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -104,16 +98,13 @@ export class AdminLeadProfileComponent implements OnInit {
   }
 
   isPastStage(stage: string, currentStatus: string): boolean {
-    const order = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
-    return order.indexOf(stage) < order.indexOf(currentStatus) && currentStatus !== 'lost';
+    const statuses = this.dataSvc.leadStatuses().map(x => x.name);
+    return statuses.indexOf(stage) < statuses.indexOf(currentStatus) && currentStatus !== 'lost';
   }
 
   labelStatus(s: string): string {
-    const map: Record<string, string> = {
-      new: 'New', contacted: 'Contacted', qualified: 'Qualified',
-      negotiating: 'Negotiating', won: 'Won', lost: 'Lost',
-    };
-    return map[s] ?? s;
+    const found = this.dataSvc.leadStatuses().find(x => x.name === s);
+    return found ? found.name.charAt(0).toUpperCase() + found.name.slice(1) : (s ?? '');
   }
 
   labelSource(s: string): string {

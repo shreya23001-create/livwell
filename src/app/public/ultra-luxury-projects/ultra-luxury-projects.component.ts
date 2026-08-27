@@ -17,6 +17,7 @@ interface Project {
   type: string;
   beds: string;
   price_from: number;
+  price_label: string;
   price_per_sqft: string;
   completion_date: string;
   payment_plan: string;

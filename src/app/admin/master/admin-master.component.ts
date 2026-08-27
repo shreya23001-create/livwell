@@ -20,13 +20,13 @@ type SettingsSubTab = 'whatsapp' | 'social' | 'smtp';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-master.component.html',
-  styleUrl:    './admin-master.component.scss',
+  styleUrl: './admin-master.component.scss',
 })
 export class AdminMasterComponent implements OnInit {
-  private dataSvc   = inject(AdminDataService);
+  private dataSvc = inject(AdminDataService);
   private sanitizer = inject(DomSanitizer);
-  private sb        = inject(SupabaseService).client;
-  private toast     = inject(ToastService);
+  private sb = inject(SupabaseService).client;
+  private toast = inject(ToastService);
 
   safeSvg(svg: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(svg);
@@ -45,9 +45,9 @@ export class AdminMasterComponent implements OnInit {
       if (row.key === 'whatsapp_number') {
         this.whatsappNumber.set(row.value ?? '');
       } else if (row.key === 'social_links') {
-        try { this.socialLinks.set({ ...this.socialLinks(), ...JSON.parse(row.value) }); } catch {}
+        try { this.socialLinks.set({ ...this.socialLinks(), ...JSON.parse(row.value) }); } catch { }
       } else if (row.key === 'smtp_config') {
-        try { this.smtp.set({ ...this.smtp(), ...JSON.parse(row.value) }); } catch {}
+        try { this.smtp.set({ ...this.smtp(), ...JSON.parse(row.value) }); } catch { }
       }
     }
   }
@@ -133,41 +133,41 @@ export class AdminMasterComponent implements OnInit {
   activeTab = signal<MasterTab>('categories');
 
   // Live signals from service
-  categories    = this.dataSvc.categories;
+  categories = this.dataSvc.categories;
   propertyTypes = this.dataSvc.propTypes;
-  statuses      = this.dataSvc.propStatuses;
-  leadStatuses  = this.dataSvc.leadStatuses;
-  trendingTabs  = this.dataSvc.trendingTabs;
-  locations     = this.dataSvc.locations;
-  communities   = this.dataSvc.communities;
-  amenities     = this.dataSvc.amenities;
+  statuses = this.dataSvc.propStatuses;
+  leadStatuses = this.dataSvc.leadStatuses;
+  trendingTabs = this.dataSvc.trendingTabs;
+  locations = this.dataSvc.locations;
+  communities = this.dataSvc.communities;
+  amenities = this.dataSvc.amenities;
 
   readonly amenityIconOptions = AMENITY_ICONS;
 
   // Form fields
-  newCategory    = signal('');
-  categoryError  = signal('');
-  newType        = signal('');
-  typeError      = signal('');
-  newStatus      = signal('');
+  newCategory = signal('');
+  categoryError = signal('');
+  newType = signal('');
+  typeError = signal('');
+  newStatus = signal('');
   newStatusColor = signal('#6b7280');
-  statusError    = signal('');
-  newLeadStatus      = signal('');
+  statusError = signal('');
+  newLeadStatus = signal('');
   newLeadStatusColor = signal('#6b7280');
-  leadStatusError    = signal('');
-  newTrendingTab   = signal('');
+  leadStatusError = signal('');
+  newTrendingTab = signal('');
   trendingTabError = signal('');
-  newLocation        = signal('');
-  locationError      = signal('');
-  locationSearch     = signal('');
-  importingLoc       = signal(false);
-  newCommunity       = signal('');
-  communityError     = signal('');
-  communitySearch    = signal('');
+  newLocation = signal('');
+  locationError = signal('');
+  locationSearch = signal('');
+  importingLoc = signal(false);
+  newCommunity = signal('');
+  communityError = signal('');
+  communitySearch = signal('');
   importingCommunity = signal(false);
-  newAmenityName   = signal('');
-  newAmenityIcon   = signal('');
-  showIconPicker   = signal(false);
+  newAmenityName = signal('');
+  newAmenityIcon = signal('');
+  showIconPicker = signal(false);
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(e: MouseEvent): void {
@@ -176,62 +176,62 @@ export class AdminMasterComponent implements OnInit {
       this.showIconPicker.set(false);
     }
   }
-  amenityError     = signal('');
-  saving           = signal(false);
+  amenityError = signal('');
+  saving = signal(false);
 
   // Settings
   settingsSubTab = signal<SettingsSubTab>('whatsapp');
 
   // WhatsApp
-  whatsappNumber  = signal('');
-  whatsappSaving  = signal(false);
-  whatsappSaved   = signal(false);
+  whatsappNumber = signal('');
+  whatsappSaving = signal(false);
+  whatsappSaved = signal(false);
 
   // Social media
   socialLinks = signal({
-    facebook:  '',
+    facebook: '',
     instagram: '',
-    twitter:   '',
-    linkedin:  '',
-    youtube:   '',
+    twitter: '',
+    linkedin: '',
+    youtube: '',
   });
   socialSaving = signal(false);
-  socialSaved  = signal(false);
+  socialSaved = signal(false);
 
   // SMTP
   smtp = signal({
-    host:       '',
-    port:       '587',
-    username:   '',
-    password:   '',
+    host: '',
+    port: '587',
+    username: '',
+    password: '',
     encryption: 'TLS',
-    auth_method:'Login',
-    from_name:  '',
+    auth_method: 'Login',
+    from_name: '',
     from_email: '',
-    reply_to:   '',
+    reply_to: '',
   });
-  smtpSaving    = signal(false);
-  smtpSaved     = signal(false);
-  smtpTesting   = signal(false);
-  smtpTestMsg   = signal('');
-  smtpTestOk    = signal<boolean | null>(null);
-  smtpShowPass  = signal(false);
+  smtpSaving = signal(false);
+  smtpSaved = signal(false);
+  smtpTesting = signal(false);
+  smtpTestMsg = signal('');
+  smtpTestOk = signal<boolean | null>(null);
+  smtpShowPass = signal(false);
   smtpGuideOpen = signal(false);
 
   // Partner logos
-  partnerLogos     = signal<{ url: string; name: string; link: string }[]>([]);
-  plDragOver       = signal(false);
-  plUploading      = signal(false);
-  plSaving         = signal(false);
+  partnerLogos = signal<{ url: string; name: string; link: string }[]>([]);
+  plDragOver = signal(false);
+  plUploading = signal(false);
+  plSaving = signal(false);
   partnerLogoError = signal('');
 
   readonly presetLogos = [
-    { name: 'Emaar',            url: 'images/emaar.png' },
-    { name: 'Binghatti',        url: 'images/binghatti.png' },
+    { name: 'Emaar', url: 'images/emaar.png' },
+    { name: 'Binghatti', url: 'images/binghatti.png' },
     { name: 'Dubai Properties', url: 'images/dubai_property.png' },
-    { name: 'DAMAC',            url: 'images/damac.png' },
-    { name: 'Meraas',           url: 'images/meraas.png' },
-    { name: 'Azizi',            url: 'images/azizi.png' },
+    { name: 'DAMAC', url: 'images/damac.png' },
+    { name: 'Meraas', url: 'images/meraas.png' },
+    { name: 'Azizi', url: 'images/azizi.png' },
   ];
 
   filteredLocations = computed(() => {
@@ -245,14 +245,14 @@ export class AdminMasterComponent implements OnInit {
   });
 
   counts = computed(() => ({
-    categories:   this.categories().length,
-    types:        this.propertyTypes().length,
-    statuses:     this.statuses().length,
+    categories: this.categories().length,
+    types: this.propertyTypes().length,
+    statuses: this.statuses().length,
     leadStatuses: this.leadStatuses().length,
     trendingTabs: this.trendingTabs().length,
-    locations:    this.locations().length,
-    communities:  this.communities().length,
-    amenities:    this.amenities().length,
+    locations: this.locations().length,
+    communities: this.communities().length,
+    amenities: this.amenities().length,
   }));
 
   // ── Categories ────────────────────────────────────────
@@ -456,14 +456,33 @@ export class AdminMasterComponent implements OnInit {
 
   async addAmenity(): Promise<void> {
     const name = this.newAmenityName().trim();
-    if (!name) { this.amenityError.set('Enter an amenity name.'); return; }
-    if (this.amenities().find(a => a.name === name)) { this.amenityError.set('Already exists.'); return; }
+    const icon = this.newAmenityIcon(); // Get the selected icon (could be empty)
+
+    // Validate name only
+    if (!name) {
+      this.amenityError.set('Enter an amenity name.');
+      return;
+    }
+
+    // Check for duplicates
+    if (this.amenities().find(a => a.name === name)) {
+      this.amenityError.set('Already exists.');
+      return;
+    }
+
     this.saving.set(true);
-    const err = await this.dataSvc.addMasterItem('amenity', name, this.newAmenityIcon());
+    // Pass the icon (could be empty string or null)
+    const err = await this.dataSvc.addMasterItem('amenity', name, icon || '');
     this.saving.set(false);
-    if (err) { this.amenityError.set(err); return; }
+
+    if (err) {
+      this.amenityError.set(err);
+      return;
+    }
+
+    // Reset form - set to empty string (no default icon)
     this.newAmenityName.set('');
-    this.newAmenityIcon.set('pool');
+    this.newAmenityIcon.set(''); // ← Empty string, no default
     this.amenityError.set('');
   }
 
@@ -477,7 +496,7 @@ export class AdminMasterComponent implements OnInit {
     const { data } = await this.sb
       .from('site_settings').select('value').eq('key', 'partner_logos').maybeSingle();
     if (data?.value) {
-      try { this.partnerLogos.set(JSON.parse(data.value)); } catch {}
+      try { this.partnerLogos.set(JSON.parse(data.value)); } catch { }
     }
   }
 
@@ -496,10 +515,10 @@ export class AdminMasterComponent implements OnInit {
 
   private async uploadPartnerLogo(file: File): Promise<void> {
     if (!file.type.startsWith('image/')) { this.partnerLogoError.set('Please select an image file.'); return; }
-    if (file.size > 5 * 1024 * 1024)    { this.partnerLogoError.set('Image must be under 5 MB.'); return; }
+    if (file.size > 5 * 1024 * 1024) { this.partnerLogoError.set('Image must be under 5 MB.'); return; }
     this.partnerLogoError.set('');
     this.plUploading.set(true);
-    const ext  = file.name.split('.').pop();
+    const ext = file.name.split('.').pop();
     const path = `partners/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const { data, error } = await this.sb.storage.from('imagesFolder').upload(path, file, { upsert: true });
     if (error) { this.partnerLogoError.set('Upload failed: ' + error.message); this.plUploading.set(false); return; }
@@ -531,7 +550,7 @@ export class AdminMasterComponent implements OnInit {
   }
 
   movePartnerLogo(index: number, dir: -1 | 1): void {
-    const list   = [...this.partnerLogos()];
+    const list = [...this.partnerLogos()];
     const target = index + dir;
     if (target < 0 || target >= list.length) return;
     [list[index], list[target]] = [list[target], list[index]];

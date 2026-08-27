@@ -140,6 +140,15 @@ $white: #fff;
   display: flex;
   align-items: center;
   flex: 1;
+  flex-wrap: wrap;
+}
+
+.lpfs-dd-subrow {
+  display: flex;
+  align-items: center;
+
+  &--a { flex: 1; }
+  &--b { flex: 1; justify-content: flex-end; }
 }
 
 // ── Dropdown buttons ───────────────────────────────────────
@@ -1003,12 +1012,17 @@ $white: #fff;
     border-top: 1px solid $border;
   }
 
+  .lpfs-dd-row > .lpfs-divider-v { display: none; }
+
   .lpfs-dd-subrow {
     display: flex;
     align-items: center;
     width: 100%;
+    flex: unset;
+    justify-content: unset;
 
     &--a { border-bottom: 1px solid $border; }
+    &--b { justify-content: unset; }
 
     .lpfs-dd-wrap { flex: 1; min-width: 0; }
   }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
+import { AdminDataService } from '../../shared/services/admin-data.service';
 import { toPropertySlug } from '../../shared/utils/slug';
 
 interface LeadMessage {
@@ -44,7 +45,7 @@ interface TimelineEntry {
   sortKey: number;
 }
 
-type LeadStatus = 'new' | 'contacted' | 'qualified' | 'negotiating' | 'won' | 'lost';
+type LeadStatus = string;
 
 interface FollowUpRecord {
   id: number;
@@ -76,10 +77,11 @@ interface LeadDetail {
   styleUrl: './lead-profile.component.scss',
 })
 export class LeadProfileComponent implements OnInit, OnDestroy {
-  private route  = inject(ActivatedRoute);
-  private router = inject(Router);
-  private auth   = inject(AuthService);
-  private sb     = inject(SupabaseService).client;
+  private route   = inject(ActivatedRoute);
+  private router  = inject(Router);
+  private auth    = inject(AuthService);
+  private sb      = inject(SupabaseService).client;
+  private dataSvc = inject(AdminDataService);
 
   private msgSub: any = null;
 
@@ -153,12 +155,9 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
 
   readonly priorities = ['low', 'medium', 'high', 'urgent'];
 
-  readonly statusTimeline: { status: LeadStatus; label: string }[] = [
-    { status: 'new',         label: 'New Lead'    },
-    { status: 'contacted',   label: 'Contacted'   },
-    { status: 'qualified',   label: 'Qualified'   },
-    { status: 'negotiating', label: 'Negotiating' },
-  ];
+  readonly statusTimeline = computed(() =>
+    this.dataSvc.leadStatuses().map(s => ({ status: s.name, label: s.name.charAt(0).toUpperCase() + s.name.slice(1) }))
+  );
 
   waHref(phone: string): string {
     const digits = phone?.replace(/[^\d+]/g, '').replace(/^\+/, '');
@@ -411,12 +410,13 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
   }
 
   getStatusIndex(s: LeadStatus): number {
-    return ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'].indexOf(s);
+    return this.dataSvc.leadStatuses().findIndex(x => x.name === s);
   }
 
   labelStatus(s: string, lead?: LeadDetail | null): string {
     if (s === 'won' && lead?.assignedAgent) return `Won by ${lead.assignedAgent}`;
-    return ({ new: 'New', contacted: 'Contacted', qualified: 'Qualified', negotiating: 'Negotiating', won: 'Won', lost: 'Lost' } as Record<string, string>)[s] ?? s;
+    const found = this.dataSvc.leadStatuses().find(x => x.name === s);
+    return found ? found.name.charAt(0).toUpperCase() + found.name.slice(1) : (s ?? '');
   }
 
   formatPrice(n: number): string {

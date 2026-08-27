@@ -2436,6 +2436,19 @@ $gold-light: #e8c870;
   color: #fff;
   line-height: 1;
   margin-bottom: 0.375rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.property-price-from {
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1;
 }
 
 .property-title {

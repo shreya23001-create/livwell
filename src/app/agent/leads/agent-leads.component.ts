@@ -9,16 +9,6 @@ import { ToastService } from '../../shared/services/toast.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 import * as XLSX from 'xlsx';
 
-const DUBAI_LOCATIONS = [
-  'Downtown Dubai', 'Dubai Marina', 'Palm Jumeirah', 'Business Bay',
-  'Jumeirah Beach Residence (JBR)', 'Jumeirah Village Circle (JVC)',
-  'Jumeirah Village Triangle (JVT)', 'Arabian Ranches', 'Emirates Hills',
-  'Meydan', 'Mohammed Bin Rashid City', 'Dubai Hills Estate',
-  'Dubai Creek Harbour', 'Al Barsha', 'Deira', 'Bur Dubai',
-  'Jumeirah', 'Al Quoz', 'Dubai South', 'DIFC',
-  'Discovery Gardens', 'International City', 'Sports City',
-  'Motor City', 'Damac Hills', 'Tilal Al Ghaf',
-];
 
 interface LeadMessage {
   id: number;
@@ -29,7 +19,7 @@ interface LeadMessage {
 }
 
 
-export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'negotiating' | 'won' | 'lost';
+export type LeadStatus = string;
 
 export interface AgentLead {
   id: number;
@@ -159,10 +149,9 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
 
     if (!rows.length) { this.toast.error('No data found in the file.'); this.importing.set(false); return; }
 
-    const statusMap: Record<string, string> = {
-      'New': 'new', 'Contacted': 'contacted', 'Qualified': 'qualified',
-      'Negotiating': 'negotiating', 'Won': 'won', 'Lost': 'lost',
-    };
+    const statusMap: Record<string, string> = Object.fromEntries(
+      this.dataSvc.leadStatuses().map(s => [s.name.charAt(0).toUpperCase() + s.name.slice(1), s.name])
+    );
     const sourceMap: Record<string, string> = {
       'Website': 'website', 'Referral': 'referral', 'Walk-in': 'walk_in',
       'Social Media': 'social_media', 'Portal': 'portal', 'Cold Call': 'cold_call',
@@ -258,8 +247,12 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   }
 
   followUps = computed(() =>
-    this.leads().filter(l => l.followUpDate).sort((a, b) => (a.followUpDate ?? '').localeCompare(b.followUpDate ?? ''))
+    this.leads().filter(l => l.followUpDate && !['won','lost'].includes(l.status)).sort((a, b) => (a.followUpDate ?? '').localeCompare(b.followUpDate ?? ''))
   );
+
+  private get activeFollowUpRecords(): any[] {
+    return this.allFollowUpRecords().filter(r => !['won','lost'].includes(r.lead?.status));
+  }
 
   // Deduplicate records by lead — keep the "best" record per lead for each bucket.
   // all/overdue: most recent date (latest overdue); today: latest created; upcoming: earliest date.
@@ -281,28 +274,28 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   // Lead IDs whose latest follow-up is upcoming — exclude from overdue/today
   private leadsWithUpcoming = computed(() => {
     const latest = this.dedupeByLead(
-      this.allFollowUpRecords().filter(r => r.follow_up_date), 'latest'
+      this.activeFollowUpRecords.filter(r => r.follow_up_date), 'latest'
     );
     return new Set(latest.filter(r => r.follow_up_date > this.today).map(r => r.lead_id));
   });
 
   overdueFollowUps  = computed(() => this.dedupeByLead(
-    this.allFollowUpRecords().filter(r =>
+    this.activeFollowUpRecords.filter(r =>
       r.follow_up_date && r.follow_up_date < this.today &&
       !this.leadsWithUpcoming().has(r.lead_id)
     ), 'latest'
   ));
   todayFollowUps    = computed(() => this.dedupeByLead(
-    this.allFollowUpRecords().filter(r =>
+    this.activeFollowUpRecords.filter(r =>
       r.follow_up_date === this.today &&
       !this.leadsWithUpcoming().has(r.lead_id)
     ), 'latest'
   ));
   upcomingFollowUps = computed(() => this.dedupeByLead(
-    this.allFollowUpRecords().filter(r => r.follow_up_date && r.follow_up_date > this.today), 'earliest'
+    this.activeFollowUpRecords.filter(r => r.follow_up_date && r.follow_up_date > this.today), 'earliest'
   ));
   latestFollowUpPerLead = computed(() => this.dedupeByLead(
-    this.allFollowUpRecords().filter(r => r.follow_up_date), 'latest'
+    this.activeFollowUpRecords.filter(r => r.follow_up_date), 'latest'
   ));
 
   filteredFollowUps = computed(() => {
@@ -328,7 +321,8 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   locSearch    = signal('');
   filteredLocations = computed(() => {
     const q = this.locSearch().toLowerCase();
-    return q ? DUBAI_LOCATIONS.filter(l => l.toLowerCase().includes(q)) : DUBAI_LOCATIONS;
+    const locs = this.dataSvc.locations();
+    return q ? locs.filter(l => l.toLowerCase().includes(q)) : locs;
   });
 
   @HostListener('document:click', ['$event'])
@@ -366,7 +360,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     const st = this.filterStatus();
     const tp = this.filterType();
     let list = this.leads().filter(l => {
-      const mq  = !q  || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.location.toLowerCase().includes(q);
+      const mq  = !q  || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.location.toLowerCase().includes(q) || (l.phone || '').toLowerCase().includes(q);
       const mst = !st || l.status === st;
       const mtp = tp === 'all' || (tp === 'property' ? !!l.propertyTitle : !!l.projectTitle);
       return mq && mst && mtp;

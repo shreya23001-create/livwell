@@ -388,7 +388,7 @@ export class HomeComponent implements OnInit {
     if (!data || !data.length) {
       ({ data } = await this.sb
         .from('properties')
-        .select('id, title, location, community, price, bedrooms, bathrooms, area_sqft, type, images, is_featured, status')
+        .select('id, title, location, community, price, price_label, bedrooms, bathrooms, area_sqft, type, images, is_featured, status')
         .eq('status', 'Published')
         .order('created_at', { ascending: false })
         .limit(6));
@@ -399,7 +399,7 @@ export class HomeComponent implements OnInit {
         id: p.id,
         title: p.title,
         location: [p.community, p.location].filter(Boolean).join(', ') || 'Dubai',
-        price: `AED ${Number(p.price || 0).toLocaleString()}`,
+        price: p.price_label || `AED ${Number(p.price || 0).toLocaleString()}`,
         beds: p.bedrooms || 0,
         baths: p.bathrooms || 0,
         sqft: Number(p.area_sqft || 0).toLocaleString(),

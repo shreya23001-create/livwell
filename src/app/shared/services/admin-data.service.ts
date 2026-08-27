@@ -32,7 +32,7 @@ export interface AuditLog {
   detail: string; ip: string; status: AuditStatus;
 }
 
-export type LeadStatus   = 'new' | 'contacted' | 'qualified' | 'negotiating' | 'won' | 'lost';
+export type LeadStatus   = string;
 export type LeadSource   = 'website' | 'referral' | 'walk_in' | 'social_media' | 'portal' | 'cold_call';
 export type LeadCategory = 'buy' | 'rent' | 'invest';
 

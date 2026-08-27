@@ -2,6 +2,7 @@ import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+import * as XLSX from 'xlsx';
 
 interface AgentRow { name: string; leads: number; won: number; conversion: number; }
 
@@ -18,9 +19,71 @@ export class AdminReportsComponent {
 
   period = signal<'week' | 'month' | 'quarter' | 'year'>('month');
 
-  // ── KPIs (computed from live data) ───────────────────
+  // ── Filter controls ───────────────────────────────────
+  filterAgent  = signal('');
+  filterStatus = signal('');
+  filterDateFrom = signal('');
+  filterDateTo   = signal('');
+
+  agentNames = computed(() => {
+    const agents = this.dataSvc.users().filter(u => u.role === 'agent');
+    return agents.map(a => a.name).sort();
+  });
+
+  statusOptions = computed(() => this.dataSvc.leadStatuses().map(s => s.name));
+
+  filteredLeads = computed(() => {
+    const agent  = this.filterAgent();
+    const status = this.filterStatus();
+    const from   = this.filterDateFrom();
+    const to     = this.filterDateTo();
+    return this.dataSvc.leads().filter(l => {
+      const contactDate = l.lastContact || l.createdDate || '';
+      if (agent  && l.assignedAgent !== agent)    return false;
+      if (status && l.status        !== status)   return false;
+      if (from   && contactDate < from)            return false;
+      if (to     && contactDate > to)              return false;
+      return true;
+    });
+  });
+
+  hasActiveFilters = computed(() =>
+    !!(this.filterAgent() || this.filterStatus() || this.filterDateFrom() || this.filterDateTo())
+  );
+
+  clearFilters(): void {
+    this.filterAgent.set('');
+    this.filterStatus.set('');
+    this.filterDateFrom.set('');
+    this.filterDateTo.set('');
+  }
+
+  exportFiltered(): void {
+    const leads = this.filteredLeads();
+    const rows = leads.map(l => ({
+      'Name':           l.name,
+      'Email':          l.email,
+      'Phone':          l.phone,
+      'Status':         l.status,
+      'Source':         l.source,
+      'Category':       l.category,
+      'Budget':         l.budget,
+      'Location':       l.location,
+      'Property Type':  l.propertyType,
+      'Assigned Agent': l.assignedAgent,
+      'Notes':          l.notes,
+      'Created Date':   l.createdDate,
+      'Last Contact':   l.lastContact,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Leads');
+    XLSX.writeFile(wb, `livwell-report-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+
+  // ── KPIs (computed from filtered data) ───────────────
   kpis = computed(() => {
-    const leads = this.dataSvc.leads();
+    const leads = this.filteredLeads();
     const users = this.dataSvc.users();
     const agents = users.filter(u => u.role === 'agent' && u.status === 'active');
     const wonLeads = leads.filter(l => l.status === 'won').length;
@@ -39,7 +102,7 @@ export class AdminReportsComponent {
 
   // ── Lead pipeline (dynamic) ───────────────────────────
   leadsByStatus = computed(() => {
-    const leads = this.dataSvc.leads();
+    const leads = this.filteredLeads();
     const counts = {
       new:         leads.filter(l => l.status === 'new').length,
       contacted:   leads.filter(l => l.status === 'contacted').length,
@@ -59,11 +122,11 @@ export class AdminReportsComponent {
     ];
   });
 
-  totalLeadsPipeline = computed(() => this.dataSvc.leads().length);
+  totalLeadsPipeline = computed(() => this.filteredLeads().length);
 
   // ── Leads by source (dynamic) ─────────────────────────
   leadsBySource = computed(() => {
-    const leads = this.dataSvc.leads();
+    const leads = this.filteredLeads();
     const counts: Record<string, number> = {};
     leads.forEach(l => { counts[l.source] = (counts[l.source] || 0) + 1; });
     const labels: Record<string, string> = {
@@ -105,7 +168,7 @@ export class AdminReportsComponent {
 
   // ── Top agents (dynamic) ──────────────────────────────
   topAgents = computed((): AgentRow[] => {
-    const leads  = this.dataSvc.leads();
+    const leads  = this.filteredLeads();
     const agents = this.dataSvc.users().filter(u => u.role === 'agent');
 
     return agents.map(a => {
@@ -120,7 +183,7 @@ export class AdminReportsComponent {
 
   // ── Leads by category (dynamic) ───────────────────────
   leadsByCategory = computed(() => {
-    const leads = this.dataSvc.leads();
+    const leads = this.filteredLeads();
     const buy    = leads.filter(l => l.category === 'buy').length;
     const rent   = leads.filter(l => l.category === 'rent').length;
     const invest = leads.filter(l => l.category === 'invest').length;

@@ -153,7 +153,7 @@
         <div class="lxp-card-pricing">
           <div class="lxp-price-main">
             <span class="lxp-price-label">Starting From</span>
-            <span class="lxp-price-value">{{ formatPrice(p.price_from) }}</span>
+            <span class="lxp-price-value">{{ p.price_label || formatPrice(p.price_from) }}</span>
           </div>
           <div class="lxp-price-sub">
             <div class="lxp-pill" *ngIf="p.completion_date">

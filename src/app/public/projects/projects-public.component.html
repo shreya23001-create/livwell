@@ -8,24 +8,33 @@
 
     <div class="prj-search-bar">
       <div class="prj-search-input-wrap">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Search by project, developer or community…"
-               [value]="searchQuery()" (input)="setSearch($any($event.target).value)" class="prj-search-input">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input type="text" placeholder="Search by project, developer or community…" [value]="searchQuery()"
+          (input)="setSearch($any($event.target).value)" class="prj-search-input">
         <button *ngIf="searchQuery()" class="prj-search-clear" (click)="setSearch('')" title="Clear">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
         </button>
       </div>
       <select class="prj-search-select" [ngModel]="selectedType()" (ngModelChange)="setType($event)">
         <option *ngFor="let t of projectTypes" [value]="t">{{ t === 'All' ? 'All Types' : t }}</option>
       </select>
-      <select class="prj-search-select" [ngModel]="selectedLocation()" (ngModelChange)="selectedLocation.set($event); currentPage.set(1)">
+      <select class="prj-search-select" [ngModel]="selectedLocation()"
+        (ngModelChange)="selectedLocation.set($event); currentPage.set(1)">
         <option *ngFor="let l of locationOptions" [value]="l">{{ l === 'All' ? 'All Areas' : l }}</option>
       </select>
       <select class="prj-search-select" [ngModel]="selectedHandover()" (ngModelChange)="setHandover($event)">
         <option *ngFor="let h of handoverOptions" [value]="h">{{ h === 'All' ? 'Handover' : h }}</option>
       </select>
       <button class="prj-search-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
         Search
       </button>
     </div>
@@ -36,10 +45,14 @@
 <div class="prj-stats-strip">
   <div class="container-custom">
     <div class="prj-stats-grid">
-      <div class="prj-stat"><span class="prj-stat-value">{{ stats().total || '—' }}</span><span class="prj-stat-label">Active Projects</span></div>
-      <div class="prj-stat"><span class="prj-stat-value">{{ stats().featured || '—' }}</span><span class="prj-stat-label">Featured</span></div>
-      <div class="prj-stat"><span class="prj-stat-value">{{ stats().luxury || '—' }}</span><span class="prj-stat-label">Luxury</span></div>
-      <div class="prj-stat"><span class="prj-stat-value">{{ stats().minPrice }}</span><span class="prj-stat-label">Starting Price</span></div>
+      <div class="prj-stat"><span class="prj-stat-value">{{ stats().total || '—' }}</span><span
+          class="prj-stat-label">Active Projects</span></div>
+      <div class="prj-stat"><span class="prj-stat-value">{{ stats().featured || '—' }}</span><span
+          class="prj-stat-label">Featured</span></div>
+      <div class="prj-stat"><span class="prj-stat-value">{{ stats().luxury || '—' }}</span><span
+          class="prj-stat-label">Luxury</span></div>
+      <div class="prj-stat"><span class="prj-stat-value">{{ stats().minPrice }}</span><span
+          class="prj-stat-label">Starting Price</span></div>
     </div>
   </div>
 </div>
@@ -71,24 +84,29 @@
     <div class="prj-grid" *ngIf="!loading()">
       <a [routerLink]="['/projects', projectSlug(p)]" class="prj-card" *ngFor="let p of pagedProjects()">
         <div class="prj-card-img-wrap">
-          <img [src]="p.images?.[0] || '/images/dummy-image.png'" [alt]="p.title" class="prj-card-img" loading="lazy" (error)="$any($event.target).src='/images/dummy-image.png'">
+          <img [src]="p.images?.[0] || '/images/dummy-image.png'" [alt]="p.title" class="prj-card-img" loading="lazy"
+            (error)="$any($event.target).src='/images/dummy-image.png'">
           <span *ngIf="p.badge" class="prj-badge prj-badge--overlay">{{ p.badge }}</span>
           <span *ngIf="p.is_ultra_luxury" class="prj-badge prj-badge--ultra prj-badge--tl">Ultra Luxury</span>
-          <span *ngIf="p.is_luxury && !p.is_ultra_luxury" class="prj-badge prj-badge--luxury prj-badge--tl">Luxury</span>
-          <span *ngIf="p.is_featured && !p.is_luxury && !p.is_ultra_luxury" class="prj-badge prj-badge--featured prj-badge--tl">Featured</span>
+          <span *ngIf="p.is_luxury && !p.is_ultra_luxury"
+            class="prj-badge prj-badge--luxury prj-badge--tl">Luxury</span>
+          <span *ngIf="p.is_featured && !p.is_luxury && !p.is_ultra_luxury"
+            class="prj-badge prj-badge--featured prj-badge--tl">Featured</span>
           <!-- Save / Share -->
           <div class="prj-card-actions">
             <button class="prj-card-action-btn" [class.saved]="isSaved(p.id)"
-              [title]="isSaved(p.id) ? 'Remove from saved' : 'Save project'"
-              (click)="toggleSave(p.id, $event)">
-              <svg viewBox="0 0 24 24" [attr.fill]="isSaved(p.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+              [title]="isSaved(p.id) ? 'Remove from saved' : 'Save project'" (click)="toggleSave(p.id, $event)">
+              <svg viewBox="0 0 24 24" [attr.fill]="isSaved(p.id) ? 'currentColor' : 'none'" stroke="currentColor"
+                stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
               </svg>
             </button>
             <div style="position:relative">
               <button class="prj-card-action-btn" title="Share" (click)="shareCard(p.id, p.title, $event)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                 </svg>
               </button>
               <div *ngIf="shareToastId() === p.id" class="prj-share-toast">Link copied!</div>
@@ -102,44 +120,50 @@
           <h3 class="prj-card-title">{{ p.title }}</h3>
           <p class="prj-card-dev">{{ p.developer }}</p>
           <p class="prj-card-loc" *ngIf="p.location">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
             {{ p.location }}
           </p>
           <div class="prj-card-price-row">
-            <span class="prj-card-price">{{ formatPrice(p.price_from) }}</span>
-            <span class="prj-card-handover" *ngIf="p.completion_date">{{ p.completion_date }}</span>
+            <span class="prj-card-price">Starting from {{ formatPrice(p.price_from) }}</span>
+            <span class="prj-card-handover" *ngIf="p.completion_date">Handover By {{ p.completion_date }}</span>
           </div>
           <div class="prj-card-plan" *ngIf="p.payment_plan">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" />
+              <path d="M1 10h22" />
+            </svg>
             {{ p.payment_plan }}
           </div>
         </div>
       </a>
 
-      <div *ngIf="noResultsNotice()" class="prj-no-results-notice">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        No exact matches — showing all projects instead. Use the filters to refine your search.
-      </div>
     </div>
 
     <!-- Pagination -->
     <div *ngIf="totalPages() > 1" class="prj-pagination">
       <button class="prj-pg-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
         Prev
       </button>
       <div class="prj-pg-numbers">
-        <button *ngFor="let page of pageNumbers()" class="prj-pg-num"
-          [class.active]="page === currentPage()" [class.ellipsis]="page === '...'"
-          [disabled]="page === '...'" (click)="goToPage(page)">{{ page }}</button>
+        <button *ngFor="let page of pageNumbers()" class="prj-pg-num" [class.active]="page === currentPage()"
+          [class.ellipsis]="page === '...'" [disabled]="page === '...'" (click)="goToPage(page)">{{ page }}</button>
       </div>
       <button class="prj-pg-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
         Next
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
       </button>
     </div>
     <div *ngIf="totalResults() > 0" class="prj-page-info">
-      Showing {{ (currentPage() - 1) * pageSize + 1 }}–{{ currentPage() * pageSize > totalResults() ? totalResults() : currentPage() * pageSize }} of {{ totalResults() }} projects
+      Showing {{ (currentPage() - 1) * pageSize + 1 }}–{{ currentPage() * pageSize > totalResults() ? totalResults() :
+      currentPage() * pageSize }} of {{ totalResults() }} projects
     </div>
 
   </div>
@@ -153,7 +177,9 @@
       <div class="prj-faq-item" *ngFor="let f of faqs; let i = index" [class.open]="f.open" (click)="toggleFaq(i)">
         <div class="prj-faq-q">
           <span>{{ f.question }}</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
         <div class="prj-faq-a" *ngIf="f.open">{{ f.answer }}</div>
       </div>

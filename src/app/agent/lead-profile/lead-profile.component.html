@@ -254,7 +254,7 @@
             <span class="lp-card-sub">click to update</span>
           </div>
           <div class="lp-pipeline">
-            @for (step of statusTimeline; track step.status) {
+            @for (step of statusTimeline(); track step.status) {
               <div class="lp-pipe-step"
                 [class.done]="getStatusIndex(l.status) > getStatusIndex(step.status) && l.status !== 'lost'"
                 [class.active]="l.status === step.status"
@@ -301,11 +301,9 @@
               <label>Lead Status</label>
               <div class="select-wrapper">
                 <select [ngModel]="statusUpdateVal()" (ngModelChange)="statusUpdateVal.set($event)">
-                  @for (s of statusTimeline; track s.status) {
+                  @for (s of statusTimeline(); track s.status) {
                     <option [value]="s.status">{{ s.label }}</option>
                   }
-                  <option value="won">Won</option>
-                  <option value="lost">Lost</option>
                 </select>
                 <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
               </div>

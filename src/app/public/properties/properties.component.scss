@@ -1189,9 +1189,30 @@
 
 .prop-price-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 0.625rem;
   flex-wrap: wrap;
+}
+
+.prop-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.prop-price-from {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.spec-from {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  font-weight: 400;
 }
 
 .prop-price {
@@ -1627,7 +1648,7 @@
 
 .plc-price-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 0.625rem;
   flex-wrap: wrap;
   margin-bottom: 0.25rem;

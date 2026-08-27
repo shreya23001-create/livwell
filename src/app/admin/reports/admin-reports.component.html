@@ -6,12 +6,29 @@
       <h1 class="reports-title">Reports & Analytics</h1>
       <p class="reports-subtitle">Live data from users and leads</p>
     </div>
-    <div class="period-tabs">
-      <button [class.active]="period()==='week'"    (click)="period.set('week')">Week</button>
-      <button [class.active]="period()==='month'"   (click)="period.set('month')">Month</button>
-      <button [class.active]="period()==='quarter'" (click)="period.set('quarter')">Quarter</button>
-      <button [class.active]="period()==='year'"    (click)="period.set('year')">Year</button>
+    <button class="rpt-export-btn" (click)="exportFiltered()" title="Export current view">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Export {{ hasActiveFilters() ? 'Filtered' : 'All' }} ({{ filteredLeads().length }})
+    </button>
+  </div>
+
+  <!-- ── Filters ── -->
+  <div class="rpt-filters">
+    <select class="rpt-filter-sel" [ngModel]="filterAgent()" (ngModelChange)="filterAgent.set($event)">
+      <option value="">All Agents</option>
+      <option *ngFor="let a of agentNames()" [value]="a">{{ a }}</option>
+    </select>
+    <select class="rpt-filter-sel" [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)">
+      <option value="">All Statuses</option>
+      <option *ngFor="let s of statusOptions()" [value]="s">{{ s | titlecase }}</option>
+    </select>
+    <div class="rpt-filter-dates">
+      <label class="rpt-filter-label">Contacted from</label>
+      <input type="date" class="rpt-filter-date" [ngModel]="filterDateFrom()" (ngModelChange)="filterDateFrom.set($event)">
+      <label class="rpt-filter-label">to</label>
+      <input type="date" class="rpt-filter-date" [ngModel]="filterDateTo()" (ngModelChange)="filterDateTo.set($event)">
     </div>
+    <button *ngIf="hasActiveFilters()" class="rpt-clear-btn" (click)="clearFilters()">Clear filters</button>
   </div>
 
   <!-- ── KPI Cards (dynamic) ── -->

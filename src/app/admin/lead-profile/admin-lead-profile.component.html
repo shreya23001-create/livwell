@@ -106,10 +106,10 @@
       <div class="alp-section-title" style="margin-top:1.5rem">Pipeline Stage</div>
       <div class="alp-pipeline">
         <div class="alp-pipeline-line"></div>
-        <div class="alp-stage" *ngFor="let s of pipelineStages"
+        <div class="alp-stage" *ngFor="let s of pipelineStages()"
           [class.active]="s.status === l.status"
           [class.passed]="isPastStage(s.status, l.status)">
-          <div class="alp-stage-dot" [style.background]="s.status === l.status ? stageColors[s.status] : ''"></div>
+          <div class="alp-stage-dot" [style.background]="s.status === l.status ? stageColor(s.status) : ''"></div>
           <div class="alp-stage-label">{{ s.label }}</div>
         </div>
       </div>

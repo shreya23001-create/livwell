@@ -98,7 +98,10 @@ export class AdminLeadsComponent implements OnInit {
   editFuRemarks   = signal('');
   editFuStatus    = signal('new');
   savingEditFu    = signal(false);
-  readonly fuStatusOptions = ['new','contacted','qualified','negotiating','won','lost','pending','missed'];
+  readonly fuStatusOptions = computed(() => [
+    ...this.dataSvc.leadStatuses().map(s => s.name),
+    'pending', 'missed',
+  ]);
 
   openEditFu(r: any): void {
     this.editFuRecord.set(r);
@@ -203,34 +206,38 @@ export class AdminLeadsComponent implements OnInit {
       .sort((a, b) => (a.follow_up_date ?? '').localeCompare(b.follow_up_date ?? ''));
   }
 
+  private get activeFollowUpRecords(): any[] {
+    return this.allFollowUpRecords().filter(r => !['won','lost'].includes(r.lead?.status));
+  }
+
   // Lead IDs whose latest follow-up is upcoming — exclude from overdue/today
   private leadsWithUpcoming = computed(() => {
     const latest = this.dedupeByLead(
-      this.allFollowUpRecords().filter(r => r.follow_up_date), 'latest'
+      this.activeFollowUpRecords.filter(r => r.follow_up_date), 'latest'
     );
     return new Set(latest.filter(r => r.follow_up_date > this.today).map(r => r.lead_id));
   });
 
   overdueFollowUps = computed(() => this.dedupeByLead(
-    this.allFollowUpRecords().filter(r =>
+    this.activeFollowUpRecords.filter(r =>
       r.follow_up_date && r.follow_up_date < this.today &&
       !this.leadsWithUpcoming().has(r.lead_id)
     ), 'latest'
   ));
 
   todayFollowUps = computed(() => this.dedupeByLead(
-    this.allFollowUpRecords().filter(r =>
+    this.activeFollowUpRecords.filter(r =>
       r.follow_up_date === this.today &&
       !this.leadsWithUpcoming().has(r.lead_id)
     ), 'latest'
   ));
 
   upcomingFollowUps = computed(() => this.dedupeByLead(
-    this.allFollowUpRecords().filter(r => r.follow_up_date && r.follow_up_date > this.today), 'earliest'
+    this.activeFollowUpRecords.filter(r => r.follow_up_date && r.follow_up_date > this.today), 'earliest'
   ));
 
   latestFollowUpPerLead = computed(() => this.dedupeByLead(
-    this.allFollowUpRecords().filter(r => r.follow_up_date), 'latest'
+    this.activeFollowUpRecords.filter(r => r.follow_up_date), 'latest'
   ));
 
   filteredFollowUps = computed(() => {
@@ -243,7 +250,7 @@ export class AdminLeadsComponent implements OnInit {
 
   followUps = computed(() =>
     this.leads()
-      .filter(l => l.followUpDate)
+      .filter(l => l.followUpDate && !['won','lost'].includes(l.status))
       .sort((a, b) => a.followUpDate.localeCompare(b.followUpDate))
   );
 
@@ -286,13 +293,13 @@ export class AdminLeadsComponent implements OnInit {
   });
 
   pipelineStages = computed(() => {
-    const order: LeadStatus[] = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
+    const statuses = this.dataSvc.leadStatuses();
     const total = this.leads().length || 1;
-    return order.map(s => ({
-      status: s,
-      count: this.leads().filter(l => l.status === s).length,
-      pct: Math.round(this.leads().filter(l => l.status === s).length / total * 100),
-      color: this.dataSvc.leadStatuses().find(x => x.name === s)?.color ?? '#6b7280',
+    return statuses.map(s => ({
+      status: s.name,
+      count: this.leads().filter(l => l.status === s.name).length,
+      pct: Math.round(this.leads().filter(l => l.status === s.name).length / total * 100),
+      color: s.color ?? '#6b7280',
     }));
   });
 
@@ -378,10 +385,8 @@ export class AdminLeadsComponent implements OnInit {
   }
 
   isPastStage(stage: string, currentStatus: string): boolean {
-    const order = ['new', 'contacted', 'qualified', 'negotiating', 'won', 'lost'];
-    const si = order.indexOf(stage);
-    const ci = order.indexOf(currentStatus);
-    return si < ci && currentStatus !== 'lost';
+    const statuses = this.dataSvc.leadStatuses().map(x => x.name);
+    return statuses.indexOf(stage) < statuses.indexOf(currentStatus) && currentStatus !== 'lost';
   }
 
   filtered = computed(() => {
@@ -542,7 +547,7 @@ export class AdminLeadsComponent implements OnInit {
 
   // ── Export ────────────────────────────────────────────
   exportToExcel(): void {
-    const rows = this.leads().map(l => ({
+    const rows = this.filtered().map(l => ({
       'Name':           l.name,
       'Email':          l.email,
       'Phone':          l.phone,
@@ -597,10 +602,10 @@ export class AdminLeadsComponent implements OnInit {
       return;
     }
 
-    const statusMap: Record<string, LeadStatus> = {
-      'New': 'new', 'Contacted': 'contacted', 'Qualified': 'qualified',
-      'Negotiating': 'negotiating', 'Won': 'won', 'Lost': 'lost',
-    };
+    const knownStatuses = this.dataSvc.leadStatuses().map(s => s.name);
+    const statusMap: Record<string, string> = Object.fromEntries(
+      knownStatuses.map(s => [s.charAt(0).toUpperCase() + s.slice(1), s])
+    );
     const sourceMap: Record<string, LeadSource> = {
       'Website': 'website', 'Referral': 'referral', 'Walk-in': 'walk_in',
       'Social Media': 'social_media', 'Portal': 'portal', 'Cold Call': 'cold_call',
@@ -689,8 +694,11 @@ export class AdminLeadsComponent implements OnInit {
   pageNumbers(): number[] {
     const total = this.totalPages();
     const cur   = this.page();
+    if (total <= 100) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
     const pages: number[] = [];
-    for (let i = Math.max(1, cur - 2); i <= Math.min(total, cur + 2); i++) pages.push(i);
+    for (let i = Math.max(1, cur - 5); i <= Math.min(total, cur + 5); i++) pages.push(i);
     return pages;
   }
 }

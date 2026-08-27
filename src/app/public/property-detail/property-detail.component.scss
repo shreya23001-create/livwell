@@ -519,7 +519,7 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
   font-size: 1.3rem;
   font-weight: 400;
   color: $dark;
-  margin: 0 0 1.25rem;
+  margin: 32px 0 1.25rem;
   letter-spacing: -0.01em;
 }
 
@@ -608,6 +608,13 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
   font-weight: 600;
   color: $dark;
   text-align: right;
+}
+
+.pd-detail-from {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: #9ca3af;
+  margin-right: 0.25rem;
 }
 
 /* Amenities */
@@ -1009,22 +1016,55 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
 }
 
 .pd-sim-actions {
-  position: absolute; top: .5rem; right: .5rem;
-  display: flex; gap: .3rem; z-index: 2;
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  display: flex;
+  gap: .3rem;
+  z-index: 2;
 }
+
 .pd-sim-action-btn {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: rgba(255,255,255,.88); backdrop-filter: blur(4px);
-  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  color: #374151; transition: all .2s;
-  svg { width: 14px; height: 14px; flex-shrink: 0; }
-  &:hover { background: #fff; color: $accent; }
-  &.saved { color: #e11d48; }
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .88);
+  backdrop-filter: blur(4px);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  transition: all .2s;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: #fff;
+    color: $accent;
+  }
+
+  &.saved {
+    color: #e11d48;
+  }
 }
+
 .pd-sim-share-toast {
-  position: absolute; top: calc(100% + 5px); right: 0;
-  background: #111827; color: #fff; font-size: .7rem; font-weight: 600;
-  padding: .25rem .6rem; border-radius: .35rem; white-space: nowrap;
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  background: #111827;
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 600;
+  padding: .25rem .6rem;
+  border-radius: .35rem;
+  white-space: nowrap;
   pointer-events: none;
 }
 
@@ -1250,7 +1290,10 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
   position: relative;
   display: flex;
 
-  .pd-btn-whatsapp { flex: 1; width: 100%; }
+  .pd-btn-whatsapp {
+    flex: 1;
+    width: 100%;
+  }
 }
 
 .pd-wa-toast {
@@ -1281,8 +1324,15 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
 }
 
 @keyframes pd-wa-fadein {
-  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .pd-btn-email {
@@ -1338,7 +1388,15 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
     border-color: $accent;
   }
 
-  &[readonly] { background: #f3f4f6; color: #6b7280; cursor: default; &:focus { border-color: $border; } }
+  &[readonly] {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: default;
+
+    &:focus {
+      border-color: $border;
+    }
+  }
 }
 
 .pd-textarea {

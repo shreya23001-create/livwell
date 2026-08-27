@@ -101,6 +101,7 @@ export class AdminPropertiesComponent implements OnInit {
   uploadingImages  = signal(false);
   uploadedImages   = signal<string[]>([]);   // final public URLs (saved to DB)
   previewImages    = signal<string[]>([]);   // local blob URLs for instant preview
+  coverIndex       = signal(0);             // index of the cover image
   amenityDropdownOpen = signal(false);
   faqs             = signal<PropertyFaq[]>([]);
   masterAmenities  = this.dataSvc.amenities;
@@ -258,6 +259,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.saveError.set('');
     this.uploadedImages.set([]);
     this.previewImages.set([]);
+    this.coverIndex.set(0);
     this.amenityDropdownOpen.set(false);
     this.locSearch.set('');
     this.commSearch.set('');
@@ -346,6 +348,20 @@ export class AdminPropertiesComponent implements OnInit {
   removeImage(index: number): void {
     this.previewImages.update(imgs => imgs.filter((_, i) => i !== index));
     this.uploadedImages.update(imgs => imgs.filter((_, i) => i !== index));
+    const ci = this.coverIndex();
+    if (index < ci) this.coverIndex.set(ci - 1);
+    else if (index === ci) this.coverIndex.set(0);
+  }
+
+  setCover(index: number): void {
+    const moveToFront = (arr: string[]) => {
+      const a = [...arr];
+      const [item] = a.splice(index, 1);
+      return [item, ...a];
+    };
+    this.previewImages.update(moveToFront);
+    this.uploadedImages.update(imgs => imgs.length > index ? moveToFront(imgs) : imgs);
+    this.coverIndex.set(0);
   }
 
 

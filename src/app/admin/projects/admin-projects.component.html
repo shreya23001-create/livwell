@@ -399,9 +399,11 @@
         <!-- Previews -->
         <ng-container *ngIf="previewImages().length > 0">
           <div class="apr-img-previews">
-            <div *ngFor="let url of previewImages(); let i = index" class="apr-img-preview">
+            <div *ngFor="let url of previewImages(); let i = index" class="apr-img-preview" [class.apr-img-preview--cover]="i === 0">
               <img [src]="url" [alt]="'Image ' + (i + 1)">
               <button type="button" class="apr-img-remove" (click)="removeImage(i)">✕</button>
+              <span *ngIf="i === 0" class="apr-img-cover-badge">Cover</span>
+              <button *ngIf="i !== 0" type="button" class="apr-img-set-cover" (click)="setCover(i)">Set as Cover</button>
             </div>
           </div>
           <p class="apr-img-count">{{ previewImages().length }} image(s) ready</p>

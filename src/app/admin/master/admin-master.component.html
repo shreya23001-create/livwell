@@ -46,671 +46,790 @@
 
   <!-- ── Tabs ── -->
   <div class="master-tabs">
-    <button class="master-tab" [class.active]="activeTab()==='categories'"     (click)="activeTab.set('categories')">Categories</button>
-    <button class="master-tab" [class.active]="activeTab()==='property-types'" (click)="activeTab.set('property-types')">Property Types</button>
-    <button class="master-tab" [class.active]="activeTab()==='statuses'"       (click)="activeTab.set('statuses')">Status</button>
-    <button class="master-tab" [class.active]="activeTab()==='lead-statuses'"  (click)="activeTab.set('lead-statuses')">Lead Status</button>
-    <button class="master-tab" [class.active]="activeTab()==='trending-tabs'"  (click)="activeTab.set('trending-tabs')">Trending Tabs</button>
-    <button class="master-tab" [class.active]="activeTab()==='locations'"      (click)="activeTab.set('locations')">Locations</button>
-    <button class="master-tab" [class.active]="activeTab()==='amenities'"      (click)="activeTab.set('amenities')">Amenities</button>
-    <button class="master-tab" [class.active]="activeTab()==='partner-logos'"  (click)="activeTab.set('partner-logos')">Partner Logos</button>
-    <button class="master-tab" [class.active]="activeTab()==='settings'"       (click)="activeTab.set('settings')">Settings</button>
+    <button class="master-tab" [class.active]="activeTab()==='categories'"
+      (click)="activeTab.set('categories')">Categories</button>
+    <button class="master-tab" [class.active]="activeTab()==='property-types'"
+      (click)="activeTab.set('property-types')">Property Types</button>
+    <button class="master-tab" [class.active]="activeTab()==='statuses'"
+      (click)="activeTab.set('statuses')">Status</button>
+    <button class="master-tab" [class.active]="activeTab()==='lead-statuses'"
+      (click)="activeTab.set('lead-statuses')">Lead Status</button>
+    <button class="master-tab" [class.active]="activeTab()==='trending-tabs'"
+      (click)="activeTab.set('trending-tabs')">Trending Tabs</button>
+    <button class="master-tab" [class.active]="activeTab()==='locations'"
+      (click)="activeTab.set('locations')">Locations</button>
+    <button class="master-tab" [class.active]="activeTab()==='amenities'"
+      (click)="activeTab.set('amenities')">Amenities</button>
+    <button class="master-tab" [class.active]="activeTab()==='partner-logos'"
+      (click)="activeTab.set('partner-logos')">Partner Logos</button>
+    <button class="master-tab" [class.active]="activeTab()==='settings'"
+      (click)="activeTab.set('settings')">Settings</button>
   </div>
 
   <!-- ══ CATEGORIES ══════════════════════════════════════ -->
   @if (activeTab() === 'categories') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <h2 class="master-card-title">Listing Categories</h2>
-        <p class="master-card-sub">Used as the listing type on properties (e.g. Sale, Rent, Off-Plan)</p>
-      </div>
+  <div class="master-card">
+    <div class="master-card-header">
+      <h2 class="master-card-title">Listing Categories</h2>
+      <p class="master-card-sub">Used as the listing type on properties (e.g. Sale, Rent, Off-Plan)</p>
+    </div>
 
-      <!-- Add form -->
-      <div class="master-add-row">
-        <input class="master-input" type="text" placeholder="e.g. Commercial"
-               [ngModel]="newCategory()" (ngModelChange)="newCategory.set($event)"
-               (keyup.enter)="addCategory()">
-        <button class="master-btn master-btn--primary" (click)="addCategory()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Category
+    <!-- Add form -->
+    <div class="master-add-row">
+      <input class="master-input" type="text" placeholder="e.g. Commercial" [ngModel]="newCategory()"
+        (ngModelChange)="newCategory.set($event)" (keyup.enter)="addCategory()">
+      <button class="master-btn master-btn--primary" (click)="addCategory()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Category
+      </button>
+    </div>
+    @if (categoryError()) {
+    <p class="master-error">{{ categoryError() }}</p>
+    }
+
+    <!-- List -->
+    <div class="master-list">
+      @for (cat of categories(); track cat) {
+      <div class="master-item">
+        <span class="master-item-badge">{{ cat }}</span>
+        <span class="master-item-name">{{ cat }}</span>
+        <button class="master-item-del" (click)="removeCategory(cat)" title="Remove">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
-      @if (categoryError()) {
-        <p class="master-error">{{ categoryError() }}</p>
       }
-
-      <!-- List -->
-      <div class="master-list">
-        @for (cat of categories(); track cat) {
-          <div class="master-item">
-            <span class="master-item-badge">{{ cat }}</span>
-            <span class="master-item-name">{{ cat }}</span>
-            <button class="master-item-del" (click)="removeCategory(cat)" title="Remove">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-        }
-      </div>
     </div>
+  </div>
   }
 
   <!-- ══ PROPERTY TYPES ══════════════════════════════════ -->
   @if (activeTab() === 'property-types') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <h2 class="master-card-title">Property Types</h2>
-        <p class="master-card-sub">Types available when creating or editing a property listing</p>
-      </div>
+  <div class="master-card">
+    <div class="master-card-header">
+      <h2 class="master-card-title">Property Types</h2>
+      <p class="master-card-sub">Types available when creating or editing a property listing</p>
+    </div>
 
-      <div class="master-add-row">
-        <input class="master-input" type="text" placeholder="e.g. Duplex"
-               [ngModel]="newType()" (ngModelChange)="newType.set($event)"
-               (keyup.enter)="addType()">
-        <button class="master-btn master-btn--primary" (click)="addType()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Type
+    <div class="master-add-row">
+      <input class="master-input" type="text" placeholder="e.g. Duplex" [ngModel]="newType()"
+        (ngModelChange)="newType.set($event)" (keyup.enter)="addType()">
+      <button class="master-btn master-btn--primary" (click)="addType()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Type
+      </button>
+    </div>
+    @if (typeError()) {
+    <p class="master-error">{{ typeError() }}</p>
+    }
+
+    <div class="master-list">
+      @for (t of propertyTypes(); track t) {
+      <div class="master-item">
+        <span class="master-item-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+        </span>
+        <span class="master-item-name">{{ t }}</span>
+        <button class="master-item-del" (click)="removeType(t)" title="Remove">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
-      @if (typeError()) {
-        <p class="master-error">{{ typeError() }}</p>
       }
-
-      <div class="master-list">
-        @for (t of propertyTypes(); track t) {
-          <div class="master-item">
-            <span class="master-item-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-            </span>
-            <span class="master-item-name">{{ t }}</span>
-            <button class="master-item-del" (click)="removeType(t)" title="Remove">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-        }
-      </div>
     </div>
+  </div>
   }
 
   <!-- ══ STATUSES ════════════════════════════════════════ -->
   @if (activeTab() === 'statuses') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <h2 class="master-card-title">Property Status</h2>
-        <p class="master-card-sub">Status options available on property listings</p>
-      </div>
+  <div class="master-card">
+    <div class="master-card-header">
+      <h2 class="master-card-title">Property Status</h2>
+      <p class="master-card-sub">Status options available on property listings</p>
+    </div>
 
-      <div class="master-add-row">
-        <input class="master-input" type="text" placeholder="e.g. Under Offer"
-               [ngModel]="newStatus()" (ngModelChange)="newStatus.set($event)"
-               (keyup.enter)="addStatus()">
-        <div class="master-color-wrap">
-          <label class="master-color-lbl">Color</label>
-          <input type="color" class="master-color-input"
-                 [ngModel]="newStatusColor()" (ngModelChange)="newStatusColor.set($event)">
-        </div>
-        <button class="master-btn master-btn--primary" (click)="addStatus()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Status
+    <div class="master-add-row">
+      <input class="master-input" type="text" placeholder="e.g. Under Offer" [ngModel]="newStatus()"
+        (ngModelChange)="newStatus.set($event)" (keyup.enter)="addStatus()">
+      <div class="master-color-wrap">
+        <label class="master-color-lbl">Color</label>
+        <input type="color" class="master-color-input" [ngModel]="newStatusColor()"
+          (ngModelChange)="newStatusColor.set($event)">
+      </div>
+      <button class="master-btn master-btn--primary" (click)="addStatus()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Status
+      </button>
+    </div>
+    @if (statusError()) {
+    <p class="master-error">{{ statusError() }}</p>
+    }
+
+    <div class="master-list">
+      @for (s of statuses(); track s.name) {
+      <div class="master-item">
+        <span class="master-status-dot" [style.background]="s.color"></span>
+        <span class="master-item-name">{{ s.name }}</span>
+        <span class="master-status-badge" [style.background]="s.color + '22'" [style.color]="s.color">{{ s.name
+          }}</span>
+        <button class="master-item-del" (click)="removeStatus(s.name)" title="Remove">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
-      @if (statusError()) {
-        <p class="master-error">{{ statusError() }}</p>
       }
-
-      <div class="master-list">
-        @for (s of statuses(); track s.name) {
-          <div class="master-item">
-            <span class="master-status-dot" [style.background]="s.color"></span>
-            <span class="master-item-name">{{ s.name }}</span>
-            <span class="master-status-badge" [style.background]="s.color + '22'" [style.color]="s.color">{{ s.name }}</span>
-            <button class="master-item-del" (click)="removeStatus(s.name)" title="Remove">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-        }
-      </div>
     </div>
+  </div>
   }
 
   <!-- ══ LEAD STATUSES ════════════════════════════════════ -->
   @if (activeTab() === 'lead-statuses') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <h2 class="master-card-title">Lead Status</h2>
-        <p class="master-card-sub">Status options used in the leads pipeline (e.g. new, contacted, won)</p>
-      </div>
+  <div class="master-card">
+    <div class="master-card-header">
+      <h2 class="master-card-title">Lead Status</h2>
+      <p class="master-card-sub">Status options used in the leads pipeline (e.g. new, contacted, won)</p>
+    </div>
 
-      <div class="master-add-row">
-        <input class="master-input" type="text" placeholder="e.g. Follow Up"
-               [ngModel]="newLeadStatus()" (ngModelChange)="newLeadStatus.set($event)"
-               (keyup.enter)="addLeadStatus()">
-        <div class="master-color-wrap">
-          <label class="master-color-lbl">Color</label>
-          <input type="color" class="master-color-input"
-                 [ngModel]="newLeadStatusColor()" (ngModelChange)="newLeadStatusColor.set($event)">
-        </div>
-        <button class="master-btn master-btn--primary" (click)="addLeadStatus()" [disabled]="saving()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Status
+    <div class="master-add-row">
+      <input class="master-input" type="text" placeholder="e.g. Follow Up" [ngModel]="newLeadStatus()"
+        (ngModelChange)="newLeadStatus.set($event)" (keyup.enter)="addLeadStatus()">
+      <div class="master-color-wrap">
+        <label class="master-color-lbl">Color</label>
+        <input type="color" class="master-color-input" [ngModel]="newLeadStatusColor()"
+          (ngModelChange)="newLeadStatusColor.set($event)">
+      </div>
+      <button class="master-btn master-btn--primary" (click)="addLeadStatus()" [disabled]="saving()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Status
+      </button>
+    </div>
+    @if (leadStatusError()) {
+    <p class="master-error">{{ leadStatusError() }}</p>
+    }
+
+    <div class="master-list">
+      @for (s of leadStatuses(); track s.name) {
+      <div class="master-item">
+        <span class="master-status-dot" [style.background]="s.color"></span>
+        <span class="master-item-name">{{ s.name }}</span>
+        <span class="master-status-badge" [style.background]="s.color + '22'" [style.color]="s.color">{{ s.name
+          }}</span>
+        <button class="master-item-del" (click)="removeLeadStatus(s.name)" title="Remove">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
-      @if (leadStatusError()) {
-        <p class="master-error">{{ leadStatusError() }}</p>
       }
-
-      <div class="master-list">
-        @for (s of leadStatuses(); track s.name) {
-          <div class="master-item">
-            <span class="master-status-dot" [style.background]="s.color"></span>
-            <span class="master-item-name">{{ s.name }}</span>
-            <span class="master-status-badge" [style.background]="s.color + '22'" [style.color]="s.color">{{ s.name }}</span>
-            <button class="master-item-del" (click)="removeLeadStatus(s.name)" title="Remove">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-        }
-      </div>
     </div>
+  </div>
   }
 
   <!-- ══ TRENDING TABS ═══════════════════════════════════ -->
   @if (activeTab() === 'trending-tabs') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <h2 class="master-card-title">Trending Project Tabs</h2>
-        <p class="master-card-sub">These tabs appear on the home page "Most Trending Projects" section. Add any category — Villas, Apartments, Flats, Luxury, etc.</p>
-      </div>
+  <div class="master-card">
+    <div class="master-card-header">
+      <h2 class="master-card-title">Trending Project Tabs</h2>
+      <p class="master-card-sub">These tabs appear on the home page "Most Trending Projects" section. Add any category —
+        Villas, Apartments, Flats, Luxury, etc.</p>
+    </div>
 
-      <div class="master-add-row">
-        <input class="master-input" type="text" placeholder="e.g. Apartments"
-               [ngModel]="newTrendingTab()" (ngModelChange)="newTrendingTab.set($event)"
-               (keyup.enter)="addTrendingTab()">
-        <button class="master-btn master-btn--primary" (click)="addTrendingTab()" [disabled]="saving()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Tab
+    <div class="master-add-row">
+      <input class="master-input" type="text" placeholder="e.g. Apartments" [ngModel]="newTrendingTab()"
+        (ngModelChange)="newTrendingTab.set($event)" (keyup.enter)="addTrendingTab()">
+      <button class="master-btn master-btn--primary" (click)="addTrendingTab()" [disabled]="saving()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Tab
+      </button>
+    </div>
+    @if (trendingTabError()) {
+    <p class="master-error">{{ trendingTabError() }}</p>
+    }
+
+    <div class="master-list">
+      @for (tab of trendingTabs(); track tab) {
+      <div class="master-item">
+        <span class="master-item-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+          </svg>
+        </span>
+        <span class="master-item-name">{{ tab }}</span>
+        <span class="master-item-badge">Home Page Tab</span>
+        <button class="master-item-del" (click)="removeTrendingTab(tab)" title="Remove">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
-      @if (trendingTabError()) {
-        <p class="master-error">{{ trendingTabError() }}</p>
       }
-
-      <div class="master-list">
-        @for (tab of trendingTabs(); track tab) {
-          <div class="master-item">
-            <span class="master-item-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
-            </span>
-            <span class="master-item-name">{{ tab }}</span>
-            <span class="master-item-badge">Home Page Tab</span>
-            <button class="master-item-del" (click)="removeTrendingTab(tab)" title="Remove">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-        }
-        @if (trendingTabs().length === 0) {
-          <p class="master-empty">No trending tabs yet. Add one above.</p>
-        }
-      </div>
+      @if (trendingTabs().length === 0) {
+      <p class="master-empty">No trending tabs yet. Add one above.</p>
+      }
     </div>
+  </div>
   }
 
   <!-- ══ LOCATIONS ══════════════════════════════════════ -->
   @if (activeTab() === 'locations') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <div class="master-card-header-row">
-          <div>
-            <h2 class="master-card-title">Dubai Locations</h2>
-            <p class="master-card-sub">These locations appear in the dropdown when adding/editing properties and projects.</p>
-          </div>
-          <div class="master-loc-actions">
-            <button class="master-btn master-btn--ghost" (click)="downloadSampleLocationsExcel()" title="Download sample">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-              Sample
-            </button>
-            <label class="master-btn master-btn--ghost" [class.master-btn--loading]="importingLoc()" title="Import from Excel">
-              <input type="file" accept=".xlsx,.xls,.csv" (change)="importLocationsExcel($event)" style="display:none" [disabled]="importingLoc()">
-              @if (importingLoc()) { Importing… } @else {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
-                Import Excel
-              }
-            </label>
-            <button class="master-btn master-btn--ghost" (click)="exportLocationsExcel()" [disabled]="locations().length === 0" title="Export to Excel">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-              Export Excel
-            </button>
-          </div>
+  <div class="master-card">
+    <div class="master-card-header">
+      <div class="master-card-header-row">
+        <div>
+          <h2 class="master-card-title">Dubai Locations</h2>
+          <p class="master-card-sub">These locations appear in the dropdown when adding/editing properties and projects.
+          </p>
+        </div>
+        <div class="master-loc-actions">
+          <button class="master-btn master-btn--ghost" (click)="downloadSampleLocationsExcel()" title="Download sample">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+            </svg>
+            Sample
+          </button>
+          <label class="master-btn master-btn--ghost" [class.master-btn--loading]="importingLoc()"
+            title="Import from Excel">
+            <input type="file" accept=".xlsx,.xls,.csv" (change)="importLocationsExcel($event)" style="display:none"
+              [disabled]="importingLoc()">
+            @if (importingLoc()) { Importing… } @else {
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+            </svg>
+            Import Excel
+            }
+          </label>
+          <button class="master-btn master-btn--ghost" (click)="exportLocationsExcel()"
+            [disabled]="locations().length === 0" title="Export to Excel">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Export Excel
+          </button>
         </div>
       </div>
+    </div>
 
-      @if (locationError()) {
-        <p class="master-error">{{ locationError() }}</p>
-      }
+    @if (locationError()) {
+    <p class="master-error">{{ locationError() }}</p>
+    }
 
-      <div class="master-add-row">
-        <input class="master-input" type="text" placeholder="e.g. Jumeirah Lake Towers"
-               [ngModel]="newLocation()" (ngModelChange)="newLocation.set($event)"
-               (keyup.enter)="addLocation()">
-        <button class="master-btn master-btn--primary" (click)="addLocation()" [disabled]="saving()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Location
+    <div class="master-add-row">
+      <input class="master-input" type="text" placeholder="e.g. Jumeirah Lake Towers" [ngModel]="newLocation()"
+        (ngModelChange)="newLocation.set($event)" (keyup.enter)="addLocation()">
+      <button class="master-btn master-btn--primary" (click)="addLocation()" [disabled]="saving()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Location
+      </button>
+    </div>
+
+    <input class="master-input master-loc-search" type="text" placeholder="Search locations…"
+      [ngModel]="locationSearch()" (ngModelChange)="locationSearch.set($event)">
+
+    <div class="master-list master-list--grid">
+      @for (loc of filteredLocations(); track loc) {
+      <div class="master-item">
+        <svg class="master-item-pin" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+        </svg>
+        <span class="master-item-name">{{ loc }}</span>
+        <button class="master-item-del" (click)="removeLocation(loc)" title="Remove">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
-
-      <input class="master-input master-loc-search" type="text" placeholder="Search locations…"
-             [ngModel]="locationSearch()" (ngModelChange)="locationSearch.set($event)">
-
-      <div class="master-list master-list--grid">
-        @for (loc of filteredLocations(); track loc) {
-          <div class="master-item">
-            <svg class="master-item-pin" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
-            <span class="master-item-name">{{ loc }}</span>
-            <button class="master-item-del" (click)="removeLocation(loc)" title="Remove">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-        }
-        @if (filteredLocations().length === 0) {
-          <p class="master-empty">No locations found.</p>
-        }
-      </div>
+      }
+      @if (filteredLocations().length === 0) {
+      <p class="master-empty">No locations found.</p>
+      }
     </div>
+  </div>
   }
 
   <!-- ══ AMENITIES ════════════════════════════════════════ -->
   @if (activeTab() === 'amenities') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <h2 class="master-card-title">Amenities</h2>
-        <p class="master-card-sub">Amenities appear with their icons on property and project listings. Pick an icon from the list.</p>
-      </div>
+  <div class="master-card">
+    <div class="master-card-header">
+      <h2 class="master-card-title">Amenities</h2>
+      <p class="master-card-sub">Amenities appear on property and project listings.</p>
+    </div>
 
-      <div class="master-add-row master-amenity-add-row">
-        <input class="master-input" type="text" placeholder="e.g. Rooftop Terrace"
-               [ngModel]="newAmenityName()" (ngModelChange)="newAmenityName.set($event)"
-               (keyup.enter)="addAmenity()">
-        <div class="master-amenity-icon-picker">
-          <label class="master-color-lbl">Icon</label>
-          <div class="master-icon-trigger" (click)="showIconPicker.set(!showIconPicker())">
-            @if (newAmenityIcon()) {
-              <span class="master-amenity-icon" [innerHTML]="safeSvg(getAmenityIconSvg(newAmenityIcon()))"></span>
-              <span class="master-icon-trigger__label">{{ getAmenityIconLabel(newAmenityIcon()) }}</span>
-            } @else {
-              <span class="master-icon-trigger__placeholder">Select Icon</span>
-            }
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-          @if (showIconPicker()) {
-            <div class="master-icon-grid">
-              @for (opt of amenityIconOptions; track opt.key) {
-                <button type="button" class="master-icon-cell"
-                  [class.master-icon-cell--active]="newAmenityIcon() === opt.key"
-                  [title]="opt.label"
-                  (click)="newAmenityIcon.set(opt.key); showIconPicker.set(false)">
-                  <span [innerHTML]="safeSvg(opt.svg)"></span>
-                </button>
-              }
-            </div>
-          }
-        </div>
-        <button class="master-btn master-btn--primary" (click)="addAmenity()" [disabled]="saving()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Amenity
+    <div class="master-add-row">
+      <input class="master-input" type="text" placeholder="e.g. Rooftop Terrace" [ngModel]="newAmenityName()"
+        (ngModelChange)="newAmenityName.set($event)" (keyup.enter)="addAmenity()">
+      <button class="master-btn master-btn--primary" (click)="addAmenity()" [disabled]="saving()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Amenity
+      </button>
+    </div>
+    @if (amenityError()) {
+    <p class="master-error">{{ amenityError() }}</p>
+    }
+
+    <div class="master-list master-list--grid">
+      @for (a of amenities(); track a.name) {
+      <div class="master-item">
+        <span class="master-item-name">{{ a.name }}</span>
+        <button class="master-item-del" (click)="removeAmenity(a.name)" title="Remove">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
-      @if (amenityError()) {
-        <p class="master-error">{{ amenityError() }}</p>
       }
-
-      <div class="master-list master-list--grid">
-        @for (a of amenities(); track a.name) {
-          <div class="master-item">
-            <span class="master-amenity-icon" [innerHTML]="safeSvg(getAmenityIconSvg(a.icon))"></span>
-            <span class="master-item-name">{{ a.name }}</span>
-            <button class="master-item-del" (click)="removeAmenity(a.name)" title="Remove">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-        }
-        @if (amenities().length === 0) {
-          <p class="master-empty">No amenities yet. Add one above.</p>
-        }
-      </div>
+      @if (amenities().length === 0) {
+      <p class="master-empty">No amenities yet. Add one above.</p>
+      }
     </div>
+  </div>
   }
 
   <!-- ══ PARTNER LOGOS ═══════════════════════════════════ -->
   @if (activeTab() === 'partner-logos') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <h2 class="master-card-title">Partner Logos</h2>
-        <p class="master-card-sub">Logos shown in the "Trusted Partner" strip on the home page. Drag &amp; drop or click to upload — one image at a time.</p>
-      </div>
-
-      <!-- Upload zone -->
-      <input #plInput type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" style="display:none" (change)="onPartnerLogoFile($event)" />
-      <div class="master-pl-dropzone"
-           [class.over]="plDragOver()"
-           (click)="plInput.click()"
-           (dragover)="$event.preventDefault(); plDragOver.set(true)"
-           (dragleave)="plDragOver.set(false)"
-           (drop)="onPartnerLogoDrop($event)">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span>{{ plUploading() ? 'Uploading…' : 'Click or drag an image to upload' }}</span>
-        <span class="master-pl-hint">PNG, SVG, JPG, WebP · 1 image at a time · max 5 MB</span>
-      </div>
-
-      <!-- Preset logos from /images folder -->
-      <div class="master-pl-preset-head">
-        <span>Or pick from existing images:</span>
-      </div>
-      <div class="master-pl-presets">
-        @for (p of presetLogos; track p.name) {
-          <button class="master-pl-preset" (click)="addPresetLogo(p)" [title]="'Add ' + p.name">
-            <img [src]="p.url" [alt]="p.name">
-            <span>{{ p.name }}</span>
-          </button>
-        }
-      </div>
-
-      @if (partnerLogoError()) {
-        <p class="master-error">{{ partnerLogoError() }}</p>
-      }
-
-      <!-- Current logos grid -->
-      <div class="master-pl-grid" *ngIf="partnerLogos().length > 0">
-        @for (logo of partnerLogos(); track logo.url; let i = $index) {
-          <div class="master-pl-card">
-            <div class="master-pl-card__img">
-              <img [src]="logo.url" [alt]="logo.name">
-            </div>
-            <input class="master-pl-name" type="text" [value]="logo.name"
-              (input)="updatePartnerLogoName(i, $any($event.target).value)" placeholder="Logo name" />
-            <input class="master-pl-name master-pl-link" type="url" [value]="logo.link || ''"
-              (input)="updatePartnerLogoLink(i, $any($event.target).value)" placeholder="https://developer.com (optional)" />
-            <div class="master-pl-card__actions">
-              <button class="master-pl-move" (click)="movePartnerLogo(i, -1)" [disabled]="i === 0" title="Move left">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
-              <button class="master-pl-move" (click)="movePartnerLogo(i, 1)" [disabled]="i === partnerLogos().length - 1" title="Move right">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-              </button>
-              <button class="master-pl-del" (click)="removePartnerLogo(i)" title="Remove">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-              </button>
-            </div>
-          </div>
-        }
-      </div>
-      @if (partnerLogos().length === 0) {
-        <p class="master-empty" style="margin-top:1rem">No partner logos yet. Upload one or pick from the presets above.</p>
-      }
-
-      <!-- Save -->
-      <div class="master-pl-footer" *ngIf="partnerLogos().length > 0">
-        <button class="master-btn master-btn--primary" (click)="savePartnerLogos()" [disabled]="plSaving()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          {{ plSaving() ? 'Saving…' : 'Save Changes' }}
-        </button>
-      </div>
-
+  <div class="master-card">
+    <div class="master-card-header">
+      <h2 class="master-card-title">Partner Logos</h2>
+      <p class="master-card-sub">Logos shown in the "Trusted Partner" strip on the home page. Drag &amp; drop or click
+        to upload — one image at a time.</p>
     </div>
+
+    <!-- Upload zone -->
+    <input #plInput type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" style="display:none"
+      (change)="onPartnerLogoFile($event)" />
+    <div class="master-pl-dropzone" [class.over]="plDragOver()" (click)="plInput.click()"
+      (dragover)="$event.preventDefault(); plDragOver.set(true)" (dragleave)="plDragOver.set(false)"
+      (drop)="onPartnerLogoDrop($event)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" y1="3" x2="12" y2="15" />
+      </svg>
+      <span>{{ plUploading() ? 'Uploading…' : 'Click or drag an image to upload' }}</span>
+      <span class="master-pl-hint">PNG, SVG, JPG, WebP · 1 image at a time · max 5 MB</span>
+    </div>
+
+    <!-- Preset logos from /images folder -->
+    <div class="master-pl-preset-head">
+      <span>Or pick from existing images:</span>
+    </div>
+    <div class="master-pl-presets">
+      @for (p of presetLogos; track p.name) {
+      <button class="master-pl-preset" (click)="addPresetLogo(p)" [title]="'Add ' + p.name">
+        <img [src]="p.url" [alt]="p.name">
+        <span>{{ p.name }}</span>
+      </button>
+      }
+    </div>
+
+    @if (partnerLogoError()) {
+    <p class="master-error">{{ partnerLogoError() }}</p>
+    }
+
+    <!-- Current logos grid -->
+    <div class="master-pl-grid" *ngIf="partnerLogos().length > 0">
+      @for (logo of partnerLogos(); track logo.url; let i = $index) {
+      <div class="master-pl-card">
+        <div class="master-pl-card__img">
+          <img [src]="logo.url" [alt]="logo.name">
+        </div>
+        <input class="master-pl-name" type="text" [value]="logo.name"
+          (input)="updatePartnerLogoName(i, $any($event.target).value)" placeholder="Logo name" />
+        <input class="master-pl-name master-pl-link" type="url" [value]="logo.link || ''"
+          (input)="updatePartnerLogoLink(i, $any($event.target).value)"
+          placeholder="https://developer.com (optional)" />
+        <div class="master-pl-card__actions">
+          <button class="master-pl-move" (click)="movePartnerLogo(i, -1)" [disabled]="i === 0" title="Move left">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button class="master-pl-move" (click)="movePartnerLogo(i, 1)" [disabled]="i === partnerLogos().length - 1"
+            title="Move right">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+          <button class="master-pl-del" (click)="removePartnerLogo(i)" title="Remove">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+    @if (partnerLogos().length === 0) {
+    <p class="master-empty" style="margin-top:1rem">No partner logos yet. Upload one or pick from the presets above.</p>
+    }
+
+    <!-- Save -->
+    <div class="master-pl-footer" *ngIf="partnerLogos().length > 0">
+      <button class="master-btn master-btn--primary" (click)="savePartnerLogos()" [disabled]="plSaving()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+          <polyline points="17 21 17 13 7 13 7 21" />
+          <polyline points="7 3 7 8 15 8" />
+        </svg>
+        {{ plSaving() ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+
+  </div>
   }
 
   <!-- ══ SETTINGS ══════════════════════════════════════════ -->
   @if (activeTab() === 'settings') {
-    <div class="master-card">
-      <div class="master-card-header">
-        <h2 class="master-card-title">Site Settings</h2>
-        <p class="master-card-sub">Manage WhatsApp contact, social media links, and email (SMTP) configuration</p>
-      </div>
-
-      <!-- Settings Sub-tabs -->
-      <div class="stt-tabs">
-        <button class="stt-tab" [class.active]="settingsSubTab()==='whatsapp'" (click)="settingsSubTab.set('whatsapp')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-          WhatsApp
-        </button>
-        <button class="stt-tab" [class.active]="settingsSubTab()==='social'" (click)="settingsSubTab.set('social')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          Social Media
-        </button>
-        <button class="stt-tab" [class.active]="settingsSubTab()==='smtp'" (click)="settingsSubTab.set('smtp')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          SMTP Setup
-          @if (settingsSubTab() === 'smtp') {
-            <span class="stt-guide-icon" (click)="$event.stopPropagation(); smtpGuideOpen.set(true)" title="Setup Guide">i</span>
-          }
-        </button>
-      </div>
-
-      <!-- ── WhatsApp ── -->
-      @if (settingsSubTab() === 'whatsapp') {
-        <div class="stt-panel">
-          <div class="stt-field-group">
-            <label class="stt-label">WhatsApp Number</label>
-            <p class="stt-hint">Include country code. Visitors will be redirected to this number when clicking "WhatsApp" buttons on the website.</p>
-            <div class="stt-input-row">
-              <span class="stt-prefix stt-prefix--wa">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-              </span>
-              <input class="stt-input stt-input--prefixed" type="tel" placeholder="+971 50 123 4567"
-                     [ngModel]="whatsappNumber()" (ngModelChange)="whatsappNumber.set($event)">
-            </div>
-          </div>
-          <div class="stt-footer">
-            <button class="master-btn master-btn--primary" (click)="saveWhatsapp()" [disabled]="whatsappSaving()">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              {{ whatsappSaving() ? 'Saving…' : whatsappSaved() ? '✓ Saved' : 'Save' }}
-            </button>
-          </div>
-        </div>
-      }
-
-      <!-- ── Social Media ── -->
-      @if (settingsSubTab() === 'social') {
-        <div class="stt-panel">
-          <div class="stt-grid">
-            <div class="stt-field-group">
-              <label class="stt-label">Facebook</label>
-              <div class="stt-input-row">
-                <span class="stt-prefix stt-prefix--fb">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                </span>
-                <input class="stt-input stt-input--prefixed" type="url" placeholder="https://facebook.com/yourpage"
-                       [ngModel]="socialLinks().facebook" (ngModelChange)="updateSocial('facebook', $event)">
-              </div>
-            </div>
-            <div class="stt-field-group">
-              <label class="stt-label">Instagram</label>
-              <div class="stt-input-row">
-                <span class="stt-prefix stt-prefix--ig">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-                </span>
-                <input class="stt-input stt-input--prefixed" type="url" placeholder="https://instagram.com/yourhandle"
-                       [ngModel]="socialLinks().instagram" (ngModelChange)="updateSocial('instagram', $event)">
-              </div>
-            </div>
-            <div class="stt-field-group">
-              <label class="stt-label">Twitter / X</label>
-              <div class="stt-input-row">
-                <span class="stt-prefix">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                </span>
-                <input class="stt-input stt-input--prefixed" type="url" placeholder="https://x.com/yourhandle"
-                       [ngModel]="socialLinks().twitter" (ngModelChange)="updateSocial('twitter', $event)">
-              </div>
-            </div>
-            <div class="stt-field-group">
-              <label class="stt-label">LinkedIn</label>
-              <div class="stt-input-row">
-                <span class="stt-prefix stt-prefix--li">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                </span>
-                <input class="stt-input stt-input--prefixed" type="url" placeholder="https://linkedin.com/company/yourco"
-                       [ngModel]="socialLinks().linkedin" (ngModelChange)="updateSocial('linkedin', $event)">
-              </div>
-            </div>
-            <div class="stt-field-group">
-              <label class="stt-label">YouTube</label>
-              <div class="stt-input-row">
-                <span class="stt-prefix stt-prefix--yt">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                </span>
-                <input class="stt-input stt-input--prefixed" type="url" placeholder="https://youtube.com/@yourchannel"
-                       [ngModel]="socialLinks().youtube" (ngModelChange)="updateSocial('youtube', $event)">
-              </div>
-            </div>
-          </div>
-          <div class="stt-footer">
-            <button class="master-btn master-btn--primary" (click)="saveSocial()" [disabled]="socialSaving()">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              {{ socialSaving() ? 'Saving…' : socialSaved() ? '✓ Saved' : 'Save Links' }}
-            </button>
-          </div>
-        </div>
-      }
-
-      <!-- ── SMTP ── -->
-      @if (settingsSubTab() === 'smtp') {
-        <div class="stt-panel">
-
-          <!-- Guide popup modal -->
-          @if (smtpGuideOpen()) {
-            <div class="stt-guide-overlay" (click)="smtpGuideOpen.set(false)">
-              <div class="stt-guide-modal" (click)="$event.stopPropagation()">
-                <div class="stt-guide-modal-header">
-                  <span>SMTP Setup Guide</span>
-                  <button class="stt-guide-close" (click)="smtpGuideOpen.set(false)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
-                </div>
-                <div class="stt-guide-modal-body">
-                  <div class="stt-guide-step">
-                    <span class="stt-guide-badge">Gmail</span>
-                    <p>Enable 2-Step Verification → Google Account → Security → App Passwords → generate a 16-char password.</p>
-                    <p><strong>Username and From Email must be the same Gmail address</strong> — Gmail does not allow sending from a different address.</p>
-                  </div>
-                  <div class="stt-guide-step">
-                    <span class="stt-guide-badge stt-guide-badge--domain">Domain / cPanel</span>
-                    <p>Use credentials from your hosting provider (e.g. <em>mail.yourdomain.com</em>, port 587).</p>
-                    <p>From Email can be any address on your domain (e.g. <em>contact&#64;livwelldubai.com</em>).</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-
-          <div class="stt-smtp-layout">
-            <div class="stt-smtp-col">
-              <div class="stt-section-head">
-                <span class="stt-section-dot"></span>
-                SMTP SERVER
-              </div>
-              <div class="stt-field-group">
-                <label class="stt-label">
-                  SMTP Host
-                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="Gmail: smtp.gmail.com | cPanel: mail.yourdomain.com | Brevo: smtp-relay.brevo.com">i</span>
-                </label>
-                <input class="stt-input" type="text" placeholder="smtp.example.com"
-                       [ngModel]="smtp().host" (ngModelChange)="updateSmtp('host', $event)">
-              </div>
-              <div class="stt-field-group">
-                <label class="stt-label">
-                  Port
-                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="587 for TLS (recommended) | 465 for SSL | 25 for plain (not recommended)">i</span>
-                </label>
-                <input class="stt-input" type="number" placeholder="587"
-                       [ngModel]="smtp().port" (ngModelChange)="updateSmtp('port', $event)">
-              </div>
-              <div class="stt-field-group">
-                <label class="stt-label">
-                  Username
-                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="Your SMTP login email. For Gmail this must match the From Email exactly.">i</span>
-                </label>
-                <input class="stt-input" type="text" placeholder="no-reply@yourdomain.com"
-                       [ngModel]="smtp().username" (ngModelChange)="updateSmtp('username', $event)">
-              </div>
-              <div class="stt-field-group">
-                <label class="stt-label">
-                  Password
-                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="Gmail: use App Password (16 chars) from Google Account → Security → App Passwords. Do NOT use your regular Gmail password.">i</span>
-                </label>
-                <div class="stt-input-row">
-                  <input class="stt-input stt-input--pass" [type]="smtpShowPass() ? 'text' : 'password'" placeholder="••••••••••••"
-                         [ngModel]="smtp().password" (ngModelChange)="updateSmtp('password', $event)">
-                  <button type="button" class="stt-eye" (click)="smtpShowPass.set(!smtpShowPass())">
-                    @if (smtpShowPass()) {
-                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    } @else {
-                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    }
-                  </button>
-                </div>
-              </div>
-              <div class="stt-field-group">
-                <label class="stt-label">Encryption</label>
-                <select class="stt-input stt-select"
-                        [ngModel]="smtp().encryption" (ngModelChange)="updateSmtp('encryption', $event)">
-                  <option>TLS</option><option>SSL</option><option>None</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="stt-smtp-col">
-              <div class="stt-section-head">
-                <span class="stt-section-dot"></span>
-                SENDER IDENTITY
-              </div>
-              <div class="stt-field-group">
-                <label class="stt-label">From Name</label>
-                <input class="stt-input" type="text" placeholder="Livwell Real Estate"
-                       [ngModel]="smtp().from_name" (ngModelChange)="updateSmtp('from_name', $event)">
-              </div>
-              <div class="stt-field-group">
-                <label class="stt-label">
-                  From Email
-                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="The email address recipients will see as the sender. For Gmail, this must match the Username. For domain SMTP, this can be any email on your domain.">i</span>
-                </label>
-                <input class="stt-input" type="email" placeholder="no-reply@yourdomain.com"
-                       [ngModel]="smtp().from_email" (ngModelChange)="updateSmtp('from_email', $event)">
-              </div>
-              <div class="stt-field-group">
-                <label class="stt-label">
-                  Reply-To
-                  <span class="stt-tooltip" style="font-style:italic;font-family:serif;" title="When a recipient clicks Reply, their email will be addressed here. Can be different from From Email.">i</span>
-                </label>
-                <input class="stt-input" type="email" placeholder="support@yourdomain.com"
-                       [ngModel]="smtp().reply_to" (ngModelChange)="updateSmtp('reply_to', $event)">
-              </div>
-              <div class="stt-test-row">
-                <button class="stt-test-btn" (click)="sendTestEmail()" [disabled]="smtpTesting() || !smtp().host">
-                  @if (smtpTesting()) {
-                    <svg class="stt-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                    Sending…
-                  } @else {
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
-                    Send Test Email
-                  }
-                </button>
-                @if (smtpTestMsg()) {
-                  <span class="stt-test-msg" [class.ok]="smtpTestOk() === true" [class.err]="smtpTestOk() === false">
-                    {{ smtpTestMsg() }}
-                  </span>
-                }
-              </div>
-            </div>
-          </div>
-          <div class="stt-footer">
-            <p class="stt-footer-note">Changes apply across all outgoing emails (enquiries, lead notifications).</p>
-            <button class="master-btn master-btn--primary" (click)="saveSmtp()" [disabled]="smtpSaving()">
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              {{ smtpSaving() ? 'Saving…' : smtpSaved() ? '✓ Saved' : 'Save Settings' }}
-            </button>
-          </div>
-        </div>
-      }
+  <div class="master-card">
+    <div class="master-card-header">
+      <h2 class="master-card-title">Site Settings</h2>
+      <p class="master-card-sub">Manage WhatsApp contact, social media links, and email (SMTP) configuration</p>
     </div>
+
+    <!-- Settings Sub-tabs -->
+    <div class="stt-tabs">
+      <button class="stt-tab" [class.active]="settingsSubTab()==='whatsapp'" (click)="settingsSubTab.set('whatsapp')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
+        </svg>
+        WhatsApp
+      </button>
+      <button class="stt-tab" [class.active]="settingsSubTab()==='social'" (click)="settingsSubTab.set('social')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+        </svg>
+        Social Media
+      </button>
+      <button class="stt-tab" [class.active]="settingsSubTab()==='smtp'" (click)="settingsSubTab.set('smtp')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+        SMTP Setup
+        @if (settingsSubTab() === 'smtp') {
+        <span class="stt-guide-icon" (click)="$event.stopPropagation(); smtpGuideOpen.set(true)"
+          title="Setup Guide">i</span>
+        }
+      </button>
+    </div>
+
+    <!-- ── WhatsApp ── -->
+    @if (settingsSubTab() === 'whatsapp') {
+    <div class="stt-panel">
+      <div class="stt-field-group">
+        <label class="stt-label">WhatsApp Number</label>
+        <p class="stt-hint">Include country code. Visitors will be redirected to this number when clicking "WhatsApp"
+          buttons on the website.</p>
+        <div class="stt-input-row">
+          <span class="stt-prefix stt-prefix--wa">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
+            </svg>
+          </span>
+          <input class="stt-input stt-input--prefixed" type="tel" placeholder="+971 50 123 4567"
+            [ngModel]="whatsappNumber()" (ngModelChange)="whatsappNumber.set($event)">
+        </div>
+      </div>
+      <div class="stt-footer">
+        <button class="master-btn master-btn--primary" (click)="saveWhatsapp()" [disabled]="whatsappSaving()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          {{ whatsappSaving() ? 'Saving…' : whatsappSaved() ? '✓ Saved' : 'Save' }}
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- ── Social Media ── -->
+    @if (settingsSubTab() === 'social') {
+    <div class="stt-panel">
+      <div class="stt-grid">
+        <div class="stt-field-group">
+          <label class="stt-label">Facebook</label>
+          <div class="stt-input-row">
+            <span class="stt-prefix stt-prefix--fb">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+            </span>
+            <input class="stt-input stt-input--prefixed" type="url" placeholder="https://facebook.com/yourpage"
+              [ngModel]="socialLinks().facebook" (ngModelChange)="updateSocial('facebook', $event)">
+          </div>
+        </div>
+        <div class="stt-field-group">
+          <label class="stt-label">Instagram</label>
+          <div class="stt-input-row">
+            <span class="stt-prefix stt-prefix--ig">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
+              </svg>
+            </span>
+            <input class="stt-input stt-input--prefixed" type="url" placeholder="https://instagram.com/yourhandle"
+              [ngModel]="socialLinks().instagram" (ngModelChange)="updateSocial('instagram', $event)">
+          </div>
+        </div>
+        <div class="stt-field-group">
+          <label class="stt-label">Twitter / X</label>
+          <div class="stt-input-row">
+            <span class="stt-prefix">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </span>
+            <input class="stt-input stt-input--prefixed" type="url" placeholder="https://x.com/yourhandle"
+              [ngModel]="socialLinks().twitter" (ngModelChange)="updateSocial('twitter', $event)">
+          </div>
+        </div>
+        <div class="stt-field-group">
+          <label class="stt-label">LinkedIn</label>
+          <div class="stt-input-row">
+            <span class="stt-prefix stt-prefix--li">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+            </span>
+            <input class="stt-input stt-input--prefixed" type="url" placeholder="https://linkedin.com/company/yourco"
+              [ngModel]="socialLinks().linkedin" (ngModelChange)="updateSocial('linkedin', $event)">
+          </div>
+        </div>
+        <div class="stt-field-group">
+          <label class="stt-label">YouTube</label>
+          <div class="stt-input-row">
+            <span class="stt-prefix stt-prefix--yt">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+            </span>
+            <input class="stt-input stt-input--prefixed" type="url" placeholder="https://youtube.com/@yourchannel"
+              [ngModel]="socialLinks().youtube" (ngModelChange)="updateSocial('youtube', $event)">
+          </div>
+        </div>
+      </div>
+      <div class="stt-footer">
+        <button class="master-btn master-btn--primary" (click)="saveSocial()" [disabled]="socialSaving()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          {{ socialSaving() ? 'Saving…' : socialSaved() ? '✓ Saved' : 'Save Links' }}
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- ── SMTP ── -->
+    @if (settingsSubTab() === 'smtp') {
+    <div class="stt-panel">
+
+      <!-- Guide popup modal -->
+      @if (smtpGuideOpen()) {
+      <div class="stt-guide-overlay" (click)="smtpGuideOpen.set(false)">
+        <div class="stt-guide-modal" (click)="$event.stopPropagation()">
+          <div class="stt-guide-modal-header">
+            <span>SMTP Setup Guide</span>
+            <button class="stt-guide-close" (click)="smtpGuideOpen.set(false)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <div class="stt-guide-modal-body">
+            <div class="stt-guide-step">
+              <span class="stt-guide-badge">Gmail</span>
+              <p>Enable 2-Step Verification → Google Account → Security → App Passwords → generate a 16-char password.
+              </p>
+              <p><strong>Username and From Email must be the same Gmail address</strong> — Gmail does not allow sending
+                from a different address.</p>
+            </div>
+            <div class="stt-guide-step">
+              <span class="stt-guide-badge stt-guide-badge--domain">Domain / cPanel</span>
+              <p>Use credentials from your hosting provider (e.g. <em>mail.yourdomain.com</em>, port 587).</p>
+              <p>From Email can be any address on your domain (e.g. <em>contact&#64;livwelldubai.com</em>).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+
+      <div class="stt-smtp-layout">
+        <div class="stt-smtp-col">
+          <div class="stt-section-head">
+            <span class="stt-section-dot"></span>
+            SMTP SERVER
+          </div>
+          <div class="stt-field-group">
+            <label class="stt-label">
+              SMTP Host
+              <span class="stt-tooltip" style="font-style:italic;font-family:serif;"
+                title="Gmail: smtp.gmail.com | cPanel: mail.yourdomain.com | Brevo: smtp-relay.brevo.com">i</span>
+            </label>
+            <input class="stt-input" type="text" placeholder="smtp.example.com" [ngModel]="smtp().host"
+              (ngModelChange)="updateSmtp('host', $event)">
+          </div>
+          <div class="stt-field-group">
+            <label class="stt-label">
+              Port
+              <span class="stt-tooltip" style="font-style:italic;font-family:serif;"
+                title="587 for TLS (recommended) | 465 for SSL | 25 for plain (not recommended)">i</span>
+            </label>
+            <input class="stt-input" type="number" placeholder="587" [ngModel]="smtp().port"
+              (ngModelChange)="updateSmtp('port', $event)">
+          </div>
+          <div class="stt-field-group">
+            <label class="stt-label">
+              Username
+              <span class="stt-tooltip" style="font-style:italic;font-family:serif;"
+                title="Your SMTP login email. For Gmail this must match the From Email exactly.">i</span>
+            </label>
+            <input class="stt-input" type="text" placeholder="no-reply@yourdomain.com" [ngModel]="smtp().username"
+              (ngModelChange)="updateSmtp('username', $event)">
+          </div>
+          <div class="stt-field-group">
+            <label class="stt-label">
+              Password
+              <span class="stt-tooltip" style="font-style:italic;font-family:serif;"
+                title="Gmail: use App Password (16 chars) from Google Account → Security → App Passwords. Do NOT use your regular Gmail password.">i</span>
+            </label>
+            <div class="stt-input-row">
+              <input class="stt-input stt-input--pass" [type]="smtpShowPass() ? 'text' : 'password'"
+                placeholder="••••••••••••" [ngModel]="smtp().password" (ngModelChange)="updateSmtp('password', $event)">
+              <button type="button" class="stt-eye" (click)="smtpShowPass.set(!smtpShowPass())">
+                @if (smtpShowPass()) {
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+                } @else {
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                }
+              </button>
+            </div>
+          </div>
+          <div class="stt-field-group">
+            <label class="stt-label">Encryption</label>
+            <select class="stt-input stt-select" [ngModel]="smtp().encryption"
+              (ngModelChange)="updateSmtp('encryption', $event)">
+              <option>TLS</option>
+              <option>SSL</option>
+              <option>None</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="stt-smtp-col">
+          <div class="stt-section-head">
+            <span class="stt-section-dot"></span>
+            SENDER IDENTITY
+          </div>
+          <div class="stt-field-group">
+            <label class="stt-label">From Name</label>
+            <input class="stt-input" type="text" placeholder="Livwell Real Estate" [ngModel]="smtp().from_name"
+              (ngModelChange)="updateSmtp('from_name', $event)">
+          </div>
+          <div class="stt-field-group">
+            <label class="stt-label">
+              From Email
+              <span class="stt-tooltip" style="font-style:italic;font-family:serif;"
+                title="The email address recipients will see as the sender. For Gmail, this must match the Username. For domain SMTP, this can be any email on your domain.">i</span>
+            </label>
+            <input class="stt-input" type="email" placeholder="no-reply@yourdomain.com" [ngModel]="smtp().from_email"
+              (ngModelChange)="updateSmtp('from_email', $event)">
+          </div>
+          <div class="stt-field-group">
+            <label class="stt-label">
+              Reply-To
+              <span class="stt-tooltip" style="font-style:italic;font-family:serif;"
+                title="When a recipient clicks Reply, their email will be addressed here. Can be different from From Email.">i</span>
+            </label>
+            <input class="stt-input" type="email" placeholder="support@yourdomain.com" [ngModel]="smtp().reply_to"
+              (ngModelChange)="updateSmtp('reply_to', $event)">
+          </div>
+          <div class="stt-test-row">
+            <button class="stt-test-btn" (click)="sendTestEmail()" [disabled]="smtpTesting() || !smtp().host">
+              @if (smtpTesting()) {
+              <svg class="stt-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              Sending…
+              } @else {
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m22 2-7 20-4-9-9-4 20-7z" />
+              </svg>
+              Send Test Email
+              }
+            </button>
+            @if (smtpTestMsg()) {
+            <span class="stt-test-msg" [class.ok]="smtpTestOk() === true" [class.err]="smtpTestOk() === false">
+              {{ smtpTestMsg() }}
+            </span>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="stt-footer">
+        <p class="stt-footer-note">Changes apply across all outgoing emails (enquiries, lead notifications).</p>
+        <button class="master-btn master-btn--primary" (click)="saveSmtp()" [disabled]="smtpSaving()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          {{ smtpSaving() ? 'Saving…' : smtpSaved() ? '✓ Saved' : 'Save Settings' }}
+        </button>
+      </div>
+    </div>
+    }
+  </div>
   }
 
 </div>

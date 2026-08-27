@@ -760,7 +760,7 @@
         <label>Status</label>
         <div class="select-wrapper">
           <select [value]="editFuStatus()" (change)="editFuStatus.set($any($event.target).value)">
-            <option *ngFor="let s of fuStatusOptions" [value]="s">{{ s | titlecase }}</option>
+            <option *ngFor="let s of fuStatusOptions()" [value]="s">{{ s | titlecase }}</option>
           </select>
           <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
         </div>

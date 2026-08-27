@@ -1035,6 +1035,51 @@ $purple: #7c3aed;
     object-fit: cover;
     display: block;
   }
+
+  &--cover {
+    border: 2px solid #1a5c3a;
+  }
+
+  &:hover .prop-img-set-cover {
+    opacity: 1;
+  }
+}
+
+.prop-img-cover-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: #1a5c3a;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.prop-img-set-cover {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+  text-align: center;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(26,92,58,0.85);
+  }
 }
 
 .prop-img-remove {

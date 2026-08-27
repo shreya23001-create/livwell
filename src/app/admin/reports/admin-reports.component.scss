@@ -53,6 +53,50 @@ $bg:      #f4f6fa;
   }
 }
 
+// ── Export button ──
+.rpt-export-btn {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1rem; border-radius: 0.45rem;
+  border: 1px solid $border; background: #fff;
+  font-size: 0.83rem; font-weight: 600; color: $text;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  &:hover { background: $bg; border-color: $accent; color: $accent; }
+}
+
+// ── Filters ──
+.rpt-filters {
+  display: flex; align-items: center; gap: 0.75rem;
+  flex-wrap: wrap; margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem; background: #fff;
+  border: 1px solid $border; border-radius: 0.6rem;
+}
+.rpt-filter-sel {
+  padding: 0.4rem 0.65rem; border: 1px solid $border;
+  border-radius: 0.4rem; font-size: 0.82rem; color: $text;
+  background: #fff; cursor: pointer;
+  &:focus { outline: none; border-color: $accent; }
+}
+.rpt-filter-dates {
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.rpt-filter-label {
+  font-size: 0.8rem; color: $subtext; white-space: nowrap;
+}
+.rpt-filter-date {
+  padding: 0.4rem 0.65rem; border: 1px solid $border;
+  border-radius: 0.4rem; font-size: 0.82rem; color: $text;
+  background: #fff;
+  &:focus { outline: none; border-color: $accent; }
+}
+.rpt-clear-btn {
+  padding: 0.4rem 0.75rem; border-radius: 0.4rem;
+  border: 1px solid #fca5a5; background: #fef2f2;
+  font-size: 0.8rem; font-weight: 500; color: #dc2626;
+  cursor: pointer;
+  &:hover { background: #fee2e2; }
+}
+
 // ── KPI Grid ──
 .kpi-grid {
   display: grid;

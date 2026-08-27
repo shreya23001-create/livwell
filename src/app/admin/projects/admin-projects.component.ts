@@ -105,6 +105,7 @@ export class AdminProjectsComponent implements OnInit {
   uploadingImages    = signal(false);
   uploadedImages     = signal<string[]>([]);
   previewImages      = signal<string[]>([]);
+  coverIndex         = signal(0);
   uploadingBrandLogo = signal(false);
   uploadingVideo     = signal(false);
   videoDragOver      = signal(false);
@@ -254,6 +255,7 @@ export class AdminProjectsComponent implements OnInit {
     this.commSearch.set('');
     this.uploadedImages.set([]);
     this.previewImages.set([]);
+    this.coverIndex.set(0);
     this.selectedTypes.set([]);
     this.typeDropdownOpen.set(false);
     this.trendDropdownOpen.set(false);
@@ -296,6 +298,7 @@ export class AdminProjectsComponent implements OnInit {
     this.showModal.set(false);
     this.previewImages.set([]);
     this.uploadedImages.set([]);
+    this.coverIndex.set(0);
   }
 
   onFileChange(event: Event): void {
@@ -349,6 +352,20 @@ export class AdminProjectsComponent implements OnInit {
   removeImage(i: number): void {
     this.previewImages.update(imgs => imgs.filter((_, idx) => idx !== i));
     this.uploadedImages.update(imgs => imgs.filter((_, idx) => idx !== i));
+    const ci = this.coverIndex();
+    if (i < ci) this.coverIndex.set(ci - 1);
+    else if (i === ci) this.coverIndex.set(0);
+  }
+
+  setCover(index: number): void {
+    const moveToFront = (arr: string[]) => {
+      const a = [...arr];
+      const [item] = a.splice(index, 1);
+      return [item, ...a];
+    };
+    this.previewImages.update(moveToFront);
+    this.uploadedImages.update(imgs => imgs.length > index ? moveToFront(imgs) : imgs);
+    this.coverIndex.set(0);
   }
 
   async uploadBrandLogo(event: Event): Promise<void> {

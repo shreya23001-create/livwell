@@ -497,10 +497,15 @@
       <!-- Previews -->
       @if (previewImages().length > 0) {
       <div class="prop-img-previews">
-        @for (url of previewImages(); track url; let i = $index) {
-        <div class="prop-img-preview">
+        @for (url of previewImages(); track i; let i = $index) {
+        <div class="prop-img-preview" [class.prop-img-preview--cover]="i === 0">
           <img [src]="url" [alt]="'Image ' + (i + 1)">
           <button type="button" class="prop-img-remove" (click)="removeImage(i)">✕</button>
+          @if (i === 0) {
+            <span class="prop-img-cover-badge">Cover</span>
+          } @else {
+            <button type="button" class="prop-img-set-cover" (click)="setCover(i)">Set as Cover</button>
+          }
         </div>
         }
       </div>

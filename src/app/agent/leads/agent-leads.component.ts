@@ -2,7 +2,7 @@ import { PhoneInputComponent } from '../../shared/components/phone-input/phone-i
 import { Component, OnInit, OnDestroy, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -69,6 +69,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   private sb      = inject(SupabaseService).client;
   private toast   = inject(ToastService);
   private router  = inject(Router);
+  private route   = inject(ActivatedRoute);
   dataSvc = inject(AdminDataService);
 
   private realtimeSub: any    = null;
@@ -406,6 +407,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    this.restoreFiltersFromUrl();
     await this.auth.waitForSession();
     const user = this.auth.currentUser();
     if (!user) { this.loading.set(false); return; }
@@ -526,6 +528,47 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   sort(col: keyof AgentLead): void {
     if (this.sortCol() === col) this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
     else { this.sortCol.set(col); this.sortDir.set('asc'); }
+    this.page.set(1);
+    this.syncFiltersToUrl();
+  }
+
+  onSearch(): void { this.page.set(1); this.syncFiltersToUrl(); }
+  onFilter(): void { this.page.set(1); this.syncFiltersToUrl(); }
+
+  hasActiveFilters(): boolean {
+    return !!(this.search() || this.filterStatus() || this.filterType() !== 'all' ||
+              this.filterDateFrom() || this.filterDateTo());
+  }
+
+  clearFilters(): void {
+    this.search.set('');
+    this.filterStatus.set('');
+    this.filterType.set('all');
+    this.filterDateFrom.set('');
+    this.filterDateTo.set('');
+    this.page.set(1);
+    this.syncFiltersToUrl();
+  }
+
+  private syncFiltersToUrl(): void {
+    const qp: Record<string, string> = {};
+    if (this.search())                qp['q']      = this.search();
+    if (this.filterStatus())          qp['status'] = this.filterStatus();
+    if (this.filterType() !== 'all')  qp['type']   = this.filterType();
+    if (this.filterDateFrom())        qp['from']   = this.filterDateFrom();
+    if (this.filterDateTo())          qp['to']     = this.filterDateTo();
+    if (this.page() > 1)              qp['page']   = String(this.page());
+    this.router.navigate([], { relativeTo: this.route, queryParams: qp, replaceUrl: true });
+  }
+
+  private restoreFiltersFromUrl(): void {
+    const p = this.route.snapshot.queryParamMap;
+    if (p.get('q'))      this.search.set(p.get('q')!);
+    if (p.get('status')) this.filterStatus.set(p.get('status') as LeadStatus);
+    if (p.get('type'))   this.filterType.set(p.get('type') as 'all' | 'property' | 'project');
+    if (p.get('from'))   this.filterDateFrom.set(p.get('from')!);
+    if (p.get('to'))     this.filterDateTo.set(p.get('to')!);
+    if (p.get('page'))   this.page.set(Number(p.get('page')) || 1);
   }
 
   // ── Edit / Add Modal ─────────────────────────────────────

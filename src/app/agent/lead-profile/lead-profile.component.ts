@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
@@ -79,8 +79,9 @@ interface LeadDetail {
   styleUrl: './lead-profile.component.scss',
 })
 export class LeadProfileComponent implements OnInit, OnDestroy {
-  private route   = inject(ActivatedRoute);
-  private router  = inject(Router);
+  private route    = inject(ActivatedRoute);
+  private router   = inject(Router);
+  private location = inject(Location);
   private auth    = inject(AuthService);
   private sb      = inject(SupabaseService).client;
   private dataSvc = inject(AdminDataService);
@@ -576,7 +577,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     this.savingFu.set(false);
   }
 
-  goBack(): void { this.router.navigate(['/agent/leads']); }
+  goBack(): void { this.location.back(); }
 
   private fmtDate(ts: string): string {
     return new Date(ts).toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: true }) +

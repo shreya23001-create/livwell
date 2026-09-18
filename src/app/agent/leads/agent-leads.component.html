@@ -58,19 +58,19 @@
           d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
       </svg>
       <input type="text" placeholder="Search name, email, phone, location…" [value]="search()"
-        (input)="search.set($any($event.target).value); page.set(1)">
+        (input)="search.set($any($event.target).value); onSearch()">
     </div>
     <div class="type-filter-group">
-      <button class="type-filter-btn" [class.active]="filterType()==='all'" (click)="filterType.set('all'); page.set(1)">All</button>
+      <button class="type-filter-btn" [class.active]="filterType()==='all'" (click)="filterType.set('all'); onFilter()">All</button>
       <button class="type-filter-btn type-filter-btn--prop" [class.active]="filterType()==='property'"
-        (click)="filterType.set('property'); page.set(1)">
+        (click)="filterType.set('property'); onFilter()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
         </svg>
         Property
       </button>
       <button class="type-filter-btn type-filter-btn--proj" [class.active]="filterType()==='project'"
-        (click)="filterType.set('project'); page.set(1)">
+        (click)="filterType.set('project'); onFilter()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M2.25 21 12 3l9.75 18H2.25Z" />
         </svg>
@@ -78,7 +78,7 @@
       </button>
     </div>
     <div class="select-wrapper">
-      <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value); page.set(1)">
+      <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event); onFilter()">
         <option value="">Status</option>
         <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
       </select>
@@ -88,13 +88,13 @@
     </div>
     <div class="date-filter-group">
       <input type="date" class="date-input" [value]="filterDateFrom()"
-        (change)="filterDateFrom.set($any($event.target).value); page.set(1)" title="From date">
+        (change)="filterDateFrom.set($any($event.target).value); onFilter()" title="From date">
       <span class="date-sep">–</span>
       <input type="date" class="date-input" [value]="filterDateTo()"
-        (change)="filterDateTo.set($any($event.target).value); page.set(1)" title="To date">
+        (change)="filterDateTo.set($any($event.target).value); onFilter()" title="To date">
     </div>
-    <button *ngIf="filterDateFrom() || filterDateTo() || filterStatus() || search()" class="clear-filters-btn"
-      (click)="search.set(''); filterStatus.set(''); filterDateFrom.set(''); filterDateTo.set(''); page.set(1)">
+    <button *ngIf="hasActiveFilters()" class="clear-filters-btn"
+      (click)="clearFilters()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="M6 18 18 6M6 6l12 12"/>
       </svg>

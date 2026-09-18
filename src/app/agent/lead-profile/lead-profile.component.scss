@@ -1307,6 +1307,21 @@ $white: #ffffff;
   &:hover:not(:disabled) { background: #4f46e5; }
   &:disabled { opacity: 0.55; cursor: not-allowed; }
 }
+.dialed-row {
+  display: flex; align-items: center; gap: 0.75rem; margin-left: auto;
+}
+.dialed-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: #fff; color: #14b8a6; border: 1.5px solid #14b8a6;
+  border-radius: 0.5rem; padding: 0.5rem 1.1rem; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+  &:hover:not(:disabled) { background: #f0fdfa; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+.dialed-count {
+  font-size: 0.78rem; color: #14b8a6; font-weight: 600;
+}
+
 .crm-btn-outline {
   display: inline-flex; align-items: center; gap: 0.4rem;
   background: #fff; color: $sub; border: 1px solid $border;
@@ -1365,6 +1380,7 @@ $white: #ffffff;
   &--status   { background: rgba(217, 119, 6, .12);   color: #d97706; }
   &--save     { background: rgba(239, 68, 68, .12);   color: #ef4444; }
   &--view     { background: rgba(26, 92, 58, .12);    color: $green;  }
+  &--dialed   { background: rgba(20, 184, 166, .12);  color: #14b8a6; }
 }
 
 .utl-line {

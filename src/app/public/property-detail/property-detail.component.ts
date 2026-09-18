@@ -18,6 +18,8 @@ interface Property {
   listing_type: string;
   status: string;
   price: number;
+  price_label: string | null;
+  area_label: string | null;
   area_sqft: number;
   bedrooms: number;
   bathrooms: number;
@@ -248,6 +250,17 @@ export class PropertyDetailComponent implements OnInit {
     this.subscribing.set(false);
     if (error) { this.newsletterError.set('Something went wrong. Please try again.'); return; }
     this.newsletterSubmitted.set(true);
+
+    const now = new Date().toLocaleString('en-GB', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true,
+    });
+    this.emailSvc.send('newsletter_welcome', { to_email: email, email });
+    this.emailSvc.send('newsletter_notify_admin', {
+      to_email: 'contact@livwelldubai.com',
+      email,
+      subscribed_at: now,
+    });
   }
 
   // Inquiry form — pre-fill from logged-in user if available
@@ -570,6 +583,8 @@ export class PropertyDetailComponent implements OnInit {
     listing_type: p.listing_type || '',
     status:       p.status       || '',
     price:        p.price        || 0,
+    price_label:  p.price_label  || null,
+    area_label:   p.area_label   || null,
     area_sqft:    p.area_sqft    || 0,
     bedrooms:     p.bedrooms     || 0,
     bathrooms:    p.bathrooms    || 0,

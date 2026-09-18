@@ -43,7 +43,9 @@ export class AdminMasterComponent implements OnInit {
     if (!data) return;
     for (const row of data) {
       if (row.key === 'whatsapp_number') {
-        this.whatsappNumber.set(row.value ?? '');
+        const val = row.value ?? '';
+        this.whatsappNumber.set(val);
+        this.splitWaNumber(val);
       } else if (row.key === 'social_links') {
         try { this.socialLinks.set({ ...this.socialLinks(), ...JSON.parse(row.value) }); } catch { }
       } else if (row.key === 'smtp_config') {
@@ -53,12 +55,16 @@ export class AdminMasterComponent implements OnInit {
   }
 
   async saveWhatsapp(): Promise<void> {
+    const local = this.waLocalNumber().replace(/\D/g, '');
+    if (!local) { this.toast.error('Enter a phone number.'); return; }
+    const full = '+' + this.waCountryCode() + local;
+    this.whatsappNumber.set(full);
     this.whatsappSaving.set(true);
     const { error } = await this.sb.from('site_settings')
-      .upsert({ key: 'whatsapp_number', value: this.whatsappNumber() }, { onConflict: 'key' });
+      .upsert({ key: 'whatsapp_number', value: full }, { onConflict: 'key' });
     this.whatsappSaving.set(false);
     if (error) { this.toast.error(error.message); return; }
-    this.dataSvc.whatsappNumber.set(this.whatsappNumber());
+    this.dataSvc.whatsappNumber.set(full);
     this.whatsappSaved.set(true);
     setTimeout(() => this.whatsappSaved.set(false), 2500);
   }
@@ -184,8 +190,49 @@ export class AdminMasterComponent implements OnInit {
 
   // WhatsApp
   whatsappNumber = signal('');
+  waCountryCode  = signal('971');
+  waLocalNumber  = signal('');
   whatsappSaving = signal(false);
-  whatsappSaved = signal(false);
+  whatsappSaved  = signal(false);
+
+  readonly countryCodeOptions: { code: string; label: string }[] = [
+    { code: '971', label: '🇦🇪 +971 (UAE)' },
+    { code: '966', label: '🇸🇦 +966 (KSA)' },
+    { code: '974', label: '🇶🇦 +974 (Qatar)' },
+    { code: '973', label: '🇧🇭 +973 (Bahrain)' },
+    { code: '968', label: '🇴🇲 +968 (Oman)' },
+    { code: '965', label: '🇰🇼 +965 (Kuwait)' },
+    { code: '91',  label: '🇮🇳 +91 (India)' },
+    { code: '44',  label: '🇬🇧 +44 (UK)' },
+    { code: '1',   label: '🇺🇸 +1 (US/CA)' },
+    { code: '49',  label: '🇩🇪 +49 (Germany)' },
+    { code: '33',  label: '🇫🇷 +33 (France)' },
+    { code: '7',   label: '🇷🇺 +7 (Russia)' },
+    { code: '86',  label: '🇨🇳 +86 (China)' },
+    { code: '81',  label: '🇯🇵 +81 (Japan)' },
+    { code: '92',  label: '🇵🇰 +92 (Pakistan)' },
+    { code: '880', label: '🇧🇩 +880 (Bangladesh)' },
+    { code: '20',  label: '🇪🇬 +20 (Egypt)' },
+    { code: '249', label: '🇸🇩 +249 (Sudan)' },
+    { code: '212', label: '🇲🇦 +212 (Morocco)' },
+    { code: '213', label: '🇩🇿 +213 (Algeria)' },
+  ];
+
+  private splitWaNumber(full: string): void {
+    const digits = full.replace(/^\+/, '').replace(/\D/g, '');
+    // Try longest code match first (3 digits, then 2, then 1)
+    const known = this.countryCodeOptions.map(o => o.code).sort((a, b) => b.length - a.length);
+    for (const code of known) {
+      if (digits.startsWith(code)) {
+        this.waCountryCode.set(code);
+        this.waLocalNumber.set(digits.slice(code.length));
+        return;
+      }
+    }
+    // fallback: default to 971
+    this.waCountryCode.set('971');
+    this.waLocalNumber.set(digits);
+  }
 
   // Social media
   socialLinks = signal({

@@ -422,11 +422,11 @@
         <path stroke-linecap="round" stroke-linejoin="round"
           d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
       </svg>
-      <input type="text" placeholder="Search name, email, phone, location…" [value]="search()"
-        (input)="search.set($any($event.target).value); onSearch()">
+      <input type="text" placeholder="Search name, email, phone, location…" [ngModel]="search()"
+        (ngModelChange)="search.set($event); onSearch()">
     </div>
     <div class="select-wrapper">
-      <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value); onFilter()">
+      <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event); onFilter()">
         <option value="">Status</option>
         <option *ngFor="let s of statuses" [value]="s">{{ labelStatus(s) }}</option>
       </select>
@@ -435,7 +435,7 @@
       </svg>
     </div>
     <div class="select-wrapper">
-      <select [value]="filterSource()" (change)="filterSource.set($any($event.target).value); onFilter()">
+      <select [ngModel]="filterSource()" (ngModelChange)="filterSource.set($event); onFilter()">
         <option value="">All Sources</option>
         <option *ngFor="let s of sources" [value]="s">{{ labelSource(s) }}</option>
       </select>
@@ -444,9 +444,18 @@
       </svg>
     </div>
     <div class="select-wrapper">
-      <select [value]="filterAgent()" (change)="filterAgent.set($any($event.target).value); onFilter()">
+      <select [ngModel]="filterAgent()" (ngModelChange)="filterAgent.set($event); onFilter()">
         <option value="">All Agents</option>
         <option *ngFor="let a of agents()" [value]="a">{{ a }}</option>
+      </select>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </div>
+    <div class="select-wrapper">
+      <select [ngModel]="filterDialed()" (ngModelChange)="filterDialed.set($event); onFilter()">
+        <option value="">All Leads</option>
+        <option value="all">Dialed Leads</option>
       </select>
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="m6 9 6 6 6-6" />
@@ -463,6 +472,12 @@
       <input type="date" [value]="filterDateTo()" (change)="filterDateTo.set($any($event.target).value); onFilter()"
         title="To date">
     </div>
+    <button class="clear-filters-btn" *ngIf="hasActiveFilters()" (click)="clearFilters()" title="Clear all filters">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+      Clear
+    </button>
   </div>
 
   <!-- ── Loading / Error ── -->
@@ -475,7 +490,9 @@
 
   <!-- ── Table ── -->
   <div class="leads-table-wrap" *ngIf="!loading()">
-    <table class="leads-table">
+
+    <!-- ── Normal leads table ── -->
+    <table class="leads-table" *ngIf="!showDialedView()">
       <thead>
         <tr>
           <th (click)="sort('name')" class="sortable">Lead<svg *ngIf="sortCol()==='name'"
@@ -501,7 +518,7 @@
               [class.flipped]="sortDir()==='asc'">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
             </svg></th>
-          <th (click)="sort('createdDate')" class="sortable">Created<svg *ngIf="sortCol()==='createdDate'"
+          <th (click)="sort('createdDate')" class="sortable">Updated<svg *ngIf="sortCol()==='createdDate'"
               xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
               [class.flipped]="sortDir()==='asc'">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
@@ -531,17 +548,13 @@
           <td>
             <div class="action-btns">
               <button class="action-btn action-btn--edit" (click)="openEdit(lead)" title="Edit">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
                 </svg>
               </button>
               <button class="action-btn action-btn--delete" (click)="confirmDelete(lead)" title="Delete">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                 </svg>
               </button>
             </div>
@@ -552,27 +565,87 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- ── Dialed history table ── -->
+    <table class="leads-table" *ngIf="showDialedView()">
+      <thead>
+        <tr>
+          <th>Attempt</th>
+          <th>Lead</th>
+          <th>Status at Dial</th>
+          <th>Category</th>
+          <th>Source</th>
+          <th>Budget</th>
+          <th>Location</th>
+          <th>Agent</th>
+          <th>Dialed At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of paginatedDialed()">
+          <td><span class="dialed-attempt-badge">#{{ r.attemptNo }}</span></td>
+          <td>
+            <div class="lead-name lead-name--link" [routerLink]="['/admin/leads', r.leadId]">{{ r.leadName }}</div>
+            <div class="lead-email">{{ r.email }}</div>
+            <div class="lead-phone">{{ r.phone }}</div>
+          </td>
+          <td><span class="badge badge--status badge--{{ r.statusAtDial }}">{{ labelStatus(r.statusAtDial) }}</span></td>
+          <td><span class="badge badge--cat badge--{{ r.category }}">{{ r.category | titlecase }}</span></td>
+          <td><span class="source-label">{{ labelSource(r.source) }}</span></td>
+          <td class="td-budget">{{ r.budget }}</td>
+          <td class="td-location">{{ r.location }}</td>
+          <td>
+            <div class="agent-cell">
+              <div class="agent-avatar">{{ r.assignedAgent === 'Unassigned' ? '?' : r.assignedAgent[0] }}</div>
+              <span [class.unassigned]="r.assignedAgent === 'Unassigned'">{{ r.assignedAgent }}</span>
+            </div>
+          </td>
+          <td class="td-date">{{ r.dialedAt | date:'dd MMM yyyy, hh:mm a' }}</td>
+        </tr>
+        <tr *ngIf="filteredDialedRows().length === 0">
+          <td colspan="9" class="empty-row">No dialed attempts found.</td>
+        </tr>
+      </tbody>
+    </table>
+
   </div>
 
   <!-- ── Pagination ── -->
-  <div class="leads-pagination" *ngIf="totalPages() > 1">
-    <span class="pagination-info">
-      Showing {{ (page()-1)*pageSize + 1 }}–{{ page()*pageSize > filtered().length ? filtered().length : page()*pageSize
-      }} of {{ filtered().length }} leads
-    </span>
-    <div class="pagination-btns">
-      <button (click)="page.update(p => p-1)" [disabled]="page()===1">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-        </svg>
-      </button>
-      <button *ngFor="let n of pageNumbers()" (click)="page.set(n)" [class.active]="page()===n">{{ n }}</button>
-      <button (click)="page.update(p => p+1)" [disabled]="page()===totalPages()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-        </svg>
-      </button>
-    </div>
+  <div class="leads-pagination" *ngIf="!showDialedView() ? totalPages() > 1 : dialedTotalPages() > 1">
+    <ng-container *ngIf="!showDialedView()">
+      <span class="pagination-info">
+        Showing {{ (page()-1)*pageSize + 1 }}–{{ page()*pageSize > filtered().length ? filtered().length : page()*pageSize }} of {{ filtered().length }} leads
+      </span>
+      <div class="pagination-btns">
+        <button (click)="page.update(p => p-1)" [disabled]="page()===1">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+        </button>
+        <ng-container *ngFor="let n of pageNumbers()">
+          <span *ngIf="n === null" class="pagination-ellipsis">…</span>
+          <button *ngIf="n !== null" (click)="page.set(n)" [class.active]="page()===n">{{ n }}</button>
+        </ng-container>
+        <button (click)="page.update(p => p+1)" [disabled]="page()===totalPages()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+        </button>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="showDialedView()">
+      <span class="pagination-info">
+        Showing {{ (page()-1)*pageSize + 1 }}–{{ page()*pageSize > filteredDialedRows().length ? filteredDialedRows().length : page()*pageSize }} of {{ filteredDialedRows().length }} attempts
+      </span>
+      <div class="pagination-btns">
+        <button (click)="page.update(p => p-1)" [disabled]="page()===1">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+        </button>
+        <ng-container *ngFor="let n of dialedPageNumbers()">
+          <span *ngIf="n === null" class="pagination-ellipsis">…</span>
+          <button *ngIf="n !== null" (click)="page.set(n)" [class.active]="page()===n">{{ n }}</button>
+        </ng-container>
+        <button (click)="page.update(p => p+1)" [disabled]="page()===dialedTotalPages()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+        </button>
+      </div>
+    </ng-container>
   </div>
 
   }<!-- end leads tab -->
@@ -582,7 +655,7 @@
 
   <!-- 4 KPI cards -->
   <div class="fu-kpi-strip">
-    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'all'" (click)="fuFilter.set('all')">
+    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'all'" (click)="fuFilter.set('all'); fuPage.set(1)">
       <div class="fu-kpi-icon fu-kpi-icon--all">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -594,7 +667,7 @@
         <div class="fu-kpi-lbl">All Follow-ups</div>
       </div>
     </div>
-    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'overdue'" (click)="fuFilter.set('overdue')">
+    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'overdue'" (click)="fuFilter.set('overdue'); fuPage.set(1)">
       <div class="fu-kpi-icon fu-kpi-icon--overdue">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -606,7 +679,7 @@
         <div class="fu-kpi-lbl">Overdue</div>
       </div>
     </div>
-    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'today'" (click)="fuFilter.set('today')">
+    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'today'" (click)="fuFilter.set('today'); fuPage.set(1)">
       <div class="fu-kpi-icon fu-kpi-icon--today">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -617,7 +690,7 @@
         <div class="fu-kpi-lbl">Due Today</div>
       </div>
     </div>
-    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'upcoming'" (click)="fuFilter.set('upcoming')">
+    <div class="fu-kpi" [class.fu-kpi--active]="fuFilter() === 'upcoming'" (click)="fuFilter.set('upcoming'); fuPage.set(1)">
       <div class="fu-kpi-icon fu-kpi-icon--upcoming">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -652,7 +725,7 @@
       <p>No follow-ups in this category.</p>
     </div>
 
-    <div class="fu-card" *ngFor="let r of filteredFollowUps()" [class.fu-card--overdue]="r.follow_up_date < today"
+    <div class="fu-card" *ngFor="let r of pagedFollowUps()" [class.fu-card--overdue]="r.follow_up_date < today"
       [class.fu-card--today]="r.follow_up_date === today" [class.fu-card--upcoming]="r.follow_up_date > today">
 
       <!-- Date column -->
@@ -723,6 +796,19 @@
         <button *ngIf="r.lead" [routerLink]="['/admin/leads', r.lead.id]" class="fu-view-btn">View</button>
       </div>
 
+    </div>
+
+    <!-- Follow-up Pagination -->
+    <div class="fu-pagination" *ngIf="fuTotalPages() > 1">
+      <span class="fu-pg-info">{{ filteredFollowUps().length }} records · Page {{ fuPage() }} of {{ fuTotalPages() }}</span>
+      <div class="fu-pg-btns">
+        <button class="fu-pg-btn" (click)="fuPage.set(fuPage() - 1)" [disabled]="fuPage() === 1">‹</button>
+        <ng-container *ngFor="let n of fuPageNumbers()">
+          <span *ngIf="n === null" class="fu-pg-ellipsis">…</span>
+          <button *ngIf="n !== null" class="fu-pg-btn" (click)="fuPage.set(n)" [class.active]="fuPage() === n">{{ n }}</button>
+        </ng-container>
+        <button class="fu-pg-btn" (click)="fuPage.set(fuPage() + 1)" [disabled]="fuPage() === fuTotalPages()">›</button>
+      </div>
     </div>
   </div>
 

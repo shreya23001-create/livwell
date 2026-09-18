@@ -70,6 +70,7 @@ export interface Lead {
   lastContact: string;
   followUpDate: string;
   followUpNote: string;
+  dialedCount: number;
 }
 
 // ── Master Data ───────────────────────────────────────────
@@ -329,16 +330,21 @@ export class AdminDataService {
   async loadLeads(): Promise<void> {
     this.leadsLoading.set(true);
     this.leadsError.set('');
-    const { data, error } = await this.sb
-      .from('admin_leads')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const [leadsRes, dialedRes] = await Promise.all([
+      this.sb.from('admin_leads').select('*').order('updated_at', { ascending: false, nullsFirst: false }),
+      this.sb.from('lead_follow_ups').select('lead_id').eq('status', 'dialed'),
+    ]);
 
-    this.dbLog('loadLeads', error, data);
-    if (error) {
-      this.leadsError.set(error.message);
-    } else if (data) {
-      this.leads.set(data.map((r: any) => ({
+    this.dbLog('loadLeads', leadsRes.error, leadsRes.data);
+    if (leadsRes.error) {
+      this.leadsError.set(leadsRes.error.message);
+    } else if (leadsRes.data) {
+      // Build dialed count map
+      const dialedMap: Record<number, number> = {};
+      for (const row of dialedRes.data ?? []) {
+        dialedMap[row.lead_id] = (dialedMap[row.lead_id] || 0) + 1;
+      }
+      this.leads.set(leadsRes.data.map((r: any) => ({
         id:            r.id,
         name:          r.name           || '',
         email:         r.email          || '',
@@ -351,10 +357,11 @@ export class AdminDataService {
         propertyType:  r.property_type  || '',
         assignedAgent: r.assigned_agent || 'Unassigned',
         notes:         r.notes          || '',
-        createdDate:   (r.created_at    || '').slice(0, 10),
+        createdDate:   (r.updated_at || r.created_at || '').slice(0, 10),
         lastContact:   r.last_contact   || (r.created_at || '').slice(0, 10),
         followUpDate:  r.follow_up_date || '',
         followUpNote:  r.follow_up_note || '',
+        dialedCount:   dialedMap[r.id]  || 0,
       })));
     }
     this.leadsLoading.set(false);
@@ -416,6 +423,7 @@ export class AdminDataService {
   }
 
   async deleteLead(id: number): Promise<void> {
+    await this.sb.from('lead_follow_ups').delete().eq('lead_id', id);
     await this.sb.from('admin_leads').delete().eq('id', id);
     await this.loadLeads();
   }

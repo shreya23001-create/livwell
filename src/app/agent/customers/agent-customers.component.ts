@@ -35,6 +35,9 @@ export class AgentCustomersComponent implements OnInit {
   filterStatus = signal<'active' | 'inactive' | 'closed' | ''>('');
   loading      = signal(true);
 
+  page     = signal(1);
+  pageSize = 50;
+
   stats = computed(() => {
     const a = this.customers();
     return {
@@ -54,6 +57,28 @@ export class AgentCustomersComponent implements OnInit {
       return mq && mst;
     });
   });
+
+  totalPages = computed(() => Math.max(1, Math.ceil(this.filtered().length / this.pageSize)));
+
+  pagedCustomers = computed(() => {
+    const p = Math.min(this.page(), this.totalPages());
+    const start = (p - 1) * this.pageSize;
+    return this.filtered().slice(start, start + this.pageSize);
+  });
+
+  pageNumbers(): (number | null)[] {
+    const total = this.totalPages();
+    const cur   = this.page();
+    const delta = 2;
+    const range: number[] = [];
+    for (let i = Math.max(2, cur - delta); i <= Math.min(total - 1, cur + delta); i++) range.push(i);
+    const pages: (number | null)[] = [1];
+    if (range.length && range[0] > 2) pages.push(null);
+    pages.push(...range);
+    if (range.length && range[range.length - 1] < total - 1) pages.push(null);
+    if (total > 1) pages.push(total);
+    return pages;
+  }
 
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();

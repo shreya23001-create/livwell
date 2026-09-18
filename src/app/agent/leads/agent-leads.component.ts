@@ -81,6 +81,11 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   sortCol      = signal<keyof AgentLead>('createdDate');
   sortDir      = signal<'asc' | 'desc'>('desc');
   loading      = signal(true);
+
+  page       = signal(1);
+  pageSize   = 50;
+  filterDateFrom = signal('');
+  filterDateTo   = signal('');
   saving       = signal(false);
   saveError    = signal('');
 
@@ -356,14 +361,19 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   });
 
   filtered = computed(() => {
-    const q  = this.search().toLowerCase();
-    const st = this.filterStatus();
-    const tp = this.filterType();
+    const q    = this.search().toLowerCase();
+    const st   = this.filterStatus();
+    const tp   = this.filterType();
+    const from = this.filterDateFrom();
+    const to   = this.filterDateTo();
     let list = this.leads().filter(l => {
-      const mq  = !q  || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.location.toLowerCase().includes(q) || (l.phone || '').toLowerCase().includes(q);
-      const mst = !st || l.status === st;
-      const mtp = tp === 'all' || (tp === 'property' ? !!l.propertyTitle : !!l.projectTitle);
-      return mq && mst && mtp;
+      const mq   = !q  || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.location.toLowerCase().includes(q) || (l.phone || '').toLowerCase().includes(q);
+      const mst  = !st || l.status === st;
+      const mtp  = tp === 'all' || (tp === 'property' ? !!l.propertyTitle : !!l.projectTitle);
+      const date = l.createdDate?.slice(0, 10) ?? '';
+      const mfrom = !from || date >= from;
+      const mto   = !to   || date <= to;
+      return mq && mst && mtp && mfrom && mto;
     });
     const col = this.sortCol();
     const dir = this.sortDir();
@@ -373,12 +383,35 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     });
   });
 
+  totalPages = computed(() => Math.max(1, Math.ceil(this.filtered().length / this.pageSize)));
+
+  pagedLeads = computed(() => {
+    const p = Math.min(this.page(), this.totalPages());
+    const start = (p - 1) * this.pageSize;
+    return this.filtered().slice(start, start + this.pageSize);
+  });
+
+  pageNumbers(): (number | null)[] {
+    const total = this.totalPages();
+    const cur   = this.page();
+    const delta = 2;
+    const range: number[] = [];
+    for (let i = Math.max(2, cur - delta); i <= Math.min(total - 1, cur + delta); i++) range.push(i);
+    const pages: (number | null)[] = [1];
+    if (range.length && range[0] > 2) pages.push(null);
+    pages.push(...range);
+    if (range.length && range[range.length - 1] < total - 1) pages.push(null);
+    if (total > 1) pages.push(total);
+    return pages;
+  }
+
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
     const user = this.auth.currentUser();
     if (!user) { this.loading.set(false); return; }
     const agentEmail = user.email;
     const agentName  = user.name;
+    this.dataSvc.loadMasterData();
     await this.fetchLeads(agentEmail, agentName);
     this.loadAllFollowUps();
     this.subscribeRealtime(agentEmail, agentName);

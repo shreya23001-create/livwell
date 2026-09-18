@@ -38,7 +38,7 @@ interface TimelineEntry {
   action: string;
   detail: string;
   timestamp: string;
-  icon: 'followup' | 'status' | 'message' | 'save' | 'view' | 'create';
+  icon: 'followup' | 'status' | 'message' | 'save' | 'view' | 'create' | 'dialed';
   badge?: string;
   badgeStatus?: string;
   by?: string;
@@ -54,6 +54,7 @@ interface FollowUpRecord {
   remarks: string;
   status: string;
   by: string;
+  createdAt: string;
 }
 
 interface LeadDetail {
@@ -67,6 +68,7 @@ interface LeadDetail {
   followUpDate?: string | null;
   followUpNote?: string | null;
   priority?: string;
+  dialedCount: number;
 }
 
 @Component({
@@ -113,15 +115,20 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
 
     // From follow-up history
     for (const fu of this.followUpHistory()) {
-      const sortKey = fu.date ? new Date(fu.date).getTime() : 0;
+      const sortKey = fu.date ? new Date(fu.date).getTime()
+                    : fu.createdAt ? new Date(fu.createdAt).getTime() : 0;
+      const isDialed = fu.status === 'dialed';
+      const displayTime = fu.date
+        ? `${fu.date}${fu.time ? ' · ' + fu.time : ''}`
+        : fu.createdAt ? new Date(fu.createdAt).toLocaleString('en-AE', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : '';
       entries.push({
         id: `fu-${fu.id}`,
         action: fu.remarks ? fu.remarks : `Status updated to ${this.labelStatus(fu.status)}`,
         detail: fu.by ? `by ${fu.by}` : '',
-        timestamp: `${fu.date}${fu.time ? ' · ' + fu.time : ''}`,
-        icon: 'followup',
-        badge: this.labelStatus(fu.status),
-        badgeStatus: fu.status,
+        timestamp: displayTime,
+        icon: isDialed ? 'dialed' : 'followup',
+        badge: isDialed ? undefined : this.labelStatus(fu.status),
+        badgeStatus: isDialed ? undefined : fu.status,
         by: fu.by,
         sortKey,
       });
@@ -143,6 +150,9 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     // Sort newest first
     return entries.sort((a, b) => b.sortKey - a.sortKey);
   });
+  dialedCount   = signal<number>(0);
+  dialedPending = signal(false);   // true after Dialed clicked, before Save
+
   statusUpdateVal  = signal<LeadStatus>('new');
   priorityVal      = signal('medium');
   statusRemarks    = signal('');
@@ -174,6 +184,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
+    this.dataSvc.loadMasterData();
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) { this.router.navigate(['/agent/leads']); return; }
     await this.loadLead(id);
@@ -185,13 +196,24 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
 
   private async loadLead(id: number): Promise<void> {
     this.loading.set(true);
-    const { data } = await this.sb
+    let { data, error } = await this.sb
       .from('admin_leads')
-      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id, category, follow_up_date, follow_up_note, priority')
+      .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id, category, follow_up_date, follow_up_note, priority, dialed_count')
       .eq('id', id)
       .maybeSingle();
 
-    if (!data) { this.router.navigate(['/agent/leads']); return; }
+    // If dialed_count column doesn't exist yet, retry without it
+    if (error?.message?.includes('dialed_count')) {
+      const res2 = await this.sb
+        .from('admin_leads')
+        .select('id, name, email, phone, status, source, notes, agent_reply, assigned_agent, created_at, location, property_type, property_title, property_id, project_id, project_title, budget, customer_id, category, follow_up_date, follow_up_note, priority')
+        .eq('id', id)
+        .maybeSingle();
+      data = res2.data ? { ...res2.data, dialed_count: 0 } as any : null;
+      error = res2.error;
+    }
+
+    if (!data) { this.loading.set(false); this.router.navigate(['/agent/leads']); return; }
 
     const lead: LeadDetail = {
       id:            data.id,
@@ -217,8 +239,11 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       followUpDate:  data.follow_up_date ?? null,
       followUpNote:  data.follow_up_note ?? null,
       priority:      data.priority       || 'medium',
+      dialedCount:   data.dialed_count   ?? 0,
     };
     this.lead.set(lead);
+    this.dialedCount.set(lead.dialedCount);
+    this.dialedPending.set(false);
     this.statusUpdateVal.set(lead.status);
     this.priorityVal.set(lead.priority || 'medium');
     this.nextFuDate.set('');
@@ -441,6 +466,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       remarks: r.remarks || '',
       status: r.status || '',
       by: r.created_by || 'Agent',
+      createdAt: r.created_at || '',
     }));
     // Fallback: if no history rows but lead has a follow_up_date, show it
     if (rows.length === 0) {
@@ -453,11 +479,24 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
           remarks: lead.followUpNote || '',
           status: lead.status,
           by: 'Admin',
+          createdAt: lead.followUpDate,
         });
       }
     }
     this.followUpHistory.set(rows);
+    // Sync dialed count from actual DB records (source of truth)
+    const dbDialedCount = rows.filter(r => r.status === 'dialed').length;
+    if (!this.dialedPending()) {
+      this.dialedCount.set(dbDialedCount);
+    }
     this.fuLoading.set(false);
+  }
+
+  // ── Dialed ────────────────────────────────────────────
+  markDialed(): void {
+    if (this.dialedPending()) return;
+    this.dialedPending.set(true);
+    this.dialedCount.update(n => n + 1);
   }
 
   // ── Save lead status ───────────────────────────────────
@@ -465,24 +504,48 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     const lead = this.lead();
     if (!lead) return;
     this.savingStatus.set(true);
-    const agentEmail = this.auth.currentUser()?.email ?? '';
-    const agentName  = this.auth.currentUser()?.name  ?? '';
-    const newStatus  = this.statusUpdateVal();
+    const agentEmail  = this.auth.currentUser()?.email ?? '';
+    const agentName   = this.auth.currentUser()?.name  ?? '';
+    const newStatus   = this.statusUpdateVal();
     const newPriority = this.priorityVal();
-    const remarks    = this.statusRemarks().trim();
+    const remarks     = this.statusRemarks().trim();
+    const pendingDial = this.dialedPending();
+    const newDialedCount = this.dialedCount();
+
     const payload: any = { status: newStatus, priority: newPriority, agent_email: agentEmail };
+
     const { error } = await this.sb.from('admin_leads').update(payload).eq('id', lead.id);
     if (!error) {
-      this.lead.update(l => l ? { ...l, status: newStatus, priority: newPriority } : l);
+      this.lead.update(l => l ? { ...l, status: newStatus, priority: newPriority, dialedCount: newDialedCount } : l);
+
+      // Status timeline entry
       await this.sb.from('lead_follow_ups').insert({
         lead_id: lead.id,
         remarks: remarks ? `[Status: ${newStatus}] ${remarks}` : `Status changed to ${this.labelStatus(newStatus)}`,
         status: newStatus,
         created_by: agentName || agentEmail,
       });
+
+      // Dialed timeline entry — embed current status in remarks for admin history view
+      if (pendingDial) {
+        await this.sb.from('lead_follow_ups').insert({
+          lead_id:    lead.id,
+          remarks:    `[Status: ${newStatus}] Dialed — Attempt #${newDialedCount}`,
+          status:     'dialed',
+          created_by: agentName || agentEmail,
+        });
+        this.dialedPending.set(false);
+      }
+
       this.statusRemarks.set('');
       await this.loadFollowUpHistory(lead.id);
       this.buildActivity();
+    } else {
+      if (pendingDial) {
+        // Revert optimistic increment — re-sync from DB records
+        this.dialedPending.set(false);
+        await this.loadFollowUpHistory(lead.id);
+      }
     }
     this.savingStatus.set(false);
   }

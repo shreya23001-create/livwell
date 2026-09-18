@@ -39,8 +39,8 @@
     <div class="pd-wrap">
       <div class="pd-hero-inner">
         <div>
-          <h1 class="pd-hero-title">{{ p.title }}{{ p.community ? ' - ' + p.community : '' }} Starting from {{
-            p.price_label || formatPriceShort(p.price_from) }}</h1>
+          <h1 class="pd-hero-title">{{ p.title }}{{ p.community ? ' - ' + p.community : '' }}</h1>
+          <div class="pd-hero-price" *ngIf="p.price_label || p.price_from">{{ p.price_label || formatPriceShort(p.price_from) }}</div>
           <div class="pd-hero-loc">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -169,7 +169,7 @@
             <span class="pd-hl-val">{{ p.payment_plan }}</span>
           </div>
 
-          <div class="pd-hl-cell" *ngIf="p.area_sqft">
+          <div class="pd-hl-cell" *ngIf="p.area_label || p.area_sqft">
             <div class="pd-hl-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -177,7 +177,7 @@
               </svg>
             </div>
             <span class="pd-hl-lbl">Lifestyle</span>
-            <span class="pd-hl-val">{{ p.area_sqft | number }} sqft</span>
+            <span class="pd-hl-val">{{ p.area_label || ((p.area_sqft | number) + ' sqft') }}</span>
           </div>
 
           <div class="pd-hl-cell" *ngIf="p.community || p.location">

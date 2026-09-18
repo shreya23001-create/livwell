@@ -1,18 +1,31 @@
 <div class="props-page">
   <div class="page-header">
-    <div><h1 class="page-title">My Properties</h1><p class="page-sub">Manage your listed properties</p></div>
+    <div>
+      <h1 class="page-title">My Properties</h1>
+      <p class="page-sub">Manage your listed properties</p>
+    </div>
     <div class="page-header-actions">
       <label class="btn-icon-outline" [class.btn-icon-outline--loading]="importing()" title="Import from Excel">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
         {{ importing() ? 'Importing…' : 'Import' }}
-        <input type="file" accept=".xlsx,.xls" (change)="importFromExcel($event)" [disabled]="importing()" style="display:none" />
+        <input type="file" accept=".xlsx,.xls" (change)="importFromExcel($event)" [disabled]="importing()"
+          style="display:none" />
       </label>
-      <button class="btn-icon-outline" (click)="exportToExcel()" [disabled]="!properties().length" title="Export to Excel">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
+      <button class="btn-icon-outline" (click)="exportToExcel()" [disabled]="!properties().length"
+        title="Export to Excel">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+        </svg>
         Export
       </button>
       <button class="btn-primary" (click)="openAdd()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
         Add Property
       </button>
     </div>
@@ -20,90 +33,133 @@
 
   <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-card"><div class="stat-val">{{ stats().total }}</div><div class="stat-lbl">Total Listings</div></div>
-    <div class="stat-card stat-card--green"><div class="stat-val">{{ stats().published }}</div><div class="stat-lbl">Published</div></div>
-    <div class="stat-card stat-card--amber"><div class="stat-val">{{ stats().draft }}</div><div class="stat-lbl">Draft</div></div>
-    <div class="stat-card stat-card--blue"><div class="stat-val">{{ stats().views }}</div><div class="stat-lbl">Total Views</div></div>
+    <div class="stat-card">
+      <div class="stat-val">{{ stats().total }}</div>
+      <div class="stat-lbl">Total Listings</div>
+    </div>
+    <div class="stat-card stat-card--green">
+      <div class="stat-val">{{ stats().published }}</div>
+      <div class="stat-lbl">Published</div>
+    </div>
+    <div class="stat-card stat-card--amber">
+      <div class="stat-val">{{ stats().draft }}</div>
+      <div class="stat-lbl">Draft</div>
+    </div>
+    <div class="stat-card stat-card--blue">
+      <div class="stat-val">{{ stats().views }}</div>
+      <div class="stat-lbl">Total Views</div>
+    </div>
   </div>
 
   <!-- Filters -->
   <div class="filters-row">
     <div class="search-box">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-      <input type="text" placeholder="Search title, location…" [value]="search()" (input)="search.set($any($event.target).value)">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+      </svg>
+      <input type="text" placeholder="Search title, location…" [value]="search()"
+        (input)="search.set($any($event.target).value)">
     </div>
     <div class="select-wrapper">
       <select [value]="filterCat()" (change)="filterCat.set($any($event.target).value)">
         <option value="">All Categories</option>
         <option *ngFor="let c of categoryList" [value]="c">{{ c }}</option>
       </select>
-      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
     </div>
     <div class="select-wrapper">
       <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
         <option value="">Status</option>
         <option *ngFor="let s of statusList" [value]="s">{{ s }}</option>
       </select>
-      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
     </div>
   </div>
 
   <!-- Property Cards -->
   @if (loading()) {
-    <div class="empty-state">Loading properties…</div>
+  <div class="empty-state">Loading properties…</div>
   } @else if (filtered().length === 0) {
-    <div class="empty-state">No properties found.</div>
+  <div class="empty-state">No properties found.</div>
   } @else {
-    <div class="prop-grid">
-      @for (p of filtered(); track p.id) {
-        <div class="prop-card">
-          <div class="prop-card-top">
-            @if (p.images?.length) {
-              <img [src]="p.images[0]" class="prop-img" [alt]="p.title" (error)="$any($event.target).src='/images/dummy-image.png'">
-            } @else {
-              <div class="prop-img-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-              </div>
-            }
-            <div class="prop-badges">
-              <span class="type-badge">{{ p.type }}</span>
-              <span class="cat-badge">{{ p.listing_type }}</span>
-            </div>
-            <span class="status-badge status-badge--{{ p.status?.toLowerCase()?.replace(' ','-') }}">{{ p.status }}</span>
-          </div>
-          <div class="prop-body">
-            <div class="prop-title">{{ p.title }}</div>
-            <div class="prop-location">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
-              {{ p.location }}
-            </div>
-            <div class="prop-price">{{ formatPrice(p.price) }}</div>
-            <div class="prop-specs">
-              <span *ngIf="p.bedrooms > 0">{{ p.bedrooms }} bed</span>
-              <span>{{ p.bathrooms }} bath</span>
-              <span *ngIf="p.area_sqft">{{ p.area_sqft | number }} sqft</span>
-            </div>
-          </div>
-          <div class="prop-footer">
-            <div class="prop-stats">
-              <span>👁 {{ p.views }}</span>
-              <span *ngIf="p.is_featured" class="feat-tag">★ Featured</span>
-            </div>
-            <div class="prop-actions">
-              <a [routerLink]="['/properties', propertySlug(p)]" target="_blank" class="action-btn action-btn--view" title="View on Site">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
-              </a>
-              <button class="action-btn action-btn--edit" (click)="openEdit(p)" title="Edit">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
-              </button>
-              <button class="action-btn action-btn--delete" (click)="confirmDelete(p)" title="Delete">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-              </button>
-            </div>
-          </div>
+  <div class="prop-grid">
+    @for (p of filtered(); track p.id) {
+    <div class="prop-card">
+      <div class="prop-card-top">
+        @if (p.images?.length) {
+        <img [src]="p.images[0]" class="prop-img" [alt]="p.title"
+          (error)="$any($event.target).src='/images/dummy-image.png'">
+        } @else {
+        <div class="prop-img-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
         </div>
-      }
+        }
+        <div class="prop-badges">
+          <span class="type-badge">{{ p.type }}</span>
+          <span class="cat-badge">{{ p.listing_type }}</span>
+        </div>
+        <span class="status-badge status-badge--{{ p.status?.toLowerCase()?.replace(' ','-') }}">{{ p.status }}</span>
+      </div>
+      <div class="prop-body">
+        <div class="prop-title">{{ p.title }}</div>
+        <div class="prop-location">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+          </svg>
+          {{ p.location }}
+        </div>
+        <div class="prop-price">{{ formatPrice(p.price) }}</div>
+        <div class="prop-specs">
+          <span *ngIf="p.bedrooms > 0">{{ p.bedrooms }} bed</span>
+          <span>{{ p.bathrooms }} bath</span>
+          <span *ngIf="p.area_sqft">{{ p.area_sqft | number }} sqft</span>
+        </div>
+      </div>
+      <div class="prop-footer">
+        <div class="prop-stats">
+          <span>👁 {{ p.views }}</span>
+          <span *ngIf="p.is_featured" class="feat-tag">★ Featured</span>
+        </div>
+        <div class="prop-actions">
+          <a [routerLink]="['/properties', propertySlug(p)]" target="_blank" class="action-btn action-btn--view"
+            title="View on Site">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            </svg>
+          </a>
+          <button class="action-btn action-btn--edit" (click)="openEdit(p)" title="Edit">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+            </svg>
+          </button>
+          <button class="action-btn action-btn--delete" (click)="confirmDelete(p)" title="Delete">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
+    }
+  </div>
   }
 </div>
 
@@ -115,7 +171,9 @@
   <div class="prop-modal-header">
     <h2 class="prop-modal-title">{{ isEdit() ? 'Edit Property' : 'Add Property' }}</h2>
     <button class="prop-modal-close" (click)="closeModal()">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
     </button>
   </div>
 
@@ -126,7 +184,7 @@
     <div class="prop-form-field" [class.has-error]="formErrors()['title']">
       <label class="prop-form-label">Property Title *</label>
       <input class="prop-form-input" type="text" placeholder="e.g. Luxury 3BR Apartment in Downtown"
-             [value]="form()['title'] || ''" (input)="patchForm('title', $any($event.target).value)">
+        [value]="form()['title'] || ''" (input)="patchForm('title', $any($event.target).value)">
       <span *ngIf="formErrors()['title']" class="prop-form-error">{{ formErrors()['title'] }}</span>
     </div>
 
@@ -136,9 +194,12 @@
         <label class="prop-form-label">Category *</label>
         <div class="select-wrapper">
           <select class="prop-form-input" (change)="patchForm('listing_type', $any($event.target).value)">
-            <option *ngFor="let c of categoryList" [value]="c" [selected]="form()['listing_type'] === c">{{ c }}</option>
+            <option *ngFor="let c of categoryList" [value]="c" [selected]="form()['listing_type'] === c">{{ c }}
+            </option>
           </select>
-          <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
       </div>
       <div class="prop-form-field">
@@ -147,7 +208,9 @@
           <select class="prop-form-input" (change)="patchForm('type', $any($event.target).value)">
             <option *ngFor="let t of typeList" [value]="t" [selected]="form()['type'] === t">{{ t }}</option>
           </select>
-          <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
       </div>
     </div>
@@ -156,8 +219,8 @@
     <div class="prop-form-row">
       <div class="prop-form-field" [class.has-error]="formErrors()['price']">
         <label class="prop-form-label">Price (AED) *</label>
-        <input class="prop-form-input" type="number" min="0" placeholder="0"
-               [value]="form()['price'] || ''" (input)="patchForm('price', +$any($event.target).value)">
+        <input class="prop-form-input" type="number" min="0" placeholder="0" [value]="form()['price'] || ''"
+          (input)="patchForm('price', +$any($event.target).value)">
         <span *ngIf="formErrors()['price']" class="prop-form-error">{{ formErrors()['price'] }}</span>
       </div>
       <div class="prop-form-field">
@@ -166,29 +229,45 @@
           <select class="prop-form-input" (change)="patchForm('status', $any($event.target).value)">
             <option *ngFor="let s of statusList" [value]="s" [selected]="form()['status'] === s">{{ s }}</option>
           </select>
-          <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
       </div>
+    </div>
+
+    <!-- Price Label -->
+    <div class="prop-form-field">
+      <label class="prop-form-label">Price Label </label>
+      <input class="prop-form-input" type="text" placeholder="e.g. Starting from AED 3.1M"
+        [value]="form()['price_label'] || ''" (input)="patchForm('price_label', $any($event.target).value)">
+    </div>
+
+    <!-- Area Label -->
+    <div class="prop-form-field">
+      <label class="prop-form-label">Area Label </label>
+      <input class="prop-form-input" type="text" placeholder="e.g. 650 – 1,200 sqft"
+        [value]="form()['area_label'] || ''" (input)="patchForm('area_label', $any($event.target).value)">
     </div>
 
     <!-- Area + Beds + Baths -->
     <div class="prop-form-row prop-form-row--3">
       <div class="prop-form-field" [class.has-error]="formErrors()['area_sqft']">
         <label class="prop-form-label">Area (sqft) *</label>
-        <input class="prop-form-input" type="number" min="0" placeholder="0"
-               [value]="form()['area_sqft'] || ''" (input)="patchForm('area_sqft', +$any($event.target).value)">
+        <input class="prop-form-input" type="number" min="0" placeholder="0" [value]="form()['area_sqft'] || ''"
+          (input)="patchForm('area_sqft', +$any($event.target).value)">
         <span *ngIf="formErrors()['area_sqft']" class="prop-form-error">{{ formErrors()['area_sqft'] }}</span>
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Bedrooms</label>
-        <input class="prop-form-input" type="number" min="0" max="50"
-               [value]="form()['bedrooms'] ?? 1" (input)="patchForm('bedrooms', +$any($event.target).value)">
+        <input class="prop-form-input" type="number" min="0" max="50" [value]="form()['bedrooms'] ?? 1"
+          (input)="patchForm('bedrooms', +$any($event.target).value)">
         <span class="prop-form-error" *ngIf="formErrors()['bedrooms']">{{ formErrors()['bedrooms'] }}</span>
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Bathrooms</label>
-        <input class="prop-form-input" type="number" min="0" max="50"
-               [value]="form()['bathrooms'] ?? 1" (input)="patchForm('bathrooms', +$any($event.target).value)">
+        <input class="prop-form-input" type="number" min="0" max="50" [value]="form()['bathrooms'] ?? 1"
+          (input)="patchForm('bathrooms', +$any($event.target).value)">
         <span class="prop-form-error" *ngIf="formErrors()['bathrooms']">{{ formErrors()['bathrooms'] }}</span>
       </div>
     </div>
@@ -197,22 +276,22 @@
     <div class="prop-form-row">
       <div class="prop-form-field" [class.has-error]="formErrors()['location']">
         <label class="prop-form-label">Location *</label>
-        <input class="prop-form-input" type="text" placeholder="e.g. Downtown Dubai"
-               [value]="form()['location'] || ''" (input)="patchForm('location', $any($event.target).value)">
+        <input class="prop-form-input" type="text" placeholder="e.g. Downtown Dubai" [value]="form()['location'] || ''"
+          (input)="patchForm('location', $any($event.target).value)">
         <span *ngIf="formErrors()['location']" class="prop-form-error">{{ formErrors()['location'] }}</span>
       </div>
       <div class="prop-form-field">
         <label class="prop-form-label">Community</label>
-        <input class="prop-form-input" type="text" placeholder="e.g. Burj Views"
-               [value]="form()['community'] || ''" (input)="patchForm('community', $any($event.target).value)">
+        <input class="prop-form-input" type="text" placeholder="e.g. Burj Views" [value]="form()['community'] || ''"
+          (input)="patchForm('community', $any($event.target).value)">
       </div>
     </div>
 
     <!-- Address -->
     <div class="prop-form-field">
       <label class="prop-form-label">Address</label>
-      <input class="prop-form-input" type="text" placeholder="Full address"
-             [value]="form()['address'] || ''" (input)="patchForm('address', $any($event.target).value)">
+      <input class="prop-form-input" type="text" placeholder="Full address" [value]="form()['address'] || ''"
+        (input)="patchForm('address', $any($event.target).value)">
     </div>
 
     <!-- Furnishing -->
@@ -229,39 +308,40 @@
     <div class="prop-form-field">
       <label class="prop-form-label">Description</label>
       <textarea class="prop-form-input prop-form-textarea" rows="4" placeholder="Property description…"
-                [value]="form()['description'] || ''" (input)="patchForm('description', $any($event.target).value)"></textarea>
+        [value]="form()['description'] || ''" (input)="patchForm('description', $any($event.target).value)"></textarea>
     </div>
 
     <!-- Image Upload -->
     <div class="prop-form-field">
       <label class="prop-form-label">Property Images</label>
-      <label class="prop-upload-area" [class.prop-upload-area--dragover]="imgDragOver()" [class.prop-upload-area--uploading]="uploadingImages()"
-             (dragover)="onImgDragOver($event)" (dragleave)="onImgDragLeave()" (drop)="onImgDrop($event)">
-        <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif"
-               style="display:none" (change)="onFileChange($event)" [disabled]="uploadingImages()" />
+      <label class="prop-upload-area" [class.prop-upload-area--dragover]="imgDragOver()"
+        [class.prop-upload-area--uploading]="uploadingImages()" (dragover)="onImgDragOver($event)"
+        (dragleave)="onImgDragLeave()" (drop)="onImgDrop($event)">
+        <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" style="display:none"
+          (change)="onFileChange($event)" [disabled]="uploadingImages()" />
         @if (!uploadingImages()) {
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-          <span>{{ imgDragOver() ? 'Drop images here' : 'Drag & drop or click to upload' }}</span>
-          <span class="prop-upload-hint">JPG, PNG, WEBP — multiple allowed</span>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <span>{{ imgDragOver() ? 'Drop images here' : 'Drag & drop or click to upload' }}</span>
+        <span class="prop-upload-hint">JPG, PNG, WEBP — multiple allowed</span>
         } @else {
-          <div class="prop-upload-spinner"></div>
-          <span>Uploading… please wait</span>
+        <div class="prop-upload-spinner"></div>
+        <span>Uploading… please wait</span>
         }
       </label>
       @if (previewImages().length > 0) {
-        <div class="prop-img-previews">
-          @for (url of previewImages(); track url; let i = $index) {
-            <div class="prop-img-preview">
-              <img [src]="url" [alt]="'Image ' + (i + 1)">
-              <button type="button" class="prop-img-remove" (click)="removeImage(i)">✕</button>
-            </div>
-          }
+      <div class="prop-img-previews">
+        @for (url of previewImages(); track url; let i = $index) {
+        <div class="prop-img-preview">
+          <img [src]="url" [alt]="'Image ' + (i + 1)">
+          <button type="button" class="prop-img-remove" (click)="removeImage(i)">✕</button>
         </div>
-        <p class="prop-img-count">{{ previewImages().length }} image(s) ready</p>
+        }
+      </div>
+      <p class="prop-img-count">{{ previewImages().length }} image(s) ready</p>
       }
     </div>
 
@@ -270,16 +350,20 @@
       <label class="prop-form-label">Video Tour</label>
       <div class="prop-video-toggle">
         <button type="button" class="prop-vtab" [class.active]="videoType() === 'url'"
-                (click)="videoType.set('url'); videoFileName.set(''); patchForm('video_url', null)">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>
+          (click)="videoType.set('url'); videoFileName.set(''); patchForm('video_url', null)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
           </svg>
           Paste URL
         </button>
         <button type="button" class="prop-vtab" [class.active]="videoType() === 'file'"
-                (click)="videoType.set('file'); patchForm('video_url', null); videoFileName.set('')">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/>
+          (click)="videoType.set('file'); patchForm('video_url', null); videoFileName.set('')">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
           </svg>
           Upload File
         </button>
@@ -287,16 +371,19 @@
 
       <div *ngIf="videoType() === 'url'" style="margin-top:0.75rem">
         <input class="prop-form-input" type="url" placeholder="YouTube, Vimeo or direct video URL…"
-               [value]="form()['video_url'] || ''" (input)="patchForm('video_url', $any($event.target).value || null)">
+          [value]="form()['video_url'] || ''" (input)="patchForm('video_url', $any($event.target).value || null)">
         <span class="prop-form-hint">Supports YouTube, Vimeo or direct .mp4 links</span>
       </div>
 
       <div *ngIf="videoType() === 'file'" style="margin-top:0.75rem">
         <label class="prop-video-upload-label">
-          <input type="file" accept="video/*" (change)="onVideoFileChange($event)" [disabled]="uploadingVideo()" style="display:none">
+          <input type="file" accept="video/*" (change)="onVideoFileChange($event)" [disabled]="uploadingVideo()"
+            style="display:none">
           <ng-container *ngIf="!uploadingVideo()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
             </svg>
             <span>{{ videoFileName() || 'Click to upload video' }}</span>
             <span class="prop-upload-hint">MP4, MOV, AVI — max 500MB</span>
@@ -307,8 +394,9 @@
           </ng-container>
         </label>
         <div class="prop-video-uploaded" *ngIf="form()['video_url'] && !uploadingVideo()">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
           </svg>
           Video uploaded successfully
         </div>
@@ -318,7 +406,8 @@
     <!-- Featured -->
     <div class="prop-form-field prop-form-field--check">
       <label class="prop-check-label">
-        <input type="checkbox" [checked]="form()['is_featured']" (change)="patchForm('is_featured', $any($event.target).checked)">
+        <input type="checkbox" [checked]="form()['is_featured']"
+          (change)="patchForm('is_featured', $any($event.target).checked)">
         <span class="prop-check-box"></span>
         Mark as Featured (shows on homepage)
       </label>
@@ -331,7 +420,8 @@
     </div>
     <div class="prop-modal-footer-right">
       <button class="prop-btn prop-btn--ghost" (click)="closeModal()">Cancel</button>
-      <button class="prop-btn prop-btn--primary" (click)="save()" [disabled]="saving() || uploadingImages() || uploadingVideo()">
+      <button class="prop-btn prop-btn--primary" (click)="save()"
+        [disabled]="saving() || uploadingImages() || uploadingVideo()">
         @if (saving()) { <span class="prop-btn-spinner"></span> Saving… }
         @else if (uploadingImages()) { <span class="prop-btn-spinner"></span> Uploading images… }
         @else if (uploadingVideo()) { <span class="prop-btn-spinner"></span> Uploading video… }
@@ -349,11 +439,14 @@
   <div class="prop-modal-header">
     <h2 class="prop-modal-title">Delete Property</h2>
     <button class="prop-modal-close" (click)="cancelDelete()">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
     </button>
   </div>
   <div class="prop-modal-body">
-    <p class="prop-delete-msg">Are you sure you want to delete <strong>{{ deleteTarget()?.title }}</strong>? This action cannot be undone.</p>
+    <p class="prop-delete-msg">Are you sure you want to delete <strong>{{ deleteTarget()?.title }}</strong>? This action
+      cannot be undone.</p>
   </div>
   <div class="prop-modal-footer">
     <div class="prop-modal-footer-left"></div>

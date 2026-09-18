@@ -1384,6 +1384,13 @@ $font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
   line-height: 1.35;
 }
 
+.pd-hero-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  margin: 0 0 0.375rem;
+}
+
 .pd-hero-loc {
   display: flex;
   align-items: center;

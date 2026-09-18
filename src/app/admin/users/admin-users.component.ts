@@ -281,9 +281,9 @@ export class AdminUsersComponent {
       this.toast.success(`User "${f.name}" created successfully.`);
       if (f.email && f.password) {
         const portalUrl =
-          f.role === 'agent'                              ? 'https://testlivwelldubai.vercel.app/agent/login'
-          : f.role === 'admin' || f.role === 'super_admin' ? 'https://testlivwelldubai.vercel.app/admin/login'
-          : 'https://testlivwelldubai.vercel.app/customer';
+          f.role === 'agent'                              ? 'https://livwelldubai.ae/agent/login'
+          : f.role === 'admin' || f.role === 'super_admin' ? 'https://livwelldubai.ae/admin/login'
+          : 'https://livwelldubai.ae/customer';
         const templateKey =
           f.role === 'agent'       ? 'agent_credentials'
           : f.role === 'admin'     ? 'admin_credentials'

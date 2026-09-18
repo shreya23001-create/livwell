@@ -256,6 +256,10 @@
           <input type="number" [(ngModel)]="draft.area_sqft" placeholder="e.g. 1200">
         </div>
         <div class="apr-form-group">
+          <label>Area Label <small style="font-weight:400;opacity:.7">(optional — overrides displayed area)</small></label>
+          <input type="text" [(ngModel)]="draft.area_label" placeholder="e.g. 650 – 1,200 sqft">
+        </div>
+        <div class="apr-form-group">
           <label>Total Units</label>
           <input type="number" [(ngModel)]="draft.total_units" placeholder="e.g. 250" min="0">
         </div>

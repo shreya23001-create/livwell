@@ -17,6 +17,8 @@ export interface AgentProperty {
   listing_type: string;
   status:       AgentPropStatus;
   price:        number;
+  price_label:  string;
+  area_label:   string;
   area_sqft:    number;
   bedrooms:     number;
   bathrooms:    number;
@@ -35,7 +37,7 @@ export interface AgentProperty {
 
 const EMPTY_FORM = (): Partial<AgentProperty> => ({
   title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
-  price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
+  price: 0, price_label: '', area_label: '', area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', address: '', description: '',
   furnishing: 'Unfurnished', is_featured: false, images: [], video_url: null,
 });
@@ -132,6 +134,8 @@ export class AgentPropertiesComponent implements OnInit {
       listing_type: p.listing_type || 'Sale',
       status:       (p.status      || 'Draft') as AgentPropStatus,
       price:        p.price        || 0,
+      price_label:  p.price_label  || '',
+      area_label:   p.area_label   || '',
       area_sqft:    p.area_sqft    || 0,
       bedrooms:     p.bedrooms     || 0,
       bathrooms:    p.bathrooms    || 1,
@@ -366,6 +370,8 @@ export class AgentPropertiesComponent implements OnInit {
       listing_type: f.listing_type || 'Sale',
       status:       f.status       || 'Draft',
       price:        Number(f.price)     || 0,
+      price_label:  f.price_label?.trim() || null,
+      area_label:   f.area_label?.trim()  || null,
       area_sqft:    Number(f.area_sqft) || 0,
       bedrooms:     Number(f.bedrooms)  || 0,
       bathrooms:    Number(f.bathrooms) || 1,

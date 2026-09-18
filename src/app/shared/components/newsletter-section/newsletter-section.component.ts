@@ -2,6 +2,7 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
+import { EmailService } from '../../services/email.service';
 
 @Component({
   selector: 'app-newsletter-section',
@@ -11,7 +12,8 @@ import { SupabaseService } from '../../services/supabase.service';
   styleUrl: './newsletter-section.component.scss',
 })
 export class NewsletterSectionComponent {
-  private sb = inject(SupabaseService).client;
+  private sb       = inject(SupabaseService).client;
+  private emailSvc = inject(EmailService);
 
   newsletterEmail     = signal('');
   newsletterSubmitted = signal(false);
@@ -40,5 +42,20 @@ export class NewsletterSectionComponent {
       return;
     }
     this.newsletterSubmitted.set(true);
+
+    const now = new Date().toLocaleString('en-GB', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true,
+    });
+
+    // Welcome email to subscriber
+    this.emailSvc.send('newsletter_welcome', { to_email: email, email });
+
+    // Admin notification to contact@livwelldubai.com
+    this.emailSvc.send('newsletter_notify_admin', {
+      to_email: 'contact@livwelldubai.com',
+      email,
+      subscribed_at: now,
+    });
   }
 }

@@ -64,6 +64,9 @@
           <div *ngIf="shareToast()" class="pd-share-toast">Opening WhatsApp…</div>
         </div>
       </div>
+      <div class="pd-inline-price" *ngIf="p.price_label || p.price">
+        <span class="pd-inline-price-amount">{{ p.price_label || formatPrice(p.price) }}</span>
+      </div>
       <div class="pd-location-line">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd"
@@ -194,9 +197,9 @@
             <span class="pd-detail-label">Bathrooms</span>
             <span class="pd-detail-value">{{ p.bathrooms }}</span>
           </div>
-          <div class="pd-detail-row" *ngIf="p.area_sqft">
+          <div class="pd-detail-row" *ngIf="p.area_label || p.area_sqft">
             <span class="pd-detail-label">Area</span>
-            <span class="pd-detail-value"><span class="pd-detail-from">Starting from</span> {{ p.area_sqft | number }} sqft</span>
+            <span class="pd-detail-value">{{ p.area_label || ((p.area_sqft | number) + ' sqft') }}</span>
           </div>
           <div class="pd-detail-row">
             <span class="pd-detail-label">Furnishing</span>

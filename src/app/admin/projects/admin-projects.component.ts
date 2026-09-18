@@ -22,6 +22,7 @@ export interface Project {
   status: 'Draft' | 'Published' | 'Archived';
   price_from: number;
   price_label: string;
+  area_label: string;
   price_per_sqft: string;
   beds: string;
   bathrooms: number;
@@ -50,7 +51,7 @@ export interface Project {
 
 const BLANK: Project = {
   title: '', developer: '', location: '', community: '', type: 'Apartment',
-  status: 'Draft', price_from: 0, price_label: '', price_per_sqft: '',
+  status: 'Draft', price_from: 0, price_label: '', area_label: '', price_per_sqft: '',
   beds: '', bathrooms: 0, area_sqft: 0, completion_date: '', launch_date: '', payment_plan: '',
   description: '', amenities: [], images: [], floor_plan_url: '',
   badge: '', is_featured: false, is_luxury: false, is_ultra_luxury: false,
@@ -130,7 +131,6 @@ export class AdminProjectsComponent implements OnInit {
   agentOpts     = computed<MsOption[]>(() => [{ value: '', label: '— Unassigned —' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
   amenityOpts   = computed<MsOption[]>(() => this.masterAmenities().map(a => ({
     value: a.name, label: a.name,
-    iconHtml: this.getAmenityIconSvg(a.icon),
   })));
 
   onLocationChange(vals: string[])       { this.draft.location = vals[0] ?? ''; }
@@ -394,7 +394,7 @@ export class AdminProjectsComponent implements OnInit {
     const payload: any = {
       title: f.title, developer: f.developer, location: f.location, community: f.community,
       type: f.type, status: f.status, price_from: f.price_from || 0,
-      price_label: f.price_label, price_per_sqft: f.price_per_sqft,
+      price_label: f.price_label, area_label: f.area_label?.trim() || null, price_per_sqft: f.price_per_sqft,
       beds: f.beds, bathrooms: f.bathrooms || 0, area_sqft: f.area_sqft || 0,
       completion_date: f.completion_date, launch_date: f.launch_date, payment_plan: f.payment_plan,
       description: f.description, amenities: f.amenities,

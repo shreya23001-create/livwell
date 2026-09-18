@@ -26,6 +26,8 @@ export interface Property {
   listing_type:    PropCategory;
   status:          PropStatus;
   price:           number;
+  price_label:     string;
+  area_label:      string;
   area_sqft:       number;
   bedrooms:        number;
   bathrooms:       number;
@@ -51,7 +53,7 @@ export interface Property {
 
 const EMPTY_FORM = (): Partial<Property> => ({
   title: '', type: 'Apartment', listing_type: 'Sale', status: 'Draft',
-  price: 0, area_sqft: 0, bedrooms: 1, bathrooms: 1,
+  price: 0, price_label: '', area_label: '', area_sqft: 0, bedrooms: 1, bathrooms: 1,
   location: '', community: '', project_name: '', address: '', description: '',
   furnishing: 'Unfurnished', agent_name: '', agent_avatar: '', is_featured: false, is_luxury: false, by_developer: false, images: [],
   amenities: [], video_url: '', faqs: [],
@@ -455,6 +457,8 @@ export class AdminPropertiesComponent implements OnInit {
       listing_type:    f.listing_type    || 'Sale',
       status:          f.status          || 'Draft',
       price:           Number(f.price)    || 0,
+      price_label:     f.price_label?.trim() || null,
+      area_label:      f.area_label?.trim()  || null,
       area_sqft:       Number(f.area_sqft) || 0,
       bedrooms:        Number(f.bedrooms)  || 0,
       bathrooms:       Number(f.bathrooms) || 1,
@@ -683,7 +687,6 @@ export class AdminPropertiesComponent implements OnInit {
   agentOpts      = computed<MsOption[]>(() => [{ value: '', label: '— Unassigned —' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
   amenityOpts    = computed<MsOption[]>(() => this.masterAmenities().map(a => ({
     value: a.name, label: a.name,
-    iconHtml: this.getAmenityIconSvg(a.icon),
   })));
 
   onCategoryChange(vals: string[])  { this.draft.listing_type = (vals[0] ?? 'Sale') as any; }

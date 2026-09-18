@@ -15,10 +15,10 @@
   <div class="filters-row">
     <div class="search-box">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-      <input type="text" placeholder="Search name, email, interest…" [value]="search()" (input)="search.set($any($event.target).value)">
+      <input type="text" placeholder="Search name, email, interest…" [value]="search()" (input)="search.set($any($event.target).value); page.set(1)">
     </div>
     <div class="select-wrapper">
-      <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
+      <select [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value); page.set(1)">
         <option value="">Status</option>
         <option value="active">Active</option>
         <option value="inactive">Inactive</option>
@@ -30,7 +30,7 @@
 
   <!-- Cards -->
   <div class="cust-grid">
-    <div class="cust-card" *ngFor="let c of filtered()">
+    <div class="cust-card" *ngFor="let c of pagedCustomers()">
       <div class="cust-card-top">
         <div class="cust-avatar">{{ c.name[0] }}</div>
         <div class="cust-info">
@@ -61,5 +61,18 @@
       </div>
     </div>
     <div *ngIf="filtered().length===0" class="empty-state">No customers found.</div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-bar" *ngIf="totalPages() > 1">
+    <span class="pagination-info">{{ filtered().length }} customers · Page {{ page() }} of {{ totalPages() }}</span>
+    <div class="pagination-btns">
+      <button class="pg-btn" (click)="page.set(page() - 1)" [disabled]="page() === 1">‹</button>
+      <ng-container *ngFor="let n of pageNumbers()">
+        <span *ngIf="n === null" class="pagination-ellipsis">…</span>
+        <button *ngIf="n !== null" class="pg-btn" (click)="page.set(n)" [class.active]="page() === n">{{ n }}</button>
+      </ng-container>
+      <button class="pg-btn" (click)="page.set(page() + 1)" [disabled]="page() === totalPages()">›</button>
+    </div>
   </div>
 </div>

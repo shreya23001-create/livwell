@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Location } from '@angular/common';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
 
@@ -21,10 +22,11 @@ interface LeadDetail {
   styleUrl: './admin-lead-profile.component.scss',
 })
 export class AdminLeadProfileComponent implements OnInit {
-  private sb      = inject(SupabaseService).client;
-  private route   = inject(ActivatedRoute);
-  private router  = inject(Router);
-  private dataSvc = inject(AdminDataService);
+  private sb       = inject(SupabaseService).client;
+  private route    = inject(ActivatedRoute);
+  private router   = inject(Router);
+  private location = inject(Location);
+  private dataSvc  = inject(AdminDataService);
 
   lead        = signal<LeadDetail | null>(null);
   loading     = signal(true);
@@ -115,5 +117,5 @@ export class AdminLeadProfileComponent implements OnInit {
     return map[s] ?? s;
   }
 
-  goBack(): void { this.router.navigate(['/admin/leads']); }
+  goBack(): void { this.location.back(); }
 }

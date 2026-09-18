@@ -2,7 +2,7 @@ import { PhoneInputComponent } from '../../shared/components/phone-input/phone-i
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { AdminDataService, LeadStatus, LeadSource, LeadCategory, Lead } from '../../shared/services/admin-data.service';
 import { AuthService } from '../../shared/services/auth.service';
@@ -12,6 +12,23 @@ import { SupabaseService } from '../../shared/services/supabase.service';
 import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
 
 export type { LeadStatus, LeadSource, LeadCategory, Lead };
+
+export interface DialedRow {
+  attemptNo:     number;
+  leadId:        number;
+  leadName:      string;
+  email:         string;
+  phone:         string;
+  statusAtDial:  string;   // status captured at the time of this dial
+  category:      string;
+  source:        string;
+  budget:        string;
+  location:      string;
+  assignedAgent: string;
+  dialedAt:      string;   // created_at of the follow_up row
+  dialedBy:      string;
+  remarks:       string;
+}
 
 
 const EMPTY_FORM = (): Partial<Lead> => ({
@@ -35,6 +52,7 @@ export class AdminLeadsComponent implements OnInit {
   private auth   = inject(AuthService);
   private toast  = inject(ToastService);
   private route  = inject(ActivatedRoute);
+  private router = inject(Router);
   private emailSvc = inject(EmailService);
   private sb       = inject(SupabaseService).client;
   leads   = this.dataSvc.leads;
@@ -47,17 +65,16 @@ export class AdminLeadsComponent implements OnInit {
   sortCol      = signal<keyof Lead>('createdDate');
   sortDir      = signal<'asc' | 'desc'>('desc');
   page         = signal(1);
-  pageSize     = 10;
+  pageSize     = 50;
 
-  // ── Date filter — default: rolling last 1 month ───────
-  private static defaultDateFrom(): string {
-    const d = new Date(); d.setMonth(d.getMonth() - 1); return d.toISOString().slice(0, 10);
-  }
-  private static defaultDateTo(): string {
-    return new Date().toISOString().slice(0, 10);
-  }
-  filterDateFrom = signal(AdminLeadsComponent.defaultDateFrom());
-  filterDateTo   = signal(AdminLeadsComponent.defaultDateTo());
+  filterDateFrom = signal('');
+  filterDateTo   = signal('');
+  // '' = normal view, 'all' = all dialed attempts, '1'/'2'/... = specific attempt number
+  filterDialed   = signal('');
+
+  // Dialed history rows — each attempt as a flat row with lead snapshot + attempt#
+  dialedRows     = signal<DialedRow[]>([]);
+  dialedLoading  = signal(false);
 
   // ── Modal ─────────────────────────────────────────────
   showModal       = signal(false);
@@ -172,7 +189,28 @@ export class AdminLeadsComponent implements OnInit {
   allFollowUpRecords = computed(() => {
     const rows = this.rawFollowUpRows();
     const leadsMap = new Map(this.leads().map(l => [l.id, l]));
-    const records: any[] = rows.map(r => ({ ...r, lead: leadsMap.get(r.lead_id) ?? null }));
+    const records: any[] = rows
+      .filter(r => {
+        // build lead from joined data or in-memory signal
+        const joined = (r as any).admin_leads;
+        const inMem  = leadsMap.get(r.lead_id);
+        return !!(joined || inMem);  // skip rows whose lead was deleted
+      })
+      .map(r => {
+        const joined = (r as any).admin_leads;
+        const inMem  = leadsMap.get(r.lead_id);
+        const lead = inMem ?? (joined ? {
+          id:            joined.id,
+          name:          joined.name          || '',
+          email:         joined.email         || '',
+          phone:         joined.phone         || '',
+          status:        joined.status        || 'new',
+          category:      joined.category      || 'buy',
+          assignedAgent: joined.assigned_agent || 'Unassigned',
+          createdDate:   (joined.created_at    || '').slice(0, 10),
+        } : null);
+        return { ...r, lead };
+      });
     // Fallback: leads with follow_up_date on admin_leads but no row in lead_follow_ups
     const leadsWithHistory = new Set(rows.map(r => r.lead_id));
     for (const lead of this.leads()) {
@@ -185,7 +223,9 @@ export class AdminLeadsComponent implements OnInit {
         });
       }
     }
-    return records.sort((a, b) => (a.follow_up_date ?? '').localeCompare(b.follow_up_date ?? ''));
+    return records
+      .filter(r => !!r.follow_up_date)
+      .sort((a, b) => (b.follow_up_date ?? '').localeCompare(a.follow_up_date ?? ''));
   });
 
   // ── Dashboard computed ────────────────────────────────
@@ -203,7 +243,7 @@ export class AdminLeadsComponent implements OnInit {
       if (!existing || wins) byLead.set(r.lead_id, r);
     }
     return Array.from(byLead.values())
-      .sort((a, b) => (a.follow_up_date ?? '').localeCompare(b.follow_up_date ?? ''));
+      .sort((a, b) => (b.follow_up_date ?? '').localeCompare(a.follow_up_date ?? ''));
   }
 
   private get activeFollowUpRecords(): any[] {
@@ -245,8 +285,29 @@ export class AdminLeadsComponent implements OnInit {
     if (f === 'overdue')  return this.overdueFollowUps();
     if (f === 'today')    return this.todayFollowUps();
     if (f === 'upcoming') return this.upcomingFollowUps();
-    return this.latestFollowUpPerLead();
+    return this.allFollowUpRecords(); // 'all' — show every record undeduped
   });
+
+  fuPage     = signal(1);
+  fuPageSize = 20;
+  fuTotalPages = computed(() => Math.max(1, Math.ceil(this.filteredFollowUps().length / this.fuPageSize)));
+  pagedFollowUps = computed(() => {
+    const p = Math.min(this.fuPage(), this.fuTotalPages());
+    return this.filteredFollowUps().slice((p - 1) * this.fuPageSize, p * this.fuPageSize);
+  });
+  fuPageNumbers(): (number | null)[] {
+    const total = this.fuTotalPages();
+    const cur   = this.fuPage();
+    const delta = 2;
+    const range: number[] = [];
+    for (let i = Math.max(2, cur - delta); i <= Math.min(total - 1, cur + delta); i++) range.push(i);
+    const pages: (number | null)[] = [1];
+    if (range.length && range[0] > 2) pages.push(null);
+    pages.push(...range);
+    if (range.length && range[range.length - 1] < total - 1) pages.push(null);
+    if (total > 1) pages.push(total);
+    return pages;
+  }
 
   followUps = computed(() =>
     this.leads()
@@ -349,27 +410,65 @@ export class AdminLeadsComponent implements OnInit {
 
   // ── Computed ──────────────────────────────────────────
   filteredList = computed(() => {
-    const q    = this.search().toLowerCase();
-    const st   = this.filterStatus();
-    const src  = this.filterSource();
-    const ag   = this.filterAgent();
-    const from = this.filterDateFrom();
-    const to   = this.filterDateTo();
+    const q      = this.search().toLowerCase();
+    const st     = this.filterStatus();
+    const src    = this.filterSource();
+    const ag     = this.filterAgent();
+    const from   = this.filterDateFrom();
+    const to     = this.filterDateTo();
     return this.leads().filter(l => {
       const matchQ    = !q   || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.phone.includes(q) || l.location.toLowerCase().includes(q);
       const matchSt   = !st  || l.status === st;
       const matchSrc  = !src || l.source === src;
       const matchAg   = !ag  || l.assignedAgent === ag;
       const date      = l.createdDate || '';
-      const matchFrom = q || !from || date >= from;
-      const matchTo   = q || !to   || date <= to;
+      const matchFrom = !from || date >= from;
+      const matchTo   = !to   || date <= to;
       return matchQ && matchSt && matchSrc && matchAg && matchFrom && matchTo;
     });
   });
 
+  // True when the Dialed history view is active
+  showDialedView = computed(() => this.filterDialed() !== '');
+
+  // Dialed attempt rows filtered by all active filters
+  filteredDialedRows = computed(() => {
+    const q      = this.search().toLowerCase();
+    const st     = this.filterStatus();
+    const src    = this.filterSource();
+    const ag     = this.filterAgent();
+    const from   = this.filterDateFrom();
+    const to     = this.filterDateTo();
+    const dialed = this.filterDialed(); // 'all' | '1' | '2' | ...
+    const attemptNo = dialed === 'all' ? 0 : Number(dialed) || 0;
+
+    return this.dialedRows().filter(r => {
+      const matchQ    = !q   || r.leadName.toLowerCase().includes(q) || r.email.toLowerCase().includes(q) || r.phone.includes(q) || r.location.toLowerCase().includes(q);
+      const matchSt   = !st  || r.statusAtDial === st;
+      const matchSrc  = !src || r.source === src;
+      const matchAg   = !ag  || r.assignedAgent === ag;
+      const date      = r.dialedAt.slice(0, 10);
+      const matchFrom = !from || date >= from;
+      const matchTo   = !to   || date <= to;
+      const matchAttempt = attemptNo === 0 || r.attemptNo === attemptNo;
+      return matchQ && matchSt && matchSrc && matchAg && matchFrom && matchTo && matchAttempt;
+    });
+  });
+
+  // Max attempt number seen across all dialed rows (for building dropdown options)
+  maxDialedAttempt = computed(() =>
+    this.dialedRows().reduce((max, r) => Math.max(max, r.attemptNo), 0)
+  );
+
+  // [1, 2, 3, ... maxAttempt] for the dropdown
+  dialedAttemptOptions = computed(() =>
+    Array.from({ length: this.maxDialedAttempt() }, (_, i) => i + 1)
+  );
+
   stats = computed(() => {
-    const list = this.filteredList();
-    const counts: Record<string, number> = { total: list.length };
+    const all  = this.leads();          // always total across all leads
+    const list = this.filteredList();   // per-status counts respect active filters
+    const counts: Record<string, number> = { total: all.length };
     for (const s of this.dataSvc.leadStatuses()) {
       counts[s.name] = list.filter(l => l.status === s.name).length;
     }
@@ -405,17 +504,76 @@ export class AdminLeadsComponent implements OnInit {
     return this.filtered().slice((p - 1) * this.pageSize, p * this.pageSize);
   });
 
+  dialedTotalPages = computed(() => Math.max(1, Math.ceil(this.filteredDialedRows().length / this.pageSize)));
+  paginatedDialed  = computed(() => {
+    const p = Math.min(this.page(), this.dialedTotalPages());
+    return this.filteredDialedRows().slice((p - 1) * this.pageSize, p * this.pageSize);
+  });
+
   // ── Sort / Filter ─────────────────────────────────────
   sort(col: keyof Lead): void {
     if (this.sortCol() === col) this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
     else { this.sortCol.set(col); this.sortDir.set('asc'); }
     this.page.set(1);
+    this.syncFiltersToUrl();
   }
-  onSearch(): void { this.page.set(1); }
-  onFilter(): void { this.page.set(1); }
+  onSearch(): void { this.page.set(1); this.syncFiltersToUrl(); }
+  onFilter(): void { this.page.set(1); this.syncFiltersToUrl(); }  // resets page on every filter change incl. dialed toggle
+
+  hasActiveFilters = (): boolean =>
+    !!(this.search() || this.filterStatus() || this.filterSource() ||
+       this.filterAgent() || this.filterDateFrom() || this.filterDateTo() || this.filterDialed());
+
+  clearFilters(): void {
+    this.search.set('');
+    this.filterStatus.set('');
+    this.filterSource.set('');
+    this.filterAgent.set('');
+    this.filterDateFrom.set('');
+    this.filterDateTo.set('');
+    this.filterDialed.set('');
+    this.page.set(1);
+    this.syncFiltersToUrl();
+  }
+
+  private syncFiltersToUrl(): void {
+    const qp: Record<string, string> = {};
+    if (this.search())         qp['q']      = this.search();
+    if (this.filterStatus())   qp['status'] = this.filterStatus();
+    if (this.filterSource())   qp['source'] = this.filterSource();
+    if (this.filterAgent())    qp['agent']  = this.filterAgent();
+    if (this.filterDateFrom()) qp['from']   = this.filterDateFrom();
+    if (this.filterDateTo())   qp['to']     = this.filterDateTo();
+    if (this.filterDialed())   qp['dialed'] = this.filterDialed();
+    if (this.page() > 1)       qp['page']   = String(this.page());
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: qp,
+      replaceUrl: true,
+    });
+  }
+
+  private restoreFiltersFromUrl(): void {
+    const p = this.route.snapshot.queryParamMap;
+    if (p.get('q'))      this.search.set(p.get('q')!);
+    if (p.get('status')) this.filterStatus.set(p.get('status') as LeadStatus);
+    if (p.get('source')) this.filterSource.set(p.get('source') as LeadSource);
+    if (p.get('agent'))  this.filterAgent.set(p.get('agent')!);
+    if (p.get('from'))   this.filterDateFrom.set(p.get('from')!);
+    if (p.get('to'))     this.filterDateTo.set(p.get('to')!);
+    if (p.get('dialed')) this.filterDialed.set(p.get('dialed')!);
+    if (p.get('page'))   this.page.set(Number(p.get('page')) || 1);
+    // If any filter/search param present, land on Leads tab not Dashboard
+    if (p.get('q') || p.get('status') || p.get('source') ||
+        p.get('agent') || p.get('from') || p.get('to') || p.get('dialed') || p.get('page')) {
+      this.activeTab.set('leads');
+    }
+  }
 
   ngOnInit(): void {
+    this.restoreFiltersFromUrl();
     this.loadAllFollowUps();
+    this.loadDialedHistory();
     const leadIdParam = this.route.snapshot.queryParamMap.get('lead');
     if (leadIdParam) {
       const id = Number(leadIdParam);
@@ -430,10 +588,53 @@ export class AdminLeadsComponent implements OnInit {
     this.allFollowUpRecordsLoading.set(true);
     const { data } = await this.sb
       .from('lead_follow_ups')
-      .select('*')
-      .order('follow_up_date', { ascending: true });
+      .select('*, admin_leads!lead_follow_ups_lead_id_fkey(id, name, email, phone, status, category, assigned_agent, created_at)')
+      .order('follow_up_date', { ascending: false });
     this.rawFollowUpRows.set(data ?? []);
     this.allFollowUpRecordsLoading.set(false);
+  }
+
+  async loadDialedHistory(): Promise<void> {
+    this.dialedLoading.set(true);
+    const { data } = await this.sb
+      .from('lead_follow_ups')
+      .select('id, lead_id, status, remarks, created_at, created_by, admin_leads!lead_follow_ups_lead_id_fkey(id, name, email, phone, source, category, budget, location, assigned_agent)')
+      .eq('status', 'dialed')
+      .order('created_at', { ascending: true });
+
+    if (data) {
+      // Track per-lead attempt counter to assign sequential attempt numbers
+      const attemptMap: Record<number, number> = {};
+      const rows: DialedRow[] = data.map((r: any) => {
+        const lead = r.admin_leads ?? {};
+        const lid  = r.lead_id;
+        attemptMap[lid] = (attemptMap[lid] || 0) + 1;
+        // Extract the status stored in remarks: "Dialed — Attempt #N" was the old format;
+        // newer saves store remarks like "[Status: contacted] ..." or "Status changed to..."
+        // We look for the status saved alongside this dialed entry:
+        // The status snapshot is stored as a separate lead_follow_ups row inserted just before dialing,
+        // so we use the lead's current status as a fallback for older records.
+        const remarksStatus = r.remarks?.match(/\[Status:\s*(\w+)\]/i)?.[1] ?? '';
+        return {
+          attemptNo:     attemptMap[lid],
+          leadId:        lid,
+          leadName:      lead.name      || '',
+          email:         lead.email     || '',
+          phone:         lead.phone     || '',
+          statusAtDial:  remarksStatus  || lead.status || '',
+          category:      lead.category  || '',
+          source:        lead.source    || '',
+          budget:        lead.budget    || '',
+          location:      lead.location  || '',
+          assignedAgent: lead.assigned_agent || 'Unassigned',
+          dialedAt:      r.created_at   || '',
+          dialedBy:      r.created_by   || '',
+          remarks:       r.remarks      || '',
+        };
+      });
+      this.dialedRows.set(rows);
+    }
+    this.dialedLoading.set(false);
   }
 
   // ── Modal ─────────────────────────────────────────────
@@ -527,6 +728,7 @@ export class AdminLeadsComponent implements OnInit {
     const actor = this.auth.currentUser()?.email ?? 'admin';
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
     this.dataSvc.logLeadAction(actor, role, isEdit ? 'Update Lead' : 'Add Lead', `Lead "${f.name}" ${isEdit ? 'updated' : 'created'}`);
+    this.loadDialedHistory();
   }
 
   confirmDelete(lead: Lead): void { this.deleteTarget.set(lead); this.showDeleteModal.set(true); }
@@ -541,6 +743,7 @@ export class AdminLeadsComponent implements OnInit {
     const role  = (this.auth.currentUser()?.role ?? 'admin') as any;
     this.dataSvc.logLeadAction(actor, role, 'Delete Lead', `Lead "${t.name}" deleted`, 'warning');
     this.deleteTarget.set(null);
+    this.loadDialedHistory();
   }
 
   updateForm(patch: Partial<Lead>): void { this.form.update(f => ({ ...f, ...patch })); }
@@ -632,6 +835,7 @@ export class AdminLeadsComponent implements OnInit {
         lastContact:   r['Last Contact']   || new Date().toISOString().slice(0, 10),
         followUpDate:  r['Follow-up Date'] || '',
         followUpNote:  r['Follow-up Note'] || '',
+        dialedCount:   0,
       }));
 
     // Step 2: deduplicate within the file by phone (keep last occurrence)
@@ -679,6 +883,7 @@ export class AdminLeadsComponent implements OnInit {
 
     this.importing.set(false);
     input.value = '';
+    this.loadDialedHistory();
   }
 
   // ── Helpers ───────────────────────────────────────────
@@ -691,14 +896,25 @@ export class AdminLeadsComponent implements OnInit {
     return ({ website: 'Website', referral: 'Referral', walk_in: 'Walk-in', social_media: 'Social Media', portal: 'Portal', cold_call: 'Cold Call' } as Record<string,string>)[s] ?? s;
   }
 
-  pageNumbers(): number[] {
-    const total = this.totalPages();
+  pageNumbers(): (number | null)[] {
+    return this.buildPageNumbers(this.totalPages());
+  }
+
+  dialedPageNumbers(): (number | null)[] {
+    return this.buildPageNumbers(this.dialedTotalPages());
+  }
+
+  private buildPageNumbers(total: number): (number | null)[] {
     const cur   = this.page();
-    if (total <= 100) {
-      return Array.from({ length: total }, (_, i) => i + 1);
-    }
-    const pages: number[] = [];
-    for (let i = Math.max(1, cur - 5); i <= Math.min(total, cur + 5); i++) pages.push(i);
+    const delta = 2;
+    const range: number[] = [];
+    for (let i = Math.max(2, cur - delta); i <= Math.min(total - 1, cur + delta); i++) range.push(i);
+
+    const pages: (number | null)[] = [1];
+    if (range.length && range[0] > 2) pages.push(null);
+    pages.push(...range);
+    if (range.length && range[range.length - 1] < total - 1) pages.push(null);
+    if (total > 1) pages.push(total);
     return pages;
   }
 }

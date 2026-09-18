@@ -386,10 +386,21 @@
         <span *ngIf="formErrors()['price']" class="prop-form-error">{{ formErrors()['price'] }}</span>
       </div>
       <div class="prop-form-field">
+        <label class="prop-form-label">Price Label </label>
+        <input class="prop-form-input" type="text" placeholder="e.g. Starting from AED 3.1M"
+          [(ngModel)]="draft.price_label">
+      </div>
+      <div class="prop-form-field">
         <label class="prop-form-label">Status</label>
         <app-ms-select [options]="statusOpts()" [value]="draft.status ? [draft.status] : []"
           placeholder="Select status…" [multi]="false" (valueChange)="onStatusChange($event)"></app-ms-select>
       </div>
+    </div>
+
+    <!-- Area Label -->
+    <div class="prop-form-field">
+      <label class="prop-form-label">Area Label </label>
+      <input class="prop-form-input" type="text" placeholder="e.g. 650 – 1,200 sqft" [(ngModel)]="draft.area_label">
     </div>
 
     <!-- Area + Beds + Baths -->
@@ -502,9 +513,9 @@
           <img [src]="url" [alt]="'Image ' + (i + 1)">
           <button type="button" class="prop-img-remove" (click)="removeImage(i)">✕</button>
           @if (i === 0) {
-            <span class="prop-img-cover-badge">Cover</span>
+          <span class="prop-img-cover-badge">Cover</span>
           } @else {
-            <button type="button" class="prop-img-set-cover" (click)="setCover(i)">Set as Cover</button>
+          <button type="button" class="prop-img-set-cover" (click)="setCover(i)">Set as Cover</button>
           }
         </div>
         }
@@ -626,7 +637,8 @@
         <span class="prop-check-box"></span>
         Listed By Developer
       </label>
-      <span class="prop-check-hint">Shows a "By Developer" badge on the property page — legally required for developer-listed properties</span>
+      <span class="prop-check-hint">Shows a "By Developer" badge on the property page — legally required for
+        developer-listed properties</span>
     </div>
 
   </div>

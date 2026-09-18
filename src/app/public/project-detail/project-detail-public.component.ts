@@ -22,6 +22,7 @@ interface Project {
   status: string;
   price_from: number;
   price_label: string;
+  area_label: string;
   price_per_sqft: string;
   beds: string;
   bathrooms: number;

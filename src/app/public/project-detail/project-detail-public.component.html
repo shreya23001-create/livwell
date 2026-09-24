@@ -177,7 +177,7 @@
               </svg>
             </div>
             <span class="pd-hl-lbl">Lifestyle</span>
-            <span class="pd-hl-val">{{ p.area_label || ((p.area_sqft | number) + ' sqft') }}</span>
+            <span class="pd-hl-val">{{ p.area_label ? p.area_label + ' ' : '' }}{{ p.area_sqft ? (p.area_sqft | number) + ' sqft' : '' }}</span>
           </div>
 
           <div class="pd-hl-cell" *ngIf="p.community || p.location">

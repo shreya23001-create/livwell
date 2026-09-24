@@ -199,7 +199,7 @@
           </div>
           <div class="pd-detail-row" *ngIf="p.area_label || p.area_sqft">
             <span class="pd-detail-label">Area</span>
-            <span class="pd-detail-value">{{ p.area_label || ((p.area_sqft | number) + ' sqft') }}</span>
+            <span class="pd-detail-value">{{ p.area_label ? p.area_label + ' ' : '' }}{{ p.area_sqft ? (p.area_sqft | number) + ' sqft' : '' }}</span>
           </div>
           <div class="pd-detail-row">
             <span class="pd-detail-label">Furnishing</span>

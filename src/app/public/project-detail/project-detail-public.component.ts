@@ -518,17 +518,13 @@ export class ProjectDetailPublicComponent implements OnInit {
   }
 
   formatPrice(n: number): string {
-    if (!n) return 'Price on request';
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   formatPriceShort(n: number): string {
-    if (!n) return 'Call for Price';
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   async submitInquiry(p: Project) {
@@ -620,4 +616,5 @@ export class ProjectDetailPublicComponent implements OnInit {
     } catch { /* table may not have amenities yet */ }
   }
 }
+
 

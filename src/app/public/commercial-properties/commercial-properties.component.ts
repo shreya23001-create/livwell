@@ -354,10 +354,8 @@ export class CommercialPropertiesComponent implements OnInit {
         const area: number = p.area_sqft ?? 0;
         const pricePerSqft = area > 0 ? `AED ${Math.round(price / area).toLocaleString()}` : '';
         const priceDisplay = isRent
-          ? `AED ${price.toLocaleString()} / yr`
-          : price >= 1_000_000
-            ? `AED ${(price / 1_000_000).toFixed(2)}M`
-            : `AED ${price.toLocaleString()}`;
+          ? `AED ${price.toLocaleString('en-US')} / yr`
+          : `AED ${price.toLocaleString('en-US')}`;
         const ag = agentMap[p.agent_name] ?? { avatar: '', phone: '+971 52 520 9703', email: 'contact@livwelldubai.com' };
         const raw: string[] = p.images ?? []; const clean = raw.filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); const imgs: string[] = [...clean.filter((u: string) => !u.includes('/images/')), ...clean.filter((u: string) => u.includes('/images/'))];
         return {

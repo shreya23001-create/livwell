@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+﻿import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -417,12 +417,12 @@ export class AgentPropertiesComponent implements OnInit {
   }
 
   formatPrice(n: number): string {
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(2)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   propertySlug(p: { title: string; id: number }): string {
     return toPropertySlug(p.title, p.id);
   }
 }
+

@@ -341,9 +341,8 @@ export class OffPlanDetailComponent implements OnInit {
   }
 
   formatPrice(n: number): string {
-    if (n >= 1000000) return 'AED ' + (n / 1000000).toFixed(2) + 'M';
-    if (n >= 1000) return 'AED ' + (n / 1000).toFixed(0) + 'K';
-    return 'AED ' + n.toLocaleString();
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   getPaymentPlanDash(pct: number): string {
@@ -364,4 +363,5 @@ export class OffPlanDetailComponent implements OnInit {
 
   safeHtml(html: string): SafeHtml { return this.sanitizer.bypassSecurityTrustHtml(html ?? ''); }
 }
+
 

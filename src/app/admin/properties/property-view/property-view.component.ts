@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+﻿import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../../shared/services/supabase.service';
@@ -169,10 +169,8 @@ export class PropertyViewComponent implements OnInit {
   }
 
   formatPrice(n: number): string {
-    if (!n) return 'AED —';
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(2)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   statusColor(s: string): string {
@@ -193,3 +191,4 @@ export class PropertyViewComponent implements OnInit {
 
   goBack(): void { this.router.navigate(['/admin/properties']); }
 }
+

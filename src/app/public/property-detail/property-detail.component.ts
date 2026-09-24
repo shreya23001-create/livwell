@@ -1,4 +1,4 @@
-import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
+﻿import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
@@ -263,7 +263,7 @@ export class PropertyDetailComponent implements OnInit {
     });
   }
 
-  // Inquiry form — pre-fill from logged-in user if available
+  // Inquiry form â€” pre-fill from logged-in user if available
   inquiryForm_name    = '';
   inquiryForm_phone   = '';
   inquiryForm_email   = '';
@@ -292,7 +292,7 @@ export class PropertyDetailComponent implements OnInit {
     }
     const _ph = this.inquiryForm_phone.trim();
     if (!/^\+?[\d\s\-()]+$/.test(_ph) || _ph.replace(/\D/g, '').length < 7 || _ph.replace(/\D/g, '').length > 15) {
-      this.inquiryError.set('Enter a valid phone number (7–15 digits).');
+      this.inquiryError.set('Enter a valid phone number (7â€“15 digits).');
       return;
     }
     this.inquirySubmitting.set(true);
@@ -376,7 +376,7 @@ export class PropertyDetailComponent implements OnInit {
   readonly demandValues   = [42,55,38,61,74,68,82,79,91,85,98,107];
   getDemandBarHeight(val: number): number { return Math.round((val / Math.max(...this.demandValues)) * 100); }
 
-  // Price trend (static chart data — decorative)
+  // Price trend (static chart data â€” decorative)
   readonly priceTrendPoints = [1180, 1195, 1210, 1198, 1220, 1245, 1238, 1260, 1255, 1278, 1290, 1305];
   readonly priceTrendMonths = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'];
   get priceTrendMax(): number { return Math.max(...this.priceTrendPoints); }
@@ -515,7 +515,7 @@ export class PropertyDetailComponent implements OnInit {
       if (data?.length) {
         const lat = parseFloat(data[0].lat);
         const lon = parseFloat(data[0].lon);
-        // Use ll= with the address label — avoids "Place info couldn't load" popup
+        // Use ll= with the address label â€” avoids "Place info couldn't load" popup
         const q   = encodeURIComponent(query);
         const url = `https://maps.google.com/maps?q=${q}&ll=${lat},${lon}&t=m&z=16&output=embed`;
         this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
@@ -552,7 +552,7 @@ export class PropertyDetailComponent implements OnInit {
     const url   = window.location.href;
     const parts = [p.title, this.formatPrice(p.price)];
     if (p.community || p.location) parts.push(p.community || p.location);
-    const text = parts.join(' · ');
+    const text = parts.join(' Â· ');
     const fullMsg = `${text}\n${url}`;
     if (navigator.share) {
       try { await navigator.share({ title: p.title, text, url }); } catch {}
@@ -596,7 +596,7 @@ export class PropertyDetailComponent implements OnInit {
     images:       (() => { const raw: string[] = Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? JSON.parse(p.images) : []); const clean = raw.filter((u: string) => u && !u.includes('unsplash.com') && !u.includes('dummy-image')); const real = clean.filter((u: string) => !u.includes('/images/')); const local = clean.filter((u: string) => u.includes('/images/')); return [...real, ...local]; })(),
     is_featured:  p.is_featured  || false,
     by_developer: p.by_developer || false,
-    agent_name:   ((p.agent_name ?? '').trim().replace(/^[-–—]+$/, '')) || 'LivWell Agent',
+    agent_name:   ((p.agent_name ?? '').trim().replace(/^[-â€“â€”]+$/, '')) || 'LivWell Agent',
     created_at:   p.created_at   || '',
     views:        p.views        || 0,
     share_count:  p.share_count  || 0,
@@ -631,9 +631,8 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   formatPrice(n: number): string {
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(2)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   formatBeds(n: number): string {
@@ -667,3 +666,4 @@ export class PropertyDetailComponent implements OnInit {
     return toPropertySlug(p.title, p.id);
   }
 }
+

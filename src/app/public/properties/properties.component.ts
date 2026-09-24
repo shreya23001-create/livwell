@@ -552,10 +552,9 @@ export class PropertiesComponent implements OnInit {
   }
 
   private formatPrice(price: number, listingType: string): string {
+    if (!price) return '—';
     const suffix = listingType === 'Rent' ? '/yr' : '';
-    if (price >= 1_000_000) return `AED ${(price / 1_000_000).toFixed(2)}M${suffix}`;
-    if (price >= 1_000) return `AED ${(price / 1_000).toFixed(0)}K${suffix}`;
-    return `AED ${price.toLocaleString()}${suffix}`;
+    return `AED ${price.toLocaleString('en-US')}${suffix}`;
   }
 
   // ── Actions ──────────────────────────────────────────────────
@@ -711,3 +710,4 @@ export class PropertiesComponent implements OnInit {
 
   navigateTo(commands: any[]): void { this.router.navigate(commands); }
 }
+

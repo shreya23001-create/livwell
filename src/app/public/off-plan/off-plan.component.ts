@@ -123,10 +123,8 @@ export class OffPlanComponent implements OnInit {
   }
 
   private formatPrice(n: number): string {
-    if (!n) return 'Call for Price';
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   faqs: FaqItem[] = [
@@ -154,4 +152,5 @@ export class OffPlanComponent implements OnInit {
     areas:             ['Downtown Dubai', 'Palm Jumeirah', 'Dubai Marina', 'Business Bay', 'DIFC', 'JBR', 'Jumeirah', 'Al Barsha', 'Arabian Ranches', 'Dubai South'],
   };
 }
+
 

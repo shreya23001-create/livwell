@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+﻿import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -73,13 +73,13 @@ export class AdminPropertiesComponent implements OnInit {
   private toast     = inject(ToastService);
   private sanitizer = inject(DomSanitizer);
 
-  // ── Data ──────────────────────────────────────────────
+  // â”€â”€ Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   properties  = signal<Property[]>([]);
   agents      = signal<{ name: string }[]>([]);
   loading     = signal(true);
   saving      = signal(false);
 
-  // ── Filters ───────────────────────────────────────────
+  // â”€â”€ Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   search         = signal('');
   filterStatus   = signal<PropStatus | ''>('');
   filterType     = signal<PropType | ''>('');
@@ -87,16 +87,16 @@ export class AdminPropertiesComponent implements OnInit {
   sortField      = signal<keyof Property>('created_at');
   sortDir        = signal<'asc' | 'desc'>('desc');
 
-  // ── Pagination ────────────────────────────────────────
+  // â”€â”€ Pagination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   page     = signal(1);
   pageSize = signal(10);
 
-  // ── Modal ─────────────────────────────────────────────
+  // â”€â”€ Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   modalOpen      = signal(false);
   editingId      = signal<number | null>(null);
   deleteModal    = signal<Property | null>(null);
   form           = signal<Partial<Property>>(EMPTY_FORM());
-  // Mutable draft — ngModel binds here; signal only written on open/save
+  // Mutable draft â€” ngModel binds here; signal only written on open/save
   draft: Partial<Property> = EMPTY_FORM();
   formErrors     = signal<Record<string, string>>({});
   saveError      = signal('');
@@ -111,7 +111,7 @@ export class AdminPropertiesComponent implements OnInit {
   videoDragOver    = signal(false);
   videoTab         = signal<'url' | 'upload'>('url');
 
-  // ── Location dropdown ─────────────────────────────────
+  // â”€â”€ Location dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   locSearch        = signal('');
   locDropdownOpen  = signal(false);
   filteredLocs     = computed(() => {
@@ -126,7 +126,7 @@ export class AdminPropertiesComponent implements OnInit {
     return q ? this.dataSvc.communities().filter(c => c.toLowerCase().includes(q)) : this.dataSvc.communities();
   });
 
-  // ── Project name dropdown ─────────────────────────────
+  // â”€â”€ Project name dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   projectNames       = signal<string[]>([]);
   projSearch         = signal('');
   projDropdownOpen   = signal(false);
@@ -135,7 +135,7 @@ export class AdminPropertiesComponent implements OnInit {
     return q ? this.projectNames().filter(n => n.toLowerCase().includes(q)) : this.projectNames();
   });
 
-  // ── Computed ──────────────────────────────────────────
+  // â”€â”€ Computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   filtered = computed(() => {
     const q  = this.search().toLowerCase();
     const s  = this.filterStatus();
@@ -180,7 +180,7 @@ export class AdminPropertiesComponent implements OnInit {
 
   hasFilters = computed(() => !!(this.search() || this.filterStatus() || this.filterType() || this.filterCategory()));
 
-  // ── Lifecycle ─────────────────────────────────────────
+  // â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async ngOnInit(): Promise<void> {
     await this.auth.waitForSession();
     await Promise.all([this.loadProperties(), this.loadAgents(), this.loadProjectNames()]);
@@ -211,7 +211,7 @@ export class AdminPropertiesComponent implements OnInit {
       }
       this.properties.set(data.map((p: any) => ({
         ...p,
-        agent_name:   p.agent_name || '—',
+        agent_name:   p.agent_name || 'â€”',
         agent_avatar: avatarMap[p.agent_name] ?? '',
         created_by:   p.created_by || p.agent_name || 'Admin',
         faqs:         Array.isArray(p.faqs) ? p.faqs : [],
@@ -234,7 +234,7 @@ export class AdminPropertiesComponent implements OnInit {
     if (data) this.agents.set(data.map((a: any) => ({ name: a.name })));
   }
 
-  // ── Sorting / Filtering ───────────────────────────────
+  // â”€â”€ Sorting / Filtering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   sort(field: keyof Property): void {
     if (this.sortField() === field) {
       this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
@@ -252,7 +252,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.page.set(1);
   }
 
-  // ── Modal ─────────────────────────────────────────────
+  // â”€â”€ Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   openAdd(): void {
     this.draft = EMPTY_FORM();
     this.form.set(this.draft);
@@ -531,7 +531,7 @@ export class AdminPropertiesComponent implements OnInit {
     this.formErrors.update(e => { const n = { ...e }; delete n[field]; return n; });
   }
 
-  // ── Delete ────────────────────────────────────────────
+  // â”€â”€ Delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   confirmDelete(p: Property): void { this.deleteModal.set(p); }
   cancelDelete(): void  { this.deleteModal.set(null); }
 
@@ -545,10 +545,10 @@ export class AdminPropertiesComponent implements OnInit {
     }
   }
 
-  // ── Status quick-change ───────────────────────────────
+  // â”€â”€ Status quick-change â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async updateStatus(p: Property, status: PropStatus): Promise<void> {
     const previous = p.status;
-    // ngModel already updated p.status on the object — also update the signal array
+    // ngModel already updated p.status on the object â€” also update the signal array
     this.properties.update(list => list.map(x => x.id === p.id ? { ...x, status } : x));
     const { error } = await this.sb.from('properties').update({ status }).eq('id', p.id);
     if (error) {
@@ -558,15 +558,14 @@ export class AdminPropertiesComponent implements OnInit {
     }
   }
 
-  // ── Helpers ───────────────────────────────────────────
+  // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   formatPrice(price: number): string {
-    if (price >= 1_000_000) return `AED ${(price / 1_000_000).toFixed(2)}M`;
-    if (price >= 1_000)     return `AED ${(price / 1_000).toFixed(0)}K`;
-    return `AED ${price.toLocaleString()}`;
+    if (!price) return '—';
+    return `AED ${price.toLocaleString('en-US')}`;
   }
 
   agentName(name: string | null): string {
-    return name || '—';
+    return name || 'â€”';
   }
 
   pages(): number[] {
@@ -582,7 +581,7 @@ export class AdminPropertiesComponent implements OnInit {
   importSuccess = signal('');
   importing     = signal(false);
 
-  // ── Export ────────────────────────────────────────────
+  // â”€â”€ Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   exportToExcel(): void {
     const rows = this.properties().map(p => ({
       'Title':        p.title,
@@ -619,7 +618,7 @@ export class AdminPropertiesComponent implements OnInit {
     XLSX.writeFile(wb, 'livwell-properties-sample.xlsx');
   }
 
-  // ── Import ────────────────────────────────────────────
+  // â”€â”€ Import â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async importFromExcel(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
@@ -672,7 +671,7 @@ export class AdminPropertiesComponent implements OnInit {
     input.value = '';
   }
 
-  // Read from master data service — updates when admin adds new items in Master
+  // Read from master data service â€” updates when admin adds new items in Master
   get statusList()   { return this.dataSvc.propStatuses().map(s => s.name) as PropStatus[]; }
   get typeList()     { return this.dataSvc.propTypes() as PropType[]; }
   get categoryList() { return this.dataSvc.categories() as PropCategory[]; }
@@ -684,7 +683,7 @@ export class AdminPropertiesComponent implements OnInit {
   statusOpts     = computed<MsOption[]>(() => this.dataSvc.propStatuses().map(s => ({ value: s.name, label: s.name })));
   furnishingOpts = computed<MsOption[]>(() => this.furnishingList.map(f => ({ value: f, label: f })));
   locationOpts   = computed<MsOption[]>(() => this.dataSvc.locations().map(l => ({ value: l, label: l })));
-  agentOpts      = computed<MsOption[]>(() => [{ value: '', label: '— Unassigned —' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
+  agentOpts      = computed<MsOption[]>(() => [{ value: '', label: 'â€” Unassigned â€”' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
   amenityOpts    = computed<MsOption[]>(() => this.masterAmenities().map(a => ({
     value: a.name, label: a.name,
   })));
@@ -697,3 +696,4 @@ export class AdminPropertiesComponent implements OnInit {
   onAgentChange(vals: string[])     { this.draft.agent_name = vals[0] ?? ''; }
   onAmenitiesChange(vals: string[]) { this.draft.amenities = vals; }
 }
+

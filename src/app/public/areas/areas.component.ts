@@ -174,7 +174,7 @@ export class AreasComponent implements OnInit {
           projectCount:      v.projects,
           commercialCount:   v.commercial,
           totalListings:     total,
-          avgPriceSale:      avgPrice ? `AED ${this.formatPrice(avgPrice)}` : '',
+          avgPriceSale:      avgPrice ? this.formatPrice(avgPrice) : '',
           types:             Array.from(v.types),
           featured:          total >= 3,
           description:       '',
@@ -200,9 +200,8 @@ export class AreasComponent implements OnInit {
   }
 
   private formatPrice(n: number): string {
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
-    if (n >= 1_000)     return (n / 1_000).toFixed(0) + 'K';
-    return n.toString();
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   filtered = computed(() => {
@@ -228,4 +227,5 @@ export class AreasComponent implements OnInit {
     }
   }
 }
+
 

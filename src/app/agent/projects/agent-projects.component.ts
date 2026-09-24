@@ -319,10 +319,8 @@ export class AgentProjectsComponent implements OnInit {
 
   // â”€â”€ Excel import / export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   formatPrice(n: number) {
-    if (!n) return 'â€”';
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   statusClass(s: string) {
@@ -410,4 +408,5 @@ export class AgentProjectsComponent implements OnInit {
     this.projects.set(reloaded);
   }
 }
+
 

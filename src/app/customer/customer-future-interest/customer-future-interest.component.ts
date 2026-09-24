@@ -297,8 +297,8 @@ export class CustomerFutureInterestComponent {
   clampMax() { if (this.rateMax < this.rateMin + this.RATE_STEP) this.rateMax = this.rateMin + this.RATE_STEP; }
 
   formatAED(v: number): string {
-    if (v >= 1_000_000) return `AED ${(v / 1_000_000).toFixed(2)}M`;
-    return `AED ${(v / 1000).toFixed(0)}K`;
+    if (!v) return '—';
+    return `AED ${v.toLocaleString('en-US')}`;
   }
 
   toggleDrop()  { this._dropOpen.update(v => !v); this.locSearch = ''; }
@@ -350,4 +350,5 @@ export class CustomerFutureInterestComponent {
     setTimeout(() => this.saved.set(false), 3000);
   }
 }
+
 

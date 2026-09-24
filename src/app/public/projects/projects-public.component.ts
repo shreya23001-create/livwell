@@ -198,10 +198,8 @@ export class ProjectsPublicComponent implements OnInit {
   }
 
   formatPrice(n: number): string {
-    if (!n || n === Infinity) return 'â€”';
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n || n === Infinity) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
   faqs = [
@@ -224,4 +222,5 @@ export class ProjectsPublicComponent implements OnInit {
     return toProjectSlug(p.title, p.id);
   }
 }
+
 

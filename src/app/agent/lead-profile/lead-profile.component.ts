@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
@@ -120,7 +120,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
                     : fu.createdAt ? new Date(fu.createdAt).getTime() : 0;
       const isDialed = fu.status === 'dialed';
       const displayTime = fu.date
-        ? `${fu.date}${fu.time ? ' · ' + fu.time : ''}`
+        ? `${fu.date}${fu.time ? ' Â· ' + fu.time : ''}`
         : fu.createdAt ? new Date(fu.createdAt).toLocaleString('en-AE', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : '';
       entries.push({
         id: `fu-${fu.id}`,
@@ -359,7 +359,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     if (lead.propertyTitle) log.push({ id: n++, action: 'Property Interest', detail: lead.propertyTitle, timestamp: lead.createdDate, icon: 'view' });
     this.messages().forEach(m => {
       const plain = m.content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
-      log.push({ id: n++, action: m.senderRole === 'agent' ? 'Agent Replied' : 'Customer Message', detail: plain.slice(0, 90) + (plain.length > 90 ? '…' : ''), timestamp: m.createdAt, icon: 'message' });
+      log.push({ id: n++, action: m.senderRole === 'agent' ? 'Agent Replied' : 'Customer Message', detail: plain.slice(0, 90) + (plain.length > 90 ? 'â€¦' : ''), timestamp: m.createdAt, icon: 'message' });
     });
     if (lead.status !== 'new') log.push({ id: n++, action: 'Status Updated', detail: `Changed to: ${this.labelStatus(lead.status)}`, timestamp: lead.lastContact, icon: 'status' });
     this.savedProperties().forEach(s => {
@@ -397,7 +397,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       await this.loadMessages(lead);
       this.buildActivity();
       // Notify the customer if this lead has a linked customer account
-      // Notify the customer — use customerId directly or look up by email
+      // Notify the customer â€” use customerId directly or look up by email
       let custId = lead.customerId ?? null;
       if (!custId && lead.email) {
         const { data: prof } = await this.sb.from('profiles').select('id').eq('email', lead.email).maybeSingle();
@@ -407,7 +407,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
         const { error: nErr } = await this.sb.from('notifications').insert({
           user_id: custId,
           title:   `Reply from ${user.name || 'your agent'}`,
-          message: text.length > 120 ? text.slice(0, 120) + '…' : text,
+          message: text.length > 120 ? text.slice(0, 120) + 'â€¦' : text,
           type:    lead.propertyTitle || lead.projectTitle || 'Enquiry',
           read:    false,
         });
@@ -446,13 +446,11 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
   }
 
   formatPrice(n: number): string {
-    if (!n) return 'AED —';
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(2)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
-  // ── Follow-up history ──────────────────────────────────
+  // â”€â”€ Follow-up history â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   private async loadFollowUpHistory(leadId: number): Promise<void> {
     this.fuLoading.set(true);
     const { data } = await this.sb
@@ -493,14 +491,14 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     this.fuLoading.set(false);
   }
 
-  // ── Dialed ────────────────────────────────────────────
+  // â”€â”€ Dialed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   markDialed(): void {
     if (this.dialedPending()) return;
     this.dialedPending.set(true);
     this.dialedCount.update(n => n + 1);
   }
 
-  // ── Save lead status ───────────────────────────────────
+  // â”€â”€ Save lead status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async saveLeadStatus(): Promise<void> {
     const lead = this.lead();
     if (!lead) return;
@@ -527,11 +525,11 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
         created_by: agentName || agentEmail,
       });
 
-      // Dialed timeline entry — embed current status in remarks for admin history view
+      // Dialed timeline entry â€” embed current status in remarks for admin history view
       if (pendingDial) {
         await this.sb.from('lead_follow_ups').insert({
           lead_id:    lead.id,
-          remarks:    `[Status: ${newStatus}] Dialed — Attempt #${newDialedCount}`,
+          remarks:    `[Status: ${newStatus}] Dialed â€” Attempt #${newDialedCount}`,
           status:     'dialed',
           created_by: agentName || agentEmail,
         });
@@ -543,7 +541,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
       this.buildActivity();
     } else {
       if (pendingDial) {
-        // Revert optimistic increment — re-sync from DB records
+        // Revert optimistic increment â€” re-sync from DB records
         this.dialedPending.set(false);
         await this.loadFollowUpHistory(lead.id);
       }
@@ -551,7 +549,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     this.savingStatus.set(false);
   }
 
-  // ── Save next follow-up ────────────────────────────────
+  // â”€â”€ Save next follow-up â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async saveNextFollowUp(): Promise<void> {
     const lead = this.lead();
     if (!lead) return;
@@ -581,7 +579,7 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
 
   private fmtDate(ts: string): string {
     return new Date(ts).toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: true }) +
-           ' · ' + new Date(ts).toLocaleDateString('en-AE', { day: 'numeric', month: 'short' });
+           ' Â· ' + new Date(ts).toLocaleDateString('en-AE', { day: 'numeric', month: 'short' });
   }
 
   private mapMsg = (r: any): LeadMessage => ({
@@ -593,3 +591,4 @@ export class LeadProfileComponent implements OnInit, OnDestroy {
     return toPropertySlug(p.title, p.id);
   }
 }
+

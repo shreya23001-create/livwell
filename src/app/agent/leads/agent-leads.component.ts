@@ -1,4 +1,4 @@
-import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
+﻿import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, OnDestroy, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -107,7 +107,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
 
   readonly priorities = ['low', 'medium', 'high', 'urgent'];
 
-  // ── Tabs ─────────────────────────────────────────────
+  // â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   activeTab  = signal<'leads' | 'followup'>('leads');
   fuFilter   = signal<'all' | 'overdue' | 'today' | 'upcoming'>('all');
   today      = new Date().toISOString().slice(0, 10);
@@ -116,7 +116,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   allFollowUpRecords        = signal<any[]>([]);
   allFollowUpRecordsLoading = signal(false);
 
-  // ── Edit follow-up modal ──────────────────────────────
+  // â”€â”€ Edit follow-up modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   showEditFuModal  = signal(false);
   editFuRecord     = signal<any>(null);
   editFuDate       = signal('');
@@ -126,7 +126,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   savingEditFu     = signal(false);
   readonly fuStatusOptions = ['pending', 'done', 'missed', 'cancelled'];
 
-  // ── Import ────────────────────────────────────────────
+  // â”€â”€ Import â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   importing = signal(false);
 
   downloadSampleExcel(): void {
@@ -135,7 +135,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       { 'Name': 'Sample Lead A', 'Email': 'sample.a@example.com', 'Phone': '+971521110001', 'Status': 'New',       'Source': 'Website',  'Category': 'buy',    'Budget': 'AED 2,000,000', 'Location': 'Dubai Marina',     'Property Type': 'Apartment', 'Notes': '', 'Created Date': today },
       { 'Name': 'Sample Lead B', 'Email': 'sample.b@example.com', 'Phone': '+971521110002', 'Status': 'Contacted', 'Source': 'Referral', 'Category': 'rent',   'Budget': 'AED 120,000',   'Location': 'Business Bay',     'Property Type': 'Office',    'Notes': 'Needs office space', 'Created Date': today },
       { 'Name': 'Sample Lead C', 'Email': 'sample.c@example.com', 'Phone': '+971521110003', 'Status': 'New',       'Source': 'Cold Call','Category': 'invest', 'Budget': 'AED 5,000,000', 'Location': 'Downtown Dubai',   'Property Type': 'Villa',     'Notes': 'Investor', 'Created Date': today },
-      { 'Name': 'Sample Lead D (dup of A)', 'Email': 'sample.d@example.com', 'Phone': '+971521110001', 'Status': 'New', 'Source': 'Website', 'Category': 'buy', 'Budget': 'AED 2,200,000', 'Location': 'JBR', 'Property Type': 'Apartment', 'Notes': 'Same phone as A — this row wins', 'Created Date': today },
+      { 'Name': 'Sample Lead D (dup of A)', 'Email': 'sample.d@example.com', 'Phone': '+971521110001', 'Status': 'New', 'Source': 'Website', 'Category': 'buy', 'Budget': 'AED 2,200,000', 'Location': 'JBR', 'Property Type': 'Apartment', 'Notes': 'Same phone as A â€” this row wins', 'Created Date': today },
     ];
     const ws = XLSX.utils.json_to_sheet(sample);
     const wb = XLSX.utils.book_new();
@@ -188,7 +188,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
         followUpNote:  r['Follow-up Note'] || '',
       }));
 
-    // Dedup within file — last occurrence per phone wins
+    // Dedup within file â€” last occurrence per phone wins
     const phoneToRow = new Map<string, typeof mapped[0]>();
     for (const r of mapped) {
       const key = normalisePhone(r.phone);
@@ -209,7 +209,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       const msg = [
         fileDupeCount ? `${fileDupeCount} duplicate(s) removed from file` : '',
         dbDupeCount   ? `${dbDupeCount} already in system (${dupeNames})` : '',
-      ].filter(Boolean).join(' · ');
+      ].filter(Boolean).join(' Â· ');
       this.toast.error(`Nothing to import. ${msg}.`);
       this.importing.set(false);
       return;
@@ -245,7 +245,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       fileDupeCount ? `${fileDupeCount} in-file duplicate(s) skipped` : '',
       dbDupeCount   ? `${dbDupeCount} already in system skipped (${dupeNames})` : '',
     ].filter(Boolean);
-    this.toast.success(parts.join(' · '));
+    this.toast.success(parts.join(' Â· '));
 
     const user = this.auth.currentUser();
     if (user) await this.fetchLeads(user.email ?? '', user.name ?? '');
@@ -260,7 +260,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     return this.allFollowUpRecords().filter(r => !['won','lost'].includes(r.lead?.status));
   }
 
-  // Deduplicate records by lead — keep the "best" record per lead for each bucket.
+  // Deduplicate records by lead â€” keep the "best" record per lead for each bucket.
   // all/overdue: most recent date (latest overdue); today: latest created; upcoming: earliest date.
   private dedupeByLead(records: any[], prefer: 'latest' | 'earliest'): any[] {
     const byLead = new Map<number, any>();
@@ -277,7 +277,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
       .sort((a, b) => (a.follow_up_date ?? '').localeCompare(b.follow_up_date ?? ''));
   }
 
-  // Lead IDs whose latest follow-up is upcoming — exclude from overdue/today
+  // Lead IDs whose latest follow-up is upcoming â€” exclude from overdue/today
   private leadsWithUpcoming = computed(() => {
     const latest = this.dedupeByLead(
       this.activeFollowUpRecords.filter(r => r.follow_up_date), 'latest'
@@ -571,7 +571,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     if (p.get('page'))   this.page.set(Number(p.get('page')) || 1);
   }
 
-  // ── Edit / Add Modal ─────────────────────────────────────
+  // â”€â”€ Edit / Add Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   openAdd(): void {
     this.form.set(EMPTY_FORM()); this.formErrors.set({}); this.isEdit.set(false);
     this.editId.set(null); this.modalMessages.set([]); this.newMessage.set('');
@@ -638,7 +638,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     if (!error) {
       this.newMessage.set('');
       await this.loadModalMessages(leadId);
-      // Notify the customer — use customerId directly or look up by email
+      // Notify the customer â€” use customerId directly or look up by email
       const lead = this.leads().find(l => l.id === leadId);
       if (lead) {
         let custId = lead.customerId ?? null;
@@ -650,7 +650,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
           const { error: nErr } = await this.sb.from('notifications').insert({
             user_id: custId,
             title:   `Reply from ${user.name || 'your agent'}`,
-            message: text.length > 120 ? text.slice(0, 120) + '…' : text,
+            message: text.length > 120 ? text.slice(0, 120) + 'â€¦' : text,
             type:    lead.propertyTitle || lead.projectTitle || 'Enquiry',
             read:    false,
           });
@@ -673,7 +673,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     if (!f.name?.trim())     e['name']     = 'Required.';
     if (f.email?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e['email'] = 'Enter a valid email.';
     if (!f.phone?.trim())    e['phone']    = 'Required.';
-    else if (!/^\+?[\d\s\-()]+$/.test(f.phone.trim()) || (f.phone.replace(/\D/g, '').length < 7 || f.phone.replace(/\D/g, '').length > 15)) e['phone'] = 'Enter a valid phone number (7–15 digits).';
+    else if (!/^\+?[\d\s\-()]+$/.test(f.phone.trim()) || (f.phone.replace(/\D/g, '').length < 7 || f.phone.replace(/\D/g, '').length > 15)) e['phone'] = 'Enter a valid phone number (7â€“15 digits).';
     this.formErrors.set(e);
     if (Object.keys(e).length) return;
 
@@ -741,13 +741,11 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
   }
 
   formatPrice(n: number): string {
-    if (!n) return 'AED —';
-    if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(2)}M`;
-    if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
-    return `AED ${n.toLocaleString()}`;
+    if (!n) return '—';
+    return `AED ${n.toLocaleString('en-US')}`;
   }
 
-  // ── Open lead detail page ─────────────────────────────
+  // â”€â”€ Open lead detail page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   openDetail(l: AgentLead): void {
     this.router.navigate(['/agent/leads', l.id]);
   }
@@ -756,7 +754,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/agent/leads', l.id]);
   }
 
-  // ── Edit follow-up ────────────────────────────────────
+  // â”€â”€ Edit follow-up â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   openEditFu(r: any): void {
     this.editFuRecord.set(r);
     this.editFuDate.set(r.follow_up_date ?? '');
@@ -780,7 +778,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     const isFallback = rec.id?.toString().startsWith('fallback-');
     let error: any = null;
     if (isFallback) {
-      // No real row exists — insert one and sync admin_leads
+      // No real row exists â€” insert one and sync admin_leads
       const agentName = this.auth.currentUser()?.name || this.auth.currentUser()?.email || 'Agent';
       const res = await this.sb.from('lead_follow_ups').insert({
         lead_id:        rec.lead_id,
@@ -829,7 +827,7 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
 
   private fmtDate(ts: string): string {
     return new Date(ts).toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: true }) +
-           ' · ' + new Date(ts).toLocaleDateString('en-AE', { day: 'numeric', month: 'short' });
+           ' Â· ' + new Date(ts).toLocaleDateString('en-AE', { day: 'numeric', month: 'short' });
   }
 
   private mapMsg = (r: any): LeadMessage => ({
@@ -837,3 +835,4 @@ export class AgentLeadsComponent implements OnInit, OnDestroy {
     content: r.content, createdAt: this.fmtDate(r.created_at),
   });
 }
+

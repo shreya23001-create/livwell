@@ -40,7 +40,7 @@
       <div class="pd-hero-inner">
         <div>
           <h1 class="pd-hero-title">{{ p.title }}{{ p.community ? ' - ' + p.community : '' }}</h1>
-          <div class="pd-hero-price" *ngIf="p.price_label || p.price_from">{{ p.price_label || formatPriceShort(p.price_from) }}</div>
+          <div class="pd-hero-price" *ngIf="p.price_label || p.price_from">{{ p.price_label ? p.price_label + ' ' : '' }}{{ p.price_from ? formatPriceShort(p.price_from) : '' }}</div>
           <div class="pd-hero-loc">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -544,7 +544,7 @@
       <!-- Price sticky card -->
       <div class="pd-price-card">
         <div class="pd-price-card__starting">Starting Price</div>
-        <div class="pd-price-card__amount">{{ p.price_label || formatPrice(p.price_from) }}</div>
+        <div class="pd-price-card__amount">{{ p.price_label ? p.price_label + ' ' : '' }}{{ p.price_from ? formatPrice(p.price_from) : '' }}</div>
 
         <!-- Discover More — scrolls to enquiry form -->
         <button class="pd-pc-discover" (click)="scrollToEnquiry()">

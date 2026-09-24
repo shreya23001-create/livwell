@@ -65,7 +65,7 @@
         </div>
       </div>
       <div class="pd-inline-price" *ngIf="p.price_label || p.price">
-        <span class="pd-inline-price-amount">{{ p.price_label || formatPrice(p.price) }}</span>
+        <span class="pd-inline-price-amount">{{ p.price_label ? p.price_label + ' ' : '' }}{{ p.price ? formatPrice(p.price) : '' }}</span>
       </div>
       <div class="pd-location-line">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

@@ -1,4 +1,4 @@
-import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
+﻿import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject, HostListener, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -67,7 +67,7 @@ export class ProjectDetailPublicComponent implements OnInit {
   masterAmenities = signal<{ name: string; icon: string }[]>([]);
 
   getAmenityIconSvg(name: string): SafeHtml {
-    // 1. Try exact match from master_data (name → icon key → svg)
+    // 1. Try exact match from master_data (name â†’ icon key â†’ svg)
     const masterEntry = this.masterAmenities().find(a => a.name.toLowerCase() === name.toLowerCase());
     const byKey = masterEntry ? AMENITY_ICONS.find(i => i.key === masterEntry.icon) : null;
     if (byKey) return this.sanitizer.bypassSecurityTrustHtml(byKey.svg);
@@ -93,7 +93,7 @@ export class ProjectDetailPublicComponent implements OnInit {
     if (vimeoMatch) {
       return this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${vimeoMatch[1]}`);
     }
-    // Direct video file — not embeddable in iframe, return null
+    // Direct video file â€” not embeddable in iframe, return null
     if (/\.(mp4|mov|avi|webm)(\?|$)/i.test(url)) return null;
     // Fallback: try embedding as-is
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -249,10 +249,10 @@ export class ProjectDetailPublicComponent implements OnInit {
   toggleDbFaq(i: number): void { this.dbFaqOpen.set(this.dbFaqOpen() === i ? null : i); }
   safeHtml(html: string): SafeHtml {
     const cleaned = (html ?? '')
-      .replace(/&nbsp;/gi, ' ')        // non-breaking spaces → normal spaces so browser can wrap
+      .replace(/&nbsp;/gi, ' ')        // non-breaking spaces â†’ normal spaces so browser can wrap
       .replace(/<\/p>\s*<p>/gi, ' ')   // merge consecutive <p> blocks
-      .replace(/<br\s*\/?>/gi, ' ')    // <br> tags → space
-      .replace(/\n/g, ' ')             // raw newlines → space
+      .replace(/<br\s*\/?>/gi, ' ')    // <br> tags â†’ space
+      .replace(/\n/g, ' ')             // raw newlines â†’ space
       .replace(/\s{2,}/g, ' ');        // collapse double spaces
     return this.sanitizer.bypassSecurityTrustHtml(cleaned);
   }
@@ -266,12 +266,12 @@ export class ProjectDetailPublicComponent implements OnInit {
     const p = this.project();
     if (!p?.floor_plan_url) return [];
     const beds = p.beds?.trim();
-    if (!beds) return [{ label: p.type || 'Unit', sqft: p.area_sqft ? `${p.area_sqft.toLocaleString()} Sqft` : '—' }];
+    if (!beds) return [{ label: p.type || 'Unit', sqft: p.area_sqft ? `${p.area_sqft.toLocaleString()} Sqft` : 'â€”' }];
     // Parse comma/slash-separated bed configs e.g. "1, 2, 3" or "3 & 4"
     const parts = beds.split(/[,\/&]/).map(b => b.trim()).filter(Boolean);
     return parts.map(b => ({
       label: isNaN(Number(b)) ? b : `${b} Bed${Number(b) !== 1 ? 's' : ''}`,
-      sqft: p.area_sqft ? `${p.area_sqft.toLocaleString()} Sqft` : '—',
+      sqft: p.area_sqft ? `${p.area_sqft.toLocaleString()} Sqft` : 'â€”',
     }));
   });
 
@@ -497,7 +497,7 @@ export class ProjectDetailPublicComponent implements OnInit {
     const parts = [p.title];
     if (p.developer) parts.push(`by ${p.developer}`);
     if (p.location)  parts.push(p.location);
-    const text = parts.join(' · ');
+    const text = parts.join(' Â· ');
 
     const fullMsg = `${text}\n${url}`;
 
@@ -538,7 +538,7 @@ export class ProjectDetailPublicComponent implements OnInit {
     }
     const _ph = this.inquiryPhone.trim();
     if (!/^\+?[\d\s\-()]+$/.test(_ph) || _ph.replace(/\D/g, '').length < 7 || _ph.replace(/\D/g, '').length > 15) {
-      this.inquiryError.set('Enter a valid phone number (7–15 digits).');
+      this.inquiryError.set('Enter a valid phone number (7â€“15 digits).');
       return;
     }
     this.inquirySubmitting.set(true);
@@ -620,3 +620,4 @@ export class ProjectDetailPublicComponent implements OnInit {
     } catch { /* table may not have amenities yet */ }
   }
 }
+

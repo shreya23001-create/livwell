@@ -1,4 +1,4 @@
-import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
+﻿import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -216,7 +216,7 @@ export class BrandedResidenceDetailComponent implements OnInit {
     }
     const _ph = this.inquiryPhone.trim();
     if (!/^\+?[\d\s\-()]+$/.test(_ph) || _ph.replace(/\D/g, '').length < 7 || _ph.replace(/\D/g, '').length > 15) {
-      this.inquiryError.set('Enter a valid phone number (7–15 digits).');
+      this.inquiryError.set('Enter a valid phone number (7â€“15 digits).');
       return;
     }
     this.inquirySubmitting.set(true);
@@ -263,3 +263,4 @@ export class BrandedResidenceDetailComponent implements OnInit {
     }
   }
 }
+

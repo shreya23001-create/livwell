@@ -1,4 +1,4 @@
-import { Component, signal, computed, OnInit, inject } from '@angular/core';
+﻿import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -144,11 +144,11 @@ export class DeveloperDetailComponent implements OnInit {
     if (p.price_label) return p.price_label;
     if (p.price_from) {
       const v = p.price_from;
-      if (v >= 1_000_000) return 'AED ' + (v / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+      if (v >= 1_000_000) return 'AED ' + (v / 1_000_000).toFixed(2) + 'M';
       if (v >= 1_000)     return 'AED ' + (v / 1_000).toFixed(0) + 'K';
       return 'AED ' + v.toLocaleString();
     }
-    return '—';
+    return 'â€”';
   }
 
   coverImage(p: Project): string {
@@ -164,3 +164,4 @@ export class DeveloperDetailComponent implements OnInit {
     this.openFaqIndex.set(this.openFaqIndex() === i ? null : i);
   }
 }
+

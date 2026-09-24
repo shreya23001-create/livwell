@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+﻿import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -86,7 +86,7 @@ export class AdminProjectsComponent implements OnInit {
   showModal       = signal(false);
   editMode        = signal(false);
   form            = signal<Project>({ ...BLANK });
-  // Mutable draft — ngModel binds here; signal only updated on open/save
+  // Mutable draft â€” ngModel binds here; signal only updated on open/save
   draft: Project  = { ...BLANK };
   faqs            = signal<ProjectFaq[]>([]);
   amenityDropdownOpen = signal(false);
@@ -126,9 +126,9 @@ export class AdminProjectsComponent implements OnInit {
   typeOpts      = computed<MsOption[]>(() => this.masterPropTypes().map(t => ({ value: t, label: t })));
   statusOpts    = computed<MsOption[]>(() => this.statuses.map(s => ({ value: s, label: s })));
   badgeOpts     = computed<MsOption[]>(() => this.badges.map(b => ({ value: b, label: b || 'None' })));
-  trendOpts     = computed<MsOption[]>(() => [{ value: '', label: '— None —' }, ...this.dataSvc.trendingTabs().map(t => ({ value: t, label: t }))]);
-  developerOpts = computed<MsOption[]>(() => [{ value: '', label: '— Select Developer —' }, ...this.developers().map(d => ({ value: d.name, label: d.name }))]);
-  agentOpts     = computed<MsOption[]>(() => [{ value: '', label: '— Unassigned —' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
+  trendOpts     = computed<MsOption[]>(() => [{ value: '', label: 'â€” None â€”' }, ...this.dataSvc.trendingTabs().map(t => ({ value: t, label: t }))]);
+  developerOpts = computed<MsOption[]>(() => [{ value: '', label: 'â€” Select Developer â€”' }, ...this.developers().map(d => ({ value: d.name, label: d.name }))]);
+  agentOpts     = computed<MsOption[]>(() => [{ value: '', label: 'â€” Unassigned â€”' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
   amenityOpts   = computed<MsOption[]>(() => this.masterAmenities().map(a => ({
     value: a.name, label: a.name,
   })));
@@ -437,13 +437,13 @@ export class AdminProjectsComponent implements OnInit {
   }
 
   formatPrice(n: number) {
-    if (!n) return '—';
+    if (!n) return 'â€”';
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
   }
 
-  // ── Export ────────────────────────────────────────────
+  // â”€â”€ Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   exportToExcel(): void {
     const rows = this.projects().map(p => ({
       'Title':          p.title,
@@ -487,7 +487,7 @@ export class AdminProjectsComponent implements OnInit {
     XLSX.writeFile(wb, 'livwell-projects-sample.xlsx');
   }
 
-  // ── Import ────────────────────────────────────────────
+  // â”€â”€ Import â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async importFromExcel(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
@@ -574,7 +574,7 @@ export class AdminProjectsComponent implements OnInit {
       if (error) {
         const msg = error.message ?? '';
         if (msg.toLowerCase().includes('payload too large') || msg.toLowerCase().includes('file size') || msg.includes('413')) {
-          this.videoError.set('Upload failed: file exceeds the storage bucket limit. Ask your admin to increase the bucket max file size in Supabase → Storage → imagesFolder → Edit bucket.');
+          this.videoError.set('Upload failed: file exceeds the storage bucket limit. Ask your admin to increase the bucket max file size in Supabase â†’ Storage â†’ imagesFolder â†’ Edit bucket.');
         } else {
           this.videoError.set('Upload failed: ' + msg);
         }
@@ -591,3 +591,4 @@ export class AdminProjectsComponent implements OnInit {
     }
   }
 }
+

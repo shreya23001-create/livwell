@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject, HostListener } from '@angular/core';
+﻿import { Component, OnInit, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -76,7 +76,7 @@ export class UltraLuxuryProjectsComponent implements OnInit {
     if (data) this.savedIds.set(new Set(data.map((r: any) => r.project_id)));
   }
 
-  // ── Filter state ─────────────────────────────────────
+  // â”€â”€ Filter state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   searchQuery    = signal('');
   filterType     = signal('');
   filterBeds     = signal('');
@@ -91,9 +91,9 @@ export class UltraLuxuryProjectsComponent implements OnInit {
   readonly priceRanges = [
     { label: 'Any Price',     min: null,       max: null },
     { label: 'Under AED 5M',  min: null,       max: 5_000_000 },
-    { label: 'AED 5M – 10M',  min: 5_000_000,  max: 10_000_000 },
-    { label: 'AED 10M – 20M', min: 10_000_000, max: 20_000_000 },
-    { label: 'AED 20M – 50M', min: 20_000_000, max: 50_000_000 },
+    { label: 'AED 5M â€“ 10M',  min: 5_000_000,  max: 10_000_000 },
+    { label: 'AED 10M â€“ 20M', min: 10_000_000, max: 20_000_000 },
+    { label: 'AED 20M â€“ 50M', min: 20_000_000, max: 50_000_000 },
     { label: 'AED 50M+',      min: 50_000_000, max: null },
   ];
 
@@ -205,3 +205,4 @@ export class UltraLuxuryProjectsComponent implements OnInit {
 
   openUrl(url: string): void { window.open(url, '_blank'); }
 }
+

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, effect, inject } from '@angular/core';
+﻿import { Component, OnInit, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -198,7 +198,7 @@ export class ProjectsPublicComponent implements OnInit {
   }
 
   formatPrice(n: number): string {
-    if (!n || n === Infinity) return '—';
+    if (!n || n === Infinity) return 'â€”';
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
@@ -224,3 +224,4 @@ export class ProjectsPublicComponent implements OnInit {
     return toProjectSlug(p.title, p.id);
   }
 }
+

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+﻿import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -133,7 +133,7 @@ export class OffPlanComponent implements OnInit {
     { question: 'What qualifies as an off-plan project in Dubai?', answer: 'An off-plan property is one that is purchased before or during construction, directly from the developer at pre-launch prices.', open: false },
     { question: 'How reliable are off-plan developers in Dubai?', answer: 'Dubai\'s RERA regulates all developers and mandates escrow accounts to protect buyer funds.', open: false },
     { question: 'What payment plans are typically available?', answer: 'Most developers offer 40/60, 50/50, or post-handover plans. Some offer 1% monthly plans. Terms vary by developer and project.', open: false },
-    { question: 'When does property appreciation happen on new projects?', answer: 'Properties typically appreciate from launch to handover. Prime locations in Dubai have historically seen 15–30% appreciation over the project cycle.', open: false },
+    { question: 'When does property appreciation happen on new projects?', answer: 'Properties typically appreciate from launch to handover. Prime locations in Dubai have historically seen 15â€“30% appreciation over the project cycle.', open: false },
     { question: 'Can I invest in off-plan projects if I\'m based outside the UAE?', answer: 'Yes. Foreign nationals can purchase freehold property in designated areas. We can assist with remote signing and power of attorney.', open: false },
     { question: 'Is a mortgage available for off-plan properties in Dubai?', answer: 'Yes, banks offer off-plan mortgages up to 50% LTV during construction. Full mortgage kicks in at completion.', open: false },
   ];
@@ -154,3 +154,4 @@ export class OffPlanComponent implements OnInit {
     areas:             ['Downtown Dubai', 'Palm Jumeirah', 'Dubai Marina', 'Business Bay', 'DIFC', 'JBR', 'Jumeirah', 'Al Barsha', 'Arabian Ranches', 'Dubai South'],
   };
 }
+

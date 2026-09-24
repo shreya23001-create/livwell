@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+﻿import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { SupabaseService } from '../../shared/services/supabase.service';
@@ -87,8 +87,8 @@ export class AreasComponent implements OnInit {
     { q: 'Which areas in Dubai are freehold for expats?', a: 'Dubai has designated over 60 freehold areas where non-UAE nationals can purchase property. Key freehold areas include Downtown Dubai, Dubai Marina, Palm Jumeirah, Business Bay, JBR, JVC, Dubai Hills Estate, MBR City, and DAMAC Hills.' },
     { q: 'What is the most affordable area to buy property in Dubai?', a: 'Jumeirah Village Circle (JVC), International City, Discovery Gardens, Dubai South, and Dubailand are among the most affordable areas. Studios and 1-bedroom apartments start from AED 350,000.' },
     { q: 'Which Dubai community is best for families?', a: 'Dubai Hills Estate, Arabian Ranches, The Springs, Mudon, and Jumeirah are widely regarded as the best family-oriented communities, offering schools, parks, community centres, and a safe suburban environment.' },
-    { q: 'What is the average rental price in Dubai Marina?', a: 'As of 2026, average rentals in Dubai Marina range from AED 70,000–90,000/yr for a studio, AED 100,000–130,000/yr for a 1-bed, and AED 140,000–200,000/yr for a 2-bed apartment.' },
-    { q: 'Which areas offer the highest rental yield in Dubai?', a: 'JVC, Dubai Sports City, International City, Business Bay, and DAMAC Hills 2 consistently deliver the highest rental yields — typically 7–9% gross per annum.' },
+    { q: 'What is the average rental price in Dubai Marina?', a: 'As of 2026, average rentals in Dubai Marina range from AED 70,000â€“90,000/yr for a studio, AED 100,000â€“130,000/yr for a 1-bed, and AED 140,000â€“200,000/yr for a 2-bed apartment.' },
+    { q: 'Which areas offer the highest rental yield in Dubai?', a: 'JVC, Dubai Sports City, International City, Business Bay, and DAMAC Hills 2 consistently deliver the highest rental yields â€” typically 7â€“9% gross per annum.' },
     { q: 'What makes a Dubai area eligible for the Golden Visa through property?', a: 'Investors must purchase a completed property worth a minimum of AED 2,000,000 in a freehold area. The property must be fully paid (or equity portion exceeds AED 2M).' },
   ];
 
@@ -96,7 +96,7 @@ export class AreasComponent implements OnInit {
   toggleFaq(i: number) { this.openFaq.set(this.openFaq() === i ? null : i); }
 
   async ngOnInit(): Promise<void> {
-    // Fetch all data in parallel — commercial listings are in properties table filtered by type
+    // Fetch all data in parallel â€” commercial listings are in properties table filtered by type
     const commercialTypes = ['Office', 'Shop', 'Warehouse', 'Plot'];
     const [propRes, projRes] = await Promise.all([
       this.sb.from('properties').select('location,community,listing_type,type,price').eq('status', 'Published'),
@@ -118,7 +118,7 @@ export class AreasComponent implements OnInit {
       return areaMap.get(key)!;
     };
 
-    // Properties (residential + commercial — all in same table)
+    // Properties (residential + commercial â€” all in same table)
     for (const p of (propRes.data ?? [])) {
       const areaName = (p.community?.trim() || p.location?.trim());
       if (!areaName) continue;
@@ -145,7 +145,7 @@ export class AreasComponent implements OnInit {
       entry.projects++;
     }
 
-    // Build Area objects — merge entries with the same slug (e.g. full address vs short name)
+    // Build Area objects â€” merge entries with the same slug (e.g. full address vs short name)
     const slugMap = new Map<string, Area>();
     areaMap.forEach((v, name) => {
       const total = v.forSale + v.forRent + v.commercial + v.projects;
@@ -200,7 +200,7 @@ export class AreasComponent implements OnInit {
   }
 
   private formatPrice(n: number): string {
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
     if (n >= 1_000)     return (n / 1_000).toFixed(0) + 'K';
     return n.toString();
   }
@@ -228,3 +228,4 @@ export class AreasComponent implements OnInit {
     }
   }
 }
+

@@ -1,4 +1,4 @@
-import { Component, signal, computed, HostListener, ElementRef } from '@angular/core';
+﻿import { Component, signal, computed, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -80,7 +80,7 @@ const PROPERTY_TYPES = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio'
             <div class="fi-dropdown-wrap" #dropRef>
               <button type="button" class="fi-dropdown-btn" (click)="toggleDrop()">
                 @if (selectedLocations.length === 0) {
-                  <span class="fi-dropdown-placeholder">Select locations…</span>
+                  <span class="fi-dropdown-placeholder">Select locationsâ€¦</span>
                 } @else {
                   <span class="fi-dropdown-value">{{ selectedLocations.length }} location{{ selectedLocations.length > 1 ? 's' : '' }} selected</span>
                 }
@@ -90,7 +90,7 @@ const PROPERTY_TYPES = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio'
               @if (dropOpen()) {
                 <div class="fi-dropdown-menu">
                   <div class="fi-dropdown-search">
-                    <input type="text" placeholder="Search…" [(ngModel)]="locSearch" class="fi-drop-search-input" />
+                    <input type="text" placeholder="Searchâ€¦" [(ngModel)]="locSearch" class="fi-drop-search-input" />
                   </div>
                   <div class="fi-dropdown-opts">
                     @for (loc of filteredLocations(); track loc) {
@@ -116,7 +116,7 @@ const PROPERTY_TYPES = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Studio'
                 @for (loc of selectedLocations; track loc) {
                   <span class="fi-tag">
                     {{ loc }}
-                    <button type="button" class="fi-tag-remove" (click)="toggleLoc(loc)">×</button>
+                    <button type="button" class="fi-tag-remove" (click)="toggleLoc(loc)">Ã—</button>
                   </span>
                 }
               </div>
@@ -297,7 +297,7 @@ export class CustomerFutureInterestComponent {
   clampMax() { if (this.rateMax < this.rateMin + this.RATE_STEP) this.rateMax = this.rateMin + this.RATE_STEP; }
 
   formatAED(v: number): string {
-    if (v >= 1_000_000) return `AED ${(v / 1_000_000).toFixed(v % 1_000_000 === 0 ? 0 : 1)}M`;
+    if (v >= 1_000_000) return `AED ${(v / 1_000_000).toFixed(2)}M`;
     return `AED ${(v / 1000).toFixed(0)}K`;
   }
 
@@ -350,3 +350,4 @@ export class CustomerFutureInterestComponent {
     setTimeout(() => this.saved.set(false), 3000);
   }
 }
+

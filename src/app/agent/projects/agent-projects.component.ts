@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject, HostListener, PLATFORM_ID } from '@angular/core';
+﻿import { Component, OnInit, signal, computed, inject, HostListener, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -98,7 +98,7 @@ export class AgentProjectsComponent implements OnInit {
   form          = signal<ProjectForm>({ ...BLANK });
   amenityInput  = signal('');
 
-  // Images — drag-and-drop
+  // Images â€” drag-and-drop
   uploadingImg  = signal(false);
   imgDragOver   = signal(false);
 
@@ -201,7 +201,7 @@ export class AgentProjectsComponent implements OnInit {
   @HostListener('document:keydown.escape')
   onEsc() { if (this.showForm()) this.closeForm(); }
 
-  // ── Amenities ─────────────────────────────────────────
+  // â”€â”€ Amenities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   addAmenity() {
     const v = this.amenityInput().trim();
     if (!v) return;
@@ -213,7 +213,7 @@ export class AgentProjectsComponent implements OnInit {
     this.form.update(f => ({ ...f, amenities: f.amenities.filter((_, idx) => idx !== i) }));
   }
 
-  // ── Images — drag and drop ────────────────────────────
+  // â”€â”€ Images â€” drag and drop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   onImgDragOver(e: DragEvent) { e.preventDefault(); this.imgDragOver.set(true); }
   onImgDragLeave()             { this.imgDragOver.set(false); }
 
@@ -250,7 +250,7 @@ export class AgentProjectsComponent implements OnInit {
     this.form.update(f => ({ ...f, images: f.images.filter((_, idx) => idx !== i) }));
   }
 
-  // ── Video ─────────────────────────────────────────────
+  // â”€â”€ Video â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async onVideoFileChange(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0];
     (e.target as HTMLInputElement).value = '';
@@ -267,7 +267,7 @@ export class AgentProjectsComponent implements OnInit {
     this.uploadingVideo.set(false);
   }
 
-  // ── Save ──────────────────────────────────────────────
+  // â”€â”€ Save â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async save() {
     const f = this.form();
     if (!f.title.trim())    { this.saveError.set('Title is required.'); return; }
@@ -317,9 +317,9 @@ export class AgentProjectsComponent implements OnInit {
     setTimeout(() => this.closeForm(), 1500);
   }
 
-  // ── Excel import / export ─────────────────────────────
+  // â”€â”€ Excel import / export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   formatPrice(n: number) {
-    if (!n) return '—';
+    if (!n) return 'â€”';
     if (n >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000)     return `AED ${(n / 1_000).toFixed(0)}K`;
     return `AED ${n.toLocaleString()}`;
@@ -410,3 +410,4 @@ export class AgentProjectsComponent implements OnInit {
     this.projects.set(reloaded);
   }
 }
+

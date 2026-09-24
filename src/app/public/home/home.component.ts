@@ -484,7 +484,7 @@ export class HomeComponent implements OnInit {
           const priceNum = Number(p.price_from || 0);
           const priceStr = p.price_label
             ? p.price_label.replace(/^AED\s*/i, '').trim()
-            : priceNum > 0 ? (priceNum >= 1_000_000 ? `${(priceNum / 1_000_000).toFixed(1)}M` : `${(priceNum / 1_000).toFixed(0)}K`) : '';
+            : priceNum > 0 ? (priceNum >= 1_000_000 ? `${(priceNum / 1_000_000).toFixed(2)}M` : `${(priceNum / 1_000).toFixed(0)}K`) : '';
 
           return {
             id: p.id,
@@ -804,3 +804,4 @@ export class HomeComponent implements OnInit {
 
   navigateTo(commands: any[]): void { this.router.navigate(commands); }
 }
+

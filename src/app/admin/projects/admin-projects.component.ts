@@ -5,6 +5,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { AdminDataService } from '../../shared/services/admin-data.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { RichEditorComponent } from '../../shared/components/rich-editor/rich-editor.component';
 import { MsSelectComponent, MsOption } from '../../shared/components/ms-select/ms-select.component';
 import { AMENITY_ICONS } from '../../shared/constants/amenity-icons';
@@ -71,6 +72,7 @@ export class AdminProjectsComponent implements OnInit {
   public  auth      = inject(AuthService);
   private dataSvc   = inject(AdminDataService);
   private sanitizer = inject(DomSanitizer);
+  private toast     = inject(ToastService);
 
   projects     = signal<Project[]>([]);
   agents       = signal<{ name: string }[]>([]);
@@ -409,13 +411,18 @@ export class AdminProjectsComponent implements OnInit {
       faqs: this.faqs().filter(q => q.question.trim()),
     };
 
+    let error: any;
     if (this.editMode() && f.id) {
-      await this.sb.from('projects').update(payload).eq('id', f.id);
+      ({ error } = await this.sb.from('projects').update(payload).eq('id', f.id));
     } else {
-      await this.sb.from('projects').insert(payload);
+      ({ error } = await this.sb.from('projects').insert(payload));
     }
 
     this.saving.set(false);
+    if (error) {
+      this.toast.error('Save failed: ' + error.message);
+      return;
+    }
     this.showModal.set(false);
     await this.loadProjects();
   }

@@ -88,7 +88,7 @@ export class AdminProjectsComponent implements OnInit {
   showModal       = signal(false);
   editMode        = signal(false);
   form            = signal<Project>({ ...BLANK });
-  // Mutable draft â€” ngModel binds here; signal only updated on open/save
+  // Mutable draft — ngModel binds here; signal only updated on open/save
   draft: Project  = { ...BLANK };
   faqs            = signal<ProjectFaq[]>([]);
   amenityDropdownOpen = signal(false);
@@ -128,9 +128,9 @@ export class AdminProjectsComponent implements OnInit {
   typeOpts      = computed<MsOption[]>(() => this.masterPropTypes().map(t => ({ value: t, label: t })));
   statusOpts    = computed<MsOption[]>(() => this.statuses.map(s => ({ value: s, label: s })));
   badgeOpts     = computed<MsOption[]>(() => this.badges.map(b => ({ value: b, label: b || 'None' })));
-  trendOpts     = computed<MsOption[]>(() => [{ value: '', label: 'â€” None â€”' }, ...this.dataSvc.trendingTabs().map(t => ({ value: t, label: t }))]);
-  developerOpts = computed<MsOption[]>(() => [{ value: '', label: 'â€” Select Developer â€”' }, ...this.developers().map(d => ({ value: d.name, label: d.name }))]);
-  agentOpts     = computed<MsOption[]>(() => [{ value: '', label: 'â€” Unassigned â€”' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
+  trendOpts     = computed<MsOption[]>(() => [{ value: '', label: '— None —' }, ...this.dataSvc.trendingTabs().map(t => ({ value: t, label: t }))]);
+  developerOpts = computed<MsOption[]>(() => [{ value: '', label: '— Select Developer —' }, ...this.developers().map(d => ({ value: d.name, label: d.name }))]);
+  agentOpts     = computed<MsOption[]>(() => [{ value: '', label: '— Unassigned —' }, ...this.agents().map(a => ({ value: a.name, label: a.name }))]);
   amenityOpts   = computed<MsOption[]>(() => this.masterAmenities().map(a => ({
     value: a.name, label: a.name,
   })));

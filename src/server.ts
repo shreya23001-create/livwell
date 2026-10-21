@@ -1,3 +1,9 @@
+// Polyfill WebSocket for Node 20 (Supabase requires it; Node 22 has it natively)
+if (!globalThis.WebSocket) {
+  const ws = await import('ws' as any).catch(() => null);
+  if (ws?.default) (globalThis as any).WebSocket = ws.default;
+}
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,

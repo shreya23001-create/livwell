@@ -235,28 +235,9 @@
     <div class="container-custom">
       <div class="trust-black-inner">
 
-        <!-- Stats + tagline (left/center) -->
+        <!-- Tagline (left/center) -->
         <div class="trust-left">
-          <div class="trust-stats-row">
-            <div class="trust-stat">
-              <span class="trust-num">20+</span>
-              <span class="trust-lbl">Agents</span>
-            </div>
-            <div class="trust-stat">
-              <span class="trust-num">17 Years</span>
-              <span class="trust-lbl">of Experience</span>
-            </div>
-            <div class="trust-stat">
-              <span class="trust-num">25 Offices</span>
-              <span class="trust-lbl">across Dubai</span>
-            </div>
-          </div>
-          <p class="trust-tagline">Every real estate decision. One trusted partner.</p>
-        </div>
-
-        <!-- Arabian Property Awards badge (right) -->
-        <div class="trust-award">
-          <img src="images/arabian-property.png" alt="Arabian Property Awards Winner 2025-2026" class="award-img">
+          <p class="trust-tagline">Dubai's most trusted real estate partner — luxury, investment, and lifestyle properties.</p>
         </div>
 
       </div>
@@ -324,7 +305,7 @@
   <!-- White bottom block: developer logos -->
   <div class="trust-white">
     <div class="container-custom">
-      <h3 class="trust-dev-heading">Trusted Partner of the Most Prominent Developers</h3>
+      <h3 class="trust-dev-heading">In Partnership With Dubai's Premier Developers</h3>
       <div class="trust-dev-logos">
         <!-- Dynamic logos from admin -->
         <ng-container *ngIf="partnerLogos().length > 0">
@@ -489,28 +470,6 @@
             <!-- Original set -->
             <ng-container *ngFor="let agent of teamAreas()[activeTeam()]?.agents">
               <div class="team-agent-card">
-                <div class="team-agent-img-wrap">
-                  <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
-                  <div *ngIf="!agent.avatar" class="team-agent-img team-agent-initials">
-                    {{ initials(agent.name) }}
-                  </div>
-                  <div class="team-agent-info">
-                    <p class="team-agent-name">{{ agent.name }}</p>
-                    <p class="team-agent-role">{{ agent.role }}</p>
-                  </div>
-                  <a [href]="'https://wa.me/' + agent.phone.replace(/[^0-9]/g, '')" class="team-wa-btn" target="_blank"
-                    rel="noopener">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
-                      <path
-                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </ng-container>
-            <!-- Duplicate set for seamless loop -->
-            <ng-container *ngFor="let agent of teamAreas()[activeTeam()]?.agents">
-              <div class="team-agent-card" aria-hidden="true">
                 <div class="team-agent-img-wrap">
                   <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="team-agent-img">
                   <div *ngIf="!agent.avatar" class="team-agent-img team-agent-initials">
@@ -1046,67 +1005,6 @@
   </div>
 </section>
 
-<!-- ============================================================
-     TOP AGENTS
-     ============================================================ -->
-<section class="agents-section section-padding" id="business-associates">
-  <div class="container-custom">
-    <div class="section-header animate-on-scroll">
-      <div class="section-label">Our Experts</div>
-      <h2 class="section-title">Meet Our Business Associates</h2>
-      <p class="section-desc">Experienced professionals dedicated to finding your ideal property</p>
-    </div>
-
-    <div class="agents-carousel-wrap">
-      <div class="agents-grid">
-        <!-- Original set -->
-        <div *ngFor="let agent of displayedAgents(); let i = index" class="agent-card animate-on-scroll"
-          [class]="'delay-' + (i * 100 + 100)">
-          <div class="agent-avatar-wrap">
-            <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
-            <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">
-              {{ initials(agent.name) }}
-            </div>
-            <div class="agent-rating">★ 5.0</div>
-          </div>
-          <h3 class="agent-name">{{ agent.name }}</h3>
-          <p class="agent-role">{{ agent.role }}</p>
-          <div class="agent-contact-info">
-            <a [href]="'https://wa.me/' + agent.phone" target="_blank" rel="noopener"
-              class="agent-contact-line agent-contact-line--wa">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
-              </svg>
-              {{ agent.phone }}
-            </a>
-            <a [href]="'mailto:' + agent.email" class="agent-contact-line">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-              </svg>
-              {{ agent.email }}
-            </a>
-          </div>
-        </div>
-        <!-- Duplicate set for seamless loop on mobile only -->
-        <div *ngFor="let agent of displayedAgents()" class="agent-card agent-card-duplicate" aria-hidden="true">
-          <div class="agent-avatar-wrap">
-            <img *ngIf="agent.avatar" [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
-            <div *ngIf="!agent.avatar" class="agent-avatar agent-avatar-initials">{{ initials(agent.name) }}</div>
-            <div class="agent-rating">★ 5.0</div>
-          </div>
-          <h3 class="agent-name">{{ agent.name }}</h3>
-          <p class="agent-role">{{ agent.role }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="text-center mt-12 animate-on-scroll">
-      <a routerLink="/agents" class="btn-outline">Meet All Agents</a>
-    </div>
-  </div>
-</section>
 
 <!-- ============================================================
      TESTIMONIALS

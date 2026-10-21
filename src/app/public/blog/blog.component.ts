@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 interface Guide {
   slug: string;
   title: string;
@@ -18,9 +19,16 @@ interface Guide {
   templateUrl: './blog.component.html',
   styleUrl: './blog.component.scss',
 })
-export class BlogComponent {
+export class BlogComponent implements OnInit {
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
   email = signal('');
   subscribed = signal(false);
+
+  ngOnInit(): void {
+    this.titleSvc.setTitle('Property Guides | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Read Livwell\'s property guides for buyers, sellers, renters and investors in Dubai. Expert advice on the UAE market.' });
+  }
 
   readonly guides: Guide[] = [
     {

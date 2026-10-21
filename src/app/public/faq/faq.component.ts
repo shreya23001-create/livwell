@@ -1,6 +1,6 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, Title, Meta } from '@angular/platform-browser';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
@@ -77,6 +77,8 @@ const FALLBACK_FAQS: Faq[] = [
 export class FaqComponent implements OnInit {
   private sb        = inject(SupabaseService).client;
   private sanitizer = inject(DomSanitizer);
+  private titleSvc  = inject(Title);
+  private metaSvc   = inject(Meta);
 
   openId = signal<number | null>(null);
   currentPage = signal(1);
@@ -87,6 +89,8 @@ export class FaqComponent implements OnInit {
   allFaqs = signal<Faq[]>(FALLBACK_FAQS);
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Dubai Real Estate FAQs | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Answers to frequently asked questions about buying, selling and renting property in Dubai with Livwell.' });
     const { data, error } = await this.sb
       .from('faqs')
       .select('id, question, answer, category, sort_order, is_active')

@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
@@ -31,7 +32,8 @@ const CATEGORIES = ['All', 'Market Insights', 'Investment', 'Lifestyle', 'Regula
   styleUrl: './blog-list.component.scss',
 })
 export class BlogListComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb       = inject(SupabaseService).client;
+  private titleSvc = inject(Title);
 
   posts      = signal<BlogPost[]>([]);
   loading    = signal(true);
@@ -52,6 +54,7 @@ export class BlogListComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Dubai Real Estate Blog | Livwell');
     const { data } = await this.sb.from('blogs').select('*').eq('published', true).order('published_at', { ascending: false });
     this.posts.set((data ?? []) as BlogPost[]);
     this.loading.set(false);

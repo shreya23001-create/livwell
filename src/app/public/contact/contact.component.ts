@@ -1,5 +1,6 @@
 import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
-import { Component, signal, inject, computed } from '@angular/core';
+import { Component, signal, inject, computed, OnInit } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -34,9 +35,16 @@ interface Office {
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
 })
-export class ContactComponent {
-  private dataSvc = inject(AdminDataService);
-  private sb      = inject(SupabaseService).client;
+export class ContactComponent implements OnInit {
+  private dataSvc  = inject(AdminDataService);
+  private sb       = inject(SupabaseService).client;
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
+
+  ngOnInit(): void {
+    this.titleSvc.setTitle('Contact Us | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Contact Livwell Real Estate in Dubai. Call, WhatsApp or email our team for property enquiries and expert advice.' });
+  }
 
   whatsappNumber = computed(() => this.dataSvc.whatsappNumber());
   socialLinks    = computed(() => this.dataSvc.socialLinks());

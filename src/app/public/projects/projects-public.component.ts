@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
@@ -37,10 +38,12 @@ interface Project {
   styleUrl: './projects-public.component.scss',
 })
 export class ProjectsPublicComponent implements OnInit {
-  private sb     = inject(SupabaseService).client;
-  private route  = inject(ActivatedRoute);
-  private router = inject(Router);
-  private auth   = inject(AuthService);
+  private sb       = inject(SupabaseService).client;
+  private route    = inject(ActivatedRoute);
+  private router   = inject(Router);
+  private auth     = inject(AuthService);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   savedIds      = signal<Set<number>>(new Set());
   shareToastId  = signal<number | null>(null);
@@ -172,6 +175,8 @@ export class ProjectsPublicComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.titleSvc.setTitle('Dubai Real Estate Projects | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Browse Dubai real estate projects. New launches, established communities and investment opportunities with Livwell.' });
     // Subscribe so query params apply even if component was already active
     this.route.queryParams.subscribe(params => {
       if (params['q'])        this.searchQuery.set(params['q']);

@@ -5,6 +5,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { GoogleLoginProvider, SocialAuthServiceConfig, SOCIAL_AUTH_CONFIG } from '@abacritt/angularx-social-login';
 
 import { routes } from './app.routes';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 // Replace with your real Google Client ID from console.cloud.google.com
 //export const GOOGLE_CLIENT_ID = '491554011088-pvlr7ccntg9lvjd688933qii69goh5dv.apps.googleusercontent.com';
@@ -35,6 +36,6 @@ export const appConfig: ApplicationConfig = {
         ],
         onError: (err: unknown) => console.error('Social auth error:', err),
       } as SocialAuthServiceConfig,
-    },
+    }, provideClientHydration(withEventReplay()),
   ],
 };

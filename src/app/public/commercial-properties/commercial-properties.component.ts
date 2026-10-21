@@ -1,6 +1,7 @@
 import { Component, computed, signal, HostListener, ElementRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -42,8 +43,10 @@ interface CommercialProperty {
 })
 export class CommercialPropertiesComponent implements OnInit {
 
-  private sb   = inject(SupabaseService).client;
-  private auth = inject(AuthService);
+  private sb       = inject(SupabaseService).client;
+  private auth     = inject(AuthService);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   savedIds     = signal<Set<number>>(new Set());
   savingId     = signal<number | null>(null);
@@ -312,6 +315,8 @@ export class CommercialPropertiesComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Commercial Properties in Dubai | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Find commercial property for sale and rent in Dubai. Offices, retail, warehouses and investment opportunities.' });
     this.auth.waitForSession().then(() => this.loadSavedIds());
     await this.loadProperties();
   }

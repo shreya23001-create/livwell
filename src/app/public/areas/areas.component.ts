@@ -1,6 +1,7 @@
 ﻿import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 
 export interface Area {
@@ -73,8 +74,10 @@ function getImage(name: string): string {
   styleUrl: './areas.component.scss',
 })
 export class AreasComponent implements OnInit {
-  private sb     = inject(SupabaseService).client;
-  private router = inject(Router);
+  private sb       = inject(SupabaseService).client;
+  private router   = inject(Router);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   searchQuery  = signal('');
   activeType   = signal('All');
@@ -96,6 +99,8 @@ export class AreasComponent implements OnInit {
   toggleFaq(i: number) { this.openFaq.set(this.openFaq() === i ? null : i); }
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Dubai Areas & Communities | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Explore the best areas to live and invest in Dubai. Community guides, property prices and lifestyle insights.' });
     // Fetch all data in parallel â€” commercial listings are in properties table filtered by type
     const commercialTypes = ['Office', 'Shop', 'Warehouse', 'Plot'];
     const [propRes, projRes] = await Promise.all([

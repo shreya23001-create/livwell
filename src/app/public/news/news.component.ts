@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Title, Meta } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -30,7 +31,9 @@ export interface NewsArticle {
   styleUrl: './news.component.scss',
 })
 export class NewsComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb       = inject(SupabaseService).client;
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   readonly perPage = 10;
 
@@ -93,6 +96,8 @@ export class NewsComponent implements OnInit {
   featuredPosts = computed(() => this.posts().filter(p => p.featured).slice(0, 5));
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Dubai Real Estate News | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Stay updated with the latest Dubai real estate news, market trends and property investment insights from Livwell.' });
     const { data } = await this.sb.from('blogs').select('*').eq('published', true).order('published_at', { ascending: false });
     this.posts.set((data ?? []) as NewsArticle[]);
     this.loading.set(false);

@@ -278,6 +278,11 @@
       </div>
     </div>
 
+    <!-- Page heading from SEO links -->
+    <div *ngIf="pageHeading()" class="props-page-heading">
+      <h1>{{ pageHeading() }}</h1>
+    </div>
+
     <!-- Active filter chips -->
     <div class="active-filters" *ngIf="activeFiltersCount() > 0">
       <span *ngIf="selectedStatus()" class="filter-chip">

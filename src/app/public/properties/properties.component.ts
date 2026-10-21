@@ -2,7 +2,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, Title, Meta } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { toPropertySlug } from '../../shared/utils/slug';
@@ -436,6 +436,8 @@ export class PropertiesComponent implements OnInit {
 
   private sanitizer = inject(DomSanitizer);
   private auth      = inject(AuthService);
+  private titleSvc  = inject(Title);
+  private metaSvc   = inject(Meta);
 
   savedIds     = signal<Set<number>>(new Set());
   savingId     = signal<number | null>(null);
@@ -461,9 +463,14 @@ export class PropertiesComponent implements OnInit {
     });
   }
 
+  pageHeading = signal('');
+
   async ngOnInit(): Promise<void> {
     this.auth.waitForSession().then(() => this.loadSavedIds());
     this.route.queryParams.subscribe(params => {
+      if (params['title'])     this.pageHeading.set(params['title']);
+      this.titleSvc.setTitle(params['title'] ? `${params['title']} | Livwell` : 'Properties for Sale & Rent in Dubai | Livwell');
+      this.metaSvc.updateTag({ name: 'description', content: 'Search properties for sale and rent in Dubai. Filter by area, type, price and bedrooms. Updated listings from Livwell.' });
       if (params['type'])      { this.selectedType.set(params['type']); this.selectedTypes.set([params['type']]); }
       if (params['status'])    this.selectedStatus.set(params['status']);
       if (params['location'])  { this.selectedLocations.set(params['location'].split('|').map((l: string) => l.trim()).filter(Boolean)); }

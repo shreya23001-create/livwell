@@ -1,7 +1,7 @@
 ﻿import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, Title, Meta } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../shared/services/supabase.service';
 
@@ -42,6 +42,8 @@ export class OffPlanComponent implements OnInit {
   private sb        = inject(SupabaseService).client;
   private route     = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
+  private titleSvc  = inject(Title);
+  private metaSvc   = inject(Meta);
 
   allProjects = signal<OffPlanProject[]>([]);
   loading     = signal(true);
@@ -83,6 +85,8 @@ export class OffPlanComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Off Plan Properties in Dubai | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Explore off-plan property projects in Dubai. Flexible payment plans, prime locations and trusted developers.' });
     this.route.queryParams.subscribe(params => {
       if (params['type']) this.selectedType.set(params['type']);
     });

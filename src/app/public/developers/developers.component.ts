@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 
 interface Developer {
@@ -29,7 +30,9 @@ interface Developer {
   styleUrl: './developers.component.scss',
 })
 export class DevelopersComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb       = inject(SupabaseService).client;
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   searchQuery   = signal('');
   activeFilter  = signal('All');
@@ -57,6 +60,8 @@ export class DevelopersComponent implements OnInit {
   readonly filters = ['All', 'Featured', 'UAE', 'International'];
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Real Estate Developers in Dubai | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Meet Dubai\'s top property developers. Off-plan launches, completed projects and track records reviewed by Livwell.' });
     const [{ data, error }, { data: projData }] = await Promise.all([
       this.sb
         .from('developers')

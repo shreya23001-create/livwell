@@ -1970,13 +1970,14 @@ $gold-light: #e8c870;
 
 .teams-carousel-track {
   display: flex;
-  gap: 1rem;
-  width: max-content;
-  animation: teams-scroll 12s linear infinite;
+  gap: 1.5rem;
+  width: 100%;
+  /* animation: teams-scroll 12s linear infinite; */
 }
 
 .team-agent-card {
-  flex: 0 0 300px;
+  flex: 1 1 0;
+  min-width: 220px;
   scroll-snap-align: start;
   border-radius: 1rem;
   overflow: hidden;
@@ -2118,7 +2119,7 @@ $gold-light: #e8c870;
   }
 
   .teams-carousel-track {
-    animation: teams-scroll 14s linear infinite;
+    /* animation: teams-scroll 14s linear infinite; */
   }
 
   .team-agent-card {

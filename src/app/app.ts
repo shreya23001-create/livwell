@@ -87,19 +87,21 @@ export class App implements OnInit {
         }
 
         // Segment-based match (handles detail pages — title set by each component via Title service)
-        // Fall back to first-segment match
-        const firstSegment = path.split('/')[0];
-        const secondSegment = path.split('/').slice(0, 2).join('/');
+        const segments = path.split('/');
+        const firstSegment = segments[0];
+        const secondSegment = segments.slice(0, 2).join('/');
         if (ROUTE_TITLES[secondSegment]) {
           this.titleSvc.setTitle(ROUTE_TITLES[secondSegment]);
           return;
         }
-        if (ROUTE_TITLES[firstSegment]) {
+        // Only use first-segment fallback for top-level routes (no child slug)
+        // Detail pages (guides/:slug, news/:slug etc.) set their own title via component
+        if (segments.length === 1 && ROUTE_TITLES[firstSegment]) {
           this.titleSvc.setTitle(ROUTE_TITLES[firstSegment]);
           return;
         }
 
-        this.titleSvc.setTitle('Livwell — Dubai Real Estate');
+        // Don't override — detail components (guides/:slug, news/:slug etc.) set their own title
       });
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
@@ -14,8 +15,9 @@ import type { BlogPost } from '../blog-list/blog-list.component';
   styleUrl: './blog-detail.component.scss',
 })
 export class BlogDetailComponent implements OnInit {
-  private sb    = inject(SupabaseService).client;
-  private route = inject(ActivatedRoute);
+  private sb       = inject(SupabaseService).client;
+  private route    = inject(ActivatedRoute);
+  private titleSvc = inject(Title);
 
   post    = signal<BlogPost | null>(null);
   related = signal<BlogPost[]>([]);
@@ -27,6 +29,7 @@ export class BlogDetailComponent implements OnInit {
     const { data } = await this.sb.from('blogs').select('*').eq('slug', slug).eq('published', true).single();
     if (!data) { this.notFound.set(true); this.loading.set(false); return; }
     this.post.set(data as BlogPost);
+    this.titleSvc.setTitle(`${(data as BlogPost).title} | Livwell`);
     this.loading.set(false);
 
     // load related (same category, exclude current)

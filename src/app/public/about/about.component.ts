@@ -1,6 +1,7 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { AdminDataService } from '../../shared/services/admin-data.service';
@@ -15,8 +16,15 @@ interface CoreValue { title: string; body: string; }
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
 })
-export class AboutComponent {
-  private dataSvc = inject(AdminDataService);
+export class AboutComponent implements OnInit {
+  private dataSvc  = inject(AdminDataService);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
+
+  ngOnInit(): void {
+    this.titleSvc.setTitle('About Livwell Real Estate | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Learn about Livwell Real Estate — Dubai\'s trusted property agency. Our story, values and commitment to clients.' });
+  }
 
   aboutPage = computed(() => this.dataSvc.pages().find(p => p.id === 'about-hero'));
   heroTitle = computed(() => this.aboutPage()?.heading || 'About Livwell');

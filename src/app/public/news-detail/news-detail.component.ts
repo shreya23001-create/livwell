@@ -1,7 +1,7 @@
 ﻿import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, Title, Meta } from '@angular/platform-browser';
 import { SupabaseService } from '../../shared/services/supabase.service';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -18,6 +18,8 @@ export class NewsDetailComponent implements OnInit {
   private sb        = inject(SupabaseService).client;
   private route     = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
+  private titleSvc  = inject(Title);
+  private metaSvc   = inject(Meta);
 
   post     = signal<NewsArticle | null>(null);
   related  = signal<NewsArticle[]>([]);
@@ -35,6 +37,8 @@ export class NewsDetailComponent implements OnInit {
     this.sb.from('blogs').update({ views: newViews }).eq('id', data.id).then(() => {});
 
     this.post.set({ ...data, views: newViews } as NewsArticle);
+    setTimeout(() => this.titleSvc.setTitle(`${data.title} | Livwell`));
+    this.metaSvc.updateTag({ name: 'description', content: data.excerpt ?? data.title });
     this.loading.set(false);
 
     const [{ data: rel }, { data: feat }] = await Promise.all([

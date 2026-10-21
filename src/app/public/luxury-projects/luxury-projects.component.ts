@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -35,11 +36,13 @@ interface Project {
   styleUrl: './luxury-projects.component.scss',
 })
 export class LuxuryProjectsComponent implements OnInit {
-  private sb      = inject(SupabaseService).client;
-  private route   = inject(ActivatedRoute);
-  private router  = inject(Router);
-  private auth    = inject(AuthService);
-  private dataSvc = inject(AdminDataService);
+  private sb       = inject(SupabaseService).client;
+  private route    = inject(ActivatedRoute);
+  private router   = inject(Router);
+  private auth     = inject(AuthService);
+  private dataSvc  = inject(AdminDataService);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   savedIds     = signal<Set<number>>(new Set());
   shareToastId = signal<number | null>(null);
@@ -149,6 +152,8 @@ export class LuxuryProjectsComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.titleSvc.setTitle('Luxury Projects in Dubai | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Discover Dubai\'s most prestigious luxury real estate projects. Ultra-premium residences by the finest developers.' });
     this.route.queryParamMap.subscribe(params => {
       this.filter.set(params.get('filter') ?? '');
       this.loadProjects();

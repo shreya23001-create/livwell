@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -34,10 +35,11 @@ interface Project {
   styleUrl: './ultra-luxury-projects.component.scss',
 })
 export class UltraLuxuryProjectsComponent implements OnInit {
-  private sb      = inject(SupabaseService).client;
-  private auth    = inject(AuthService);
-  private router  = inject(Router);
-  private dataSvc = inject(AdminDataService);
+  private sb       = inject(SupabaseService).client;
+  private auth     = inject(AuthService);
+  private router   = inject(Router);
+  private dataSvc  = inject(AdminDataService);
+  private titleSvc = inject(Title);
 
   allProjects  = signal<Project[]>([]);
   loading      = signal(true);
@@ -138,6 +140,7 @@ export class UltraLuxuryProjectsComponent implements OnInit {
   });
 
   async ngOnInit() {
+    this.titleSvc.setTitle('Ultra Luxury Projects in Dubai | Livwell');
     const { data } = await this.sb
       .from('projects').select('*')
       .eq('status', 'Published')

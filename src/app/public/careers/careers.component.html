@@ -218,19 +218,18 @@
 
     <!-- Form -->
     <form *ngIf="!submitted()" class="cj-form" (ngSubmit)="submitApplication()" (submit)="$event.preventDefault()">
-      <div class="cj-form-row">
-        <div class="cj-field">
-          <label class="cj-label">Full Name *</label>
-          <input class="cj-input" [class.cj-input-error]="formErrors()['name']"
-            type="text" placeholder="Ahmed Al-Rashidi"
-            [value]="applyForm().name" (input)="patchForm('name', $any($event.target).value)" />
-          <span class="cj-error" *ngIf="formErrors()['name']">{{ formErrors()['name'] }}</span>
-        </div>
-        <div class="cj-field">
-          <label class="cj-label">Phone Number *</label>
-          <app-phone-input [ngModel]="applyForm().phone" (ngModelChange)="patchForm('phone', $event)" name="phone" placeholder="50 000 0000" [hasError]="!!formErrors()['phone']"></app-phone-input>
-          <span class="cj-error" *ngIf="formErrors()['phone']">{{ formErrors()['phone'] }}</span>
-        </div>
+      <div class="cj-field">
+        <label class="cj-label">Full Name *</label>
+        <input class="cj-input" [class.cj-input-error]="formErrors()['name']"
+          type="text" placeholder="Ahmed Al-Rashidi"
+          [value]="applyForm().name" (input)="patchForm('name', $any($event.target).value)" />
+        <span class="cj-error" *ngIf="formErrors()['name']">{{ formErrors()['name'] }}</span>
+      </div>
+
+      <div class="cj-field">
+        <label class="cj-label">Phone Number *</label>
+        <app-phone-input [ngModel]="applyForm().phone" (ngModelChange)="patchForm('phone', $event)" name="phone" placeholder="50 000 0000" [hasError]="!!formErrors()['phone']"></app-phone-input>
+        <span class="cj-error" *ngIf="formErrors()['phone']">{{ formErrors()['phone'] }}</span>
       </div>
 
       <div class="cj-field">

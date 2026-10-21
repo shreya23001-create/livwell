@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { SupabaseService } from '../../shared/services/supabase.service';
 
@@ -22,12 +23,16 @@ interface PublicAgent {
   styleUrl: './agents.component.scss',
 })
 export class AgentsComponent implements OnInit {
-  private sb = inject(SupabaseService).client;
+  private sb       = inject(SupabaseService).client;
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   agents  = signal<PublicAgent[]>([]);
   loading = signal(true);
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Our Business Associates | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Meet Livwell\'s team of RERA-registered Dubai real estate agents. Expert advice for buyers, sellers and investors.' });
     const { data } = await this.sb
       .from('profiles')
       .select('id, name, email, phone, avatar_url, bio, designation')

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Block admin and portal routes from indexing
+Disallow: /admin/
+Disallow: /agent/
+Disallow: /my/
+Disallow: /customer/
+
+Sitemap: https://www.livwelldubai.ae/sitemap.xml

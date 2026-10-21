@@ -1,5 +1,6 @@
 ﻿import { Component, OnInit, ElementRef, QueryList, ViewChild, ViewChildren, PLATFORM_ID, Inject, signal, computed, effect, inject, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser, UpperCasePipe } from '@angular/common';
+import { Title, Meta } from '@angular/platform-browser';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
@@ -97,11 +98,13 @@ interface NewsArticle {
   styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {
-  private dataSvc = inject(AdminDataService);
-  private sb = inject(SupabaseService).client;
-  private auth = inject(AuthService);
-  private zone = inject(NgZone);
-  private router = inject(Router);
+  private dataSvc  = inject(AdminDataService);
+  private sb       = inject(SupabaseService).client;
+  private auth     = inject(AuthService);
+  private zone     = inject(NgZone);
+  private router   = inject(Router);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   savedPropertyIds = signal<Set<number>>(new Set());
   savedProjectIds = signal<Set<number>>(new Set());
@@ -656,6 +659,8 @@ export class HomeComponent implements OnInit {
   private slideInterval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
+    this.titleSvc.setTitle('Livwell Real Estate — Dubai Property for Sale & Rent');
+    this.metaSvc.updateTag({ name: 'description', content: 'Buy, rent and invest in Dubai real estate with Livwell. Expert agents, luxury properties, off-plan projects and investment advice.' });
     this.loadHomeData();
     this.loadSavedIds();
     if (isPlatformBrowser(this.platformId)) {

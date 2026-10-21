@@ -1,5 +1,6 @@
 import { PhoneInputComponent } from '../../shared/components/phone-input/phone-input.component';
 import { Component, OnInit, signal, inject } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
@@ -54,8 +55,10 @@ const EMPTY_FORM = (): ApplyForm => ({
   styleUrl: './careers.component.scss',
 })
 export class CareersComponent implements OnInit {
-  private sb    = inject(SupabaseService).client;
-  private toast = inject(ToastService);
+  private sb       = inject(SupabaseService).client;
+  private toast    = inject(ToastService);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   openFaq      = signal<number | null>(null);
 
@@ -107,6 +110,8 @@ export class CareersComponent implements OnInit {
   ];
 
   async ngOnInit() {
+    this.titleSvc.setTitle('Careers at Livwell | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Join the Livwell team in Dubai. Real estate career opportunities for agents, support staff and professionals.' });
     const { data } = await this.sb
       .from('job_posts')
       .select('*')

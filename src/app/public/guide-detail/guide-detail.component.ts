@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 
 interface GuideStep {
   number: number;
@@ -216,13 +217,22 @@ const GUIDES: Guide[] = [
   styleUrl: './guide-detail.component.scss',
 })
 export class GuideDetailComponent implements OnInit {
-  private route = inject(ActivatedRoute);
+  private route    = inject(ActivatedRoute);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
-  guide    = signal<Guide | null>(null);
+  guide     = signal<Guide | null>(null);
   allGuides = ALL_GUIDES;
 
   ngOnInit(): void {
-    const slug = this.route.snapshot.paramMap.get('slug');
-    this.guide.set(GUIDES.find(g => g.slug === slug) ?? null);
+    this.route.paramMap.subscribe(params => {
+      const slug = params.get('slug');
+      const g = GUIDES.find(g => g.slug === slug) ?? null;
+      this.guide.set(g);
+      if (g) {
+        setTimeout(() => this.titleSvc.setTitle(`${g.title} | Livwell`));
+        this.metaSvc.updateTag({ name: 'description', content: g.hero });
+      }
+    });
   }
 }

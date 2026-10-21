@@ -640,6 +640,18 @@
   min-width: 0;
 }
 
+/* ── Page Heading (from SEO links) ───────────────── */
+.props-page-heading {
+  padding: 0.5rem 0 1.5rem;
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0a1628;
+    margin: 0;
+  }
+}
+
 /* ── Toolbar ──────────────────────────────────────── */
 .props-toolbar {
   display: flex;
@@ -910,7 +922,10 @@
   color: #92400e;
   margin-bottom: 1rem;
 
-  svg { flex-shrink: 0; color: #d97706; }
+  svg {
+    flex-shrink: 0;
+    color: #d97706;
+  }
 }
 
 /* =====================================================

@@ -1,7 +1,7 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, Title, Meta } from '@angular/platform-browser';
 import { Area } from '../areas/areas.component';
 
 interface AreaDetail extends Area {
@@ -107,9 +107,11 @@ export class AreaDetailComponent implements OnInit {
   activeImage = signal(0);
   openFaq = signal<number | null>(null);
 
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private route     = inject(ActivatedRoute);
+  private router    = inject(Router);
   private sanitizer = inject(DomSanitizer);
+  private titleSvc  = inject(Title);
+  private metaSvc   = inject(Meta);
 
 
   ngOnInit() {
@@ -118,6 +120,8 @@ export class AreaDetailComponent implements OnInit {
       const found = AREA_DATA[slug] ?? buildGeneric(slug, this.getAreas());
       if (found) {
         this.area.set(found);
+        this.titleSvc.setTitle(`${found.name} Real Estate | Livwell`);
+        this.metaSvc.updateTag({ name: 'description', content: `${found.name} — property guide, prices and lifestyle in Dubai.` });
         this.notFound.set(false);
       } else {
         this.notFound.set(true);

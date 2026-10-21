@@ -1,6 +1,7 @@
 import { Component, computed, signal, HostListener, ElementRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { NewsletterSectionComponent } from '../../shared/components/newsletter-section/newsletter-section.component';
 import { SeoLinksSectionComponent } from '../../shared/components/seo-links-section/seo-links-section.component';
@@ -42,9 +43,11 @@ const LUXE_TYPES = ['Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Home', 'Man
   styleUrl: './luxury-properties-for-sale.component.scss',
 })
 export class LuxuryPropertiesForSaleComponent implements OnInit {
-  private sb    = inject(SupabaseService).client;
-  private auth  = inject(AuthService);
-  private router2 = inject(Router);
+  private sb       = inject(SupabaseService).client;
+  private auth     = inject(AuthService);
+  private router2  = inject(Router);
+  private titleSvc = inject(Title);
+  private metaSvc  = inject(Meta);
 
   savedIds     = signal<Set<number>>(new Set());
   shareToastId = signal<number | null>(null);
@@ -209,6 +212,8 @@ export class LuxuryPropertiesForSaleComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.titleSvc.setTitle('Luxury Properties for Sale in Dubai | Livwell');
+    this.metaSvc.updateTag({ name: 'description', content: 'Browse luxury properties for sale in Dubai. Prime villas, penthouses and high-end apartments with Livwell.' });
     await this.loadProperties();
   }
 

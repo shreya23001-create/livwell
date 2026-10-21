@@ -1,0 +1,93 @@
+<div class="ps-page">
+
+  <div class="ps-breadcrumb">
+    <a routerLink="/">Home</a>
+    <span class="ps-breadcrumb-sep">›</span>
+    <span>{{ pageTitle() }}</span>
+  </div>
+
+  <h1 class="ps-title">{{ pageTitle() }}</h1>
+  <p class="ps-subtitle">Browse available properties in Dubai</p>
+
+  <div *ngIf="isLoading()" class="ps-loading">
+    <div class="ps-spinner"></div>
+    <p>Loading properties…</p>
+  </div>
+
+  <p *ngIf="!isLoading() && showingAll()" class="ps-showing-all">
+    No exact matches found — showing all available properties in Dubai.
+  </p>
+
+  <div *ngIf="!isLoading() && paginatedProperties().length > 0" class="ps-grid">
+    <a *ngFor="let p of paginatedProperties()"
+       [routerLink]="['/properties', propertyLink(p)]"
+       class="ps-card">
+
+      <div class="ps-card-img-wrap">
+        <img [src]="getImage(p.images)"
+             [alt]="p.title"
+             class="ps-card-img"
+             loading="lazy"
+             (error)="$any($event.target).src='/images/dummy-image.png'">
+        <span class="ps-card-type-badge">{{ p.type }}</span>
+      </div>
+
+      <div class="ps-card-body">
+        <div class="ps-card-price">{{ formatPrice(p.price, p.listing_type) }}</div>
+        <h3 class="ps-card-title">{{ p.title }}</h3>
+
+        <div class="ps-card-location">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd" />
+          </svg>
+          {{ p.community || p.location }}
+        </div>
+
+        <div class="ps-card-specs">
+          <span class="ps-spec" *ngIf="p.bedrooms >= 0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            {{ formatBeds(p.bedrooms) }}
+          </span>
+          <span class="ps-spec-sep">·</span>
+          <span class="ps-spec">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33" />
+            </svg>
+            {{ p.bathrooms }} Bath
+          </span>
+          <span class="ps-spec-sep" *ngIf="p.area_sqft">·</span>
+          <span class="ps-spec" *ngIf="p.area_sqft">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+            </svg>
+            {{ p.area_sqft.toLocaleString() }} sqft
+          </span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div *ngIf="!isLoading() && totalPages() > 1" class="ps-pagination">
+    <button class="ps-page-btn"
+            [disabled]="currentPage() === 1"
+            (click)="goToPage(currentPage() - 1)">
+      ‹
+    </button>
+    <button *ngFor="let page of pageNumbers()"
+            class="ps-page-btn"
+            [class.active]="page === currentPage()"
+            [class.ellipsis]="page === '...'"
+            [disabled]="page === '...'"
+            (click)="goToPage(page)">
+      {{ page }}
+    </button>
+    <button class="ps-page-btn"
+            [disabled]="currentPage() === totalPages()"
+            (click)="goToPage(currentPage() + 1)">
+      ›
+    </button>
+  </div>
+
+</div>

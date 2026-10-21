@@ -42,7 +42,11 @@
               "xlsx",
               "quill"
             ],
+            "server": "src/main.server.ts",
             "outputMode": "static",
+            "ssr": {
+              "entry": "src/server.ts"
+            },
             "security": {
               "allowedHosts": []
             }
